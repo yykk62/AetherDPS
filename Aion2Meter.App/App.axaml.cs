@@ -85,12 +85,32 @@ public partial class App : Application
             mode = Services.GetRequiredService<TrackingMode>();
             mode.Changed += (_, _) => Dispatcher.UIThread.Post(() =>
             {
-                Serilog.Log.Information("Modus: {Modus}", mode.IsActive ? "aktiv" : "Bereitschaft");
-                if (mode.IsActive) window.Show();
-                else window.Hide();
+                Serilog.Log.Information("Modus: {Modus}", mode.AutoMode ? "automatisch" : mode.IsActive ? "aktiv" : "Bereitschaft");
+                overlayHiddenByUser = false;
+                UpdateOverlay();
             });
             hotkey = new GameHotkey(Services.GetRequiredService<MeterSettings>());
-            hotkey.Pressed += (_, _) => Dispatcher.UIThread.Post(() => mode.Toggle());
+            hotkey.Pressed += (_, _) => Dispatcher.UIThread.Post(() =>
+            {
+                // Auto-Modus: Hotkey blendet nur ein/aus, erfasst wird sowieso
+                if (mode.AutoMode)
+                {
+                    overlayHiddenByUser = !overlayHiddenByUser;
+                    UpdateOverlay();
+                }
+                else mode.Toggle();
+            });
+            window.CloseRequested += (_, _) =>
+            {
+                if (mode.AutoMode)
+                {
+                    overlayHiddenByUser = true;
+                    UpdateOverlay();
+                }
+                else if (mode.IsActive) mode.Standby();   // blendet über mode.Changed aus
+                else window.Hide();
+            };
+            new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, (_, _) => mode.Tick(DateTime.Now)).Start();
             hotkey.ScreenshotPressed += (_, foreground) => TakeScreenshot(foreground);
 
             // Erinnerungen (Timer, Checkliste) und Buff-Leiste
@@ -108,7 +128,7 @@ public partial class App : Application
             }).Start();
             new DispatcherTimer(TimeSpan.FromMilliseconds(200), DispatcherPriority.Background, (_, _) =>
             {
-                bool show = mode.IsActive && meterSettings.BuffBarEnabled && window.IsVisible;
+                bool show = mode.IsCapturing && meterSettings.BuffBarEnabled && window.IsVisible;
                 if (show) buffVm.Refresh();
                 if (show && buffVm.HasItems)
                 {
@@ -131,19 +151,46 @@ public partial class App : Application
 
             StartUpdates(meterSettings);
         }
-        desktop.MainWindow = hub;
+        // Wiedergabe: nur das Overlay, das Hauptfenster öffnet sich nicht von selbst
+        bool isReplay = Services.GetRequiredService<MeterOptions>().ReplayFile is not null;
+        desktop.MainWindow = isReplay ? window : hub;
         viewModel!.Start();
         UpdateTimerOverlay();
 
         if (Services.GetRequiredService<MeterOptions>().ReplayFile is not null)
         {
-            mode!.Activate();   // Wiedergabe: sofort aktiv
+            if (Environment.GetCommandLineArgs().Contains("--auto")) mode!.SetAutoMode(true);   // Test des Auto-Modus
+            else mode!.Activate();   // Wiedergabe: sofort aktiv
+            if (Environment.GetCommandLineArgs().Contains("--offscreen"))
+            {
+                // Für Screenshots per PrintWindow, ohne dass das Fenster über einem laufenden Spiel auftaucht:
+                // unsichtbar öffnen und erst danach aus dem Bildschirm schieben (vorher setzt Windows es auf 0,0)
+                window!.ShowInTaskbar = false;
+                window.Opacity = 0;
+                window.Opened += (_, _) =>
+                {
+                    window.Position = new PixelPoint(-6000, -6000);
+                    window.Opacity = 1;
+                };
+            }
             window!.Show();
             return;
         }
 
-        // Start in Bereitschaft: Overlay bleibt aus, das Hauptfenster erklärt den Hotkey.
+        // Start in Bereitschaft: Overlay bleibt aus (im Auto-Modus: Mini-Leiste), das Hauptfenster erklärt den Hotkey.
+        UpdateOverlay();
         ShowHub(HubTabDps);
+    }
+
+    /// <summary>Im Auto-Modus per Hotkey oder ✕ ausgeblendet.</summary>
+    private bool overlayHiddenByUser;
+
+    private void UpdateOverlay()
+    {
+        if (window is null || mode is null) return;
+        bool show = mode.AutoMode ? !overlayHiddenByUser : mode.IsActive;
+        if (show && !window.IsVisible) window.Show();
+        else if (!show && window.IsVisible) window.Hide();
     }
 
     private const int HubTabDps = HubViewModel.TabDps, HubTabSettings = HubViewModel.TabSettings;
@@ -151,7 +198,12 @@ public partial class App : Application
     private GameHotkey? hotkey;
     private HubWindow? hub;
 
-    private void ShowHub(int tab) => hub?.ShowTab(tab);
+    private void ShowHub(int tab)
+    {
+        // Wiedergaben (Tests) öffnen nie das Hauptfenster – sie laufen oft neben dem echten Meter
+        if (Services.GetRequiredService<MeterOptions>().ReplayFile is not null) return;
+        hub?.ShowTab(tab);
+    }
 
     private TimersViewModel? timersVm;
     private TimerOverlayWindow? timerOverlay;
@@ -327,7 +379,15 @@ public partial class App : Application
 
     private void OnTrayClicked(object? sender, EventArgs e) => ShowHub(HubTabDps);
 
-    private void OnToggleOverlay(object? sender, EventArgs e) => mode?.Toggle();
+    private void OnToggleOverlay(object? sender, EventArgs e)
+    {
+        if (mode is { AutoMode: true })
+        {
+            overlayHiddenByUser = !overlayHiddenByUser;
+            UpdateOverlay();
+        }
+        else mode?.Toggle();
+    }
 
     private void OnToggleClickThrough(object? sender, EventArgs e) =>
         window?.SetClickThrough(!window.IsClickThrough);

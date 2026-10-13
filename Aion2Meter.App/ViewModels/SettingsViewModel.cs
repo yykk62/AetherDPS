@@ -27,6 +27,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private bool buffBarEnabled;
     [ObservableProperty] private bool launchGameWithMeter;
     [ObservableProperty] private bool autoUpdate;
+    [ObservableProperty] private bool autoTrack;
     [ObservableProperty] private string updateStatus = "";
     [ObservableProperty] private bool updateReady;
 
@@ -40,6 +41,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         this.upstream = upstream;
         this.updates = updates;
         autoUpdate = meter.AutoUpdate;
+        autoTrack = meter.AutoTrack;
         VersionText = Loc.T("update.version", updates.Current);
         updates.Changed += (_, _) => Avalonia.Threading.Dispatcher.UIThread.Post(RefreshUpdate);
         RefreshUpdate();
@@ -71,6 +73,12 @@ public sealed partial class SettingsViewModel : ObservableObject
     {
         meter.LaunchGameWithMeter = value;
         meter.Save();
+    }
+
+    partial void OnAutoTrackChanged(bool value)
+    {
+        meter.AutoTrack = value;
+        meter.Save();   // TrackingMode schaltet über MeterSettings.Changed um
     }
 
     partial void OnAutoUpdateChanged(bool value)

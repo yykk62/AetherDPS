@@ -2,6 +2,13 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
+## 0.2.0 (noch nicht veröffentlicht)
+
+- **Neues Overlay:** Boss-Karte mit Lebensbalken, Kampfzeit und Toden, darunter schmale Spielerzeilen mit Kampfkraft und Anteil. Knöpfe nur unter der Maus, die Höhe passt sich an
+- **Mini-Leiste:** Ohne Kampf schrumpft der Meter auf Name, Server und Ping
+- **Automatisch erfassen** (Einstellung): Jeder Bosskampf wird ohne Hotkey erfasst. Ein Lauf endet nach 5 Minuten ohne Kampf im Archiv
+- Wiedergaben laufen in einem eigenen Datenordner und öffnen kein Hauptfenster
+
 ## 0.1.0
 
 Erste öffentliche Version.

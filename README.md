@@ -25,7 +25,7 @@
 
 | | |
 |---|---|
-| ⚔ **DPS-Meter** | Schaden, DPS und Anteil für jedes Gruppenmitglied als Overlay über dem Spiel. Skill-Details per Klick. Start und Stopp mit STRG+W |
+| ⚔ **DPS-Meter** | Boss mit Lebensbalken, darunter Schaden, DPS, Anteil und Kampfkraft jedes Gruppenmitglieds. Skill-Details per Klick. Start mit STRG+W oder automatisch bei jedem Boss |
 | 👥 **Nur deine Gruppe** | Fremde in der Nähe erscheinen nie. Beschwörungen zählen zu ihrem Besitzer |
 | 🏆 **Läufe-Archiv** | Jeder Dungeon mit Boss-Zeiten, Bestzeit und Kampfanalyse, als Bild oder Text für Discord kopierbar |
 | ⏱ **Timer-Overlay** | Risse, Weltbosse, Events und Feldbosse mit Erinnerung, frei anpassbar |
@@ -82,8 +82,10 @@ Beim Start öffnet sich das **Hauptfenster** mit den Reitern DPS-Meter, Verbindu
 | Was | Wie |
 |---|---|
 | Meter starten / ausblenden | **STRG+W** im Spiel (in den Einstellungen änderbar). Ohne STRG+W ist der Meter in Bereitschaft und zeichnet keine Kämpfe auf |
-| Verschieben | Kopfzeile ziehen |
-| Größe ändern | rechten oder unteren Rand ziehen |
+| Automatisch erfassen | Einstellungen → „Automatisch erfassen“. Der Meter bleibt als schmale Leiste mit Name und Server stehen und klappt bei jedem Bosskampf von selbst auf. STRG+W blendet ihn dann nur ein und aus |
+| Knöpfe | erscheinen, sobald die Maus über dem Meter ist |
+| Verschieben | Boss-Karte oder Leiste ziehen |
+| Breite ändern | rechten Rand ziehen. Die Höhe passt sich der Gruppe an |
 | Gesamt / Ziel | Knopf oben. **Gesamt** = aller Schaden seit STRG+W, zum Beispiel ein ganzer Dungeon. **Ziel** = nur der aktuelle Gegner |
 | Zurücksetzen | ⟲ |
 | Ausblenden (Bereitschaft) | ✕. Ganz beenden über das Tray-Symbol → „Beenden“ |

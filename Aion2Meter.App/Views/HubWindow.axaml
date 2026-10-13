@@ -103,7 +103,7 @@
                     <TextBlock Text="{l:T hub.launch_hint}" Classes="dim" FontSize="11" TextWrapping="Wrap" VerticalAlignment="Center" MaxWidth="380" />
                   </StackPanel>
                 </StackPanel>
-                <Button Grid.Column="2" Classes="primary" Content="{Binding ToggleText}" Command="{Binding ToggleMeterCommand}" VerticalAlignment="Center" />
+                <Button Grid.Column="2" Classes="primary" Content="{Binding ToggleText}" Command="{Binding ToggleMeterCommand}" VerticalAlignment="Center" IsVisible="{Binding !IsAuto}" />
               </Grid>
             </Border>
 

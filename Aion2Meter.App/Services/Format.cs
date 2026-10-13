@@ -17,5 +17,8 @@ public static class Format
         _ => value.ToString("N0", De),
     };
 
+    /// <summary>Ganze Zahl mit Tausenderpunkten: 10.681.200</summary>
+    public static string Number(long value) => value.ToString("N0", De);
+
     public static string Percent(double value) => value.ToString("0.0", De) + " %";
 }

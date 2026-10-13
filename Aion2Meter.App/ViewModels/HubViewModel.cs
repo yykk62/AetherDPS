@@ -34,6 +34,7 @@ public sealed partial class HubViewModel : ObservableObject
 
     [ObservableProperty] private int selectedTab;
     [ObservableProperty] private bool isActive;
+    [ObservableProperty] private bool isAuto;
     [ObservableProperty] private string modeTitle = "";
     [ObservableProperty] private string modeText = "";
     [ObservableProperty] private string toggleText = "";
@@ -89,9 +90,10 @@ public sealed partial class HubViewModel : ObservableObject
 
     private void Refresh()
     {
-        IsActive = mode.IsActive;
-        ModeTitle = Loc.T(IsActive ? "hub.mode.active" : "hub.mode.standby");
-        ModeText = Loc.T(IsActive ? "hub.mode.active_text" : "hub.mode.standby_text", meterSettings.HotkeyText);
+        IsActive = mode.IsCapturing;
+        IsAuto = mode.AutoMode;
+        ModeTitle = Loc.T(IsAuto ? "hub.mode.auto" : IsActive ? "hub.mode.active" : "hub.mode.standby");
+        ModeText = Loc.T(IsAuto ? "hub.mode.auto_text" : IsActive ? "hub.mode.active_text" : "hub.mode.standby_text", meterSettings.HotkeyText);
         ToggleText = Loc.T(IsActive ? "hub.stop" : "hub.start");
         GameRunning = Aion2Meter.App.Services.GameLauncher.IsRunning;
         LaunchText = Loc.T(GameRunning ? "hub.launch_running" : "hub.launch");

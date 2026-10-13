@@ -4,7 +4,9 @@ using Aion2Meter.App.Services;
 using Aion2Meter.Engine;
 using Aion2Meter.Engine.Capture;
 using AionDpsMeter.Services.Models;
+using AionDpsMeter.Core.Models;
 using AionDpsMeter.Services.PacketCapture;
+using AionDpsMeter.Services.Services.Entity;
 using AionDpsMeter.Services.Services.Session;
 using AionDpsMeter.Services.Services.Settings;
 using Avalonia.Threading;
@@ -26,6 +28,7 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly MeterSettings meterSettings;
     private readonly TimerService timers;
     private readonly SelfIdentity self;
+    private readonly EntityTracker entities;
     private readonly IAppSettingsService settings;
     private readonly MeterOptions options;
     private readonly ILogger<MainViewModel> logger;
@@ -57,12 +60,33 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty] private bool showTargetView;
     [ObservableProperty] private string viewLabel = Loc.T("view.run");
 
+    // Mini-Leiste (kein Kampf) und Kampfkarte
+    [ObservableProperty] private bool isCompact = true;
+    [ObservableProperty] private string selfName = "";
+    [ObservableProperty] private string compactInfo = "";
+    [ObservableProperty] private Avalonia.Media.Imaging.Bitmap? selfIcon;
+    [ObservableProperty] private string cardLabel = "";
+    [ObservableProperty] private string hpText = "";
+    [ObservableProperty] private string hpPercentText = "";
+    [ObservableProperty] private bool isBoss;
+    [ObservableProperty] private string deathsText = "";
+    [ObservableProperty] private bool hasDeaths;
+
+    /// <summary>Auto-Modus: zuletzt bekämpfter Boss – bleibt nach dem Kampf noch kurz stehen.</summary>
+    private TargetCombatSession? shownBoss;
+    private DateTime shownBossLastHit;
+    private DateTime shownBossSeenAt;
+    private TargetCombatSession? expiredBoss;
+    private DateTime expiredBossLastHit;
+    private static readonly TimeSpan BossLinger = TimeSpan.FromSeconds(45);
+
     private long? selectedPlayerId;
 
     public MainViewModel(CombatSessionManager sessions, IPacketService pipeline, IPacketCaptureDevice capture,
         RingRecorder recorder, TrackingMode mode, RunTracker run, PartyRoster roster, MeterSettings meterSettings, TimerService timers, SelfIdentity self,
-        IAppSettingsService settings, MeterOptions options, ILogger<MainViewModel> logger)
+        EntityTracker entities, IAppSettingsService settings, MeterOptions options, ILogger<MainViewModel> logger)
     {
+        this.entities = entities;
         this.sessions = sessions;
         this.pipeline = pipeline;
         this.capture = capture;
@@ -81,8 +105,10 @@ public sealed partial class MainViewModel : ObservableObject
         });
         mode.Changed += (_, _) => Dispatcher.UIThread.Post(() =>
         {
-            IsStandby = !mode.IsActive;
+            IsStandby = !mode.IsCapturing;
             if (mode.IsActive) { rowsById.Clear(); Players.Clear(); Skills.Clear(); }
+            // Auto-Modus zeigt standardmäßig den aktuellen Boss, STRG+W den ganzen Lauf
+            SetTargetView(mode.AutoMode);
             Refresh();
         });
         this.settings = settings;
@@ -122,34 +148,44 @@ public sealed partial class MainViewModel : ObservableObject
     {
         UpdateStatus();
 
-        var target = sessions.GetActiveTargetInfo();
-        HasTarget = target is not null;
-        TargetHpPercent = target is { HpTotal: > 0 } ? (double)target.HpCurrent / target.HpTotal * 100 : 0;
-        string targetName = target is null ? Loc.T("target.none")
-            : target.MobCode == 0 ? Loc.T("target.unknown") : GermanGameData.MobName(target);
-
+        var now = DateTime.Now;
+        var snapshot = run.Snapshot();
+        var boss = TrackBoss(now);
+        Mob? target;
         List<MeterLine> entries;
         if (ShowTargetView)
         {
-            TargetName = targetName;
-            Duration = sessions.GetCombatDuration().ToString(@"mm\:ss");
-            PartyDps = Loc.T("footer.party", Format.Compact(sessions.GetPartyDps()));
-            entries = sessions.PlayerStats
+            // Auto-Modus: der Boss (auch kurz nach seinem Tod), sonst das aktuelle Ziel
+            var session = mode.AutoMode ? boss : sessions.GetActiveTargetSession();
+            target = session is null ? null : entities.GetTargetMob(session.TargetId) ?? session.TargetInfo;
+            CardLabel = Loc.T("card.fight");
+            Duration = FormatDuration(session?.GetCombatDuration() ?? TimeSpan.Zero);
+            entries = (session?.GetPlayerStats() ?? [])
                 .Select(p => new MeterLine(p.PlayerId, p.PlayerName, p.IsUser, p.IsIdentified, p.ClassId, p.ClassName,
                     p.TotalDamage, p.DamagePerSecond, p.DamagePercentage))
                 .ToList();
         }
         else
         {
-            var snapshot = run.Snapshot();
-            TargetName = Loc.T("run.title", meterSettings.HotkeyText);
+            target = sessions.GetActiveTargetInfo();
+            CardLabel = Loc.T(mode.AutoMode ? "card.run_auto" : "card.run");
             Duration = FormatDuration(snapshot.Elapsed);
-            PartyDps = Loc.T("footer.party", Format.Compact(snapshot.PartyDps));
             entries = snapshot.Players
                 .Select(p => new MeterLine(p.PlayerId, p.Name, p.IsUser, p.IsIdentified, p.ClassId, p.ClassName,
                     p.Damage, p.Dps, p.Share))
                 .ToList();
         }
+
+        HasTarget = target is { HpTotal: > 0 };
+        IsBoss = target is { MobCode: > 0 } && target.IsBoss;
+        TargetHpPercent = target is { HpTotal: > 0 } ? Math.Clamp((double)target.HpCurrent / target.HpTotal * 100, 0, 100) : 0;
+        HpText = target is { HpTotal: > 0 } ? Format.Number(Math.Max(0, target.HpCurrent)) + " / " + Format.Number(target.HpTotal) : "";
+        HpPercentText = target is { HpTotal: > 0 } ? Format.Percent(TargetHpPercent) : "";
+        TargetName = target is null ? Loc.T(ShowTargetView ? "target.none" : "run.title_short")
+            : target.MobCode == 0 ? Loc.T("target.unknown") : GermanGameData.MobName(target);
+        int deaths = snapshot.Players.Sum(p => p.Deaths);
+        HasDeaths = deaths > 0;
+        DeathsText = Loc.T("card.deaths", deaths);
 
         // Fremde ausblenden (Gruppenmodus) und namenlose Beschwörungen ihrem Besitzer zuschlagen.
         bool userKnown = self.SelfId is not null || entries.Any(e => e.IsUser);
@@ -159,9 +195,67 @@ public sealed partial class MainViewModel : ObservableObject
         PartyDps = Loc.T("footer.party", Format.Compact(entries.Sum(e => e.DamagePerSecond)));
 
         UpdatePlayers(entries);
+        UpdateSelf();
+        // Mini-Leiste, solange nichts zu zeigen ist (Auto-Modus: kein Boss in den letzten Sekunden)
+        IsCompact = !ShowDetails && !NpcapMissing && (mode.AutoMode ? boss is null && (ShowTargetView || !HasPlayers) : !HasPlayers);
         // Solange dein Charakter unbekannt ist, erklären, wie er erkannt wird.
-        ShowNameHint = !userKnown;
+        ShowNameHint = !userKnown && !IsCompact;
         if (ShowDetails) UpdateSkills();
+    }
+
+    /// <summary>Auto-Modus: welcher Bosskampf gerade angezeigt wird.</summary>
+    private TargetCombatSession? TrackBoss(DateTime now)
+    {
+        if (!mode.AutoMode)
+        {
+            shownBoss = null;
+            return null;
+        }
+        // Neuer Boss – oder derselbe, der nach dem Zuklappen wieder getroffen wird
+        if (sessions.GetActiveTargetSession() is { } active && active.TargetInfo.IsBoss && active != shownBoss
+            && !(active == expiredBoss && active.LastHitTime == expiredBossLastHit))
+        {
+            shownBoss = active;
+            shownBossLastHit = default;
+        }
+        if (shownBoss is null) return null;
+        // Uhr des PCs statt Paketzeit – so klappt es auch bei Wiedergaben
+        if (shownBoss.LastHitTime != shownBossLastHit)
+        {
+            shownBossLastHit = shownBoss.LastHitTime;
+            shownBossSeenAt = now;
+        }
+        if (now - shownBossSeenAt > BossLinger)
+        {
+            expiredBoss = shownBoss;
+            expiredBossLastHit = shownBoss.LastHitTime;
+            shownBoss = null;
+        }
+        return shownBoss;
+    }
+
+    private void UpdateSelf()
+    {
+        var name = self.Name ?? meterSettings.CharacterName;
+        SelfName = string.IsNullOrWhiteSpace(name) ? Loc.T("compact.unknown")
+            : settings.IsNicknameHidden ? Loc.T("player.you") : name;
+        int classId = self.SelfId is int id && entities.GetPlayerEntity(id)?.CharacterClass?.Id is { } c ? (int)c : meterSettings.CharacterClassId;
+        SelfIcon = classId > 0 ? ClassVisuals.Icon(classId) : null;
+        var parts = new List<string>();
+        if (!string.IsNullOrWhiteSpace(meterSettings.CharacterServer)) parts.Add(meterSettings.CharacterServer!);
+        parts.Add(!IsConnected ? StatusText : pingMs >= 0 ? Loc.T("status.ping", pingMs) : Loc.T("status.connected"));
+        parts.Add(Loc.T(mode.AutoMode ? "compact.auto" : "compact.waiting"));
+        CompactInfo = string.Join(" · ", parts);
+    }
+
+    private void SetTargetView(bool target)
+    {
+        if (ShowTargetView == target) return;
+        ShowTargetView = target;
+        ViewLabel = Loc.T(target ? "view.target" : "view.run");
+        rowsById.Clear();
+        Players.Clear();
+        Skills.Clear();
     }
 
     private static string FormatDuration(TimeSpan t) =>
@@ -234,6 +328,8 @@ public sealed partial class MainViewModel : ObservableObject
             row.Share = Format.Percent(p.DamagePercentage);
             row.BarPercent = top > 0 ? (double)p.TotalDamage / top * 100 : 0;
             row.SortKey = p.TotalDamage;
+            row.CombatPower = roster.Members.FirstOrDefault(m => m.Name == p.PlayerName) is { CombatPower: > 0 } member
+                ? "⚔ " + Format.Compact(member.CombatPower) : "";
             row.IsSelected = selectedPlayerId == p.PlayerId;
         }
 
@@ -298,11 +394,7 @@ public sealed partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void ToggleView()
     {
-        ShowTargetView = !ShowTargetView;
-        ViewLabel = Loc.T(ShowTargetView ? "view.target" : "view.run");
-        rowsById.Clear();
-        Players.Clear();
-        Skills.Clear();
+        SetTargetView(!ShowTargetView);
         Refresh();
     }
 

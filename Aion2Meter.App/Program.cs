@@ -13,12 +13,23 @@ namespace Aion2Meter.App;
 
 internal static class Program
 {
-    // Aufruf: Aion2Meter.exe [--replay <mitschnitt.txt>] [--speed <faktor>]
+    // Aufruf: Aion2Meter.exe [--replay <mitschnitt.txt>] [--speed <faktor>] [--auto] [--offscreen]
     [STAThread]
     public static int Main(string[] args)
     {
-        var dataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Aion2Meter");
+        // Wiedergaben sind Tests: eigener, frischer Datenordner, damit Einstellungen, Fensterposition
+        // und Kampf-Historie des echten Meters unberührt bleiben.
+        var dataDir = ArgValue(args, "--replay") is null
+            ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Aion2Meter")
+            : Path.Combine(Path.GetTempPath(), "aion2meter-replay");
         Directory.CreateDirectory(dataDir);
+        if (ArgValue(args, "--replay") is not null && !File.Exists(Path.Combine(dataDir, "aion2meter.json")))
+        {
+            // Mitschnitte kennen den eigenen Charakter meist nicht – sonst bliebe die Liste leer
+            var replaySettings = MeterSettings.Load(dataDir);
+            replaySettings.PartyOnly = false;
+            replaySettings.Save();
+        }
         // Upstream legt Einstellungen relativ zum Arbeitsverzeichnis ab.
         Environment.CurrentDirectory = dataDir;
 

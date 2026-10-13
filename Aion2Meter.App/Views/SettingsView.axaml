@@ -42,6 +42,14 @@
       <TextBlock Classes="dim" Text="{l:T settings.hotkey_hint}" />
     </StackPanel>
 
+    <!-- Automatisch erfassen -->
+    <StackPanel Spacing="4">
+      <CheckBox IsChecked="{Binding AutoTrack}">
+        <TextBlock Classes="label" Text="{l:T settings.auto_track}" />
+      </CheckBox>
+      <TextBlock Classes="dim" Text="{l:T settings.auto_track_hint}" Margin="28,0,0,0" />
+    </StackPanel>
+
     <!-- Screenshot-Hotkey -->
     <StackPanel Spacing="6">
       <CheckBox IsChecked="{Binding ScreenshotEnabled}">

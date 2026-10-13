@@ -5,167 +5,219 @@
         x:Class="Aion2Meter.App.Views.MainWindow"
         x:DataType="vm:MainViewModel"
         Title="{l:T app.title}"
-        Width="380" Height="320" MinWidth="260" MinHeight="140"
+        Width="380" MinWidth="260" SizeToContent="Height" MaxHeight="720"
         SystemDecorations="None" Topmost="True" CanResize="True" ShowActivated="False"
         TransparencyLevelHint="Transparent" Background="Transparent"
         Icon="/Assets/icon.ico">
 
   <Window.Styles>
-    <Style Selector="Button.icon">
+    <Style Selector="Button.icon, ToggleButton.icon">
       <Setter Property="Background" Value="Transparent" />
       <Setter Property="Foreground" Value="#C9CED6" />
-      <Setter Property="Padding" Value="6,2" />
+      <Setter Property="Padding" Value="5,1" />
       <Setter Property="MinWidth" Value="0" />
-      <Setter Property="FontSize" Value="13" />
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="FontSize" Value="12" />
       <Setter Property="CornerRadius" Value="4" />
     </Style>
     <Style Selector="Button.icon:pointerover /template/ ContentPresenter">
       <Setter Property="Background" Value="#33FFFFFF" />
     </Style>
-    <Style Selector="ToggleButton.icon">
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="Foreground" Value="#C9CED6" />
-      <Setter Property="Padding" Value="6,2" />
-      <Setter Property="MinWidth" Value="0" />
-      <Setter Property="FontSize" Value="13" />
-      <Setter Property="CornerRadius" Value="4" />
-    </Style>
     <Style Selector="ToggleButton.icon:checked /template/ ContentPresenter">
       <Setter Property="Background" Value="#55D4A84B" />
     </Style>
     <Style Selector="TextBlock">
-      <Setter Property="Foreground" Value="#E6E8EC" />
+      <Setter Property="Foreground" Value="#EEF0F3" />
     </Style>
     <Style Selector="TextBlock.dim">
       <Setter Property="Foreground" Value="#8E96A3" />
+    </Style>
+    <!-- Zahlen mit leichtem Schatten, damit sie auf jedem Spielhintergrund lesbar bleiben -->
+    <Style Selector="TextBlock.num">
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Effect">
+        <DropShadowEffect BlurRadius="2" OffsetX="0" OffsetY="1" Color="#C0000000" />
+      </Setter>
     </Style>
     <Style Selector="ProgressBar.bar">
       <Setter Property="MinHeight" Value="0" />
       <Setter Property="MinWidth" Value="0" />
       <Setter Property="Background" Value="Transparent" />
-      <Setter Property="CornerRadius" Value="3" />
       <Setter Property="Maximum" Value="100" />
     </Style>
     <Style Selector="Border.row">
-      <Setter Property="Background" Value="#14FFFFFF" />
-      <Setter Property="CornerRadius" Value="3" />
-      <Setter Property="Margin" Value="0,0,0,2" />
+      <Setter Property="Background" Value="#26000000" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="Margin" Value="0,0,0,3" />
+      <Setter Property="ClipToBounds" Value="True" />
       <Setter Property="Cursor" Value="Hand" />
     </Style>
     <Style Selector="Border.row:pointerover">
-      <Setter Property="Background" Value="#24FFFFFF" />
+      <Setter Property="Background" Value="#40000000" />
+    </Style>
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="#1C222D" />
+      <Setter Property="BorderBrush" Value="#2A3240" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="6" />
     </Style>
   </Window.Styles>
 
-  <Border Name="Root" Background="#E6141820" CornerRadius="8" BorderThickness="1"
+  <Border Name="Root" Background="#E6141820" CornerRadius="8" BorderThickness="1" Padding="6"
           BorderBrush="{Binding IsClickThrough, Converter={x:Static l:BoolBrush.LockedGoldElseSubtle}}">
-    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
+    <Panel>
+    <StackPanel Spacing="5">
 
-      <!-- Kopfzeile: Ziehen zum Verschieben -->
-      <Grid Grid.Row="0" Name="Header" ColumnDefinitions="*,Auto" Margin="10,6,4,2" Background="Transparent">
-        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-          <TextBlock Text="{Binding TargetName}" FontWeight="SemiBold" FontSize="13" MaxWidth="150" TextTrimming="CharacterEllipsis" />
-          <TextBlock Text="{Binding Duration}" Classes="dim" FontSize="12" />
+      <!-- ============ Mini-Leiste (kein Kampf) ============ -->
+      <Grid Name="CompactBar" ColumnDefinitions="Auto,*,Auto" IsVisible="{Binding IsCompact}" Background="Transparent" Margin="2,0">
+        <Border Width="30" Height="30" CornerRadius="5" Background="#262D3A" VerticalAlignment="Center">
+          <Panel>
+            <Image Source="{Binding SelfIcon}" Width="22" Height="22" RenderOptions.BitmapInterpolationMode="HighQuality" />
+            <Image Source="/Assets/icon.png" Width="18" Height="18" IsVisible="{Binding SelfIcon, Converter={x:Static ObjectConverters.IsNull}}" />
+          </Panel>
+        </Border>
+        <StackPanel Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center" Spacing="0">
+          <TextBlock Text="{Binding SelfName}" FontSize="13" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+          <StackPanel Orientation="Horizontal" Spacing="5">
+            <Ellipse Width="6" Height="6" VerticalAlignment="Center"
+                     Fill="{Binding IsConnected, Converter={x:Static l:BoolBrush.ConnectedGreenElseAmber}}" />
+            <TextBlock Text="{Binding CompactInfo}" FontSize="10" Classes="dim" TextTrimming="CharacterEllipsis" />
+          </StackPanel>
         </StackPanel>
-        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="0">
-          <Button Classes="icon" Content="{Binding ViewLabel}" Command="{Binding ToggleViewCommand}" ToolTip.Tip="{l:T view.tooltip}" FontSize="11" />
-          <Button Classes="icon" Content="⟲" Command="{Binding ResetCommand}" ToolTip.Tip="{l:T header.reset}" />
-          <Button Classes="icon" Content="⚙" Command="{Binding OpenSettingsCommand}" ToolTip.Tip="{l:T header.settings}" />
-          <ToggleButton Classes="icon" Content="☰" IsChecked="{Binding ShowDetails}" Command="{Binding ToggleDetailsCommand}" ToolTip.Tip="{l:T header.details}" />
-          <ToggleButton Classes="icon" Name="ClickThroughButton" ToolTip.Tip="{l:T header.clickthrough}" AutomationProperties.Name="Sperren">
-            <Panel>
-              <!-- Material Design Icons (Apache-2.0): lock-open / lock -->
-              <PathIcon Width="13" Height="13" IsVisible="{Binding !IsClickThrough}"
-                        Data="M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V10A2,2 0 0,1 6,8H15V6A3,3 0 0,0 12,3A3,3 0 0,0 9,6H7A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,17A2,2 0 0,0 14,15A2,2 0 0,0 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17Z" />
-              <PathIcon Width="13" Height="13" IsVisible="{Binding IsClickThrough}" Foreground="#E0A84A"
-                        Data="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z" />
-            </Panel>
-          </ToggleButton>
-          <Button Classes="icon" Content="✕" Name="CloseButton" ToolTip.Tip="{l:T header.close}" />
+        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+          <StackPanel Orientation="Horizontal" IsVisible="{Binding #Root.IsPointerOver}">
+            <Button Classes="icon" Content="⚙" Command="{Binding OpenSettingsCommand}" ToolTip.Tip="{l:T header.settings}" />
+            <Button Classes="icon" Content="✕" Click="OnCloseClicked" ToolTip.Tip="{l:T header.close}" />
+          </StackPanel>
+          <Border Width="24" />
         </StackPanel>
       </Grid>
 
-      <!-- HP des Ziels -->
-      <ProgressBar Grid.Row="1" Classes="bar" Height="3" Margin="10,0,10,6"
-                   Value="{Binding TargetHpPercent}" Foreground="#C94B4B" Background="#22FFFFFF"
-                   IsVisible="{Binding HasTarget}" />
+      <!-- ============ Kampfkarte: Boss / Ziel ============ -->
+      <Border Classes="card" Name="Header" Padding="8,6" IsVisible="{Binding !IsCompact}">
+        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto">
+          <Border Grid.RowSpan="3" Width="32" Height="32" CornerRadius="5" Background="#3A1F24" VerticalAlignment="Top" Margin="0,1,8,0">
+            <!-- Material Design Icons (Apache-2.0): skull / sword-cross -->
+            <Panel>
+              <PathIcon Width="18" Height="18" Foreground="#E0605A" IsVisible="{Binding IsBoss}"
+                        Data="M12,2A9,9 0 0,0 3,11C3,14.03 4.53,16.82 7,18.47V22H9V19H11V22H13V19H15V22H17V18.46C19.47,16.81 21,14 21,11A9,9 0 0,0 12,2M8,11A2,2 0 0,1 10,13A2,2 0 0,1 8,15A2,2 0 0,1 6,13A2,2 0 0,1 8,11M16,11A2,2 0 0,1 18,13A2,2 0 0,1 16,15A2,2 0 0,1 14,13A2,2 0 0,1 16,11M12,14L13.5,17H10.5L12,14Z" />
+              <PathIcon Width="17" Height="17" Foreground="#E0A84A" IsVisible="{Binding !IsBoss}"
+                        Data="M6.2,2.44L18.1,14.34L20.22,12.22L21.63,13.63L19.16,16.1L22.34,19.28C22.73,19.67 22.73,20.3 22.34,20.69L21.63,21.4C21.24,21.79 20.61,21.79 20.22,21.4L17,18.23L14.56,20.7L13.15,19.29L15.27,17.17L3.37,5.27V2.44H6.2M15.89,10L20.63,5.26V2.44H17.8L13.06,7.18L15.89,10M10.94,15L8.11,12.13L5.9,14.34L3.78,12.22L2.37,13.63L4.84,16.1L1.66,19.29C1.27,19.68 1.27,20.31 1.66,20.7L2.37,21.41C2.76,21.8 3.39,21.8 3.78,21.41L7,18.23L9.42,20.7L10.83,19.29L8.71,17.17L10.94,15Z" />
+            </Panel>
+          </Border>
 
-      <!-- Spielerliste + Details -->
-      <Grid Grid.Row="2" RowDefinitions="*,Auto" Margin="8,0,8,0">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-          <ItemsControl ItemsSource="{Binding Players}">
+          <!-- Zeile 1: Kampfzeit, Tode – Knöpfe nur unter der Maus -->
+          <Grid Grid.Column="1" ColumnDefinitions="*,Auto">
+            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+              <TextBlock Text="{Binding CardLabel}" FontSize="11" Classes="dim" />
+              <TextBlock Text="{Binding Duration}" FontSize="11" FontWeight="SemiBold" Foreground="#C9CED6" />
+              <TextBlock Text="{Binding DeathsText}" FontSize="11" Foreground="#E0605A" IsVisible="{Binding HasDeaths}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,-3,-4,-3">
+              <StackPanel Orientation="Horizontal" IsVisible="{Binding #Root.IsPointerOver}">
+                <Button Classes="icon" Content="{Binding ViewLabel}" Command="{Binding ToggleViewCommand}" ToolTip.Tip="{l:T view.tooltip}" FontSize="10" />
+                <Button Classes="icon" Content="⟲" Command="{Binding ResetCommand}" ToolTip.Tip="{l:T header.reset}" />
+                <ToggleButton Classes="icon" Content="☰" IsChecked="{Binding ShowDetails}" Command="{Binding ToggleDetailsCommand}" ToolTip.Tip="{l:T header.details}" />
+                <Button Classes="icon" Content="⚙" Command="{Binding OpenSettingsCommand}" ToolTip.Tip="{l:T header.settings}" />
+                <Button Classes="icon" Content="✕" Click="OnCloseClicked" ToolTip.Tip="{l:T header.close}" />
+              </StackPanel>
+              <Border Width="22" />
+            </StackPanel>
+          </Grid>
+
+          <!-- Zeile 2: Name + Leben -->
+          <Grid Grid.Row="1" Grid.Column="1" ColumnDefinitions="*,Auto,Auto" Margin="0,1,0,0">
+            <TextBlock Text="{Binding TargetName}" FontSize="13" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="1" Text="{Binding HpText}" FontSize="10" Classes="dim" Margin="8,0,0,0" VerticalAlignment="Center" IsVisible="{Binding HasTarget}" />
+            <TextBlock Grid.Column="2" Text="{Binding HpPercentText}" FontSize="12" Classes="num" Margin="8,0,0,0" VerticalAlignment="Center" IsVisible="{Binding HasTarget}" />
+          </Grid>
+
+          <!-- Zeile 3: Lebensbalken -->
+          <ProgressBar Grid.Row="2" Grid.Column="1" Classes="bar" Height="4" CornerRadius="2" Margin="0,5,0,1"
+                       Value="{Binding TargetHpPercent}" Foreground="#4FBF7A" Background="#14FFFFFF"
+                       IsVisible="{Binding HasTarget}" />
+        </Grid>
+      </Border>
+
+      <!-- ============ Spieler ============ -->
+      <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="330" IsVisible="{Binding !IsCompact}">
+        <ItemsControl ItemsSource="{Binding Players}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:PlayerRow">
+              <Border Classes="row" Height="28" PointerPressed="OnRowPressed">
+                <Panel>
+                  <!-- Balken in Klassenfarbe, Länge = Schaden im Vergleich zum Besten -->
+                  <ProgressBar Classes="bar" Height="28" Value="{Binding BarPercent}" Foreground="{Binding ClassBrush}" Opacity="0.55" CornerRadius="4" />
+                  <Grid ColumnDefinitions="Auto,*,Auto,Auto" VerticalAlignment="Stretch">
+                    <Border Width="28" Background="#40000000" CornerRadius="4,0,0,4">
+                      <Image Source="{Binding ClassIcon}" Width="20" Height="20" RenderOptions.BitmapInterpolationMode="HighQuality" />
+                    </Border>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="7" Margin="8,0,0,0" VerticalAlignment="Center">
+                      <TextBlock Text="{Binding Name}" Classes="num" FontSize="13" TextTrimming="CharacterEllipsis" MaxWidth="140" />
+                      <TextBlock Text="{Binding CombatPower}" FontSize="10" Foreground="#B8C0CC" VerticalAlignment="Center"
+                                 IsVisible="{Binding CombatPower, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                 ToolTip.Tip="{l:T row.combat_power}" />
+                    </StackPanel>
+                    <TextBlock Grid.Column="2" Text="{Binding Dps}" Classes="num" FontSize="13" Margin="8,0,8,0" VerticalAlignment="Center" TextAlignment="Right"
+                               ToolTip.Tip="{Binding Total}" />
+                    <Border Grid.Column="3" Background="#4D000000" MinWidth="50" Padding="6,0" CornerRadius="0,4,4,0">
+                      <TextBlock Text="{Binding Share}" FontSize="11" Classes="num" Foreground="#F2D28B" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                    </Border>
+                  </Grid>
+                </Panel>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+
+      <!-- ============ Skill-Details ============ -->
+      <Border IsVisible="{Binding ShowDetails}" Classes="card" Padding="6,5">
+        <StackPanel Spacing="2">
+          <TextBlock Text="{Binding DetailsTitle}" FontSize="11" Classes="dim" Margin="2,0,0,2" />
+          <ItemsControl ItemsSource="{Binding Skills}" MaxHeight="190">
             <ItemsControl.ItemTemplate>
-              <DataTemplate x:DataType="vm:PlayerRow">
-                <Border Classes="row" Height="30" PointerPressed="OnRowPressed">
-                  <Panel>
-                    <ProgressBar Classes="bar" Height="30" Value="{Binding BarPercent}" Foreground="{Binding ClassBrush}" Opacity="0.35" />
-                    <Grid ColumnDefinitions="*,Auto,Auto,Auto" Margin="5,0,8,0" VerticalAlignment="Center">
-                      <StackPanel Orientation="Horizontal" Spacing="6">
-                        <Image Source="{Binding ClassIcon}" Width="22" Height="22" VerticalAlignment="Center" RenderOptions.BitmapInterpolationMode="HighQuality" />
-                        <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" MaxWidth="130" VerticalAlignment="Center" />
-                        <TextBlock Text="{Binding ClassName}" FontSize="11" Classes="dim" VerticalAlignment="Center" />
-                      </StackPanel>
-                      <TextBlock Grid.Column="1" Text="{Binding Dps}" FontSize="13" FontWeight="SemiBold" Margin="8,0,0,0" MinWidth="58" TextAlignment="Right" />
-                      <TextBlock Grid.Column="2" Text="{Binding Total}" FontSize="11" Classes="dim" Margin="8,0,0,0" MinWidth="46" TextAlignment="Right" />
-                      <TextBlock Grid.Column="3" Text="{Binding Share}" FontSize="11" Classes="dim" Margin="8,0,0,0" MinWidth="44" TextAlignment="Right" />
-                    </Grid>
-                  </Panel>
-                </Border>
+              <DataTemplate x:DataType="vm:SkillRow">
+                <Panel Height="18" Margin="0,0,0,1">
+                  <ProgressBar Classes="bar" Height="18" Value="{Binding BarPercent}" Foreground="#5B8DEF" Opacity="0.25" CornerRadius="3" />
+                  <Grid ColumnDefinitions="*,Auto,Auto,Auto" Margin="6,0" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Name}" FontSize="11" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Grid.Column="1" Text="{Binding Damage}" FontSize="11" Margin="6,0,0,0" MinWidth="44" TextAlignment="Right" />
+                    <TextBlock Grid.Column="2" Text="{Binding Hits, StringFormat='{}{0}×'}" FontSize="11" Classes="dim" Margin="6,0,0,0" MinWidth="30" TextAlignment="Right" />
+                    <TextBlock Grid.Column="3" Text="{Binding Crit}" FontSize="11" Classes="dim" Margin="6,0,0,0" MinWidth="42" TextAlignment="Right" />
+                  </Grid>
+                </Panel>
               </DataTemplate>
             </ItemsControl.ItemTemplate>
           </ItemsControl>
-        </ScrollViewer>
+        </StackPanel>
+      </Border>
 
-        <TextBlock Text="{l:T empty.waiting}" Classes="dim" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"
-                   IsVisible="{Binding !HasPlayers}" />
-
-        <!-- Bereitschaft: wird kurz beim Start gezeigt, danach ist das Overlay ausgeblendet -->
-        <Border Background="#F2141820" IsVisible="{Binding IsStandby}" CornerRadius="6">
-          <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="6" Margin="16,0">
-            <TextBlock Text="{l:T standby.title}" FontSize="15" FontWeight="SemiBold" HorizontalAlignment="Center" Foreground="#E0A84A" />
-            <TextBlock Text="{Binding StandbyText}" FontSize="12" TextWrapping="Wrap" TextAlignment="Center" />
-          </StackPanel>
-        </Border>
-
-        <Border Grid.Row="1" IsVisible="{Binding ShowDetails}" Margin="0,4,0,0" Padding="0,4,0,0"
-                BorderBrush="#22FFFFFF" BorderThickness="0,1,0,0">
-          <StackPanel Spacing="2">
-            <TextBlock Text="{Binding DetailsTitle}" FontSize="11" Classes="dim" Margin="2,0,0,2" />
-            <ItemsControl ItemsSource="{Binding Skills}" MaxHeight="190">
-              <ItemsControl.ItemTemplate>
-                <DataTemplate x:DataType="vm:SkillRow">
-                  <Panel Height="18" Margin="0,0,0,1">
-                    <ProgressBar Classes="bar" Height="18" Value="{Binding BarPercent}" Foreground="#5B8DEF" Opacity="0.25" />
-                    <Grid ColumnDefinitions="*,Auto,Auto,Auto" Margin="6,0" VerticalAlignment="Center">
-                      <TextBlock Text="{Binding Name}" FontSize="11" TextTrimming="CharacterEllipsis" />
-                      <TextBlock Grid.Column="1" Text="{Binding Damage}" FontSize="11" Margin="6,0,0,0" MinWidth="44" TextAlignment="Right" />
-                      <TextBlock Grid.Column="2" Text="{Binding Hits, StringFormat='{}{0}×'}" FontSize="11" Classes="dim" Margin="6,0,0,0" MinWidth="30" TextAlignment="Right" />
-                      <TextBlock Grid.Column="3" Text="{Binding Crit}" FontSize="11" Classes="dim" Margin="6,0,0,0" MinWidth="42" TextAlignment="Right" />
-                    </Grid>
-                  </Panel>
-                </DataTemplate>
-              </ItemsControl.ItemTemplate>
-            </ItemsControl>
-          </StackPanel>
-        </Border>
-      </Grid>
-
-      <!-- Npcap-Hinweis / Namens-Hinweis -->
-      <StackPanel Grid.Row="3">
-        <Button Content="{l:T setup.button}" Command="{Binding OpenSetupCommand}"
-                IsVisible="{Binding NpcapMissing}" HorizontalAlignment="Center" Margin="0,4" />
-        <TextBlock Text="{l:T hint.name}" FontSize="10" Classes="dim" Margin="10,2,10,0" TextWrapping="Wrap"
-                   IsVisible="{Binding ShowNameHint}" />
-      </StackPanel>
-
-      <!-- Fußzeile -->
-      <Grid Grid.Row="4" ColumnDefinitions="Auto,*,Auto" Margin="10,4,10,6">
-        <Ellipse Width="7" Height="7" VerticalAlignment="Center" Margin="0,0,6,0"
+      <!-- ============ Hinweise + Fußzeile ============ -->
+      <Button Content="{l:T setup.button}" Command="{Binding OpenSetupCommand}"
+              IsVisible="{Binding NpcapMissing}" HorizontalAlignment="Center" />
+      <TextBlock Text="{l:T hint.name}" FontSize="10" Classes="dim" Margin="4,0" TextWrapping="Wrap"
+                 IsVisible="{Binding ShowNameHint}" />
+      <Grid ColumnDefinitions="Auto,*,Auto" Margin="4,0,4,0" IsVisible="{Binding !IsCompact}">
+        <Ellipse Width="6" Height="6" VerticalAlignment="Center" Margin="0,0,6,0"
                  Fill="{Binding IsConnected, Converter={x:Static l:BoolBrush.ConnectedGreenElseAmber}}" />
-        <TextBlock Grid.Column="1" Text="{Binding StatusText}" FontSize="11" Classes="dim" TextTrimming="CharacterEllipsis"
+        <TextBlock Grid.Column="1" Text="{Binding StatusText}" FontSize="10" Classes="dim" TextTrimming="CharacterEllipsis"
                    ToolTip.Tip="{Binding StatusText}" />
-        <TextBlock Grid.Column="2" Text="{Binding PartyDps}" FontSize="11" Classes="dim" Margin="8,0,0,0" />
+        <TextBlock Grid.Column="2" Text="{Binding PartyDps}" FontSize="10" Classes="dim" Margin="8,0,0,0" />
       </Grid>
-    </Grid>
+    </StackPanel>
+
+    <!-- Schloss: immer sichtbar und auch im gesperrten Zustand klickbar (Hover-Timer im Code) -->
+    <ToggleButton Classes="icon" Name="ClickThroughButton" ToolTip.Tip="{l:T header.clickthrough}" AutomationProperties.Name="Sperren"
+                  HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,4,4,0">
+      <Panel>
+        <!-- Material Design Icons (Apache-2.0): lock-open / lock -->
+        <PathIcon Width="12" Height="12" IsVisible="{Binding !IsClickThrough}" Foreground="#8E96A3"
+                  Data="M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V10A2,2 0 0,1 6,8H15V6A3,3 0 0,0 12,3A3,3 0 0,0 9,6H7A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,17A2,2 0 0,0 14,15A2,2 0 0,0 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17Z" />
+        <PathIcon Width="12" Height="12" IsVisible="{Binding IsClickThrough}" Foreground="#E0A84A"
+                  Data="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z" />
+      </Panel>
+    </ToggleButton>
+    </Panel>
   </Border>
 </Window>

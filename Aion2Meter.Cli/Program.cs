@@ -130,18 +130,24 @@ static void WriteDemo(string path)
         (108, 18000001, 4_200),   // Kantor
         (109, 19000001, 9_300),   // Faustkämpfer
     };
-    const int dummy = 7001;
+    // Ziel ist ein Boss (Ruthilis des Schmerzes) mit Lebensbalken, damit Kampfkarte und Auto-Modus etwas zeigen.
+    const int boss = 7001, ruthilis = 2300708;
+    const long maxHp = 4_000_000;
+    long hp = maxHp;
     var rng = new Random(42);
     var chunks = new List<RawChunk>();
     long start = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
     chunks.Add(new RawChunk(start, "demo", SyntheticPackets.Heartbeat()));
+    chunks.Add(new RawChunk(start + 100, "demo", SyntheticPackets.MobInfo(boss, ruthilis, maxHp)));
 
     for (long t = 0; t < 90_000; t += 300)
     {
         var (id, skill, baseDmg) = party[(int)(t / 300 % party.Length)];
         bool crit = rng.NextDouble() < 0.25;
         long dmg = (long)(baseDmg * (0.8 + rng.NextDouble() * 0.4) * (crit ? 1.8 : 1));
-        chunks.Add(new RawChunk(start + 200 + t, "demo", SyntheticPackets.Damage(dummy, id, skill, dmg, crit)));
+        chunks.Add(new RawChunk(start + 200 + t, "demo", SyntheticPackets.Damage(boss, id, skill, dmg, crit)));
+        hp = Math.Max(1, hp - dmg);
+        chunks.Add(new RawChunk(start + 210 + t, "demo", SyntheticPackets.RemainHp(boss, hp)));
         if (t % 5_000 == 0)
             chunks.Add(new RawChunk(start + 250 + t, "demo", SyntheticPackets.Heartbeat()));
     }

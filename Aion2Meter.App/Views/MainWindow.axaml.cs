@@ -16,7 +16,7 @@ public partial class MainWindow : Window
 
     public MainWindow() => InitializeComponent();
 
-    public MainWindow(MainViewModel viewModel, IAppSettingsService settings, TrackingMode mode) : this()
+    public MainWindow(MainViewModel viewModel, IAppSettingsService settings) : this()
     {
         DataContext = viewModel;
         this.settings = settings;
@@ -24,15 +24,9 @@ public partial class MainWindow : Window
         ApplyOpacity();
         settings.SettingsChanged += (_, _) => Dispatcher.UIThread.Post(ApplyOpacity);
 
-        Header.PointerPressed += (_, e) =>
-        {
-            if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) BeginMoveDrag(e);
-        };
-        CloseButton.Click += (_, _) =>
-        {
-            if (mode.IsActive) mode.Standby();   // App blendet dann aus
-            else Hide();
-        };
+        // Kampfkarte und Mini-Leiste sind die Griffe zum Verschieben
+        Header.PointerPressed += OnDragAreaPressed;
+        CompactBar.PointerPressed += OnDragAreaPressed;
         ClickThroughButton.IsCheckedChanged += (_, _) => SetClickThrough(ClickThroughButton.IsChecked == true);
         lockTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(60), DispatcherPriority.Input, (_, _) => UpdateLockHover());
         Closing += (_, _) => SaveBounds();
@@ -64,6 +58,17 @@ public partial class MainWindow : Window
         ClickThrough.Set(this, !ClickThrough.IsCursorOver(ClickThroughButton));
     }
 
+    /// <summary>✕: Die App entscheidet (Bereitschaft oder im Auto-Modus nur ausblenden).</summary>
+    public event EventHandler? CloseRequested;
+
+    private void OnCloseClicked(object? sender, Avalonia.Interactivity.RoutedEventArgs e) =>
+        CloseRequested?.Invoke(this, EventArgs.Empty);
+
+    private void OnDragAreaPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) BeginMoveDrag(e);
+    }
+
     private void OnRowPressed(object? sender, PointerPressedEventArgs e)
     {
         if (sender is Control { DataContext: PlayerRow row })
@@ -80,11 +85,8 @@ public partial class MainWindow : Window
     private void RestoreBounds()
     {
         if (settings is null) return;
-        if (settings.WindowWidth is double w && settings.WindowHeight is double h && w > 100 && h > 80)
-        {
-            Width = w;
-            Height = h;
-        }
+        // Die Höhe ergibt sich aus dem Inhalt (Mini-Leiste ↔ Kampf), nur die Breite ist einstellbar.
+        if (settings.WindowWidth is double w && w >= MinWidth) Width = w;
         if (settings.WindowLeft is double x && settings.WindowTop is double y)
         {
             WindowStartupLocation = WindowStartupLocation.Manual;
@@ -108,12 +110,8 @@ public partial class MainWindow : Window
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
-        // Rand-Ziehen zum Skalieren (Fenster hat keine Systemränder)
+        // Rechten Rand ziehen = breiter/schmaler (Fenster hat keine Systemränder)
         var p = e.GetPosition(this);
-        const double grip = 8;
-        bool right = p.X >= Bounds.Width - grip, bottom = p.Y >= Bounds.Height - grip;
-        if (right && bottom) BeginResizeDrag(WindowEdge.SouthEast, e);
-        else if (right) BeginResizeDrag(WindowEdge.East, e);
-        else if (bottom) BeginResizeDrag(WindowEdge.South, e);
+        if (p.X >= Bounds.Width - 8) BeginResizeDrag(WindowEdge.East, e);
     }
 }

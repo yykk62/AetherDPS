@@ -219,6 +219,43 @@ public sealed class PipelineTests : IDisposable
     }
 
     [Fact]
+    public void Auto_Modus_startet_Lauf_erst_beim_Boss_und_kennt_sein_Leben()
+    {
+        const int Boss = 7001, Ruthilis = 2300708;
+        using var host = NewHost();
+        var mode = host.Get<TrackingMode>();
+        var run = host.Get<RunTracker>();
+        mode.SetAutoMode(true);
+        Assert.True(mode.IsCapturing);
+
+        long t = 1_000;
+        host.Feed(SyntheticPackets.Heartbeat(), t);
+        host.Feed(SyntheticPackets.Damage(Mob, Gladiator, GladiatorSkill, 1_000), t += 100);   // normaler Gegner
+        Assert.False(run.IsRunning);
+
+        host.Feed(SyntheticPackets.MobInfo(Boss, Ruthilis, 10_000_000), t += 100);
+        host.Feed(SyntheticPackets.Damage(Boss, Gladiator, GladiatorSkill, 50_000), t += 100);
+        host.Feed(SyntheticPackets.RemainHp(Boss, 9_950_000), t += 100);
+        Assert.True(run.IsRunning);
+        Assert.Equal(50_000, run.Snapshot().TotalDamage);
+
+        var boss = host.Get<AionDpsMeter.Services.Services.Entity.EntityTracker>().GetTargetMob(Boss);
+        Assert.NotNull(boss);
+        Assert.True(boss.IsBoss);
+        Assert.Equal("Ruthilis des Schmerzes", GermanGameData.MobName(boss));
+        Assert.Equal(10_000_000, boss.HpTotal);
+        Assert.Equal(9_950_000, boss.HpCurrent);
+
+        // 5 Minuten ohne Kampf → Lauf geht ins Archiv
+        var now = DateTime.Now;
+        mode.Tick(now);
+        mode.Tick(now + TrackingMode.AutoRunEnd - TimeSpan.FromSeconds(1));
+        Assert.True(run.IsRunning);
+        mode.Tick(now + TrackingMode.AutoRunEnd + TimeSpan.FromSeconds(1));
+        Assert.False(run.IsRunning);
+    }
+
+    [Fact]
     public void Echte_Mitschnitte_laufen_fehlerfrei_durch()
     {
         // Mitschnitte aus "Problem melden" landen in Captures/. Jeder muss sich

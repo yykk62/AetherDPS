@@ -1,4 +1,6 @@
+using AionDpsMeter.Core.Models;
 using AionDpsMeter.Services.PacketProcessing.Routing;
+using AionDpsMeter.Services.Services.Entity;
 using AionDpsMeter.Services.Services.Session;
 
 namespace Aion2Meter.Engine;
@@ -8,6 +10,9 @@ namespace Aion2Meter.Engine;
 /// DoTs, Buffs, Tode, Abklingzeiten werden verworfen). Durch kommen nur
 /// Identitätsdaten – Namen, Gruppe, Mobs, Ping –, damit beim Aktivieren dein
 /// eigener Name schon bekannt ist (das Spiel schickt ihn nur beim Login/Teleport).
+///
+/// Auto-Modus (Einstellung): Es wird immer mitgelesen, ein Lauf startet beim ersten Treffer
+/// auf einen Boss und landet nach <see cref="AutoRunEnd"/> ohne Kampf im Archiv. Kein Hotkey nötig.
 /// </summary>
 public sealed class TrackingMode
 {
@@ -28,25 +33,75 @@ public sealed class TrackingMode
         PacketOpcodes.SkillCd,
     ];
 
+    /// <summary>Auto-Modus: so lange ohne Kampf, dann gilt der Lauf (Dungeon) als beendet.</summary>
+    public static readonly TimeSpan AutoRunEnd = TimeSpan.FromMinutes(5);
+
     private readonly CombatSessionManager sessions;
     private readonly RunTracker run;
+    private readonly EntityTracker entities;
     private volatile bool active;
+    private volatile bool auto;
 
-    public TrackingMode(PacketDispatchService dispatch, CombatSessionManager sessions, RunTracker run)
+    public TrackingMode(PacketDispatchService dispatch, CombatSessionManager sessions, RunTracker run,
+        EntityTracker entities, MeterSettings settings)
     {
         this.sessions = sessions;
         this.run = run;
-        dispatch.Gate = opcode => active || AllowedInStandby.Contains(opcode);
+        this.entities = entities;
+        dispatch.Gate = opcode => active || auto || AllowedInStandby.Contains(opcode);
+        SetAutoMode(settings.AutoTrack);
+        settings.Changed += (_, _) => SetAutoMode(settings.AutoTrack);
     }
 
+    /// <summary>Manuell per Hotkey aktiv geschaltet.</summary>
     public bool IsActive => active;
 
+    /// <summary>Automatisch erfassen (Einstellung).</summary>
+    public bool AutoMode => auto;
+
+    /// <summary>Es wird gerade Kampf aufgezeichnet bzw. darauf gewartet (aktiv oder Auto-Modus).</summary>
+    public bool IsCapturing => active || auto;
+
     public event EventHandler? Changed;
+
+    public void SetAutoMode(bool on)
+    {
+        if (auto == on) return;
+        if (on && active)
+        {
+            active = false;
+            sessions.CompleteAndPersistActiveSessions();
+        }
+        run.Stop();
+        auto = on;
+        run.AutoStart = on ? IsBossHit : null;
+        Changed?.Invoke(this, EventArgs.Empty);
+    }
+
+    private bool IsBossHit(PlayerDamage hit) =>
+        entities.GetTargetMob(hit.TargetEntity.Id) is { MobCode: > 0 } mob && mob.IsBoss;
+
+    /// <summary>Auto-Modus: Lauf nach längerer Kampfpause abschließen (→ Archiv). Einmal pro Sekunde aufrufen.</summary>
+    public void Tick(DateTime now)
+    {
+        if (!auto || !run.IsRunning) return;
+        // Uhr des PCs statt Paketzeit, damit es auch bei Wiedergaben alter Mitschnitte stimmt
+        var last = run.LastHit;
+        if (last != lastHit)
+        {
+            lastHit = last;
+            lastHitSeenAt = now;
+        }
+        if (now - lastHitSeenAt > AutoRunEnd) run.Stop(now);
+    }
+
+    private DateTime? lastHit;
+    private DateTime lastHitSeenAt;
 
     /// <summary>Aktiv schalten – die Statistik beginnt frisch ab jetzt.</summary>
     public void Activate()
     {
-        if (active) return;
+        if (active || auto) return;
         sessions.Reset();
         run.Start();
         active = true;

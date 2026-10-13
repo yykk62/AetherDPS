@@ -20,6 +20,7 @@ public sealed partial class PlayerRow(long playerId) : ObservableObject
     [ObservableProperty] private IBrush classBrush = Brushes.Gray;
     [ObservableProperty] private Bitmap? classIcon;
     [ObservableProperty] private long sortKey;
+    [ObservableProperty] private string combatPower = "";
 }
 
 public sealed record SkillRow(string Name, string Damage, string Share, int Hits, string Crit, double BarPercent);

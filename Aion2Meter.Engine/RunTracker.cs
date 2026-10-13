@@ -42,18 +42,29 @@ public sealed class RunTracker
 
     public bool IsRunning { get { lock (gate) return startedAt is not null && stoppedAt is null; } }
 
+    /// <summary>
+    /// Auto-Modus: Läuft gerade kein Lauf, startet dieser Treffer einen neuen, wenn die Funktion
+    /// true liefert (z. B. Treffer auf einen Boss). Null = nur manuell per <see cref="Start"/>.
+    /// </summary>
+    public Func<PlayerDamage, bool>? AutoStart { get; set; }
+
+    /// <summary>Letzter Treffer im laufenden Lauf.</summary>
+    public DateTime? LastHit { get { lock (gate) return lastHit; } }
+
     public void Start(DateTime? now = null)
     {
-        lock (gate)
-        {
-            players.Clear();
-            targets.Clear();
-            segments.Clear();
-            startedAt = now ?? DateTime.Now;
-            stoppedAt = null;
-            lastHit = null;
-            combatTime = TimeSpan.Zero;
-        }
+        lock (gate) ResetLocked(now ?? DateTime.Now);
+    }
+
+    private void ResetLocked(DateTime start)
+    {
+        players.Clear();
+        targets.Clear();
+        segments.Clear();
+        startedAt = start;
+        stoppedAt = null;
+        lastHit = null;
+        combatTime = TimeSpan.Zero;
     }
 
     public void Stop(DateTime? now = null)
@@ -74,7 +85,11 @@ public sealed class RunTracker
     {
         lock (gate)
         {
-            if (!Recording) return;
+            if (!Recording)
+            {
+                if (AutoStart?.Invoke(hit) != true) return;
+                ResetLocked(hit.DateTime);
+            }
             var at = hit.DateTime;
 
             if (lastHit is DateTime previous && at - previous is var gap && gap > TimeSpan.Zero && gap <= CombatGap)
