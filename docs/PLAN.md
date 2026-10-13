@@ -22,6 +22,10 @@
 - [x] Geplante Aufgabe „aion2meter-wartung“ (täglich 11 Uhr): Upstream-Merge + deutsche Daten auf Wartungs-Branch, Build+Test, nur bei Grün nach main. Kein Push. Log: docs/WARTUNGSLOG.md
 
 ## Phase 5: Ausbau
+- [x] Hauptfenster mit Reitern (DPS-Meter, Verbindung, Einstellungen), Verbindungs-Monitor mit Ping-Verlauf und Diagnose (13.10.)
+- [ ] Timer: Risse nach Plan (EU-Zeiten prüfen), Feldbosse automatisch beim Kill erkannt, Abyss-Bosse als Kalender
+- [ ] Item-Datenbank (Datenquelle klären: NC-Web-API mit Deutsch vs. Spieldateien)
+- [ ] Interaktive Karte, vorher eine kurze Aufnahme: Welche Pakete kommen beim Einsammeln? Positionen anderer Spieler NIE anzeigen
 - [x] Einstellungen: Hotkey, Deckkraft, nur meine Gruppe, „Du“ statt Name
 - [ ] Kampf-Historie ansehen (Daten liegen schon in SQLite)
 - [ ] Kampfanalyse nach dem Kampf (Rotation, Uptime der Buffs)

@@ -31,7 +31,11 @@ public partial class App : Application
         {
             desktop = lifetime;
             desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-            desktop.ShutdownRequested += (_, _) => Persist();
+            desktop.ShutdownRequested += (_, _) =>
+            {
+                if (hub is not null) hub.AllowClose = true;
+                Persist();
+            };
 
             // Ohne Npcap geht nichts – dann zuerst die Einrichtung zeigen.
             bool replay = Services.GetRequiredService<MeterOptions>().ReplayFile is not null;
@@ -52,8 +56,9 @@ public partial class App : Application
             _ = Services.GetRequiredService<ICombatHistoryStore>();
             viewModel = Services.GetRequiredService<MainViewModel>();
             viewModel.SetupRequested += (_, _) => ShowSetup();
-            viewModel.SettingsRequested += (_, _) => ShowSettings();
+            viewModel.SettingsRequested += (_, _) => ShowHub(HubTabSettings);
             window = Services.GetRequiredService<MainWindow>();
+            hub = Services.GetRequiredService<HubWindow>();
 
             mode = Services.GetRequiredService<TrackingMode>();
             mode.Changed += (_, _) => Dispatcher.UIThread.Post(() =>
@@ -65,7 +70,7 @@ public partial class App : Application
             hotkey = new GameHotkey(Services.GetRequiredService<MeterSettings>());
             hotkey.Pressed += (_, _) => Dispatcher.UIThread.Post(() => mode.Toggle());
         }
-        desktop.MainWindow = window;
+        desktop.MainWindow = hub;
         viewModel!.Start();
 
         if (Services.GetRequiredService<MeterOptions>().ReplayFile is not null)
@@ -75,16 +80,16 @@ public partial class App : Application
             return;
         }
 
-        // Start in Bereitschaft: kurz zeigen, wie man startet, dann ausblenden.
-        window!.Show();
-        DispatcherTimer.RunOnce(() =>
-        {
-            if (!mode!.IsActive) window.Hide();
-        }, TimeSpan.FromSeconds(6));
+        // Start in Bereitschaft: Overlay bleibt aus, das Hauptfenster erklärt den Hotkey.
+        ShowHub(HubTabDps);
     }
 
+    private const int HubTabDps = 0, HubTabConnection = 1, HubTabSettings = 2;
     private TrackingMode? mode;
     private GameHotkey? hotkey;
+    private HubWindow? hub;
+
+    private void ShowHub(int tab) => hub?.ShowTab(tab);
 
     private void ShowSetup()
     {
@@ -111,6 +116,7 @@ public partial class App : Application
 
     public void Quit()
     {
+        if (hub is not null) hub.AllowClose = true;
         Persist();
         desktop?.Shutdown();
     }
@@ -136,7 +142,7 @@ public partial class App : Application
         }
     }
 
-    private void OnTrayClicked(object? sender, EventArgs e) => OnToggleOverlay(sender, e);
+    private void OnTrayClicked(object? sender, EventArgs e) => ShowHub(HubTabDps);
 
     private void OnToggleOverlay(object? sender, EventArgs e) => mode?.Toggle();
 
@@ -147,21 +153,9 @@ public partial class App : Application
 
     private void OnSetup(object? sender, EventArgs e) => ShowSetup();
 
-    private void OnSettings(object? sender, EventArgs e) => ShowSettings();
+    private void OnSettings(object? sender, EventArgs e) => ShowHub(HubTabSettings);
 
-    private SettingsWindow? settingsWindow;
-
-    private void ShowSettings()
-    {
-        if (settingsWindow is not null)
-        {
-            settingsWindow.Activate();
-            return;
-        }
-        settingsWindow = new SettingsWindow(Services.GetRequiredService<SettingsViewModel>());
-        settingsWindow.Closed += (_, _) => settingsWindow = null;
-        settingsWindow.Show();
-    }
+    private void OnHub(object? sender, EventArgs e) => ShowHub(HubTabDps);
 
     private void OnOpenFolder(object? sender, EventArgs e) => viewModel?.OpenDataFolder();
 

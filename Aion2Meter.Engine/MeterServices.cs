@@ -55,6 +55,7 @@ public static class MeterServices
         services.AddSingleton<RingRecorder>();
         services.AddSingleton<RunTracker>();
         services.AddSingleton<PartyRoster>();
+        services.AddSingleton<ConnectionMonitor>();
         services.AddSingleton(_ => MeterSettings.Load(options.DataDir));
         services.AddSingleton<TrackingMode>();
         return services;

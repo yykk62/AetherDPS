@@ -47,6 +47,13 @@ namespace AionDpsMeter.Services.PacketCapture
         private AdapterContext? lockedAdapter;
         private volatile int lockedPort;
 
+        // Aion2Meter: Verbindungs-Monitor (Server-Adresse, Segmente, Lücken, erneut gesendete Segmente)
+        public System.Net.IPAddress? ServerAddress { get; private set; }
+        private long tcpSegments, tcpGaps, tcpRetransmits;
+        public long TcpSegments => Interlocked.Read(ref tcpSegments);
+        public long TcpGaps => Interlocked.Read(ref tcpGaps);
+        public long TcpRetransmits => Interlocked.Read(ref tcpRetransmits);
+
         private readonly BlockingCollection<PooledRawPacket> packetQueue;
         private Thread? processingThread;
         private readonly CancellationTokenSource cts = new();
@@ -269,6 +276,8 @@ namespace AionDpsMeter.Services.PacketCapture
             if (tcp.SourcePort != lockedPort) return;
 
             Interlocked.Increment(ref watchdogHeartbeatsSinceCheck);
+            Interlocked.Increment(ref tcpSegments);
+            ServerAddress = packet.Extract<IPPacket>()?.SourceAddress ?? ServerAddress;
 
             string streamKey = $"Client:{tcp.DestinationPort}";
             long arrivedAt = new DateTimeOffset(raw.Timestamp, TimeSpan.Zero)
@@ -297,6 +306,7 @@ namespace AionDpsMeter.Services.PacketCapture
                 {
                     if (nextSeq <= expectedSeq)
                     {
+                        Interlocked.Increment(ref tcpRetransmits);
                         logger.LogTrace(
                             $"[TCP] Duplicate/Old ignored. Seq:{currentSeq} Exp:{expectedSeq}");
                         return;
@@ -305,6 +315,7 @@ namespace AionDpsMeter.Services.PacketCapture
 
                 if (currentSeq > expectedSeq)
                 {
+                    Interlocked.Increment(ref tcpGaps);
                     logger.LogWarning(
                         $"[TCP GAP] Expected:{expectedSeq} Got:{currentSeq} " +
                         $"Diff:{currentSeq - expectedSeq}");

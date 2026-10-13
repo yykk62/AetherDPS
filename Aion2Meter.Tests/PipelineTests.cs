@@ -155,6 +155,23 @@ public sealed class PipelineTests : IDisposable
     }
 
     [Fact]
+    public void Verbindungsmonitor_erkennt_Lag_Spitzen()
+    {
+        using var host = NewHost();
+        var monitor = host.Get<ConnectionMonitor>();
+        var t0 = DateTime.Now.AddSeconds(-40);
+        for (int i = 0; i < 20; i++)
+            monitor.Add(new PingSample(t0.AddSeconds(i * 2), 9 + i % 3));
+        monitor.Add(new PingSample(t0.AddSeconds(41), 160));
+        monitor.Add(new PingSample(t0.AddSeconds(42), 220));
+
+        var stats = monitor.Stats();
+        Assert.Equal(220, stats.Current);
+        Assert.Equal(2, stats.Spikes.Count);
+        Assert.InRange(stats.SpikeThreshold, 40, 100);
+    }
+
+    [Fact]
     public void Deutsche_Namen_sind_geladen()
     {
         using var host = NewHost();

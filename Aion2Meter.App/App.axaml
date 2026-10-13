@@ -12,6 +12,7 @@
       <TrayIcon Icon="/Assets/icon.ico" ToolTipText="{l:T app.title}" Clicked="OnTrayClicked">
         <TrayIcon.Menu>
           <NativeMenu>
+            <NativeMenuItem Header="{l:T tray.hub}" Click="OnHub" />
             <NativeMenuItem Header="{l:T tray.show}" Click="OnToggleOverlay" />
             <NativeMenuItem Header="{l:T tray.clickthrough}" Click="OnToggleClickThrough" />
             <NativeMenuItemSeparator />
