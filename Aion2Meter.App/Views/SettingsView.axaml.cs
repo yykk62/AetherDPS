@@ -10,11 +10,18 @@ public partial class SettingsView : UserControl
     public SettingsView()
     {
         InitializeComponent();
+        WireHotkeyBox(HotkeyBox, HotkeySlot.Meter);
+        WireHotkeyBox(ScreenshotBox, HotkeySlot.Screenshot);
+        DetachedFromVisualTree += (_, _) => (DataContext as SettingsViewModel)?.CancelCapture();
+    }
 
-        HotkeyBox.GotFocus += (_, _) => (DataContext as SettingsViewModel)?.BeginCapture();
-        HotkeyBox.LostFocus += (_, _) => (DataContext as SettingsViewModel)?.CancelCapture();
+    /// <summary>In das Feld klicken → nächste Tastenkombination wird übernommen.</summary>
+    private void WireHotkeyBox(TextBox box, HotkeySlot slot)
+    {
+        box.GotFocus += (_, _) => (DataContext as SettingsViewModel)?.BeginCapture(slot);
+        box.LostFocus += (_, _) => (DataContext as SettingsViewModel)?.CancelCapture();
         // Tunnel-Phase: Tasten abfangen, bevor die TextBox sie verarbeitet
-        HotkeyBox.AddHandler(KeyDownEvent, (_, e) =>
+        box.AddHandler(KeyDownEvent, (_, e) =>
         {
             if (DataContext is not SettingsViewModel vm) return;
             e.Handled = true;
@@ -27,7 +34,5 @@ public partial class SettingsView : UserControl
             if (vm.TryCapture(e.Key, e.KeyModifiers))
                 TopLevel.GetTopLevel(this)?.FocusManager?.ClearFocus();
         }, RoutingStrategies.Tunnel);
-
-        DetachedFromVisualTree += (_, _) => (DataContext as SettingsViewModel)?.CancelCapture();
     }
 }

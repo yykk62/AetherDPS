@@ -33,6 +33,7 @@ Beim Start öffnet sich das **Hauptfenster** mit den Reitern DPS-Meter, Verbindu
 | Skill-Details | ☰ oder auf einen Spieler klicken |
 | Sperren (Mausklicks gehen ins Spiel, nichts wird versehentlich angeklickt) | Schloss-Symbol. Zum Entsperren wieder aufs Schloss klicken, es bleibt immer klickbar |
 | Einstellungen | ⚙ oder Tray-Symbol: Hotkey ändern, Deckkraft, nur meine Gruppe (Standard: an), „Du“ statt Name |
+| Screenshot auf den Zweitbildschirm | **STRG+S** im Spiel (änderbar). Der Spiel-Bildschirm erscheint im Vollbild auf dem anderen Monitor, jeder neue ersetzt das alte Bild. Klick oder ESC blendet aus |
 | Fehler melden | Tray-Symbol → „Problem melden“ |
 
 ## Für Entwickler

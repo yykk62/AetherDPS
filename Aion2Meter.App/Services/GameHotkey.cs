@@ -5,89 +5,105 @@ using Aion2Meter.Engine;
 namespace Aion2Meter.App.Services;
 
 /// <summary>
-/// Hotkey (Standard STRG+W, in den Einstellungen änderbar) – aber NUR solange AION 2 (oder unser Overlay) im Vordergrund ist.
-/// Sonst bleibt die Taste frei (STRG+W schließt dann z. B. weiter Browser-Tabs).
+/// Hotkeys (Meter: Standard STRG+W, Screenshot: Standard STRG+S; in den Einstellungen
+/// änderbar) – aber NUR solange AION 2 (oder unser Overlay/Hauptfenster) im Vordergrund ist.
+/// Sonst bleiben die Tasten frei (STRG+W schließt dann weiter Browser-Tabs, STRG+S speichert).
 /// Bewusst RegisterHotKey statt Tastatur-Hook: kein Mitlesen von Tastendrücken.
 /// </summary>
 public sealed partial class GameHotkey : IDisposable
 {
     private const uint ModNoRepeat = 0x4000;
     private const uint WmHotkey = 0x0312, PmRemove = 0x0001;
-    private const int HotkeyId = 0xA2;
-    private const int DebounceMs = 1500;
     private static readonly string[] GameProcessNames = ["AION2"];
+
+    private sealed class Slot(int id, int debounceMs, Func<(uint Mods, uint Key)> combo, Action<IntPtr> fire)
+    {
+        public int Id { get; } = id;
+        public int DebounceMs { get; } = debounceMs;
+        public Func<(uint Mods, uint Key)> Combo { get; } = combo;
+        public Action<IntPtr> Fire { get; } = fire;
+        public bool Registered { get; set; }
+        public (uint Mods, uint Key) Current { get; set; }
+        public long LastFiredMs { get; set; } = -100_000;
+    }
 
     private readonly Thread thread;
     private readonly int ownProcessId = Environment.ProcessId;
+    private readonly Slot[] slots;
     private volatile bool running = true;
 
     /// <summary>Während in den Einstellungen ein neuer Hotkey aufgenommen wird.</summary>
     public static volatile bool Suspended;
 
-    /// <summary>Wird auf einem Hintergrund-Thread ausgelöst.</summary>
+    /// <summary>Meter starten/stoppen. Wird auf einem Hintergrund-Thread ausgelöst.</summary>
     public event EventHandler? Pressed;
 
-    private readonly MeterSettings settings;
+    /// <summary>Screenshot. Argument = Fenster im Vordergrund beim Drücken (meist AION 2).</summary>
+    public event EventHandler<IntPtr>? ScreenshotPressed;
 
     public GameHotkey(MeterSettings settings)
     {
-        this.settings = settings;
+        slots =
+        [
+            // Entprellen 1,5 s: gedrückt gehaltenes STRG+W schaltete sonst sofort wieder aus (Log 13.10.)
+            new Slot(0xA2, 1500, () => (settings.HotkeyModifiers, settings.HotkeyKey),
+                _ => Pressed?.Invoke(this, EventArgs.Empty)),
+            new Slot(0xA3, 300, () => settings.ScreenshotEnabled ? (settings.ScreenshotModifiers, settings.ScreenshotKey) : (0u, 0u),
+                fg => ScreenshotPressed?.Invoke(this, fg)),
+        ];
         thread = new Thread(Loop) { IsBackground = true, Name = "GameHotkey" };
         thread.Start();
     }
 
     private void Loop()
     {
-        bool registered = false;
-        (uint Mods, uint Key) current = default;
-        var lastCheck = Stopwatch.StartNew();
         var clock = Stopwatch.StartNew();
-        long lastFiredMs = -DebounceMs;
+        long lastCheck = -1000;
         var notWanted = Stopwatch.StartNew();
         try
         {
             while (running)
             {
-                if (lastCheck.ElapsedMilliseconds >= 250)
+                if (clock.ElapsedMilliseconds - lastCheck >= 250)
                 {
-                    lastCheck.Restart();
+                    lastCheck = clock.ElapsedMilliseconds;
                     bool wanted = !Suspended && IsGameOrOverlayInForeground();
-                    var combo = (settings.HotkeyModifiers, settings.HotkeyKey);
-                    if (registered && combo != current)   // in den Einstellungen geändert
-                        registered = !UnregisterHotKey(IntPtr.Zero, HotkeyId);
-                    if (wanted && !registered)
-                    {
-                        current = combo;
-                        registered = RegisterHotKey(IntPtr.Zero, HotkeyId, combo.Item1 | ModNoRepeat, combo.Item2);
-                    }
-                    else if (!wanted && registered)
-                    {
-                        // Erst nach 1 s ohne Spiel im Vordergrund freigeben – kurze Fokuswechsel
-                        // (z. B. beim Einblenden des Overlays) sollen nicht neu registrieren.
-                        if (Suspended || notWanted.ElapsedMilliseconds >= 1000) registered = !UnregisterHotKey(IntPtr.Zero, HotkeyId);
-                    }
                     if (wanted) notWanted.Restart();
+                    // Erst nach 1 s ohne Spiel im Vordergrund freigeben – kurze Fokuswechsel
+                    // (z. B. beim Einblenden des Overlays) sollen nicht neu registrieren.
+                    bool release = Suspended || notWanted.ElapsedMilliseconds >= 1000;
+                    foreach (var slot in slots) Update(slot, wanted, release);
                 }
 
                 while (PeekMessageW(out var msg, IntPtr.Zero, WmHotkey, WmHotkey, PmRemove))
                 {
-                    if (msg.message == WmHotkey && msg.wParam == HotkeyId)
-                    {
-                        // Entprellen: Gedrückt gehaltene Tasten lösten sonst ein zweites Mal aus
-                        // (aktiv → nach 0,5–1 s wieder Bereitschaft, im Log vom 13.10. gesehen).
-                        if (clock.ElapsedMilliseconds - lastFiredMs >= DebounceMs)
-                        {
-                            lastFiredMs = clock.ElapsedMilliseconds;
-                            Pressed?.Invoke(this, EventArgs.Empty);
-                        }
-                    }
+                    var slot = slots.FirstOrDefault(s => s.Id == (int)msg.wParam);
+                    if (slot is null || clock.ElapsedMilliseconds - slot.LastFiredMs < slot.DebounceMs) continue;
+                    slot.LastFiredMs = clock.ElapsedMilliseconds;
+                    slot.Fire(GetForegroundWindow());
                 }
                 Thread.Sleep(30);
             }
         }
         finally
         {
-            if (registered) UnregisterHotKey(IntPtr.Zero, HotkeyId);
+            foreach (var slot in slots.Where(s => s.Registered)) UnregisterHotKey(IntPtr.Zero, slot.Id);
+        }
+    }
+
+    private static void Update(Slot slot, bool wanted, bool release)
+    {
+        var combo = slot.Combo();
+        if (slot.Registered && combo != slot.Current)   // in den Einstellungen geändert
+            slot.Registered = !UnregisterHotKey(IntPtr.Zero, slot.Id);
+        if (wanted && !slot.Registered && combo.Key != 0)
+        {
+            slot.Current = combo;
+            slot.Registered = RegisterHotKey(IntPtr.Zero, slot.Id, combo.Mods | ModNoRepeat, combo.Key);
+        }
+        else if (!wanted && slot.Registered && release)
+        {
+            slot.Registered = !UnregisterHotKey(IntPtr.Zero, slot.Id);
         }
     }
 

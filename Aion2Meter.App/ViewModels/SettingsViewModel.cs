@@ -7,26 +7,33 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace Aion2Meter.App.ViewModels;
 
+public enum HotkeySlot { Meter, Screenshot }
+
 public sealed partial class SettingsViewModel : ObservableObject
 {
     private readonly MeterSettings meter;
     private readonly IAppSettingsService upstream;
+    private HotkeySlot? capturing;
 
     [ObservableProperty] private string hotkeyText;
+    [ObservableProperty] private string screenshotText;
     [ObservableProperty] private bool isCapturingHotkey;
     [ObservableProperty] private string hotkeyError = "";
     [ObservableProperty] private double opacityPercent;
     [ObservableProperty] private bool partyOnly;
     [ObservableProperty] private bool hideName;
+    [ObservableProperty] private bool screenshotEnabled;
 
     public SettingsViewModel(MeterSettings meter, IAppSettingsService upstream)
     {
         this.meter = meter;
         this.upstream = upstream;
         hotkeyText = meter.HotkeyText;
+        screenshotText = meter.ScreenshotText;
         opacityPercent = Math.Round(upstream.WindowOpacity * 100);
         partyOnly = meter.PartyOnly;
         hideName = upstream.IsNicknameHidden;
+        screenshotEnabled = meter.ScreenshotEnabled;
     }
 
     partial void OnOpacityPercentChanged(double value) => upstream.WindowOpacity = value / 100.0;
@@ -37,21 +44,29 @@ public sealed partial class SettingsViewModel : ObservableObject
         meter.Save();
     }
 
+    partial void OnScreenshotEnabledChanged(bool value)
+    {
+        meter.ScreenshotEnabled = value;
+        meter.Save();
+    }
+
     partial void OnHideNameChanged(bool value) => upstream.IsNicknameHidden = value;
 
     partial void OnIsCapturingHotkeyChanged(bool value) => GameHotkey.Suspended = value;
 
-    public void BeginCapture()
+    public void BeginCapture(HotkeySlot slot)
     {
+        CancelCapture();
+        capturing = slot;
         IsCapturingHotkey = true;
         HotkeyError = "";
-        HotkeyText = Loc.T("settings.hotkey_press");
+        SetText(slot, Loc.T("settings.hotkey_press"));
     }
 
     /// <summary>Taste aus dem Eingabefeld übernehmen. Liefert true, wenn die Kombination gilt.</summary>
     public bool TryCapture(Key key, KeyModifiers modifiers)
     {
-        if (!IsCapturingHotkey) return false;
+        if (capturing is not HotkeySlot slot) return false;
         if (key is Key.LeftCtrl or Key.RightCtrl or Key.LeftAlt or Key.RightAlt or Key.LeftShift or Key.RightShift)
             return false;   // nur Modifier gedrückt – auf die eigentliche Taste warten
 
@@ -75,29 +90,58 @@ public sealed partial class SettingsViewModel : ObservableObject
         }
 
         parts.Add(keyName);
-        Apply(mods, vk, string.Join("+", parts));
+        var text = string.Join("+", parts);
+        var other = slot == HotkeySlot.Meter
+            ? (meter.ScreenshotModifiers, meter.ScreenshotKey)
+            : (meter.HotkeyModifiers, meter.HotkeyKey);
+        if (other == (mods, vk))
+        {
+            HotkeyError = Loc.T("settings.hotkey_taken");
+            return false;
+        }
+        Apply(slot, mods, vk, text);
         return true;
     }
 
     public void CancelCapture()
     {
-        if (!IsCapturingHotkey) return;
+        if (capturing is not HotkeySlot slot) return;
+        capturing = null;
         IsCapturingHotkey = false;
-        HotkeyText = meter.HotkeyText;
+        SetText(slot, slot == HotkeySlot.Meter ? meter.HotkeyText : meter.ScreenshotText);
     }
 
     [RelayCommand]
-    private void ResetHotkey() => Apply(MeterSettings.ModControl, 0x57, "STRG+W");
+    private void ResetHotkey() => Apply(HotkeySlot.Meter, MeterSettings.ModControl, 0x57, "STRG+W");
 
-    private void Apply(uint mods, uint vk, string text)
+    [RelayCommand]
+    private void ResetScreenshotHotkey() => Apply(HotkeySlot.Screenshot, MeterSettings.ModControl, 0x53, "STRG+S");
+
+    private void SetText(HotkeySlot slot, string text)
     {
-        meter.HotkeyModifiers = mods;
-        meter.HotkeyKey = vk;
-        meter.HotkeyText = text;
+        if (slot == HotkeySlot.Meter) HotkeyText = text;
+        else ScreenshotText = text;
+    }
+
+    private void Apply(HotkeySlot slot, uint mods, uint vk, string text)
+    {
+        if (slot == HotkeySlot.Meter)
+        {
+            meter.HotkeyModifiers = mods;
+            meter.HotkeyKey = vk;
+            meter.HotkeyText = text;
+        }
+        else
+        {
+            meter.ScreenshotModifiers = mods;
+            meter.ScreenshotKey = vk;
+            meter.ScreenshotText = text;
+        }
         meter.Save();
+        capturing = null;
         IsCapturingHotkey = false;
         HotkeyError = "";
-        HotkeyText = text;
+        SetText(slot, text);
     }
 }
 

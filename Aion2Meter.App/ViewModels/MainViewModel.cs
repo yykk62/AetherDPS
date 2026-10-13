@@ -334,6 +334,14 @@ public sealed partial class MainViewModel : ObservableObject
         Refresh();
     }
 
+    /// <summary>Kurze Meldung in der Statuszeile (8 s).</summary>
+    public void ShowNotice(string text)
+    {
+        Notice = text;
+        noticeUntil = DateTime.Now.AddSeconds(8);
+        Refresh();
+    }
+
     [RelayCommand]
     public void ReportProblem()
     {

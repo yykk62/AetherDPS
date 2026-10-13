@@ -69,6 +69,7 @@ public partial class App : Application
             });
             hotkey = new GameHotkey(Services.GetRequiredService<MeterSettings>());
             hotkey.Pressed += (_, _) => Dispatcher.UIThread.Post(() => mode.Toggle());
+            hotkey.ScreenshotPressed += (_, foreground) => TakeScreenshot(foreground);
         }
         desktop.MainWindow = hub;
         viewModel!.Start();
@@ -90,6 +91,37 @@ public partial class App : Application
     private HubWindow? hub;
 
     private void ShowHub(int tab) => hub?.ShowTab(tab);
+
+    private ScreenshotWindow? screenshotWindow;
+
+    /// <summary>Spiel-Bildschirm aufnehmen (Hintergrund-Thread) und auf dem anderen Monitor zeigen.</summary>
+    private void TakeScreenshot(IntPtr foreground) => Task.Run(() =>
+    {
+        ScreenCapture.Shot? shot = null;
+        try
+        {
+            shot = ScreenCapture.CaptureGameMonitor(foreground);
+        }
+        catch (Exception ex)
+        {
+            Serilog.Log.Warning(ex, "Screenshot fehlgeschlagen");
+        }
+
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (shot is null)
+            {
+                viewModel?.ShowNotice(Loc.T("shot.failed"));
+                return;
+            }
+            screenshotWindow ??= new ScreenshotWindow();
+            if (!screenshotWindow.ShowOnOtherScreen(shot.Image, shot.Monitor))
+            {
+                shot.Image.Dispose();
+                viewModel?.ShowNotice(Loc.T("shot.no_second"));
+            }
+        });
+    });
 
     private void ShowSetup()
     {

@@ -18,6 +18,12 @@ public sealed class MeterSettings
     public uint HotkeyKey { get; set; } = 0x57;
     public string HotkeyText { get; set; } = "STRG+W";
 
+    /// <summary>Screenshot des Spiel-Bildschirms, Vollbild auf dem Zweitbildschirm. Standard: STRG+S.</summary>
+    public bool ScreenshotEnabled { get; set; } = true;
+    public uint ScreenshotModifiers { get; set; } = ModControl;
+    public uint ScreenshotKey { get; set; } = 0x53;
+    public string ScreenshotText { get; set; } = "STRG+S";
+
     private string? path;
 
     public event EventHandler? Changed;

@@ -42,6 +42,19 @@
       <TextBlock Classes="dim" Text="{l:T settings.hotkey_hint}" />
     </StackPanel>
 
+    <!-- Screenshot-Hotkey -->
+    <StackPanel Spacing="6">
+      <CheckBox IsChecked="{Binding ScreenshotEnabled}">
+        <TextBlock Classes="label" Text="{l:T settings.screenshot}" />
+      </CheckBox>
+      <Grid ColumnDefinitions="*,Auto" IsEnabled="{Binding ScreenshotEnabled}">
+        <TextBox Name="ScreenshotBox" Text="{Binding ScreenshotText}" IsReadOnly="True" FontSize="14" FontWeight="SemiBold"
+                 HorizontalContentAlignment="Center" Cursor="Hand" />
+        <Button Grid.Column="1" Content="{l:T settings.screenshot_reset}" Command="{Binding ResetScreenshotHotkeyCommand}" Margin="8,0,0,0" />
+      </Grid>
+      <TextBlock Classes="dim" Text="{l:T settings.screenshot_hint}" />
+    </StackPanel>
+
     <!-- Deckkraft -->
     <StackPanel Spacing="4">
       <Grid ColumnDefinitions="*,Auto">
