@@ -58,13 +58,18 @@ int Replay(string path)
 
 static void WriteDemo(string path)
 {
-    // Vier Spieler gegen den Sandsack (2000000), 90 s, ein Treffer pro Spieler alle ~1,2 s.
+    // Neun Spieler (alle Klassen) gegen den Sandsack (2000000), 90 s, ein Treffer pro Spieler alle ~1,2 s.
     var party = new (int Id, int Skill, int Base)[]
     {
         (101, 11000001, 9_000),   // Gladiator
         (102, 14000001, 8_200),   // Waldläufer
         (103, 15000001, 10_500),  // Magier
         (104, 17000001, 3_000),   // Kleriker
+        (105, 12000001, 5_500),   // Templer
+        (106, 13000001, 9_800),   // Assassine
+        (107, 16000001, 8_700),   // Beschwörer
+        (108, 18000001, 4_200),   // Kantor
+        (109, 19000001, 9_300),   // Faustkämpfer
     };
     const int dummy = 7001;
     var rng = new Random(42);

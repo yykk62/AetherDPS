@@ -203,7 +203,8 @@ public sealed partial class MainViewModel : ObservableObject
             row.IsUser = p.IsUser;
             row.Name = DisplayName(p);
             row.ClassName = GermanGameData.ClassName(p.ClassId, p.ClassName);
-            row.ClassBrush = ClassColors.For(p.ClassId);
+            row.ClassBrush = ClassVisuals.Brush(p.ClassId);
+            row.ClassIcon = ClassVisuals.Icon(p.ClassId);
             row.Dps = Format.Compact(p.DamagePerSecond) + "/s";
             row.Total = Format.Compact(p.TotalDamage);
             row.Share = Format.Percent(p.DamagePercentage);
