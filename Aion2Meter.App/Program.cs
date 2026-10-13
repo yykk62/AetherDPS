@@ -3,6 +3,7 @@ using Aion2Meter.App.Services;
 using Aion2Meter.App.ViewModels;
 using Aion2Meter.App.Views;
 using Aion2Meter.Engine;
+using Aion2Meter.Engine.Updates;
 using Avalonia;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -28,6 +29,7 @@ internal static class Program
                 rollingInterval: RollingInterval.Day, retainedFileCountLimit: 7, formatProvider: CultureInfo.InvariantCulture)
             .CreateLogger();
 
+        SingleInstance? instance = null;
         try
         {
             var options = new MeterOptions
@@ -36,15 +38,54 @@ internal static class Program
                 ReplayFile = ArgValue(args, "--replay") is { } r ? Path.GetFullPath(r) : null,
                 ReplaySpeed = ArgValue(args, "--speed") is { } s ? double.Parse(s, CultureInfo.InvariantCulture) : 1,
             };
+            var version = typeof(Program).Assembly.GetName().Version ?? new Version(0, 0, 0);
+            bool justUpdated = args.Contains(AppUpdate.UpdatedArg);
+
+            // Wiedergaben dürfen neben dem echten Meter laufen, sonst nur eine Instanz.
+            if (options.ReplayFile is null)
+            {
+                instance = SingleInstance.TryAcquire(waitForPrevious: justUpdated);
+                if (instance is null)
+                {
+                    Log.Information("Meter läuft schon – Hauptfenster der laufenden Instanz geöffnet");
+                    return 0;
+                }
+            }
+
+            var updates = new UpdateService(dataDir, version);
+            if (AppUpdate.CanSelfUpdate && options.ReplayFile is null)
+            {
+                UpdateService.CleanupOld(AppUpdate.ExePath);
+                Task.Run(AppUpdate.CleanupExtractedVersions);
+                // Beim letzten Mal geladenes Update jetzt einspielen, bevor irgendwas läuft.
+                if (updates.Pending is { } pending)
+                {
+                    try
+                    {
+                        updates.Install(AppUpdate.ExePath);
+                        Log.Information("Update {Old} → {New} installiert, starte neu", version, pending.Version);
+                        instance?.Dispose();
+                        AppUpdate.StartNewVersion();
+                        return 0;
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Warning(ex, "Update konnte nicht installiert werden");
+                    }
+                }
+            }
 
             Loc.Load();
             GermanGameData.Apply();
-            Log.Information("Start {Version}, deutsche Skills: {Count}, Replay: {Replay}",
-                typeof(Program).Assembly.GetName().Version, GermanGameData.PatchedSkillCount, options.ReplayFile ?? "nein");
+            Log.Information("Start {Version}, deutsche Skills: {Count}, Replay: {Replay}, nach Update: {Updated}",
+                version, GermanGameData.PatchedSkillCount, options.ReplayFile ?? "nein", justUpdated);
+            App.JustUpdated = justUpdated;
+            App.Instance = instance;
 
             var services = new ServiceCollection();
             services.AddLogging(b => b.AddSerilog(dispose: false));
             services.AddAion2Meter(options);
+            services.AddSingleton(updates);
             services.AddSingleton<MainViewModel>();
             services.AddSingleton<MainWindow>();
             services.AddSingleton<SetupViewModel>();
@@ -68,6 +109,7 @@ internal static class Program
         }
         finally
         {
+            instance?.Dispose();
             Log.CloseAndFlush();
         }
     }

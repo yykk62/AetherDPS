@@ -1,6 +1,7 @@
 using Aion2Meter.App.ViewModels;
 using Aion2Meter.App.Views;
 using Aion2Meter.Engine;
+using Aion2Meter.Engine.Updates;
 using AionDpsMeter.Services.Services.Session;
 using AionDpsMeter.Services.Services.Session.Persistence;
 using Avalonia;
@@ -23,6 +24,12 @@ public partial class App : Application
 
     public static IServiceProvider Services { get; set; } = null!;
 
+    /// <summary>Gestartet von der alten Version nach einem Update.</summary>
+    public static bool JustUpdated { get; set; }
+
+    /// <summary>Sperre „nur ein Meter“ – ein zweiter Start holt das Hauptfenster nach vorn.</summary>
+    public static SingleInstance? Instance { get; set; }
+
     public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
     public override void OnFrameworkInitializationCompleted()
@@ -36,6 +43,13 @@ public partial class App : Application
                 if (hub is not null) hub.AllowClose = true;
                 Persist();
             };
+
+            Instance?.ListenForShow(() => Dispatcher.UIThread.Post(() =>
+            {
+                if (hub is not null) ShowHub(HubTabDps);
+                else setupWindow?.Activate();
+            }));
+            AppUpdate.RestartRequested += (_, _) => Dispatcher.UIThread.Post(RestartForUpdate);
 
             // Ohne Npcap geht nichts – dann zuerst die Einrichtung zeigen.
             bool replay = Services.GetRequiredService<MeterOptions>().ReplayFile is not null;
@@ -114,6 +128,8 @@ public partial class App : Application
             timerOverlayVm.EditRequested += (_, _) => ShowHub(HubViewModel.TabTimers);
             timerOverlayVm.HideRequested += (_, _) => timersVm.OverlayVisible = false;
             timersVm.OverlayVisibilityChanged += (_, _) => UpdateTimerOverlay();
+
+            StartUpdates(meterSettings);
         }
         desktop.MainWindow = hub;
         viewModel!.Start();
@@ -222,6 +238,68 @@ public partial class App : Application
     {
         if (hub is not null) hub.AllowClose = true;
         Persist();
+        InstallPendingUpdate();   // fertig geladenes Update gleich einspielen, gilt ab dem nächsten Start
+        desktop?.Shutdown();
+    }
+
+    private bool updateNotified;
+
+    /// <summary>Beim Start und alle 6 Stunden nach einer neuen Version sehen (nur die veröffentlichte exe).</summary>
+    private void StartUpdates(MeterSettings settings)
+    {
+        var updates = Services.GetRequiredService<UpdateService>();
+        if (JustUpdated)
+            ShowToast(Loc.T("update.done_title"), Loc.T("update.done", updates.Current));
+        if (!AppUpdate.CanSelfUpdate || Services.GetRequiredService<MeterOptions>().ReplayFile is not null) return;
+
+        updates.Changed += (_, _) => Dispatcher.UIThread.Post(() =>
+        {
+            if (updates.State == UpdateState.Ready && updates.Pending is { } p && !updateNotified)
+            {
+                updateNotified = true;
+                ShowToast(Loc.T("update.ready_title"), Loc.T("update.ready_toast", p.Version));
+            }
+        });
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(TimeSpan.FromSeconds(20));
+            while (true)
+            {
+                if (settings.AutoUpdate)
+                {
+                    var state = await updates.CheckAndDownloadAsync();
+                    Serilog.Log.Information("Update-Prüfung: {State} (neueste: {Latest}) {Error}",
+                        state, updates.Latest?.Version, updates.Error ?? "");
+                }
+                await Task.Delay(TimeSpan.FromHours(6));
+            }
+        });
+    }
+
+    private bool InstallPendingUpdate()
+    {
+        if (!AppUpdate.CanSelfUpdate) return false;
+        var updates = Services.GetRequiredService<UpdateService>();
+        if (updates.Pending is null) return false;
+        try
+        {
+            updates.Install(AppUpdate.ExePath);
+            Serilog.Log.Information("Update installiert, gilt ab dem nächsten Start");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Serilog.Log.Warning(ex, "Update konnte nicht installiert werden");
+            return false;
+        }
+    }
+
+    /// <summary>Knopf „Jetzt neu starten“: speichern, Update einspielen, neue Version starten.</summary>
+    private void RestartForUpdate()
+    {
+        if (hub is not null) hub.AllowClose = true;
+        Persist();
+        if (InstallPendingUpdate()) AppUpdate.StartNewVersion();
         desktop?.Shutdown();
     }
 

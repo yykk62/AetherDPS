@@ -70,11 +70,19 @@
 
   <Grid RowDefinitions="Auto,*">
     <!-- Kopf -->
-    <StackPanel Orientation="Horizontal" Spacing="10" Margin="22,16,22,4">
-      <Image Source="/Assets/icon.png" Width="28" Height="28" />
-      <TextBlock Text="{l:T hub.title}" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" />
-      <TextBlock Text="{l:T hub.close_hint}" Classes="dim" FontSize="11" VerticalAlignment="Center" Margin="12,2,0,0" />
-    </StackPanel>
+    <Grid ColumnDefinitions="*,Auto" Margin="22,16,22,4">
+      <StackPanel Orientation="Horizontal" Spacing="10">
+        <Image Source="/Assets/icon.png" Width="28" Height="28" />
+        <TextBlock Text="{l:T hub.title}" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" />
+        <TextBlock Text="{l:T hub.close_hint}" Classes="dim" FontSize="11" VerticalAlignment="Center" Margin="12,2,0,0" />
+      </StackPanel>
+      <!-- Update bereit -->
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center"
+                  IsVisible="{Binding UpdateBanner, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+        <TextBlock Text="{Binding UpdateBanner}" Foreground="#E0A84A" FontSize="12" VerticalAlignment="Center" />
+        <Button Classes="primary" Content="{l:T update.restart_short}" Command="{Binding RestartForUpdateCommand}" />
+      </StackPanel>
+    </Grid>
 
     <TabControl Grid.Row="1" TabStripPlacement="Left" SelectedIndex="{Binding SelectedTab}" Margin="10,6,0,0">
 

@@ -1,5 +1,6 @@
 using Aion2Meter.App.Services;
 using Aion2Meter.Engine;
+using Aion2Meter.Engine.Updates;
 using AionDpsMeter.Services.Services.Settings;
 using Avalonia.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -25,11 +26,23 @@ public sealed partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private bool screenshotEnabled;
     [ObservableProperty] private bool buffBarEnabled;
     [ObservableProperty] private bool launchGameWithMeter;
+    [ObservableProperty] private bool autoUpdate;
+    [ObservableProperty] private string updateStatus = "";
+    [ObservableProperty] private bool updateReady;
 
-    public SettingsViewModel(MeterSettings meter, IAppSettingsService upstream)
+    private readonly UpdateService updates;
+    public string VersionText { get; }
+    public bool CanSelfUpdate { get; } = AppUpdate.CanSelfUpdate;
+
+    public SettingsViewModel(MeterSettings meter, IAppSettingsService upstream, UpdateService updates)
     {
         this.meter = meter;
         this.upstream = upstream;
+        this.updates = updates;
+        autoUpdate = meter.AutoUpdate;
+        VersionText = Loc.T("update.version", updates.Current);
+        updates.Changed += (_, _) => Avalonia.Threading.Dispatcher.UIThread.Post(RefreshUpdate);
+        RefreshUpdate();
         hotkeyText = meter.HotkeyText;
         screenshotText = meter.ScreenshotText;
         opacityPercent = Math.Round(upstream.WindowOpacity * 100);
@@ -59,6 +72,40 @@ public sealed partial class SettingsViewModel : ObservableObject
         meter.LaunchGameWithMeter = value;
         meter.Save();
     }
+
+    partial void OnAutoUpdateChanged(bool value)
+    {
+        meter.AutoUpdate = value;
+        meter.Save();
+        if (value && CanSelfUpdate) _ = updates.CheckAndDownloadAsync();
+    }
+
+    private void RefreshUpdate()
+    {
+        UpdateReady = CanSelfUpdate && updates.Pending is not null;
+        UpdateStatus = !CanSelfUpdate ? Loc.T("update.dev_build") : updates.State switch
+        {
+            UpdateState.Checking => Loc.T("update.checking"),
+            UpdateState.Downloading => Loc.T("update.downloading", updates.Latest?.Version ?? updates.Current),
+            UpdateState.Ready => Loc.T("update.ready", updates.Pending?.Version ?? updates.Current),
+            UpdateState.UpToDate => Loc.T("update.up_to_date", updates.LastCheck?.ToString("HH:mm") ?? ""),
+            UpdateState.Failed => Loc.T("update.failed", updates.Error ?? ""),
+            _ => "",
+        };
+    }
+
+    [RelayCommand]
+    private async Task CheckUpdates()
+    {
+        if (CanSelfUpdate) await updates.CheckAndDownloadAsync();
+    }
+
+    [RelayCommand]
+    private void RestartForUpdate() => AppUpdate.RequestRestart();
+
+    [RelayCommand]
+    private void OpenReleases() => System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
+        $"https://github.com/{UpdateService.Repository}/releases") { UseShellExecute = true });
 
     partial void OnBuffBarEnabledChanged(bool value)
     {

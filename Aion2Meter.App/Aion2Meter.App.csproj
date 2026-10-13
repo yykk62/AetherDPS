@@ -11,6 +11,23 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
+    <Product>AION 2 Meter</Product>
+    <Description>Kostenloser, quelloffener DPS-Meter für AION 2</Description>
+    <Copyright>GPL-3.0 · Fork von RATmeter</Copyright>
+    <SatelliteResourceLanguages>de;en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <!-- dotnet publish → eine einzige Aion2Meter.exe ohne .NET-Installation (tools/release.ps1).
+       Sprachdateien und Spieldaten werden beim ersten Start nach %TEMP%\.net\Aion2Meter entpackt. -->
+  <PropertyGroup Condition="'$(_IsPublishing)' == 'true'">
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <DebugType>none</DebugType>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <DefineConstants>$(DefineConstants);SELF_UPDATE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

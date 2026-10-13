@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using Aion2Meter.App.Services;
 using Aion2Meter.Engine;
+using Aion2Meter.Engine.Updates;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -17,6 +18,7 @@ public sealed partial class HubViewModel : ObservableObject
     private readonly PartyRoster roster;
     private readonly LiveTimers live;
     private readonly TimerService timerService;
+    private readonly UpdateService updates;
     private readonly DispatcherTimer timer;
 
     public MainViewModel Overlay { get; }
@@ -41,6 +43,7 @@ public sealed partial class HubViewModel : ObservableObject
     [ObservableProperty] private string riftInfo = "";
     [ObservableProperty] private bool gameRunning = true;
     [ObservableProperty] private string launchText = "";
+    [ObservableProperty] private string updateBanner = "";
 
     [ObservableProperty] private string pingNow = "–";
     [ObservableProperty] private string pingAvg = "–";
@@ -56,8 +59,9 @@ public sealed partial class HubViewModel : ObservableObject
 
     public HubViewModel(TrackingMode mode, RunTracker run, ConnectionMonitor monitor, MeterSettings meterSettings,
         PartyRoster roster, MainViewModel overlay, SettingsViewModel settings,
-        RunsViewModel runs, PartyViewModel party, TimersViewModel timers, ChecklistViewModel checklist, LiveTimers live, TimerService timerService)
+        RunsViewModel runs, PartyViewModel party, TimersViewModel timers, ChecklistViewModel checklist, LiveTimers live, TimerService timerService, UpdateService updates)
     {
+        this.updates = updates;
         this.mode = mode;
         this.run = run;
         this.monitor = monitor;
@@ -91,6 +95,7 @@ public sealed partial class HubViewModel : ObservableObject
         ToggleText = Loc.T(IsActive ? "hub.stop" : "hub.start");
         GameRunning = Aion2Meter.App.Services.GameLauncher.IsRunning;
         LaunchText = Loc.T(GameRunning ? "hub.launch_running" : "hub.launch");
+        UpdateBanner = AppUpdate.CanSelfUpdate && updates.Pending is { } pending ? Loc.T("update.banner", pending.Version) : "";
         var next = timerService.Items().Where(i => i.DueAt > DateTime.Now).MinBy(i => i.DueAt);
         RiftInfo = next is { DueAt: DateTime due }
             ? Loc.T("rift.hub", next.Name, FormatLeft(due - DateTime.Now), due.ToString("HH:mm"))
@@ -164,6 +169,9 @@ public sealed partial class HubViewModel : ObservableObject
 
     [RelayCommand]
     private void ToggleMeter() => mode.Toggle();
+
+    [RelayCommand]
+    private void RestartForUpdate() => AppUpdate.RequestRestart();
 
     [RelayCommand]
     private void ReportProblem() => Overlay.ReportProblem();

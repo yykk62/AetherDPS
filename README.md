@@ -10,6 +10,17 @@ Kostenloser, quelloffener DPS-Meter für **AION 2**, deutsch zuerst und für die
 
 > Inoffizielles Fan-Projekt, nicht mit NCSOFT verbunden. Das Tool liest den Netzwerkverkehr nur **passiv** mit. Es verändert nichts am Spiel und liest keinen Spielspeicher. Die Nutzung erfolgt auf eigene Verantwortung.
 
+![DPS-Meter](docs/screenshot-demo.png)
+
+## Download
+
+**[Aion2Meter.exe von der Release-Seite laden](https://github.com/yykk62/Aion2Meter/releases/latest)**: eine einzige Datei, keine Installation und kein .NET nötig.
+
+- **Voraussetzung:** Windows 10 oder 11 (64 Bit) und Npcap (richtet der Meter beim ersten Start selbst ein)
+- **Wohin damit?** In einen eigenen Ordner, zum Beispiel `Dokumente\Aion2Meter`, nicht in den Download-Ordner und nicht nach `C:\Programme` (dort darf sich die Datei nicht selbst aktualisieren)
+- **Windows-Warnung „Der Computer wurde durch Windows geschützt“:** Die Datei ist (noch) nicht kostenpflichtig signiert. Auf „Weitere Informationen“ → „Trotzdem ausführen“ klicken. Wer sichergehen will, vergleicht die SHA-256-Prüfsumme mit der Angabe auf der Release-Seite: `Get-FileHash Aion2Meter.exe`
+- **Updates kommen automatisch:** Der Meter sieht beim Start und alle 6 Stunden auf GitHub nach, lädt neue Versionen herunter, prüft die Prüfsumme und installiert sie beim nächsten Start. Abschaltbar unter Einstellungen → Updates. Dabei wird nur die öffentliche Release-Seite abgefragt, von dir wird nichts gesendet
+
 ## Installation
 
 1. Aion2Meter starten.
@@ -57,6 +68,9 @@ Aion2Meter.Cli\bin\Debug\net10.0\aion2meter-cli.exe replay|demo <datei>
 ```
 
 Aufbau und Wartung stehen in [docs/WARTUNG.md](docs/WARTUNG.md), das Protokoll in [docs/PROTOKOLL.md](docs/PROTOKOLL.md).
+
+**Release bauen:** `powershell -ExecutionPolicy Bypass -File tools\release.ps1` → `artifacts\release\Aion2Meter.exe` + `.sha256`.
+**Veröffentlichen:** Version in `Aion2Meter.App.csproj` und `CHANGELOG.md` eintragen, dann `git tag v0.2.0` und `git push origin v0.2.0`. GitHub Actions baut, testet und legt das Release an.
 
 ## Danke an
 

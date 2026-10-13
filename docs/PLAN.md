@@ -14,8 +14,9 @@
 
 ## Phase 3: Veröffentlichen
 - [ ] GitHub-Repo (öffentlich, GPL), erst nach Rücksprache
-- [ ] Release als eigenständige Einzeldatei (`dotnet publish -r win-x64 --self-contained -p:PublishSingleFile=true`)
-- [ ] Update-Prüfung über unsere GitHub-Releases (Hash-Prüfung, nicht wie bei Upstream ohne)
+- [x] Release als eigenständige Einzeldatei: `tools/release.ps1`, Pipeline `aion2meter-release.yml` (13.10.)
+- [x] Auto-Update über unsere GitHub-Releases mit SHA-256-Prüfung, nur eine Instanz gleichzeitig (13.10.)
+- [ ] Signatur über die SignPath Foundation beantragen (braucht das öffentliche Repo)
 - [ ] Sync-Bug als Issue oder PR an RATmeter melden
 
 ## Phase 4: Autonome Wartung

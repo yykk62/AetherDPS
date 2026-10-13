@@ -54,4 +54,19 @@ So wenig wie möglich in Upstream-Dateien ändern. Lieber in der Engine erweiter
 
 ## Release
 
-Noch offen, siehe [PLAN.md](PLAN.md).
+1. Version in `Aion2Meter.App/Aion2Meter.App.csproj` (`<Version>`) erhöhen und einen Abschnitt `## x.y.z` oben in `CHANGELOG.md` schreiben.
+2. Committen, dann `git tag vx.y.z` und `git push origin main vx.y.z`.
+3. `.github/workflows/aion2meter-release.yml` baut mit `tools/release.ps1` (Tests, `dotnet publish`, eine einzige exe), schreibt `Aion2Meter.exe.sha256` und legt das GitHub-Release mit dem Text aus dem CHANGELOG an.
+
+**Auto-Update** (`Aion2Meter.Engine/Updates/UpdateService.cs`, `Aion2Meter.App/Services/AppUpdate.cs`):
+- Fragt `api.github.com/repos/yykk62/Aion2Meter/releases/latest` ab (beim Start nach 20 s, dann alle 6 Std.). Drafts und Pre-Releases werden ignoriert.
+- Lädt `Aion2Meter.exe` nach `%LOCALAPPDATA%\Aion2Meter\Update` und übernimmt sie nur, wenn der SHA-256 zu `Aion2Meter.exe.sha256` **und** zum `digest`, den GitHub für das Asset meldet, passt.
+- Installiert wird beim Beenden über das Tray, beim nächsten Start oder per Knopf „Neu starten“: Die laufende exe wird in `.old` umbenannt, die neue an ihre Stelle kopiert. Bei einem Fehler wird zurückgerollt.
+- Nur Builds aus `dotnet publish` aktualisieren sich selbst (Konstante `SELF_UPDATE`). Debug-Builds aus dem Repo tun es nie.
+- Testen ohne GitHub: Umgebungsvariable `AION2METER_UPDATE_API` auf eine lokale `latest.json` zeigen lassen. Am 13.10.2026 so geprüft: 0.1.0 → 0.1.1 per Knopf und 0.1.1 → 0.1.2 beim nächsten Start.
+
+Die exe entpackt Sprachdateien und Spieldaten beim ersten Start nach `%TEMP%\.net\Aion2Meter\<hash>`. Ordner älterer Versionen räumt der Meter beim Start weg.
+
+**Nur ein Meter gleichzeitig:** Ein zweiter Start holt das Hauptfenster der laufenden Instanz nach vorn (Mutex `Local\Aion2Meter`). Wiedergaben mit `--replay` sind davon ausgenommen.
+
+**Signatur:** Die exe ist noch nicht signiert, deshalb warnt SmartScreen. Kostenlos für Open-Source-Projekte geht das über die SignPath Foundation (Antrag mit öffentlichem Repo nötig). Wäre ein Schritt in der Release-Pipeline.

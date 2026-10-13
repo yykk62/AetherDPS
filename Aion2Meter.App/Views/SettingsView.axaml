@@ -92,5 +92,24 @@
       <TextBlock Classes="label" Text="{l:T settings.hide_name}" />
     </CheckBox>
 
+    <!-- Updates -->
+    <StackPanel Spacing="6">
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Classes="label" Text="{l:T update.heading}" />
+        <TextBlock Grid.Column="1" Classes="dim" Text="{Binding VersionText}" VerticalAlignment="Center" />
+      </Grid>
+      <CheckBox IsChecked="{Binding AutoUpdate}" IsEnabled="{Binding CanSelfUpdate}">
+        <TextBlock Text="{l:T update.auto}" />
+      </CheckBox>
+      <TextBlock Classes="dim" Text="{l:T update.auto_hint}" Margin="28,0,0,0" />
+      <WrapPanel>
+        <Button Content="{l:T update.check}" Command="{Binding CheckUpdatesCommand}" IsEnabled="{Binding CanSelfUpdate}" Margin="0,0,8,6" />
+        <Button Classes="primary" Content="{l:T update.restart}" Command="{Binding RestartForUpdateCommand}" IsVisible="{Binding UpdateReady}" Margin="0,0,8,6" />
+        <Button Content="{l:T update.releases}" Command="{Binding OpenReleasesCommand}" Margin="0,0,8,6" />
+      </WrapPanel>
+      <TextBlock Classes="dim" Text="{Binding UpdateStatus}"
+                 IsVisible="{Binding UpdateStatus, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+    </StackPanel>
+
   </StackPanel>
 </UserControl>
