@@ -132,7 +132,7 @@
       </Grid>
 
       <!-- Npcap-Hinweis -->
-      <Button Grid.Row="3" Content="{l:T status.npcap_button}" Command="{Binding OpenNpcapDownloadCommand}"
+      <Button Grid.Row="3" Content="{l:T setup.button}" Command="{Binding OpenSetupCommand}"
               IsVisible="{Binding NpcapMissing}" HorizontalAlignment="Center" Margin="0,4" />
 
       <!-- Fußzeile -->

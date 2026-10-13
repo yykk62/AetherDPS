@@ -1,5 +1,6 @@
 using Aion2Meter.App.ViewModels;
 using Aion2Meter.App.Views;
+using Aion2Meter.Engine;
 using AionDpsMeter.Services.Services.Session;
 using AionDpsMeter.Services.Services.Session.Persistence;
 using Avalonia;
@@ -12,8 +13,11 @@ namespace Aion2Meter.App;
 
 public partial class App : Application
 {
+    private IClassicDesktopStyleApplicationLifetime? desktop;
     private MainWindow? window;
     private MainViewModel? viewModel;
+    private SetupWindow? setupWindow;
+    private bool meterStarted;
 
     public static IServiceProvider Services { get; set; } = null!;
 
@@ -21,24 +25,65 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
         {
+            desktop = lifetime;
             desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-            _ = Services.GetRequiredService<ICombatHistoryStore>();
-            viewModel = Services.GetRequiredService<MainViewModel>();
-            window = Services.GetRequiredService<MainWindow>();
-            desktop.MainWindow = window;
-            window.Show();
-            viewModel.Start();
             desktop.ShutdownRequested += (_, _) => Persist();
+
+            // Ohne Npcap geht nichts – dann zuerst die Einrichtung zeigen.
+            bool replay = Services.GetRequiredService<MeterOptions>().ReplayFile is not null;
+            if (!replay && !Npcap.IsInstalled())
+                ShowSetup();
+            else
+                StartMeter();
         }
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private void StartMeter()
+    {
+        if (desktop is null) return;
+        if (!meterStarted)
+        {
+            meterStarted = true;
+            _ = Services.GetRequiredService<ICombatHistoryStore>();
+            viewModel = Services.GetRequiredService<MainViewModel>();
+            viewModel.SetupRequested += (_, _) => ShowSetup();
+            window = Services.GetRequiredService<MainWindow>();
+        }
+        desktop.MainWindow = window;
+        window!.Show();
+        viewModel!.Start();
+    }
+
+    private void ShowSetup()
+    {
+        if (setupWindow is not null)
+        {
+            setupWindow.Activate();
+            return;
+        }
+
+        var setupViewModel = Services.GetRequiredService<SetupViewModel>();
+        setupWindow = new SetupWindow(setupViewModel);
+        EventHandler onCompleted = (_, _) => setupWindow?.Close();
+        setupViewModel.Completed += onCompleted;
+        setupWindow.Closed += (_, _) =>
+        {
+            setupViewModel.Completed -= onCompleted;
+            setupWindow = null;
+            if (Npcap.IsInstalled()) StartMeter();
+            else if (!meterStarted) Quit();   // Einrichtung abgebrochen, bevor der Meter je lief
+        };
+        if (!meterStarted && desktop is not null) desktop.MainWindow = setupWindow;
+        setupWindow.Show();
     }
 
     public void Quit()
     {
         Persist();
-        (ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.Shutdown();
+        desktop?.Shutdown();
     }
 
     private bool persisted;
@@ -49,6 +94,7 @@ public partial class App : Application
         persisted = true;
         window?.SaveBounds();
         viewModel?.Stop();
+        if (!meterStarted) return;
         try
         {
             Services.GetRequiredService<CombatSessionManager>().CompleteAndPersistActiveSessions();
@@ -73,6 +119,8 @@ public partial class App : Application
         window?.SetClickThrough(!window.IsClickThrough);
 
     private void OnReport(object? sender, EventArgs e) => viewModel?.ReportProblem();
+
+    private void OnSetup(object? sender, EventArgs e) => ShowSetup();
 
     private void OnOpenFolder(object? sender, EventArgs e) => viewModel?.OpenDataFolder();
 

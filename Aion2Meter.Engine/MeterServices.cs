@@ -56,11 +56,3 @@ public static class MeterServices
         return services;
     }
 }
-
-public static class Npcap
-{
-    public const string DownloadUrl = "https://npcap.com/#download";
-
-    public static bool IsInstalled() =>
-        File.Exists(Path.Combine(Environment.SystemDirectory, "Npcap", "wpcap.dll"));
-}

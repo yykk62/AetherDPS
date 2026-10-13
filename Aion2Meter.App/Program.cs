@@ -47,6 +47,7 @@ internal static class Program
             services.AddAion2Meter(options);
             services.AddSingleton<MainViewModel>();
             services.AddSingleton<MainWindow>();
+            services.AddSingleton<SetupViewModel>();
             App.Services = services.BuildServiceProvider();
 
             return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);

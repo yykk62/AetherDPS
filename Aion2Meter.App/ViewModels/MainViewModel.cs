@@ -262,7 +262,10 @@ public sealed partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private static void OpenNpcapDownload() => Open(Npcap.DownloadUrl);
+    private void OpenSetup() => SetupRequested?.Invoke(this, EventArgs.Empty);
+
+    /// <summary>Overlay-Knopf „Npcap installieren“ → App öffnet das Einrichtungsfenster.</summary>
+    public event EventHandler? SetupRequested;
 
     public void OpenDataFolder() => OpenFolder(options.DataDir);
 
