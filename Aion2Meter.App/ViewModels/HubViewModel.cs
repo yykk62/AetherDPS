@@ -87,9 +87,10 @@ public sealed partial class HubViewModel : ObservableObject
         ModeTitle = Loc.T(IsActive ? "hub.mode.active" : "hub.mode.standby");
         ModeText = Loc.T(IsActive ? "hub.mode.active_text" : "hub.mode.standby_text", meterSettings.HotkeyText);
         ToggleText = Loc.T(IsActive ? "hub.stop" : "hub.start");
-        var nextRift = TimerService.NextRift(DateTime.Now, timerService.Settings.RiftAnchor, timerService.Settings.RiftIntervalHours);
-        var left = nextRift - DateTime.Now;
-        RiftInfo = Loc.T("rift.hub", left.TotalHours >= 1 ? left.ToString(@"h\:mm\:ss") : left.ToString(@"mm\:ss"), nextRift.ToString("HH:mm"));
+        var next = timerService.Items().Where(i => i.DueAt > DateTime.Now).MinBy(i => i.DueAt);
+        RiftInfo = next is { DueAt: DateTime due }
+            ? Loc.T("rift.hub", next.Name, FormatLeft(due - DateTime.Now), due.ToString("HH:mm"))
+            : "";
         switch (SelectedTab)
         {
             case TabDps: RefreshRun(); break;
@@ -105,7 +106,7 @@ public sealed partial class HubViewModel : ObservableObject
     {
         var d = live.Diagnostics();
         var self = d.Self is null ? "noch unbekannt – wird beim ersten Skill im laufenden Meter erkannt" : d.SelfGuessed ? $"{d.Self} (wiedererkannt)" : d.Self;
-        BuffDiagnostics = $"Dein Charakter: {self} · Buff-Leiste: {d.OwnBuffEvents} eigene von {d.BuffEvents} empfangenen Buffs";
+        BuffDiagnostics = $"Dein Charakter: {self} · Buff-Leiste: {d.OwnBuffEvents} eigene von {d.BuffEvents} empfangenen Buffs · Abklingzeit-Pakete: {d.CooldownPackets}";
         var snapshot = run.Snapshot();
         var lines = snapshot.Players
             .Select(p => new MeterLine(p.PlayerId, p.Name, p.IsUser, p.IsIdentified, p.ClassId, p.ClassName, p.Damage, p.Dps, p.Share))
@@ -150,6 +151,9 @@ public sealed partial class HubViewModel : ObservableObject
     }
 
     partial void OnSelectedTabChanged(int value) => Refresh();
+
+    private static string FormatLeft(TimeSpan left) =>
+        left.TotalHours >= 24 ? $"{(int)left.TotalDays} T {left.Hours} Std." : left.TotalHours >= 1 ? left.ToString(@"h\:mm\:ss") : left.ToString(@"mm\:ss");
 
     [RelayCommand]
     private void ToggleMeter() => mode.Toggle();

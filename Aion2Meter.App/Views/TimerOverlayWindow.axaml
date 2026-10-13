@@ -1,0 +1,98 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Aion2Meter.App.ViewModels"
+        xmlns:l="using:Aion2Meter.App.Services"
+        x:Class="Aion2Meter.App.Views.TimerOverlayWindow"
+        x:DataType="vm:TimerOverlayViewModel"
+        Title="{l:T timer_overlay.title}"
+        Width="300" Height="260" MinWidth="200" MinHeight="90"
+        SystemDecorations="None" Topmost="True" CanResize="True" ShowActivated="False" ShowInTaskbar="False"
+        TransparencyLevelHint="Transparent" Background="Transparent" Icon="/Assets/icon.ico">
+
+  <Window.Styles>
+    <Style Selector="Button.icon">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="#C9CED6" />
+      <Setter Property="Padding" Value="6,2" />
+      <Setter Property="MinWidth" Value="0" />
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="CornerRadius" Value="4" />
+    </Style>
+    <Style Selector="ToggleButton.icon">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="#C9CED6" />
+      <Setter Property="Padding" Value="6,2" />
+      <Setter Property="MinWidth" Value="0" />
+      <Setter Property="CornerRadius" Value="4" />
+    </Style>
+    <Style Selector="ToggleButton.icon:checked /template/ ContentPresenter">
+      <Setter Property="Background" Value="#55D4A84B" />
+    </Style>
+    <Style Selector="TextBlock">
+      <Setter Property="Foreground" Value="#E6E8EC" />
+    </Style>
+    <Style Selector="TextBlock.dim">
+      <Setter Property="Foreground" Value="#8E96A3" />
+    </Style>
+    <Style Selector="Border.row">
+      <Setter Property="Background" Value="#14FFFFFF" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="Margin" Value="0,0,0,2" />
+      <Setter Property="Padding" Value="6,3" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="Border.row:pointerover">
+      <Setter Property="Background" Value="#24FFFFFF" />
+    </Style>
+  </Window.Styles>
+
+  <Border Name="Root" Background="#E6141820" CornerRadius="8" BorderThickness="1"
+          BorderBrush="{Binding IsClickThrough, Converter={x:Static l:BoolBrush.LockedGoldElseSubtle}}">
+    <Grid RowDefinitions="Auto,*">
+      <Grid Name="Header" ColumnDefinitions="*,Auto" Margin="10,6,4,4" Background="Transparent">
+        <TextBlock Text="{l:T timer_overlay.title}" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center" />
+        <StackPanel Grid.Column="1" Orientation="Horizontal">
+          <Button Classes="icon" Content="＋" Command="{Binding EditCommand}" ToolTip.Tip="{l:T timer_overlay.add}" />
+          <ToggleButton Classes="icon" Name="LockButton" ToolTip.Tip="{l:T header.clickthrough}" AutomationProperties.Name="Sperren">
+            <Panel>
+              <PathIcon Width="13" Height="13" IsVisible="{Binding !IsClickThrough}"
+                        Data="M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V10A2,2 0 0,1 6,8H15V6A3,3 0 0,0 12,3A3,3 0 0,0 9,6H7A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,17A2,2 0 0,0 14,15A2,2 0 0,0 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17Z" />
+              <PathIcon Width="13" Height="13" IsVisible="{Binding IsClickThrough}" Foreground="#E0A84A"
+                        Data="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z" />
+            </Panel>
+          </ToggleButton>
+          <Button Classes="icon" Content="✕" Command="{Binding HideCommand}" ToolTip.Tip="{l:T timer_overlay.close}" />
+        </StackPanel>
+      </Grid>
+
+      <Panel Grid.Row="1" Margin="8,0,8,8">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <ItemsControl ItemsSource="{Binding Rows}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:TimerRow">
+                <Border Classes="row" PointerReleased="OnRowReleased">
+                  <Border.ContextMenu>
+                    <ContextMenu>
+                      <MenuItem Header="{l:T timer_overlay.edit}" Click="OnEditClicked" />
+                      <MenuItem Header="{l:T timer_overlay.hide}" Command="{Binding HideInOverlayCommand}" />
+                      <MenuItem Header="{l:T timer_overlay.remove}" Command="{Binding RemoveCommand}" />
+                    </ContextMenu>
+                  </Border.ContextMenu>
+                  <Grid ColumnDefinitions="20,*,Auto,Auto">
+                    <TextBlock Text="{Binding Icon}" Foreground="#E0A84A" FontSize="13" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="2" Text="{Binding At}" Classes="dim" FontSize="11" Margin="6,0,0,0" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="3" Text="{Binding Remaining}" FontSize="13" FontWeight="SemiBold" Margin="8,0,0,0" MinWidth="58" TextAlignment="Right" VerticalAlignment="Center"
+                               Foreground="{Binding IsSoon, Converter={x:Static l:BoolBrush.DueGreenElseText}}" />
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+        <TextBlock Text="{l:T timer_overlay.empty}" Classes="dim" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"
+                   IsVisible="{Binding !HasRows}" />
+      </Panel>
+    </Grid>
+  </Border>
+</Window>

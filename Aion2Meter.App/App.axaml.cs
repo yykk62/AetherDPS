@@ -98,9 +98,18 @@ public partial class App : Application
                     buffBar.Hide();
                 }
             }).Start();
+
+            // Timer-Overlay – eigenes Fenster, unabhängig von STRG+W
+            timersVm = Services.GetRequiredService<TimersViewModel>();
+            var timerOverlayVm = Services.GetRequiredService<TimerOverlayViewModel>();
+            timerOverlay = new TimerOverlayWindow(timerOverlayVm, timerService);
+            timerOverlayVm.EditRequested += (_, _) => ShowHub(HubViewModel.TabTimers);
+            timerOverlayVm.HideRequested += (_, _) => timersVm.OverlayVisible = false;
+            timersVm.OverlayVisibilityChanged += (_, _) => UpdateTimerOverlay();
         }
         desktop.MainWindow = hub;
         viewModel!.Start();
+        UpdateTimerOverlay();
 
         if (Services.GetRequiredService<MeterOptions>().ReplayFile is not null)
         {
@@ -119,6 +128,25 @@ public partial class App : Application
     private HubWindow? hub;
 
     private void ShowHub(int tab) => hub?.ShowTab(tab);
+
+    private TimersViewModel? timersVm;
+    private TimerOverlayWindow? timerOverlay;
+
+    private void UpdateTimerOverlay()
+    {
+        if (timerOverlay is null || timersVm is null) return;
+        if (timersVm.OverlayVisible && !timerOverlay.IsVisible) timerOverlay.Show();
+        else if (!timersVm.OverlayVisible && timerOverlay.IsVisible)
+        {
+            timerOverlay.SaveBounds();
+            timerOverlay.Hide();
+        }
+    }
+
+    private void OnToggleTimerOverlay(object? sender, EventArgs e)
+    {
+        if (timersVm is not null) timersVm.OverlayVisible = !timersVm.OverlayVisible;
+    }
 
     private ScreenshotWindow? screenshotWindow;
     private BuffBarWindow? buffBar;
@@ -197,6 +225,7 @@ public partial class App : Application
         persisted = true;
         hotkey?.Dispose();
         window?.SaveBounds();
+        timerOverlay?.SaveBounds();
         viewModel?.Stop();
         if (!meterStarted) return;
         try

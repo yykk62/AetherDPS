@@ -24,7 +24,7 @@ Die Einstellungen, die Kampf-Historie, die Logs und die Mitschnitte liegen unter
 - **DPS-Meter:** Status und aktueller Lauf
 - **Läufe:** Archiv aller Läufe mit Boss-Zeiten, Bestzeit 🏆, Vergleich mit deinem Durchschnitt, Kampfanalyse pro Spieler (Aktivität, Tode, Skills, Buff-Laufzeit) sowie „Als Bild/Text kopieren“ für Discord
 - **Gruppe:** Mitglieder mit Server, Stufe und Kampfkraft (nur für dich sichtbar)
-- **Timer:** Riss-Countdown, Feldboss-Timer (Kill wird automatisch erkannt) und eigene Timer, jeweils mit Erinnerung
+- **Timer:** Zeitpläne für Risse, Weltbosse und Events (Wochentage + Uhrzeiten oder Takt, selbst anlegbar), Feldboss-Timer (Kill wird automatisch erkannt), eigene Countdowns, jeweils mit Erinnerung. Dazu ein eigenes **Timer-Overlay**, unabhängig vom DPS-Meter: verschiebbar, skalierbar und sperrbar, Klick führt zum Bearbeiten
 - **Checkliste:** Tägliches und Wöchentliches mit automatischem Reset und Erinnerung
 - **Verbindung** und **Einstellungen**
 

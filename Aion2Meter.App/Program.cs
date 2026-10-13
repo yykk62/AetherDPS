@@ -55,6 +55,7 @@ internal static class Program
             services.AddSingleton<TimersViewModel>();
             services.AddSingleton<ChecklistViewModel>();
             services.AddSingleton<BuffBarViewModel>();
+            services.AddSingleton<TimerOverlayViewModel>();
             services.AddSingleton<HubWindow>();
             App.Services = services.BuildServiceProvider();
 

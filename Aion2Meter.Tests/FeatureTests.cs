@@ -95,13 +95,18 @@ public sealed class FeatureTests : IDisposable
         });
         Assert.Empty(live.Active());
 
-        // 101 trifft mit Skill X, danach kommt die Abklingzeit für Skill X → 101 bist du
-        host.Feed(SyntheticPackets.Damage(5001, 101, 11000001, 1_000), 1_100);
+        // Abklingzeit für Skill X kommt beim Auslösen (VOR dem Treffer), dann trifft 101 mit Skill X → Stimme 1;
+        // danach umgekehrte Reihenfolge → Stimme 2 → 101 bist du
         var skill = AionDpsMeter.Core.GameData.Services.GameDataProvider.Instance.GetSkillOrDefault(11000001);
-        host.Sessions.RegisterSkillCdEvent(new AionDpsMeter.Services.Services.Timed.TimedEvent
+        void Cooldown() => host.Sessions.RegisterSkillCdEvent(new AionDpsMeter.Services.Services.Timed.TimedEvent
         {
             Id = (uint)skill.Id, Name = skill.Name, IconUrl = "", Duration = TimeSpan.FromSeconds(8),
         });
+        Cooldown();
+        host.Feed(SyntheticPackets.Damage(5001, 101, 11000001, 1_000), 1_100);
+        Assert.Empty(live.Active());   // eine Stimme reicht noch nicht
+        host.Feed(SyntheticPackets.Damage(5001, 101, 11000001, 1_000), 1_200);
+        Cooldown();
 
         Assert.Contains(live.Active(), i => i.Name == "Kampfrausch");   // nachgetragen
         var me = host.Get<AionDpsMeter.Services.Services.Entity.EntityTracker>().GetPlayerEntity(101);
@@ -125,6 +130,34 @@ public sealed class FeatureTests : IDisposable
         var result = MeterFilter.Apply(lines, host.Get<PartyRoster>(), settings);
         var only = Assert.Single(result.Lines);
         Assert.Equal(12_000, only.TotalDamage);
+    }
+
+    [Fact]
+    public void Zeitplan_mit_Wochentagen_und_Takt()
+    {
+        var tue = DateTime.Parse("2026-10-13 21:00");   // Dienstag
+        var weekly = new ScheduleEntry { Days = [DayOfWeek.Monday, DayOfWeek.Thursday, DayOfWeek.Saturday], Times = ["20:00", "23:00"] };
+        Assert.Equal(DateTime.Parse("2026-10-15 20:00"), weekly.Next(tue));          // nächster Do
+        Assert.Equal(DateTime.Parse("2026-10-15 23:00"), weekly.Next(DateTime.Parse("2026-10-15 20:30")));
+
+        var daily = new ScheduleEntry { Times = ["18:00"] };
+        Assert.Equal(DateTime.Parse("2026-10-14 18:00"), daily.Next(tue));
+
+        var rift = new ScheduleEntry { Times = ["02:00"], IntervalHours = 3 };
+        Assert.Equal(DateTime.Parse("2026-10-13 23:00"), rift.Next(tue));
+        Assert.Equal("Mo, Do, Sa · 20:00, 23:00", weekly.Describe());
+    }
+
+    [Fact]
+    public void Alte_Riss_Einstellung_wird_in_Zeitplaene_uebernommen()
+    {
+        Directory.CreateDirectory(dataDir);
+        File.WriteAllText(Path.Combine(dataDir, "timer.json"), """{ "RiftAnchor": "01:30", "RiftIntervalHours": 2 }""");
+        using var host = NewHost();
+        var rift = host.Get<TimerService>().Schedules.First();
+        Assert.Equal("Raumzeit-Riss", rift.Name);
+        Assert.Equal(["01:30"], rift.Times);
+        Assert.Equal(2, rift.IntervalHours);
     }
 
     [Fact]

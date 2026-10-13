@@ -9,7 +9,7 @@ public sealed record LiveItem(string Name, TimeSpan Remaining, TimeSpan Duration
     public double Fraction => Duration.TotalMilliseconds > 0 ? Remaining.TotalMilliseconds / Duration.TotalMilliseconds : 0;
 }
 
-public sealed record LiveDiagnostics(int BuffEvents, int OwnBuffEvents, string? Self, bool SelfGuessed);
+public sealed record LiveDiagnostics(int BuffEvents, int OwnBuffEvents, string? Self, bool SelfGuessed, int CooldownPackets);
 
 /// <summary>
 /// Buff-Leiste: aktive Buffs auf deinem Charakter, so wie das Spiel sie schickt.
@@ -79,6 +79,6 @@ public sealed class LiveTimers
 
     public LiveDiagnostics Diagnostics()
     {
-        lock (gate) return new LiveDiagnostics(buffEvents, ownBuffEvents, self.Name, self.Guessed);
+        lock (gate) return new LiveDiagnostics(buffEvents, ownBuffEvents, self.Name, self.Guessed, self.CooldownPackets);
     }
 }

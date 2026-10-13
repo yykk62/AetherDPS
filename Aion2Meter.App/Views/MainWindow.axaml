@@ -159,13 +159,12 @@
       </StackPanel>
 
       <!-- Fußzeile -->
-      <Grid Grid.Row="4" ColumnDefinitions="Auto,*,Auto,Auto" Margin="10,4,10,6">
+      <Grid Grid.Row="4" ColumnDefinitions="Auto,*,Auto" Margin="10,4,10,6">
         <Ellipse Width="7" Height="7" VerticalAlignment="Center" Margin="0,0,6,0"
                  Fill="{Binding IsConnected, Converter={x:Static l:BoolBrush.ConnectedGreenElseAmber}}" />
         <TextBlock Grid.Column="1" Text="{Binding StatusText}" FontSize="11" Classes="dim" TextTrimming="CharacterEllipsis"
                    ToolTip.Tip="{Binding StatusText}" />
-        <TextBlock Grid.Column="2" Text="{Binding RiftText}" FontSize="11" Foreground="#E0A84A" Margin="8,0,0,0" ToolTip.Tip="{l:T rift.tooltip}" />
-        <TextBlock Grid.Column="3" Text="{Binding PartyDps}" FontSize="11" Classes="dim" Margin="8,0,0,0" />
+        <TextBlock Grid.Column="2" Text="{Binding PartyDps}" FontSize="11" Classes="dim" Margin="8,0,0,0" />
       </Grid>
     </Grid>
   </Border>

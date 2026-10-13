@@ -52,7 +52,6 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty] private string notice = "";
     [ObservableProperty] private bool isStandby = true;
     [ObservableProperty] private string standbyText = "";
-    [ObservableProperty] private string riftText = "";
     [ObservableProperty] private bool showNameHint;
     [ObservableProperty] private bool showTargetView;
     [ObservableProperty] private string viewLabel = Loc.T("view.run");
@@ -120,7 +119,6 @@ public sealed partial class MainViewModel : ObservableObject
     private void Refresh()
     {
         UpdateStatus();
-        RiftText = RiftCountdown(timers);
 
         var target = sessions.GetActiveTargetInfo();
         HasTarget = target is not null;
@@ -159,15 +157,6 @@ public sealed partial class MainViewModel : ObservableObject
 
         UpdatePlayers(entries);
         if (ShowDetails) UpdateSkills();
-    }
-
-    /// <summary>„Riss 1:23:45“ – Countdown bis zum nächsten Raumzeit-Riss.</summary>
-    public static string RiftCountdown(TimerService timers)
-    {
-        var now = DateTime.Now;
-        var next = TimerService.NextRift(now, timers.Settings.RiftAnchor, timers.Settings.RiftIntervalHours);
-        var left = next - now;
-        return Loc.T("rift.short", left.TotalHours >= 1 ? left.ToString(@"h\:mm\:ss") : left.ToString(@"mm\:ss"));
     }
 
     private static string FormatDuration(TimeSpan t) =>

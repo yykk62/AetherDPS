@@ -15,24 +15,35 @@ public sealed record BossKill(string Name, DateTime KilledAt);
 
 public sealed class TimerSettings
 {
-    /// <summary>Uhrzeit eines bekannten Riss-Starts (lokale Zeit) – von dort aus im Takt weiter.</summary>
+    // alt (vor Zeitplänen) – wird beim ersten Laden in Schedules übernommen
     public string RiftAnchor { get; set; } = "02:00";
     public double RiftIntervalHours { get; set; } = 3;
-    public int ReminderMinutes { get; set; } = 5;
     public bool RiftReminder { get; set; } = true;
+
+    public int ReminderMinutes { get; set; } = 5;
+    public List<ScheduleEntry>? Schedules { get; set; }
     public Dictionary<string, int> BossRespawnMinutes { get; set; } = [];
     public HashSet<string> IgnoredBosses { get; set; } = [];
     public List<CustomTimer> Custom { get; set; } = [];
     public List<BossKill> Kills { get; set; } = [];
+
+    // Timer-Overlay
+    public bool OverlayVisible { get; set; } = true;
+    public double? OverlayLeft { get; set; }
+    public double? OverlayTop { get; set; }
+    public double? OverlayWidth { get; set; }
+    public double? OverlayHeight { get; set; }
 }
 
-public enum TimerKind { Rift, Boss, Custom }
+public enum TimerKind { Schedule, Boss, Custom }
 
-public sealed record TimerItem(TimerKind Kind, string Name, DateTime? DueAt, TimeSpan? Remaining, string? Detail);
+public sealed record TimerItem(TimerKind Kind, string Name, string Category, DateTime? DueAt, TimeSpan? Remaining,
+    string? Detail, bool ShowInOverlay, bool Unconfirmed);
 
 /// <summary>
-/// Timer: Risse nach Zeitplan, Feldbosse (Tod wird aus dem Netzwerk erkannt, Respawn-Dauer
-/// stellt der Nutzer je Boss einmal ein) und eigene Timer. Feuert Erinnerungen.
+/// Timer: feste Zeitpläne (Risse, Weltbosse, Events – selbst anlegbar), Feldbosse (Tod wird
+/// aus dem Netzwerk erkannt, Respawn-Dauer stellt der Nutzer je Boss einmal ein) und eigene
+/// Countdown-Timer. Feuert Erinnerungen.
 /// </summary>
 public sealed class TimerService
 {
@@ -49,6 +60,8 @@ public sealed class TimerService
 
     public TimerSettings Settings { get; }
 
+    public IReadOnlyList<ScheduleEntry> Schedules { get { lock (gate) return Settings.Schedules!.ToList(); } }
+
     /// <summary>Erinnerung (Titel, Text). Wird auf dem aufrufenden Thread von <see cref="Tick"/> ausgelöst.</summary>
     public event Action<string, string>? Reminder;
     public event EventHandler? Changed;
@@ -58,6 +71,11 @@ public sealed class TimerService
         file = Path.Combine(options.DataDir, "timer.json");
         this.entities = entities;
         Settings = Load(file);
+        if (Settings.Schedules is null)
+        {
+            Settings.Schedules = ScheduleEntry.Defaults(Settings.RiftAnchor, Settings.RiftIntervalHours, Settings.RiftReminder);
+            if (File.Exists(file)) Save();
+        }
         entities.EntityDied += OnEntityDied;
     }
 
@@ -77,7 +95,7 @@ public sealed class TimerService
         Save();
     }
 
-    /// <summary>Nächster Riss-Start ab <paramref name="now"/>.</summary>
+    /// <summary>Nächster Termin im Takt ab <paramref name="now"/> (Startpunkt + n × Intervall).</summary>
     public static DateTime NextRift(DateTime now, string anchor, double intervalHours)
     {
         if (!TimeSpan.TryParse(anchor, out var time)) time = TimeSpan.FromHours(2);
@@ -94,25 +112,31 @@ public sealed class TimerService
         var list = new List<TimerItem>();
         lock (gate)
         {
-            var rift = NextRift(now, Settings.RiftAnchor, Settings.RiftIntervalHours);
-            list.Add(new TimerItem(TimerKind.Rift, "Raumzeit-Riss", rift, rift - now, null));
+            foreach (var s in Settings.Schedules!.Where(s => s.Enabled))
+            {
+                var next = s.Next(now);
+                list.Add(new TimerItem(TimerKind.Schedule, s.Name, s.Category, next, next - now, s.Describe(),
+                    s.ShowInOverlay, s.Unconfirmed));
+            }
 
             foreach (var kill in Settings.Kills.OrderByDescending(k => k.KilledAt))
             {
                 if (Settings.BossRespawnMinutes.TryGetValue(kill.Name, out var minutes) && minutes > 0)
                 {
                     var due = kill.KilledAt.AddMinutes(minutes);
-                    list.Add(new TimerItem(TimerKind.Boss, kill.Name, due, due > now ? due - now : TimeSpan.Zero, $"getötet {kill.KilledAt:HH:mm}"));
+                    list.Add(new TimerItem(TimerKind.Boss, kill.Name, "Feldboss", due, due > now ? due - now : TimeSpan.Zero,
+                        $"getötet {kill.KilledAt:HH:mm}", true, false));
                 }
                 else
                 {
-                    list.Add(new TimerItem(TimerKind.Boss, kill.Name, null, null, $"getötet {kill.KilledAt:HH:mm} – Respawn-Zeit eintragen"));
+                    list.Add(new TimerItem(TimerKind.Boss, kill.Name, "Feldboss", null, null,
+                        $"getötet {kill.KilledAt:HH:mm} – Respawn-Zeit eintragen", true, false));
                 }
             }
 
             foreach (var custom in Settings.Custom)
-                list.Add(new TimerItem(TimerKind.Custom, custom.Name, custom.EndsAt,
-                    custom.EndsAt is DateTime e ? (e > now ? e - now : TimeSpan.Zero) : null, $"{custom.Minutes} Min."));
+                list.Add(new TimerItem(TimerKind.Custom, custom.Name, "Eigener Timer", custom.EndsAt,
+                    custom.EndsAt is DateTime e ? (e > now ? e - now : TimeSpan.Zero) : null, $"{custom.Minutes} Min.", true, false));
         }
         return list;
     }
@@ -125,11 +149,10 @@ public sealed class TimerService
         lock (gate)
         {
             var lead = TimeSpan.FromMinutes(Math.Max(0, Settings.ReminderMinutes));
-            if (Settings.RiftReminder)
+            foreach (var s in Settings.Schedules!.Where(s => s.Enabled && s.Reminder))
             {
-                var rift = NextRift(now, Settings.RiftAnchor, Settings.RiftIntervalHours);
-                if (rift - now <= lead && remindedKeys.Add($"rift:{rift:O}"))
-                    reminders.Add(("Raumzeit-Riss", $"öffnet um {rift:HH:mm} (in {Math.Ceiling((rift - now).TotalMinutes)} Min.)"));
+                if (s.Next(now) is DateTime next && next - now <= lead && remindedKeys.Add($"plan:{s.Name}:{next:O}"))
+                    reminders.Add((s.Name, $"um {next:HH:mm} (in {Math.Ceiling((next - now).TotalMinutes)} Min.)"));
             }
 
             foreach (var kill in Settings.Kills)
@@ -182,12 +205,46 @@ public sealed class TimerService
         Save();
     }
 
+    public void AddSchedule(ScheduleEntry entry)
+    {
+        lock (gate) Settings.Schedules!.Add(entry);
+        Save();
+    }
+
+    public void ReplaceSchedule(ScheduleEntry old, ScheduleEntry updated)
+    {
+        lock (gate)
+        {
+            int i = Settings.Schedules!.IndexOf(old);
+            if (i >= 0) Settings.Schedules[i] = updated;
+            else Settings.Schedules.Add(updated);
+        }
+        Save();
+    }
+
+    public void RemoveSchedule(ScheduleEntry entry)
+    {
+        lock (gate) Settings.Schedules!.Remove(entry);
+        Save();
+    }
+
+    public void SetOverlayFlag(TimerKind kind, string name, bool show)
+    {
+        if (kind != TimerKind.Schedule) return;
+        lock (gate)
+        {
+            foreach (var s in Settings.Schedules!.Where(s => s.Name == name)) s.ShowInOverlay = show;
+        }
+        Save();
+    }
+
     public void Remove(TimerKind kind, string name)
     {
         lock (gate)
         {
             if (kind == TimerKind.Custom) Settings.Custom.RemoveAll(c => c.Name == name);
             if (kind == TimerKind.Boss) Settings.Kills.RemoveAll(k => k.Name == name);
+            if (kind == TimerKind.Schedule) Settings.Schedules!.RemoveAll(s => s.Name == name);
         }
         Save();
     }

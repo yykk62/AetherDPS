@@ -1,22 +1,35 @@
 using System.Collections.ObjectModel;
+using System.Globalization;
 using Aion2Meter.Engine;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace Aion2Meter.App.ViewModels;
 
+public static class TimerIcons
+{
+    public static string For(TimerItem item) => item.Kind switch
+    {
+        TimerKind.Boss => "☠",
+        TimerKind.Custom => "⏱",
+        _ => item.Category switch { "Riss" => "◈", "Weltboss" => "♛", _ => "★" },
+    };
+}
+
 public sealed partial class TimerRow(TimersViewModel owner, TimerItem item) : ObservableObject
 {
     public TimerItem Item { get; } = item;
-    public string Icon => Item.Kind switch { TimerKind.Rift => "◈", TimerKind.Boss => "☠", _ => "⏱" };
-    public string Name => Item.Name;
-    public string Detail => Item.Detail ?? (Item.DueAt is DateTime d ? $"um {d:HH:mm}" : "");
+    public string Icon => TimerIcons.For(Item);
+    public string Name => Item.Name + (Item.Unconfirmed ? " *" : "");
+    public string Detail => Item.Detail ?? "";
     public bool IsBoss => Item.Kind == TimerKind.Boss;
     public bool IsCustom => Item.Kind == TimerKind.Custom;
     public bool NeedsRespawn => IsBoss && Item.DueAt is null;
 
     [ObservableProperty] private string remaining = "";
+    [ObservableProperty] private string at = "";
     [ObservableProperty] private bool isDue;
+    [ObservableProperty] private bool isSoon;
     [ObservableProperty] private string respawnMinutes = "";
 
     public void Update(DateTime now)
@@ -24,71 +37,185 @@ public sealed partial class TimerRow(TimersViewModel owner, TimerItem item) : Ob
         if (Item.DueAt is not DateTime due)
         {
             Remaining = "–";
+            At = "";
             return;
         }
         var left = due - now;
         IsDue = left <= TimeSpan.Zero;
-        Remaining = IsDue ? "jetzt" : left.TotalHours >= 1 ? left.ToString(@"h\:mm\:ss") : left.ToString(@"mm\:ss");
+        IsSoon = !IsDue && left <= TimeSpan.FromMinutes(10);
+        At = due.Date == now.Date ? $"um {due:HH:mm}" : $"{due:ddd HH:mm}";
+        Remaining = IsDue ? "jetzt" : left.TotalHours >= 24 ? $"{(int)left.TotalDays} T {left.Hours} Std."
+            : left.TotalHours >= 1 ? left.ToString(@"h\:mm\:ss") : left.ToString(@"mm\:ss");
     }
 
     [RelayCommand]
     private void SaveRespawn()
     {
-        if (int.TryParse(RespawnMinutes, out var minutes) && minutes > 0) owner.SetRespawn(Name, minutes);
+        if (int.TryParse(RespawnMinutes, out var minutes) && minutes > 0) owner.SetRespawn(Item.Name, minutes);
     }
 
     [RelayCommand]
-    private void Ignore() => owner.Ignore(Name);
+    private void Ignore() => owner.Ignore(Item.Name);
 
     [RelayCommand]
-    private void Start() => owner.StartCustom(Name);
+    private void Start() => owner.StartCustom(Item.Name);
 
     [RelayCommand]
-    private void Remove() => owner.Remove(Item.Kind, Name);
+    private void Remove() => owner.Remove(Item.Kind, Item.Name);
+
+    [RelayCommand]
+    private void HideInOverlay() => owner.SetOverlay(Item, false);
 }
 
-/// <summary>Reiter „Timer“: Risse, Feldbosse (automatisch), eigene Timer.</summary>
+/// <summary>Bearbeitbare Kopie eines Zeitplans (gespeichert erst mit „Speichern“).</summary>
+public sealed partial class ScheduleEditor : ObservableObject
+{
+    private readonly TimersViewModel owner;
+    public ScheduleEntry? Original { get; }
+
+    [ObservableProperty] private string name;
+    [ObservableProperty] private string category;
+    [ObservableProperty] private bool enabled;
+    [ObservableProperty] private bool showInOverlay;
+    [ObservableProperty] private bool reminder;
+    [ObservableProperty] private string timesText;
+    [ObservableProperty] private string intervalText;
+    [ObservableProperty] private bool unconfirmed;
+    [ObservableProperty] private bool mo;
+    [ObservableProperty] private bool di;
+    [ObservableProperty] private bool mi;
+    [ObservableProperty] private bool don;
+    [ObservableProperty] private bool fr;
+    [ObservableProperty] private bool sa;
+    [ObservableProperty] private bool so;
+    [ObservableProperty] private string error = "";
+
+    public IReadOnlyList<string> Categories { get; } = ["Riss", "Weltboss", "Event", "Sonstiges"];
+
+    public ScheduleEditor(TimersViewModel owner, ScheduleEntry? original)
+    {
+        this.owner = owner;
+        Original = original;
+        var e = original ?? new ScheduleEntry { Name = "Neuer Zeitplan", Category = "Event", Times = ["20:00"] };
+        name = e.Name;
+        category = e.Category;
+        enabled = e.Enabled;
+        showInOverlay = e.ShowInOverlay;
+        reminder = e.Reminder;
+        timesText = string.Join(", ", e.Times);
+        intervalText = e.IntervalHours > 0 ? e.IntervalHours.ToString("0.##", CultureInfo.GetCultureInfo("de-DE")) : "";
+        unconfirmed = e.Unconfirmed;
+        mo = e.Days.Contains(DayOfWeek.Monday);
+        di = e.Days.Contains(DayOfWeek.Tuesday);
+        mi = e.Days.Contains(DayOfWeek.Wednesday);
+        don = e.Days.Contains(DayOfWeek.Thursday);
+        fr = e.Days.Contains(DayOfWeek.Friday);
+        sa = e.Days.Contains(DayOfWeek.Saturday);
+        so = e.Days.Contains(DayOfWeek.Sunday);
+    }
+
+    public string Summary => Original is null ? "neu" : Original.Describe();
+
+    [RelayCommand]
+    private void Save()
+    {
+        var times = TimesText.Split([',', ';', ' '], StringSplitOptions.RemoveEmptyEntries)
+            .Select(t => TimeSpan.TryParse(t, CultureInfo.InvariantCulture, out var ts) ? ts.ToString(@"hh\:mm") : null)
+            .ToList();
+        if (string.IsNullOrWhiteSpace(Name) || times.Count == 0 || times.Any(t => t is null))
+        {
+            Error = "Name und mindestens eine Uhrzeit (z. B. 20:00, 23:00) eintragen.";
+            return;
+        }
+        double interval = 0;
+        if (!string.IsNullOrWhiteSpace(IntervalText) && !double.TryParse(IntervalText, CultureInfo.GetCultureInfo("de-DE"), out interval))
+        {
+            Error = "Takt als Zahl in Stunden, z. B. 3 – oder leer lassen.";
+            return;
+        }
+
+        var days = new List<DayOfWeek>();
+        if (Mo) days.Add(DayOfWeek.Monday);
+        if (Di) days.Add(DayOfWeek.Tuesday);
+        if (Mi) days.Add(DayOfWeek.Wednesday);
+        if (Don) days.Add(DayOfWeek.Thursday);
+        if (Fr) days.Add(DayOfWeek.Friday);
+        if (Sa) days.Add(DayOfWeek.Saturday);
+        if (So) days.Add(DayOfWeek.Sunday);
+
+        var entry = new ScheduleEntry
+        {
+            Name = Name.Trim(), Category = Category, Enabled = Enabled, ShowInOverlay = ShowInOverlay, Reminder = Reminder,
+            Times = times!, IntervalHours = interval, Days = days,
+            // wer die Zeiten selbst angepasst hat, hat sie bestätigt
+            Unconfirmed = Unconfirmed && Original is not null && TimesText == string.Join(", ", Original.Times),
+        };
+        Error = "";
+        owner.SaveSchedule(Original, entry);
+    }
+
+    [RelayCommand]
+    private void Delete() => owner.DeleteSchedule(this);
+}
+
+/// <summary>Reiter „Timer“: alle Timer, Zeitplan-Editor, Feldbosse, eigene Timer.</summary>
 public sealed partial class TimersViewModel : ObservableObject
 {
     private readonly TimerService timers;
 
     public ObservableCollection<TimerRow> Rows { get; } = [];
+    public ObservableCollection<ScheduleEditor> Schedules { get; } = [];
 
     [ObservableProperty] private string newName = "";
     [ObservableProperty] private string newMinutes = "";
-    [ObservableProperty] private string riftAnchor;
-    [ObservableProperty] private string riftInterval;
     [ObservableProperty] private string reminderMinutes;
-    [ObservableProperty] private bool riftReminder;
+    [ObservableProperty] private bool overlayVisible;
+
+    /// <summary>Timer-Overlay ein/aus (die App reagiert darauf).</summary>
+    public event EventHandler? OverlayVisibilityChanged;
 
     public TimersViewModel(TimerService timers)
     {
         this.timers = timers;
-        riftAnchor = timers.Settings.RiftAnchor;
-        riftInterval = timers.Settings.RiftIntervalHours.ToString(System.Globalization.CultureInfo.GetCultureInfo("de-DE"));
-        reminderMinutes = timers.Settings.ReminderMinutes.ToString();
-        riftReminder = timers.Settings.RiftReminder;
+        reminderMinutes = timers.Settings.ReminderMinutes.ToString(CultureInfo.InvariantCulture);
+        overlayVisible = timers.Settings.OverlayVisible;
         timers.Changed += (_, _) => Avalonia.Threading.Dispatcher.UIThread.Post(Rebuild);
         Rebuild();
+        ReloadSchedules();
     }
+
+    public TimerService Service => timers;
 
     private void Rebuild()
     {
         Rows.Clear();
-        foreach (var item in timers.Items()) Rows.Add(new TimerRow(this, item));
+        foreach (var item in timers.Items().OrderBy(i => i.DueAt ?? DateTime.MaxValue)) Rows.Add(new TimerRow(this, item));
         Tick();
+    }
+
+    public void ReloadSchedules()
+    {
+        Schedules.Clear();
+        foreach (var s in timers.Schedules) Schedules.Add(new ScheduleEditor(this, s));
     }
 
     public void Tick()
     {
         var now = DateTime.Now;
-        // Riss-Zeit rollt weiter → neu aufbauen, wenn der angezeigte Riss vorbei ist
-        if (Rows.FirstOrDefault(r => r.Item.Kind == TimerKind.Rift) is { Item.DueAt: DateTime due } && due <= now)
+        // Termin vorbei → nächsten Termin neu berechnen
+        if (Rows.Any(r => r.Item.Kind == TimerKind.Schedule && r.Item.DueAt is DateTime due && due <= now))
         {
             Rebuild();
             return;
         }
         foreach (var row in Rows) row.Update(now);
+    }
+
+    partial void OnOverlayVisibleChanged(bool value)
+    {
+        timers.Settings.OverlayVisible = value;
+        timers.Save();
+        OverlayVisibilityChanged?.Invoke(this, EventArgs.Empty);
     }
 
     [RelayCommand]
@@ -103,18 +230,44 @@ public sealed partial class TimersViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void SaveSettings()
+    private void AddSchedule() => Schedules.Insert(0, new ScheduleEditor(this, null));
+
+    [RelayCommand]
+    private void SaveReminder()
     {
-        var de = System.Globalization.CultureInfo.GetCultureInfo("de-DE");
-        if (TimeSpan.TryParse(RiftAnchor, out _)) timers.Settings.RiftAnchor = RiftAnchor;
-        if (double.TryParse(RiftInterval, de, out var h) && h > 0) timers.Settings.RiftIntervalHours = h;
-        if (int.TryParse(ReminderMinutes, out var m) && m >= 0) timers.Settings.ReminderMinutes = m;
-        timers.Settings.RiftReminder = RiftReminder;
-        timers.Save();
+        if (int.TryParse(ReminderMinutes, out var m) && m >= 0)
+        {
+            timers.Settings.ReminderMinutes = m;
+            timers.Save();
+        }
+    }
+
+    public void SaveSchedule(ScheduleEntry? original, ScheduleEntry updated)
+    {
+        if (original is null) timers.AddSchedule(updated);
+        else timers.ReplaceSchedule(original, updated);
+        ReloadSchedules();
+    }
+
+    public void DeleteSchedule(ScheduleEditor editor)
+    {
+        if (editor.Original is not null) timers.RemoveSchedule(editor.Original);
+        Schedules.Remove(editor);
     }
 
     public void SetRespawn(string boss, int minutes) => timers.SetBossRespawn(boss, minutes);
     public void Ignore(string boss) => timers.IgnoreBoss(boss);
     public void StartCustom(string name) => timers.StartCustom(name);
-    public void Remove(TimerKind kind, string name) => timers.Remove(kind, name);
+
+    public void Remove(TimerKind kind, string name)
+    {
+        timers.Remove(kind, name);
+        if (kind == TimerKind.Schedule) ReloadSchedules();
+    }
+
+    public void SetOverlay(TimerItem item, bool show)
+    {
+        timers.SetOverlayFlag(item.Kind, item.Name, show);
+        ReloadSchedules();
+    }
 }
