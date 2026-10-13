@@ -20,6 +20,8 @@ switch (args[0])
 {
     case "replay":
         return Replay(file);
+    case "analyze":
+        return Analyze(file);
     case "demo":
         WriteDemo(file);
         Console.WriteLine($"Demo-Mitschnitt geschrieben: {file}");
@@ -53,6 +55,61 @@ int Replay(string path)
         foreach (var s in host.Sessions.GetPlayerSkillStats(p.PlayerId).OrderByDescending(s => s.TotalDamage).Take(3))
             Console.WriteLine($"    {s.SkillName,-30} {s.TotalDamage.ToString("N0", de),12}  {s.HitCount}×");
     }
+    return 0;
+}
+
+// Diagnose: welche Opcodes kommen an, werden Buffs/Abklingzeiten/eigener Charakter erkannt?
+int Analyze(string path)
+{
+    var dataDir = Path.Combine(Path.GetTempPath(), "aion2meter-cli");
+    using var host = new MeterHost(new MeterOptions { DataDir = dataDir, ReplayFile = path, ReplaySpeed = 0 });
+    var opcodes = new Dictionary<ushort, int>();
+    host.Mode.Activate();   // vorher: TrackingMode setzt beim Erzeugen seinen eigenen Filter
+    host.Get<AionDpsMeter.Services.PacketProcessing.Routing.PacketDispatchService>().Gate = op =>
+    {
+        opcodes[op] = opcodes.GetValueOrDefault(op) + 1;
+        return true;
+    };
+    int frames = 0; long frameBytes = 0;
+    host.StreamBuffer.PacketExtracted += (_, e) => { frames++; frameBytes += e.Payload.Length; };
+    var sessions = host.Sessions;
+    var entities = host.Get<AionDpsMeter.Services.Services.Entity.EntityTracker>();
+    int buffs = 0, ownBuffs = 0, cds = 0;
+    var buffTargets = new Dictionary<int, int>();
+    var buffNames = new Dictionary<string, int>();
+    sessions.BuffRecorded += b =>
+    {
+        buffs++;
+        if (entities.IsCurrentPlayer(b.EntityId)) ownBuffs++;
+        buffTargets[b.EntityId] = buffTargets.GetValueOrDefault(b.EntityId) + 1;
+        buffNames[b.BuffName] = buffNames.GetValueOrDefault(b.BuffName) + 1;
+    };
+    var cdNames = new Dictionary<string, int>();
+    sessions.SkillCooldownRecorded += c =>
+    {
+        cds++;
+        cdNames[$"{c.Name} ({c.Duration.TotalSeconds:0.#} s)"] = cdNames.GetValueOrDefault($"{c.Name} ({c.Duration.TotalSeconds:0.#} s)") + 1;
+    };
+    ((ReplayCaptureDevice)host.Capture).PlayToEnd();
+
+    long raw = CaptureFile.Read(path).Sum(c => (long)c.Payload.Length);
+    Console.WriteLine($"Rohdaten: {raw:N0} Byte, davon als Pakete erkannt: {frameBytes:N0} Byte in {frames} Paketen");
+    Console.WriteLine("Opcodes:");
+    foreach (var (op, n) in opcodes.OrderByDescending(x => x.Value).Take(25))
+        Console.WriteLine($"  0x{op:X4}  {n,6}");
+    var user = sessions.PlayerStats.FirstOrDefault(p => p.IsUser);
+    Console.WriteLine($"Eigener Charakter erkannt: {(user is null ? "nein (in Kampfstatistik)" : user.PlayerName)}");
+    Console.WriteLine($"Buff-Ereignisse: {buffs}, davon auf dir: {ownBuffs}");
+    foreach (var (id, n) in buffTargets.OrderByDescending(x => x.Value).Take(8))
+    {
+        var p = entities.GetPlayerEntity(id);
+        Console.WriteLine($"  Ziel {id,-8} {n,4}×  {(p is null ? "?" : $"{p.Name} user={p.IsUser}")}");
+    }
+    foreach (var (name, n) in buffNames.OrderByDescending(x => x.Value).Take(10))
+        Console.WriteLine($"  Buff {name,-35} {n,4}×");
+    Console.WriteLine($"Abklingzeit-Ereignisse: {cds}");
+    foreach (var (name, n) in cdNames.OrderByDescending(x => x.Value).Take(10))
+        Console.WriteLine($"  {name,-45} {n,4}×");
     return 0;
 }
 

@@ -15,6 +15,7 @@ public sealed partial class HubViewModel : ObservableObject
     private readonly ConnectionMonitor monitor;
     private readonly MeterSettings meterSettings;
     private readonly PartyRoster roster;
+    private readonly LiveTimers live;
     private readonly DispatcherTimer timer;
 
     public MainViewModel Overlay { get; }
@@ -35,6 +36,7 @@ public sealed partial class HubViewModel : ObservableObject
     [ObservableProperty] private string toggleText = "";
     [ObservableProperty] private string runSummary = "";
     [ObservableProperty] private bool hasRun;
+    [ObservableProperty] private string buffDiagnostics = "";
 
     [ObservableProperty] private string pingNow = "–";
     [ObservableProperty] private string pingAvg = "–";
@@ -50,13 +52,14 @@ public sealed partial class HubViewModel : ObservableObject
 
     public HubViewModel(TrackingMode mode, RunTracker run, ConnectionMonitor monitor, MeterSettings meterSettings,
         PartyRoster roster, MainViewModel overlay, SettingsViewModel settings,
-        RunsViewModel runs, PartyViewModel party, TimersViewModel timers, ChecklistViewModel checklist)
+        RunsViewModel runs, PartyViewModel party, TimersViewModel timers, ChecklistViewModel checklist, LiveTimers live)
     {
         this.mode = mode;
         this.run = run;
         this.monitor = monitor;
         this.meterSettings = meterSettings;
         this.roster = roster;
+        this.live = live;
         Overlay = overlay;
         Settings = settings;
         Runs = runs;
@@ -94,6 +97,9 @@ public sealed partial class HubViewModel : ObservableObject
 
     private void RefreshRun()
     {
+        var d = live.Diagnostics();
+        var self = d.Self is null ? "noch unbekannt (Teleport oder einen Skill benutzen)" : d.SelfGuessed ? $"{d.Self} (über Abklingzeiten erkannt)" : d.Self;
+        BuffDiagnostics = $"Buff-Leiste: {d.OwnBuffEvents} eigene von {d.BuffEvents} Buffs, {d.CooldownEvents} Abklingzeiten empfangen · dein Charakter: {self}";
         var snapshot = run.Snapshot();
         var lines = snapshot.Players
             .Select(p => new MeterLine(p.PlayerId, p.Name, p.IsUser, p.IsIdentified, p.ClassId, p.ClassName, p.Damage, p.Dps, p.Share))

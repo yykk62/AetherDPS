@@ -76,6 +76,36 @@ public sealed class FeatureTests : IDisposable
     }
 
     [Fact]
+    public void Buff_Leiste_erkennt_eigenen_Charakter_ueber_Abklingzeiten()
+    {
+        using var host = NewHost();
+        var live = host.Get<LiveTimers>();
+        host.Mode.Activate();
+        host.Feed(SyntheticPackets.Heartbeat(), 1_000);
+
+        // Eigener Charakter (101) ist Upstream unbekannt (kein Login/Teleport gesehen)
+        var buff = new AionDpsMeter.Core.Models.BuffEvent
+        {
+            EntityId = 101, BuffId = 11000100, BuffName = "Kampfrausch", DurationMs = 20_000, AppliedAt = DateTime.Now, CasterId = 101,
+        };
+        host.Sessions.ProcessBuffEvent(buff);
+        Assert.DoesNotContain(live.Active(), i => i.Name == "Kampfrausch");
+
+        // 101 trifft mit Skill X, kurz danach kommt die Abklingzeit für Skill X → 101 bin ich
+        host.Feed(SyntheticPackets.Damage(5001, 101, 11000001, 1_000), 1_100);
+        var skill = AionDpsMeter.Core.GameData.Services.GameDataProvider.Instance.GetSkillOrDefault(11000001);
+        host.Sessions.RegisterSkillCdEvent(new AionDpsMeter.Services.Services.Timed.TimedEvent
+        {
+            Id = (uint)skill.Id, Name = skill.Name, IconUrl = "", Duration = TimeSpan.FromSeconds(8),
+        });
+
+        var active = live.Active();
+        Assert.Contains(active, i => i.Kind == LiveKind.Buff && i.Name == "Kampfrausch");   // nachgetragen
+        Assert.Contains(active, i => i.Kind == LiveKind.Cooldown);
+        Assert.True(live.Diagnostics().SelfGuessed);
+    }
+
+    [Fact]
     public void Buff_Laufzeit_zaehlt_nur_Kampfphasen_und_keine_Doppelungen()
     {
         var t = DateTime.Parse("2026-10-13 18:00:00");

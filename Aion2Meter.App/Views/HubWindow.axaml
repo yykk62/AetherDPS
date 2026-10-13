@@ -99,6 +99,7 @@
                 <TextBlock Classes="h2" Text="{l:T hub.run.title}" />
                 <TextBlock Text="{Binding RunSummary}" Classes="dim" IsVisible="{Binding HasRun}" />
                 <TextBlock Text="{l:T hub.run.empty}" Classes="dim" IsVisible="{Binding !HasRun}" />
+                <TextBlock Text="{Binding BuffDiagnostics}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
                 <ItemsControl ItemsSource="{Binding RunPlayers}">
                   <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="vm:PlayerRow">
