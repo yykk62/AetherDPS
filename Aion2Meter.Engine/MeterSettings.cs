@@ -11,7 +11,7 @@ public sealed class MeterSettings
     public const uint ModAlt = 0x1, ModControl = 0x2, ModShift = 0x4;
 
     /// <summary>Nur Mitglieder der eigenen Gruppe anzeigen (offene Welt).</summary>
-    public bool PartyOnly { get; set; }
+    public bool PartyOnly { get; set; } = true;
 
     /// <summary>Win32-Modifier (MOD_CONTROL usw.) und virtueller Tastencode. Standard: STRG+W.</summary>
     public uint HotkeyModifiers { get; set; } = ModControl;

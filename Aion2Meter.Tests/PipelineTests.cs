@@ -172,6 +172,44 @@ public sealed class PipelineTests : IDisposable
     }
 
     [Fact]
+    public void Beschwoerungen_werden_dem_Besitzer_zugeschlagen()
+    {
+        // Echte Werte aus einem Dungeon-Bosskampf (13.10.), Namen anonymisiert:
+        // 3 erkannte Spieler + 18 namenlose Beschwörer-/Magier-Einheiten (Geister/Elementare).
+        var lines = new List<MeterLine>
+        {
+            new(8752, "Kantor", false, true, 18, "Chanter", 582_719, 0, 0),
+            new(13032, "Magier", false, true, 15, "Sorcerer", 295_715, 0, 0),
+            new(12996, "Beschwoerer", false, true, 16, "Elementalist", 219_727, 0, 0),
+        };
+        long[] elementals = [25_466, 13_460, 13_025, 10_533, 7_188, 6_887, 4_552, 3_966, 3_687, 3_457, 2_760, 2_302];
+        long[] familiars = [8_252, 7_355, 6_784, 6_673, 6_374, 5_723];
+        int id = 30_000;
+        foreach (var d in elementals) lines.Add(new(id++, $"Player_{id}", false, false, 16, "Elementalist", d, 0, 0));
+        foreach (var d in familiars) lines.Add(new(id++, $"Player_{id}", false, false, 15, "Sorcerer", d, 0, 0));
+
+        var result = SummonMerger.Merge(lines);
+
+        Assert.Equal(3, result.Lines.Count);
+        Assert.Equal(219_727 + elementals.Sum(), result.Lines.Single(l => l.PlayerId == 12996).TotalDamage);
+        Assert.Equal(295_715 + familiars.Sum(), result.Lines.Single(l => l.PlayerId == 13032).TotalDamage);
+        Assert.Equal(100, result.Lines.Sum(l => l.DamagePercentage), 3);
+        Assert.Equal(12, result.MergedInto[12996].Count);
+    }
+
+    [Fact]
+    public void Namenloser_ohne_eindeutigen_Besitzer_bleibt_oder_fliegt_im_Gruppenmodus()
+    {
+        var lines = new List<MeterLine>
+        {
+            new(1, "Gladi", false, true, 11, "Gladiator", 1000, 0, 0),
+            new(2, "Player_2", false, false, 14, "Ranger", 500, 0, 0),   // kein Waldläufer bekannt
+        };
+        Assert.Equal(2, SummonMerger.Merge(lines).Lines.Count);
+        Assert.Single(SummonMerger.Merge(lines, dropUnmerged: true).Lines);
+    }
+
+    [Fact]
     public void Deutsche_Namen_sind_geladen()
     {
         using var host = NewHost();

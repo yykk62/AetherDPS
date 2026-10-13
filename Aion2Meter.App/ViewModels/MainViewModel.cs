@@ -124,14 +124,14 @@ public sealed partial class MainViewModel : ObservableObject
         string targetName = target is null ? Loc.T("target.none")
             : target.MobCode == 0 ? Loc.T("target.unknown") : GermanGameData.MobName(target);
 
-        List<MeterEntry> entries;
+        List<MeterLine> entries;
         if (ShowTargetView)
         {
             TargetName = targetName;
             Duration = sessions.GetCombatDuration().ToString(@"mm\:ss");
             PartyDps = Loc.T("footer.party", Format.Compact(sessions.GetPartyDps()));
             entries = sessions.PlayerStats
-                .Select(p => new MeterEntry(p.PlayerId, p.PlayerName, p.IsUser, p.IsIdentified, p.ClassId, p.ClassName,
+                .Select(p => new MeterLine(p.PlayerId, p.PlayerName, p.IsUser, p.IsIdentified, p.ClassId, p.ClassName,
                     p.TotalDamage, p.DamagePerSecond, p.DamagePercentage))
                 .ToList();
         }
@@ -142,19 +142,19 @@ public sealed partial class MainViewModel : ObservableObject
             Duration = FormatDuration(snapshot.Elapsed);
             PartyDps = Loc.T("footer.party", Format.Compact(snapshot.PartyDps));
             entries = snapshot.Players
-                .Select(p => new MeterEntry(p.PlayerId, p.Name, p.IsUser, p.IsIdentified, p.ClassId, p.ClassName,
+                .Select(p => new MeterLine(p.PlayerId, p.Name, p.IsUser, p.IsIdentified, p.ClassId, p.ClassName,
                     p.Damage, p.Dps, p.Share))
                 .ToList();
         }
 
+        // Fremde ausblenden (Gruppenmodus) und namenlose Beschwörungen ihrem Besitzer zuschlagen.
+        bool partyKnown = roster.Count > 0;
         if (meterSettings.PartyOnly)
-        {
-            // Fremde ausblenden und Anteile nur innerhalb der Gruppe rechnen
             entries = entries.Where(e => roster.IsVisible(e.PlayerName, e.IsUser, e.IsIdentified)).ToList();
-            long sum = entries.Sum(e => e.TotalDamage);
-            entries = entries.Select(e => e with { DamagePercentage = sum > 0 ? e.TotalDamage * 100.0 / sum : 0 }).ToList();
-            PartyDps = Loc.T("footer.party", Format.Compact(entries.Sum(e => e.DamagePerSecond)));
-        }
+        var merge = SummonMerger.Merge(entries, dropUnmerged: meterSettings.PartyOnly && partyKnown);
+        entries = merge.Lines;
+        mergedSummons = merge.MergedInto;
+        PartyDps = Loc.T("footer.party", Format.Compact(entries.Sum(e => e.DamagePerSecond)));
 
         UpdatePlayers(entries);
         if (ShowDetails) UpdateSkills();
@@ -163,8 +163,7 @@ public sealed partial class MainViewModel : ObservableObject
     private static string FormatDuration(TimeSpan t) =>
         t.TotalHours >= 1 ? t.ToString(@"h\:mm\:ss") : t.ToString(@"mm\:ss");
 
-    private sealed record MeterEntry(long PlayerId, string PlayerName, bool IsUser, bool IsIdentified, int ClassId,
-        string ClassName, long TotalDamage, double DamagePerSecond, double DamagePercentage);
+    private Dictionary<long, List<long>> mergedSummons = [];
 
     private void UpdateStatus()
     {
@@ -203,7 +202,7 @@ public sealed partial class MainViewModel : ObservableObject
         }
     }
 
-    private void UpdatePlayers(List<MeterEntry> all)
+    private void UpdatePlayers(List<MeterLine> all)
     {
         var stats = all
             .Where(p => p.IsIdentified || p.DamagePercentage > 1)
@@ -249,7 +248,7 @@ public sealed partial class MainViewModel : ObservableObject
         ShowNameHint = HasPlayers && !stats.Any(p => p.IsUser);
     }
 
-    private string DisplayName(MeterEntry p)
+    private string DisplayName(MeterLine p)
     {
         if (p.IsUser && settings.IsNicknameHidden) return Loc.T("player.you");
         if (string.IsNullOrWhiteSpace(p.PlayerName) || p.PlayerName.StartsWith("Player_", StringComparison.Ordinal))
@@ -287,7 +286,7 @@ public sealed partial class MainViewModel : ObservableObject
 
     private List<SkillRow> RunSkills(int id)
     {
-        var skillStats = run.Skills(id).Take(12).ToList();
+        var skillStats = run.Skills(id, mergedSummons.GetValueOrDefault(id)).Take(12).ToList();
         long top = skillStats.Count > 0 ? skillStats[0].Damage : 0;
         return skillStats.Select(s => new SkillRow(
             s.Name, Format.Compact(s.Damage), Format.Percent(s.Share), s.Hits,

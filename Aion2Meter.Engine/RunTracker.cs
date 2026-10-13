@@ -102,13 +102,24 @@ public sealed class RunTracker
         }
     }
 
-    public IReadOnlyList<RunSkill> Skills(int playerId)
+    /// <param name="summonIds">Zugeschlagene Beschwörungen (siehe SummonMerger) – deren Skills erscheinen mit Präfix.</param>
+    public IReadOnlyList<RunSkill> Skills(int playerId, IEnumerable<long>? summonIds = null)
     {
         lock (gate)
         {
-            if (!players.TryGetValue(playerId, out var player)) return [];
-            long total = player.Damage;
-            return player.SkillsById.Values
+            var parts = new List<(string Prefix, PlayerRun Run)>();
+            if (players.TryGetValue(playerId, out var player)) parts.Add(("", player));
+            foreach (var id in summonIds ?? [])
+                if (players.TryGetValue((int)id, out var summon)) parts.Add(("Beschwörung · ", summon));
+            if (parts.Count == 0) return [];
+
+            var skills = parts
+                .SelectMany(p => p.Run.SkillsById.Values.Select(s => (Name: p.Prefix + s.Name, s.Damage, s.Hits, s.Crits)))
+                .GroupBy(s => s.Name)
+                .Select(g => (Name: g.Key, Damage: g.Sum(s => s.Damage), Hits: g.Sum(s => s.Hits), Crits: g.Sum(s => s.Crits)))
+                .ToList();
+            long total = skills.Sum(s => s.Damage);
+            return skills
                 .Select(s => new RunSkill(s.Name, s.Damage, total > 0 ? s.Damage * 100.0 / total : 0, s.Hits,
                     s.Hits > 0 ? s.Crits * 100.0 / s.Hits : 0))
                 .OrderByDescending(s => s.Damage)

@@ -14,6 +14,7 @@ public sealed partial class HubViewModel : ObservableObject
     private readonly RunTracker run;
     private readonly ConnectionMonitor monitor;
     private readonly MeterSettings meterSettings;
+    private readonly PartyRoster roster;
     private readonly DispatcherTimer timer;
 
     public MainViewModel Overlay { get; }
@@ -42,12 +43,13 @@ public sealed partial class HubViewModel : ObservableObject
     [ObservableProperty] private string diagnosisText = "";
 
     public HubViewModel(TrackingMode mode, RunTracker run, ConnectionMonitor monitor, MeterSettings meterSettings,
-        MainViewModel overlay, SettingsViewModel settings)
+        PartyRoster roster, MainViewModel overlay, SettingsViewModel settings)
     {
         this.mode = mode;
         this.run = run;
         this.monitor = monitor;
         this.meterSettings = meterSettings;
+        this.roster = roster;
         Overlay = overlay;
         Settings = settings;
         mode.Changed += (_, _) => Dispatcher.UIThread.Post(Refresh);
@@ -75,25 +77,31 @@ public sealed partial class HubViewModel : ObservableObject
     private void RefreshRun()
     {
         var snapshot = run.Snapshot();
-        var players = snapshot.Players.Where(p => p.IsIdentified || p.Share > 1).Take(8).ToList();
+        var lines = snapshot.Players
+            .Select(p => new MeterLine(p.PlayerId, p.Name, p.IsUser, p.IsIdentified, p.ClassId, p.ClassName, p.Damage, p.Dps, p.Share))
+            .ToList();
+        if (meterSettings.PartyOnly)
+            lines = lines.Where(l => roster.IsVisible(l.PlayerName, l.IsUser, l.IsIdentified)).ToList();
+        var players = SummonMerger.Merge(lines, dropUnmerged: meterSettings.PartyOnly && roster.Count > 0).Lines
+            .Where(p => p.IsIdentified || p.DamagePercentage > 1).Take(8).ToList();
         HasRun = players.Count > 0;
         var duration = snapshot.Elapsed.TotalHours >= 1 ? snapshot.Elapsed.ToString(@"h\:mm\:ss") : snapshot.Elapsed.ToString(@"mm\:ss");
         RunSummary = Loc.T("hub.run.summary", duration, Format.Compact(snapshot.TotalDamage), Format.Compact(snapshot.PartyDps));
 
-        long top = players.Count > 0 ? players[0].Damage : 0;
+        long top = players.Count > 0 ? players[0].TotalDamage : 0;
         RunPlayers.Clear();
         foreach (var p in players)
         {
             RunPlayers.Add(new PlayerRow(p.PlayerId)
             {
-                Name = p.Name.StartsWith("Player_", StringComparison.Ordinal) ? Loc.T("player.unknown", p.PlayerId) : p.Name,
+                Name = p.PlayerName.StartsWith("Player_", StringComparison.Ordinal) ? Loc.T("player.unknown", p.PlayerId) : p.PlayerName,
                 ClassName = GermanGameData.ClassName(p.ClassId, p.ClassName),
                 ClassBrush = ClassVisuals.Brush(p.ClassId),
                 ClassIcon = ClassVisuals.Icon(p.ClassId),
-                Dps = Format.Compact(p.Dps) + "/s",
-                Total = Format.Compact(p.Damage),
-                Share = Format.Percent(p.Share),
-                BarPercent = top > 0 ? p.Damage * 100.0 / top : 0,
+                Dps = Format.Compact(p.DamagePerSecond) + "/s",
+                Total = Format.Compact(p.TotalDamage),
+                Share = Format.Percent(p.DamagePercentage),
+                BarPercent = top > 0 ? p.TotalDamage * 100.0 / top : 0,
                 IsUser = p.IsUser,
             });
         }
