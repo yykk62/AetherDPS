@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/upstream/">
+    <Project Path="AionDpsMeter.Core/AionDpsMeter.Core.csproj" />
+    <Project Path="AionDpsMeter.Services/AionDpsMeter.Services.csproj" />
+  </Folder>
+  <Project Path="Aion2Meter.Engine/Aion2Meter.Engine.csproj" />
+  <Project Path="Aion2Meter.App/Aion2Meter.App.csproj" />
+  <Project Path="Aion2Meter.Cli/Aion2Meter.Cli.csproj" />
+  <Project Path="Aion2Meter.Tests/Aion2Meter.Tests.csproj" />
+</Solution>

@@ -8,6 +8,8 @@ namespace AionDpsMeter.Services.PacketCapture
     {
         private readonly ConcurrentDictionary<string, PacketAccumulator> _streamAccumulators = new();
         public event EventHandler<TcpPacketEventArgs>? PacketExtracted;
+        // Aion2Meter: Rohdaten für den Ringpuffer ("Problem melden").
+        public event Action<string, byte[], long>? RawDataAdded;
         private readonly ILogger<TcpStreamBuffer> logger;
         private readonly FilePacketWriter? filePacketWriter;
 
@@ -21,6 +23,7 @@ namespace AionDpsMeter.Services.PacketCapture
         {
             var accumulator = _streamAccumulators.GetOrAdd(streamKey, _ => new PacketAccumulator(logger));
             filePacketWriter?.LogPacket(streamKey, payload);
+            RawDataAdded?.Invoke(streamKey, payload, arrivedAt);
             accumulator.AppendAndProcess(payload, (packet) =>
             {
                 PacketExtracted?.Invoke(this, new TcpPacketEventArgs

@@ -1,0 +1,148 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Aion2Meter.App.ViewModels"
+        xmlns:l="using:Aion2Meter.App.Services"
+        x:Class="Aion2Meter.App.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Title="{l:T app.title}"
+        Width="360" Height="300" MinWidth="260" MinHeight="140"
+        SystemDecorations="None" Topmost="True" CanResize="True"
+        TransparencyLevelHint="Transparent" Background="Transparent"
+        Icon="/Assets/icon.ico">
+
+  <Window.Styles>
+    <Style Selector="Button.icon">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="#C9CED6" />
+      <Setter Property="Padding" Value="6,2" />
+      <Setter Property="MinWidth" Value="0" />
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="CornerRadius" Value="4" />
+    </Style>
+    <Style Selector="Button.icon:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#33FFFFFF" />
+    </Style>
+    <Style Selector="ToggleButton.icon">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="#C9CED6" />
+      <Setter Property="Padding" Value="6,2" />
+      <Setter Property="MinWidth" Value="0" />
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="CornerRadius" Value="4" />
+    </Style>
+    <Style Selector="ToggleButton.icon:checked /template/ ContentPresenter">
+      <Setter Property="Background" Value="#55D4A84B" />
+    </Style>
+    <Style Selector="TextBlock">
+      <Setter Property="Foreground" Value="#E6E8EC" />
+    </Style>
+    <Style Selector="TextBlock.dim">
+      <Setter Property="Foreground" Value="#8E96A3" />
+    </Style>
+    <Style Selector="ProgressBar.bar">
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="MinWidth" Value="0" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="Maximum" Value="100" />
+    </Style>
+    <Style Selector="Border.row">
+      <Setter Property="Background" Value="#14FFFFFF" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="Margin" Value="0,0,0,2" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="Border.row:pointerover">
+      <Setter Property="Background" Value="#24FFFFFF" />
+    </Style>
+  </Window.Styles>
+
+  <Border Background="#E6141820" CornerRadius="8" BorderBrush="#33FFFFFF" BorderThickness="1">
+    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
+
+      <!-- Kopfzeile: Ziehen zum Verschieben -->
+      <Grid Grid.Row="0" Name="Header" ColumnDefinitions="*,Auto" Margin="10,6,4,2" Background="Transparent">
+        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+          <TextBlock Text="{Binding TargetName}" FontWeight="SemiBold" FontSize="13" MaxWidth="180" TextTrimming="CharacterEllipsis" />
+          <TextBlock Text="{Binding Duration}" Classes="dim" FontSize="12" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="0">
+          <Button Classes="icon" Content="⟲" Command="{Binding ResetCommand}" ToolTip.Tip="{l:T header.reset}" />
+          <ToggleButton Classes="icon" Content="☰" IsChecked="{Binding ShowDetails}" Command="{Binding ToggleDetailsCommand}" ToolTip.Tip="{l:T header.details}" />
+          <ToggleButton Classes="icon" Content="⇣" Name="ClickThroughButton" ToolTip.Tip="{l:T header.clickthrough}" />
+          <Button Classes="icon" Content="✕" Name="CloseButton" ToolTip.Tip="{l:T header.close}" />
+        </StackPanel>
+      </Grid>
+
+      <!-- HP des Ziels -->
+      <ProgressBar Grid.Row="1" Classes="bar" Height="3" Margin="10,0,10,6"
+                   Value="{Binding TargetHpPercent}" Foreground="#C94B4B" Background="#22FFFFFF"
+                   IsVisible="{Binding HasTarget}" />
+
+      <!-- Spielerliste + Details -->
+      <Grid Grid.Row="2" RowDefinitions="*,Auto" Margin="8,0,8,0">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+          <ItemsControl ItemsSource="{Binding Players}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:PlayerRow">
+                <Border Classes="row" Height="24" PointerPressed="OnRowPressed">
+                  <Panel>
+                    <ProgressBar Classes="bar" Height="24" Value="{Binding BarPercent}" Foreground="{Binding ClassBrush}" Opacity="0.35" />
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto" Margin="8,0" VerticalAlignment="Center">
+                      <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Ellipse Width="7" Height="7" Fill="{Binding ClassBrush}" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" MaxWidth="130" />
+                        <TextBlock Text="{Binding ClassName}" FontSize="11" Classes="dim" VerticalAlignment="Center" />
+                      </StackPanel>
+                      <TextBlock Grid.Column="1" Text="{Binding Dps}" FontSize="12" FontWeight="SemiBold" Margin="8,0,0,0" MinWidth="58" TextAlignment="Right" />
+                      <TextBlock Grid.Column="2" Text="{Binding Total}" FontSize="11" Classes="dim" Margin="8,0,0,0" MinWidth="46" TextAlignment="Right" />
+                      <TextBlock Grid.Column="3" Text="{Binding Share}" FontSize="11" Classes="dim" Margin="8,0,0,0" MinWidth="44" TextAlignment="Right" />
+                    </Grid>
+                  </Panel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+
+        <TextBlock Text="{l:T empty.waiting}" Classes="dim" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"
+                   IsVisible="{Binding !HasPlayers}" />
+
+        <Border Grid.Row="1" IsVisible="{Binding ShowDetails}" Margin="0,4,0,0" Padding="0,4,0,0"
+                BorderBrush="#22FFFFFF" BorderThickness="0,1,0,0">
+          <StackPanel Spacing="2">
+            <TextBlock Text="{Binding DetailsTitle}" FontSize="11" Classes="dim" Margin="2,0,0,2" />
+            <ItemsControl ItemsSource="{Binding Skills}" MaxHeight="190">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:SkillRow">
+                  <Panel Height="18" Margin="0,0,0,1">
+                    <ProgressBar Classes="bar" Height="18" Value="{Binding BarPercent}" Foreground="#5B8DEF" Opacity="0.25" />
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto" Margin="6,0" VerticalAlignment="Center">
+                      <TextBlock Text="{Binding Name}" FontSize="11" TextTrimming="CharacterEllipsis" />
+                      <TextBlock Grid.Column="1" Text="{Binding Damage}" FontSize="11" Margin="6,0,0,0" MinWidth="44" TextAlignment="Right" />
+                      <TextBlock Grid.Column="2" Text="{Binding Hits, StringFormat='{}{0}×'}" FontSize="11" Classes="dim" Margin="6,0,0,0" MinWidth="30" TextAlignment="Right" />
+                      <TextBlock Grid.Column="3" Text="{Binding Crit}" FontSize="11" Classes="dim" Margin="6,0,0,0" MinWidth="42" TextAlignment="Right" />
+                    </Grid>
+                  </Panel>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <!-- Npcap-Hinweis -->
+      <Button Grid.Row="3" Content="{l:T status.npcap_button}" Command="{Binding OpenNpcapDownloadCommand}"
+              IsVisible="{Binding NpcapMissing}" HorizontalAlignment="Center" Margin="0,4" />
+
+      <!-- Fußzeile -->
+      <Grid Grid.Row="4" ColumnDefinitions="Auto,*,Auto" Margin="10,4,10,6">
+        <Ellipse Width="7" Height="7" VerticalAlignment="Center" Margin="0,0,6,0"
+                 Fill="{Binding IsConnected, Converter={x:Static l:BoolBrush.ConnectedGreenElseAmber}}" />
+        <TextBlock Grid.Column="1" Text="{Binding StatusText}" FontSize="11" Classes="dim" TextTrimming="CharacterEllipsis"
+                   ToolTip.Tip="{Binding StatusText}" />
+        <TextBlock Grid.Column="2" Text="{Binding PartyDps}" FontSize="11" Classes="dim" Margin="8,0,0,0" />
+      </Grid>
+    </Grid>
+  </Border>
+</Window>
