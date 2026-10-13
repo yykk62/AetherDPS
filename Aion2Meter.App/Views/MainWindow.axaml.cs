@@ -5,6 +5,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Threading;
 
 namespace Aion2Meter.App.Views;
 
@@ -25,23 +26,35 @@ public partial class MainWindow : Window
             if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) BeginMoveDrag(e);
         };
         CloseButton.Click += (_, _) => (Application.Current as App)?.Quit();
-        ClickThroughButton.IsCheckedChanged += (_, _) =>
-        {
-            if (ClickThroughButton.IsChecked == true) SetClickThrough(true);
-        };
+        ClickThroughButton.IsCheckedChanged += (_, _) => SetClickThrough(ClickThroughButton.IsChecked == true);
+        lockTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(60), DispatcherPriority.Input, (_, _) => UpdateLockHover());
         Closing += (_, _) => SaveBounds();
     }
+
+    private readonly DispatcherTimer? lockTimer;
 
     private MainViewModel ViewModel => (MainViewModel)DataContext!;
 
     public bool IsClickThrough { get; private set; }
 
+    /// <summary>
+    /// Gesperrt = Klicks gehen ins Spiel. Nur das Schloss bleibt klickbar: Ein Timer
+    /// schaut, ob die Maus darüber ist, und macht das Fenster solange wieder klickbar.
+    /// </summary>
     public void SetClickThrough(bool enabled)
     {
         IsClickThrough = enabled;
-        ClickThrough.Set(this, enabled);
         ClickThroughButton.IsChecked = enabled;
         ViewModel.IsClickThrough = enabled;
+        if (enabled) lockTimer?.Start();
+        else lockTimer?.Stop();
+        ClickThrough.Set(this, enabled && !ClickThrough.IsCursorOver(ClickThroughButton));
+    }
+
+    private void UpdateLockHover()
+    {
+        if (!IsClickThrough) return;
+        ClickThrough.Set(this, !ClickThrough.IsCursorOver(ClickThroughButton));
     }
 
     private void OnRowPressed(object? sender, PointerPressedEventArgs e)

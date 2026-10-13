@@ -26,7 +26,7 @@ Die Einstellungen, die Kampf-Historie, die Logs und die Mitschnitte liegen unter
 | Größe ändern | rechten oder unteren Rand ziehen |
 | Zurücksetzen | ⟲ |
 | Skill-Details | ☰ oder auf einen Spieler klicken |
-| Klick-durch (Mausklicks gehen ins Spiel) | ⇣, zum Ausschalten im Tray-Symbol „Klick-durch an / aus“ wählen |
+| Sperren (Mausklicks gehen ins Spiel, nichts wird versehentlich angeklickt) | Schloss-Symbol. Zum Entsperren wieder aufs Schloss klicken, es bleibt immer klickbar |
 | Fehler melden | Tray-Symbol → „Problem melden“ |
 
 ## Für Entwickler

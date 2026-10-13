@@ -28,3 +28,14 @@
 - [ ] Kampfanalyse nach dem Kampf (Rotation, Uptime der Buffs)
 - [ ] Mitlesen ohne Npcap über das in Windows eingebaute pktmon (Idee von a2kit)
 - [ ] Spendenlink (Ko-fi)
+
+## Phase 6: Bot-Radar (Idee vom 13.10.2026)
+Ziel: Bots an Farm-Spots erkennen und mit Beweisen melden. Das Tool liest nur passiv mit, es sendet nie etwas und meldet nie automatisch.
+- [ ] Mitschnitt von 5–10 Minuten an einem Bot-Spot (nach Phase 2)
+- [ ] Bewegungspakete finden: Positionen anderer Spieler und die eigene Position
+- [ ] Sichtradius aus dem Mitschnitt messen (wo Spieler erscheinen und verschwinden) und prüfen, ob es bei vielen Spielern eine Obergrenze gibt
+- [ ] Aufzeichnung je Spieler: Laufweg, Skill-Zeitpunkte, Anwesenheitsdauer
+- [ ] Bewertung: Wiederholung der Route, Streuung im Skill-Timing, Reaktionszeit auf Mob-Spawns, Dauer-Anwesenheit, synchrone Gruppen. „Sicher“ nur, wenn mehrere harte Merkmale zusammenkommen.
+- [ ] Verdachtsliste im Meter mit Namen zum Kopieren für die Meldung im Spiel
+- [ ] Beweis-Export für den NCSoft-Support: Name, Zeitraum, Ort, Laufweg als Grafik, Timing-Statistik
+- Mitschnitte und Exporte enthalten Spielernamen. Sie kommen nie ins Repo.

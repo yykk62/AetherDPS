@@ -14,6 +14,9 @@ public static class BoolBrush
     public static readonly IValueConverter ConnectedGreenElseAmber =
         new FuncValueConverter<bool, IBrush>(connected => connected ? Green : Amber);
 
+    public static readonly IValueConverter LockedGoldElseSubtle =
+        new FuncValueConverter<bool, IBrush>(locked => locked ? new SolidColorBrush(Color.Parse("#99E0A84A")) : new SolidColorBrush(Color.Parse("#33FFFFFF")));
+
     public static readonly IValueConverter ErrorRedElseText =
         new FuncValueConverter<bool, IBrush>(error => error ? Red : Text);
 }
