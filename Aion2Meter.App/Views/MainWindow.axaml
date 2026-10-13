@@ -6,7 +6,7 @@
         x:DataType="vm:MainViewModel"
         Title="{l:T app.title}"
         Width="360" Height="300" MinWidth="260" MinHeight="140"
-        SystemDecorations="None" Topmost="True" CanResize="True"
+        SystemDecorations="None" Topmost="True" CanResize="True" ShowActivated="False"
         TransparencyLevelHint="Transparent" Background="Transparent"
         Icon="/Assets/icon.ico">
 
@@ -117,6 +117,14 @@
         <TextBlock Text="{l:T empty.waiting}" Classes="dim" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"
                    IsVisible="{Binding !HasPlayers}" />
 
+        <!-- Bereitschaft: wird kurz beim Start gezeigt, danach ist das Overlay ausgeblendet -->
+        <Border Background="#F2141820" IsVisible="{Binding IsStandby}" CornerRadius="6">
+          <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="6" Margin="16,0">
+            <TextBlock Text="{l:T standby.title}" FontSize="15" FontWeight="SemiBold" HorizontalAlignment="Center" Foreground="#E0A84A" />
+            <TextBlock Text="{l:T standby.text}" FontSize="12" TextWrapping="Wrap" TextAlignment="Center" />
+          </StackPanel>
+        </Border>
+
         <Border Grid.Row="1" IsVisible="{Binding ShowDetails}" Margin="0,4,0,0" Padding="0,4,0,0"
                 BorderBrush="#22FFFFFF" BorderThickness="0,1,0,0">
           <StackPanel Spacing="2">
@@ -140,9 +148,13 @@
         </Border>
       </Grid>
 
-      <!-- Npcap-Hinweis -->
-      <Button Grid.Row="3" Content="{l:T setup.button}" Command="{Binding OpenSetupCommand}"
-              IsVisible="{Binding NpcapMissing}" HorizontalAlignment="Center" Margin="0,4" />
+      <!-- Npcap-Hinweis / Namens-Hinweis -->
+      <StackPanel Grid.Row="3">
+        <Button Content="{l:T setup.button}" Command="{Binding OpenSetupCommand}"
+                IsVisible="{Binding NpcapMissing}" HorizontalAlignment="Center" Margin="0,4" />
+        <TextBlock Text="{l:T hint.name}" FontSize="10" Classes="dim" Margin="10,2,10,0" TextWrapping="Wrap"
+                   IsVisible="{Binding ShowNameHint}" />
+      </StackPanel>
 
       <!-- Fußzeile -->
       <Grid Grid.Row="4" ColumnDefinitions="Auto,*,Auto" Margin="10,4,10,6">

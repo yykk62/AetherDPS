@@ -5,6 +5,9 @@ namespace AionDpsMeter.Services.PacketProcessing.Routing
 {
     public sealed class PacketDispatchService(OpcodeProcessorRegistry registry, ILogger<PacketDispatchService> logger)
     {
+        // Aion2Meter: Filter pro Opcode (null = alles durchlassen).
+        public Func<ushort, bool>? Gate { get; set; }
+
         public void Dispatch(Packet packet)
         {
             if (!TryReadOpcode(packet.Data, out ushort opcode))
@@ -12,6 +15,9 @@ namespace AionDpsMeter.Services.PacketProcessing.Routing
                 logger.LogTrace("Broken packet, cannot read opcode.");
                 return;
             }
+
+            // Aion2Meter: Bereitschaftsmodus lässt nur bestimmte Opcodes durch.
+            if (Gate is not null && !Gate(opcode)) return;
 
             if (!registry.TryGet(opcode, out var processor))
             {

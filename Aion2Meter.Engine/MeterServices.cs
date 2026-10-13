@@ -53,6 +53,7 @@ public static class MeterServices
         services.AddPacketProcessingRouting();
         services.AddSingleton<IPacketService, PacketPipelineService>();
         services.AddSingleton<RingRecorder>();
+        services.AddSingleton<TrackingMode>();
         return services;
     }
 }

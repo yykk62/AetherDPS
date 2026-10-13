@@ -22,9 +22,11 @@ Die Einstellungen, die Kampf-Historie, die Logs und die Mitschnitte liegen unter
 
 | Was | Wie |
 |---|---|
+| Meter starten / ausblenden | **STRG+W** im Spiel. Ohne STRG+W ist der Meter in Bereitschaft und zeichnet keine Kämpfe auf |
 | Verschieben | Kopfzeile ziehen |
 | Größe ändern | rechten oder unteren Rand ziehen |
 | Zurücksetzen | ⟲ |
+| Ausblenden (Bereitschaft) | ✕. Ganz beenden über das Tray-Symbol → „Beenden“ |
 | Skill-Details | ☰ oder auf einen Spieler klicken |
 | Sperren (Mausklicks gehen ins Spiel, nichts wird versehentlich angeklickt) | Schloss-Symbol. Zum Entsperren wieder aufs Schloss klicken, es bleibt immer klickbar |
 | Fehler melden | Tray-Symbol → „Problem melden“ |

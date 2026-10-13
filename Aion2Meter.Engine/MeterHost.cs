@@ -35,6 +35,9 @@ public sealed class MeterHost : IDisposable
     public TcpStreamBuffer StreamBuffer => provider.GetRequiredService<TcpStreamBuffer>();
     public CombatSessionManager Sessions => provider.GetRequiredService<CombatSessionManager>();
     public IPacketCaptureDevice Capture => provider.GetRequiredService<IPacketCaptureDevice>();
+
+    /// <summary>Erst beim ersten Zugriff aktiv – ohne Zugriff läuft alles ungefiltert.</summary>
+    public TrackingMode Mode => provider.GetRequiredService<TrackingMode>();
     public T Get<T>() where T : notnull => provider.GetRequiredService<T>();
 
     public void Feed(byte[] data, long arrivedAtMs, string streamKey = "test:1->test:2") =>

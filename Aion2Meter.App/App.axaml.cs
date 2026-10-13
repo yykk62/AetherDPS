@@ -7,6 +7,8 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
+using Aion2Meter.App.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Aion2Meter.App;
@@ -51,11 +53,36 @@ public partial class App : Application
             viewModel = Services.GetRequiredService<MainViewModel>();
             viewModel.SetupRequested += (_, _) => ShowSetup();
             window = Services.GetRequiredService<MainWindow>();
+
+            mode = Services.GetRequiredService<TrackingMode>();
+            mode.Changed += (_, _) => Dispatcher.UIThread.Post(() =>
+            {
+                if (mode.IsActive) window.Show();
+                else window.Hide();
+            });
+            hotkey = new GameHotkey();
+            hotkey.Pressed += (_, _) => Dispatcher.UIThread.Post(() => mode.Toggle());
         }
         desktop.MainWindow = window;
-        window!.Show();
         viewModel!.Start();
+
+        if (Services.GetRequiredService<MeterOptions>().ReplayFile is not null)
+        {
+            mode!.Activate();   // Wiedergabe: sofort aktiv
+            window!.Show();
+            return;
+        }
+
+        // Start in Bereitschaft: kurz zeigen, wie man startet, dann ausblenden.
+        window!.Show();
+        DispatcherTimer.RunOnce(() =>
+        {
+            if (!mode!.IsActive) window.Hide();
+        }, TimeSpan.FromSeconds(6));
     }
+
+    private TrackingMode? mode;
+    private GameHotkey? hotkey;
 
     private void ShowSetup()
     {
@@ -92,6 +119,7 @@ public partial class App : Application
     {
         if (persisted) return;
         persisted = true;
+        hotkey?.Dispose();
         window?.SaveBounds();
         viewModel?.Stop();
         if (!meterStarted) return;
@@ -108,12 +136,7 @@ public partial class App : Application
 
     private void OnTrayClicked(object? sender, EventArgs e) => OnToggleOverlay(sender, e);
 
-    private void OnToggleOverlay(object? sender, EventArgs e)
-    {
-        if (window is null) return;
-        if (window.IsVisible) window.Hide();
-        else window.Show();
-    }
+    private void OnToggleOverlay(object? sender, EventArgs e) => mode?.Toggle();
 
     private void OnToggleClickThrough(object? sender, EventArgs e) =>
         window?.SetClickThrough(!window.IsClickThrough);

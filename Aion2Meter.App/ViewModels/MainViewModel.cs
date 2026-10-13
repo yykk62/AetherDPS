@@ -20,6 +20,7 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly IPacketService pipeline;
     private readonly IPacketCaptureDevice capture;
     private readonly RingRecorder recorder;
+    private readonly TrackingMode mode;
     private readonly IAppSettingsService settings;
     private readonly MeterOptions options;
     private readonly ILogger<MainViewModel> logger;
@@ -45,16 +46,25 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty] private bool hasPlayers;
     [ObservableProperty] private bool isClickThrough;
     [ObservableProperty] private string notice = "";
+    [ObservableProperty] private bool isStandby = true;
+    [ObservableProperty] private bool showNameHint;
 
     private long? selectedPlayerId;
 
     public MainViewModel(CombatSessionManager sessions, IPacketService pipeline, IPacketCaptureDevice capture,
-        RingRecorder recorder, IAppSettingsService settings, MeterOptions options, ILogger<MainViewModel> logger)
+        RingRecorder recorder, TrackingMode mode, IAppSettingsService settings, MeterOptions options, ILogger<MainViewModel> logger)
     {
         this.sessions = sessions;
         this.pipeline = pipeline;
         this.capture = capture;
         this.recorder = recorder;
+        this.mode = mode;
+        mode.Changed += (_, _) => Dispatcher.UIThread.Post(() =>
+        {
+            IsStandby = !mode.IsActive;
+            if (mode.IsActive) { rowsById.Clear(); Players.Clear(); Skills.Clear(); }
+            Refresh();
+        });
         this.settings = settings;
         this.options = options;
         this.logger = logger;
@@ -188,6 +198,8 @@ public sealed partial class MainViewModel : ObservableObject
             foreach (var row in ordered) Players.Add(row);
         }
         HasPlayers = Players.Count > 0;
+        // Eigener Name kommt nur bei Login/Teleport – solange er fehlt, kurz erklären.
+        ShowNameHint = HasPlayers && !stats.Any(p => p.IsUser);
     }
 
     private string DisplayName(PlayerStats p)

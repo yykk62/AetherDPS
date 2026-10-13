@@ -1,5 +1,6 @@
 using Aion2Meter.App.Services;
 using Aion2Meter.App.ViewModels;
+using Aion2Meter.Engine;
 using AionDpsMeter.Services.Services.Settings;
 using Avalonia;
 using Avalonia.Controls;
@@ -15,7 +16,7 @@ public partial class MainWindow : Window
 
     public MainWindow() => InitializeComponent();
 
-    public MainWindow(MainViewModel viewModel, IAppSettingsService settings) : this()
+    public MainWindow(MainViewModel viewModel, IAppSettingsService settings, TrackingMode mode) : this()
     {
         DataContext = viewModel;
         this.settings = settings;
@@ -25,7 +26,11 @@ public partial class MainWindow : Window
         {
             if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) BeginMoveDrag(e);
         };
-        CloseButton.Click += (_, _) => (Application.Current as App)?.Quit();
+        CloseButton.Click += (_, _) =>
+        {
+            if (mode.IsActive) mode.Standby();   // App blendet dann aus
+            else Hide();
+        };
         ClickThroughButton.IsCheckedChanged += (_, _) => SetClickThrough(ClickThroughButton.IsChecked == true);
         lockTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(60), DispatcherPriority.Input, (_, _) => UpdateLockHover());
         Closing += (_, _) => SaveBounds();

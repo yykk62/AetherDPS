@@ -93,6 +93,25 @@ public sealed class PipelineTests : IDisposable
     }
 
     [Fact]
+    public void Bereitschaft_zeichnet_keinen_Schaden_auf()
+    {
+        using var host = NewHost();
+        var mode = host.Mode;   // Zugriff schaltet den Filter ein, Start = Bereitschaft
+        host.Feed(SyntheticPackets.Heartbeat(), 1_000);
+        host.Feed(SyntheticPackets.Damage(Mob, Gladiator, GladiatorSkill, 50_000), 1_100);
+        Assert.Equal(0, TotalOf(host, Gladiator));
+
+        mode.Activate();
+        host.Feed(SyntheticPackets.Damage(Mob, Gladiator, GladiatorSkill, 1_500), 1_200);
+        Assert.Equal(1_500, TotalOf(host, Gladiator));
+
+        mode.Standby();
+        host.Feed(SyntheticPackets.Damage(Mob, Gladiator, GladiatorSkill, 9_999), 1_300);
+        mode.Activate();   // frisch ab jetzt – nichts aus der Bereitschaft
+        Assert.Equal(0, TotalOf(host, Gladiator));
+    }
+
+    [Fact]
     public void Deutsche_Namen_sind_geladen()
     {
         using var host = NewHost();
