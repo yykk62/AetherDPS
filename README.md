@@ -12,8 +12,9 @@ Kostenloser, quelloffener DPS-Meter für **AION 2**, deutsch zuerst und für die
 
 ## Installation
 
-1. **Npcap** installieren: <https://npcap.com/#download> (Standardoptionen; „WinPcap API-compatible Mode“ anhaken)
-2. Aion2Meter starten, dann AION 2 starten und einloggen. Das Overlay findet die Verbindung von selbst.
+1. Aion2Meter starten.
+2. Fehlt **Npcap**, öffnet sich die Einrichtung. Dort einmal auf „Npcap jetzt installieren“ klicken. Der Meter lädt Npcap von der offiziellen Seite, prüft die Signatur und startet den Installer mit den richtigen Einstellungen. Du bestätigst nur noch (Admin-Abfrage → „Ja“, dann „I Agree“ → „Install“ → „Finish“).
+3. AION 2 starten und einloggen. Das Overlay findet die Verbindung von selbst.
 
 Die Einstellungen, die Kampf-Historie, die Logs und die Mitschnitte liegen unter `%LOCALAPPDATA%\Aion2Meter`.
 
