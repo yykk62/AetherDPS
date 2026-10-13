@@ -1,16 +1,52 @@
-# AION 2 Meter
+<p align="center">
+  <img src="Aion2Meter.App/Assets/icon.png" width="72" alt="" />
+</p>
 
-Kostenloser, quelloffener DPS-Meter für **AION 2**, deutsch zuerst und für die EU-Server gebaut.
+<h1 align="center">AION 2 Meter</h1>
 
-- Live-Overlay: Schaden, DPS und Anteil pro Gruppenmitglied, HP des Ziels und Kampfdauer
-- Skill-Details per Klick auf einen Spieler
-- Deutsche Klassen-, Skill- und Mob-Namen
-- **Alles bleibt lokal**: kein Login, kein Upload und keine Bestenliste
-- „Problem melden“ speichert die letzten 5 Minuten als Mitschnitt, damit Fehler ohne extra Test-Session behoben werden können
+<p align="center">
+  <b>Der kostenlose DPS-Meter und Begleiter für AION 2, auf Deutsch und für die EU-Server gebaut.</b><br />
+  Ohne Abo, ohne Konto, ohne Werbung. Alles bleibt auf deinem PC.
+</p>
 
-> Inoffizielles Fan-Projekt, nicht mit NCSOFT verbunden. Das Tool liest den Netzwerkverkehr nur **passiv** mit. Es verändert nichts am Spiel und liest keinen Spielspeicher. Die Nutzung erfolgt auf eigene Verantwortung.
+<p align="center">
+  <a href="https://github.com/yykk62/Aion2Meter/releases/latest"><b>⬇ Aion2Meter.exe herunterladen</b></a>
+  ·
+  <a href="#bedienung">Bedienung</a>
+  ·
+  <a href="#häufige-fragen">Häufige Fragen</a>
+</p>
 
-![DPS-Meter](docs/screenshot-demo.png)
+<p align="center">
+  <img src="docs/screenshot-demo.png" width="400" alt="DPS-Meter im Spiel" />
+</p>
+
+## Was kann der Meter?
+
+| | |
+|---|---|
+| ⚔ **DPS-Meter** | Schaden, DPS und Anteil für jedes Gruppenmitglied als Overlay über dem Spiel. Skill-Details per Klick. Start und Stopp mit STRG+W |
+| 👥 **Nur deine Gruppe** | Fremde in der Nähe erscheinen nie. Beschwörungen zählen zu ihrem Besitzer |
+| 🏆 **Läufe-Archiv** | Jeder Dungeon mit Boss-Zeiten, Bestzeit und Kampfanalyse, als Bild oder Text für Discord kopierbar |
+| ⏱ **Timer-Overlay** | Risse, Weltbosse, Events und Feldbosse mit Erinnerung, frei anpassbar |
+| ✅ **Checkliste** | Tägliches und Wöchentliches mit automatischem Reset |
+| 📶 **Verbindung** | Ping-Verlauf, Lag-Spitzen und eine Prüfung, ob das Problem bei dir, beim Anbieter oder beim Spielserver liegt |
+| 🖼 **Screenshot** | STRG+S zeigt das Spielbild sofort auf deinem zweiten Monitor |
+| 🔄 **Updates** | Neue Versionen kommen von selbst, geprüft per Prüfsumme |
+
+## Häufige Fragen
+
+**Ist das erlaubt?** Der Meter liest den Netzwerkverkehr nur **passiv** mit, so wie die Spieltools anderer Anbieter auch. Er verändert nichts am Spiel, liest keinen Spielspeicher und sendet nichts ans Spiel. Es ist ein inoffizielles Fan-Projekt, nicht mit NCSOFT verbunden. Die Nutzung erfolgt auf eigene Verantwortung.
+
+**Was kostet das?** Nichts. Der Quellcode ist offen (GPL-3.0), jeder kann nachsehen, was das Programm tut.
+
+**Werden meine Daten hochgeladen?** Nein. Es gibt kein Konto, keine Telemetrie und keine Bestenliste. Die einzige Verbindung nach außen ist die Update-Prüfung auf GitHub, und die lässt sich abschalten.
+
+**Warum warnt Windows beim ersten Start?** Die Datei ist noch nicht digital signiert, das ist in Arbeit. Klick auf „Weitere Informationen“ → „Trotzdem ausführen“.
+
+**Was ist Npcap?** Ein kostenloser Treiber, mit dem Programme den Netzwerkverkehr mitlesen können (auch Wireshark nutzt ihn). Der Meter richtet ihn beim ersten Start mit einem Klick ein.
+
+**Etwas stimmt nicht?** Tray-Symbol → „Problem melden“ speichert die letzten 5 Minuten. Dann ein [Issue öffnen](https://github.com/yykk62/Aion2Meter/issues) und die Datei anhängen. Achtung: Darin stehen die Namen der Spieler um dich herum.
 
 ## Download
 
@@ -18,7 +54,7 @@ Kostenloser, quelloffener DPS-Meter für **AION 2**, deutsch zuerst und für die
 
 - **Voraussetzung:** Windows 10 oder 11 (64 Bit) und Npcap (richtet der Meter beim ersten Start selbst ein)
 - **Wohin damit?** In einen eigenen Ordner, zum Beispiel `Dokumente\Aion2Meter`, nicht in den Download-Ordner und nicht nach `C:\Programme` (dort darf sich die Datei nicht selbst aktualisieren)
-- **Windows-Warnung „Der Computer wurde durch Windows geschützt“:** Die Datei ist (noch) nicht kostenpflichtig signiert. Auf „Weitere Informationen“ → „Trotzdem ausführen“ klicken. Wer sichergehen will, vergleicht die SHA-256-Prüfsumme mit der Angabe auf der Release-Seite: `Get-FileHash Aion2Meter.exe`
+- **Windows-Warnung „Der Computer wurde durch Windows geschützt“:** Die Datei ist noch nicht digital signiert. Auf „Weitere Informationen“ → „Trotzdem ausführen“ klicken. Wer sichergehen will, vergleicht die SHA-256-Prüfsumme mit der Angabe auf der Release-Seite: `Get-FileHash Aion2Meter.exe`
 - **Updates kommen automatisch:** Der Meter sieht beim Start und alle 6 Stunden auf GitHub nach, lädt neue Versionen herunter, prüft die Prüfsumme und installiert sie beim nächsten Start. Abschaltbar unter Einstellungen → Updates. Dabei wird nur die öffentliche Release-Seite abgefragt, von dir wird nichts gesendet
 
 ## Installation
