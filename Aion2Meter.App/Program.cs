@@ -48,6 +48,7 @@ internal static class Program
             services.AddSingleton<MainViewModel>();
             services.AddSingleton<MainWindow>();
             services.AddSingleton<SetupViewModel>();
+            services.AddTransient<SettingsViewModel>();
             App.Services = services.BuildServiceProvider();
 
             return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);

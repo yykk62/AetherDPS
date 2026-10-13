@@ -52,6 +52,7 @@ public partial class App : Application
             _ = Services.GetRequiredService<ICombatHistoryStore>();
             viewModel = Services.GetRequiredService<MainViewModel>();
             viewModel.SetupRequested += (_, _) => ShowSetup();
+            viewModel.SettingsRequested += (_, _) => ShowSettings();
             window = Services.GetRequiredService<MainWindow>();
 
             mode = Services.GetRequiredService<TrackingMode>();
@@ -61,7 +62,7 @@ public partial class App : Application
                 if (mode.IsActive) window.Show();
                 else window.Hide();
             });
-            hotkey = new GameHotkey();
+            hotkey = new GameHotkey(Services.GetRequiredService<MeterSettings>());
             hotkey.Pressed += (_, _) => Dispatcher.UIThread.Post(() => mode.Toggle());
         }
         desktop.MainWindow = window;
@@ -145,6 +146,22 @@ public partial class App : Application
     private void OnReport(object? sender, EventArgs e) => viewModel?.ReportProblem();
 
     private void OnSetup(object? sender, EventArgs e) => ShowSetup();
+
+    private void OnSettings(object? sender, EventArgs e) => ShowSettings();
+
+    private SettingsWindow? settingsWindow;
+
+    private void ShowSettings()
+    {
+        if (settingsWindow is not null)
+        {
+            settingsWindow.Activate();
+            return;
+        }
+        settingsWindow = new SettingsWindow(Services.GetRequiredService<SettingsViewModel>());
+        settingsWindow.Closed += (_, _) => settingsWindow = null;
+        settingsWindow.Show();
+    }
 
     private void OnOpenFolder(object? sender, EventArgs e) => viewModel?.OpenDataFolder();
 

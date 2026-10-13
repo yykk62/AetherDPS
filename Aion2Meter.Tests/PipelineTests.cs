@@ -138,6 +138,23 @@ public sealed class PipelineTests : IDisposable
     }
 
     [Fact]
+    public void Gruppenfilter_zeigt_nur_Gruppe_und_im_Zweifel_alle()
+    {
+        using var host = NewHost();
+        var roster = host.Get<PartyRoster>();
+        var entities = host.Get<AionDpsMeter.Services.Services.Entity.EntityTracker>();
+
+        // Solo / Gruppe unbekannt: kein Filter
+        Assert.True(roster.IsVisible("Fremder", isUser: false, isIdentified: true));
+
+        entities.RaisePartyUpdated([new AionDpsMeter.Core.Models.Player { Name = "Spielerin A" }, new AionDpsMeter.Core.Models.Player { Name = "Spieler B" }]);
+        Assert.True(roster.IsVisible("Spieler B", false, true));
+        Assert.False(roster.IsVisible("Fremder", false, true));
+        Assert.True(roster.IsVisible("Ich", isUser: true, isIdentified: true));           // eigener Charakter immer
+        Assert.True(roster.IsVisible("Player_77", isUser: false, isIdentified: false));   // Name noch unbekannt → zeigen
+    }
+
+    [Fact]
     public void Deutsche_Namen_sind_geladen()
     {
         using var host = NewHost();

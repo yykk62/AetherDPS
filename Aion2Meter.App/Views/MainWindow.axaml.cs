@@ -21,6 +21,8 @@ public partial class MainWindow : Window
         DataContext = viewModel;
         this.settings = settings;
         RestoreBounds();
+        ApplyOpacity();
+        settings.SettingsChanged += (_, _) => Dispatcher.UIThread.Post(ApplyOpacity);
 
         Header.PointerPressed += (_, e) =>
         {
@@ -66,6 +68,13 @@ public partial class MainWindow : Window
     {
         if (sender is Control { DataContext: PlayerRow row })
             ViewModel.SelectPlayerCommand.Execute(row);
+    }
+
+    private void ApplyOpacity()
+    {
+        // Nur der Hintergrund wird durchsichtig – Text und Balken bleiben voll lesbar.
+        byte alpha = (byte)Math.Round(Math.Clamp(settings?.WindowOpacity ?? 0.9, 0.2, 1.0) * 255);
+        Root.Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromArgb(alpha, 0x14, 0x18, 0x20));
     }
 
     private void RestoreBounds()

@@ -57,7 +57,7 @@
     </Style>
   </Window.Styles>
 
-  <Border Background="#E6141820" CornerRadius="8" BorderThickness="1"
+  <Border Name="Root" Background="#E6141820" CornerRadius="8" BorderThickness="1"
           BorderBrush="{Binding IsClickThrough, Converter={x:Static l:BoolBrush.LockedGoldElseSubtle}}">
     <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
 
@@ -70,8 +70,9 @@
         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="0">
           <Button Classes="icon" Content="{Binding ViewLabel}" Command="{Binding ToggleViewCommand}" ToolTip.Tip="{l:T view.tooltip}" FontSize="11" />
           <Button Classes="icon" Content="⟲" Command="{Binding ResetCommand}" ToolTip.Tip="{l:T header.reset}" />
+          <Button Classes="icon" Content="⚙" Command="{Binding OpenSettingsCommand}" ToolTip.Tip="{l:T header.settings}" />
           <ToggleButton Classes="icon" Content="☰" IsChecked="{Binding ShowDetails}" Command="{Binding ToggleDetailsCommand}" ToolTip.Tip="{l:T header.details}" />
-          <ToggleButton Classes="icon" Name="ClickThroughButton" ToolTip.Tip="{l:T header.clickthrough}">
+          <ToggleButton Classes="icon" Name="ClickThroughButton" ToolTip.Tip="{l:T header.clickthrough}" AutomationProperties.Name="Sperren">
             <Panel>
               <!-- Material Design Icons (Apache-2.0): lock-open / lock -->
               <PathIcon Width="13" Height="13" IsVisible="{Binding !IsClickThrough}"
@@ -122,7 +123,7 @@
         <Border Background="#F2141820" IsVisible="{Binding IsStandby}" CornerRadius="6">
           <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="6" Margin="16,0">
             <TextBlock Text="{l:T standby.title}" FontSize="15" FontWeight="SemiBold" HorizontalAlignment="Center" Foreground="#E0A84A" />
-            <TextBlock Text="{l:T standby.text}" FontSize="12" TextWrapping="Wrap" TextAlignment="Center" />
+            <TextBlock Text="{Binding StandbyText}" FontSize="12" TextWrapping="Wrap" TextAlignment="Center" />
           </StackPanel>
         </Border>
 

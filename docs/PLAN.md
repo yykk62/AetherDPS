@@ -19,11 +19,10 @@
 - [ ] Sync-Bug als Issue oder PR an RATmeter melden
 
 ## Phase 4: Autonome Wartung
-- [ ] Geplante Aufgabe: täglich `upstream/master` prüfen, mergen, testen und einen PR anlegen
-- [ ] Deutsche Spieldaten automatisch aktualisieren
+- [x] Geplante Aufgabe „aion2meter-wartung“ (täglich 11 Uhr): Upstream-Merge + deutsche Daten auf Wartungs-Branch, Build+Test, nur bei Grün nach main. Kein Push. Log: docs/WARTUNGSLOG.md
 
 ## Phase 5: Ausbau
-- [ ] Einstellungen: Deckkraft, Schriftgröße, Hotkey für Klick-durch, „Du“ statt Name
+- [x] Einstellungen: Hotkey, Deckkraft, nur meine Gruppe, „Du“ statt Name
 - [ ] Kampf-Historie ansehen (Daten liegen schon in SQLite)
 - [ ] Kampfanalyse nach dem Kampf (Rotation, Uptime der Buffs)
 - [ ] Mitlesen ohne Npcap über das in Windows eingebaute pktmon (Idee von a2kit)

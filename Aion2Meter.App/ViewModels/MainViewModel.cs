@@ -22,6 +22,8 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly RingRecorder recorder;
     private readonly TrackingMode mode;
     private readonly RunTracker run;
+    private readonly PartyRoster roster;
+    private readonly MeterSettings meterSettings;
     private readonly IAppSettingsService settings;
     private readonly MeterOptions options;
     private readonly ILogger<MainViewModel> logger;
@@ -48,6 +50,7 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty] private bool isClickThrough;
     [ObservableProperty] private string notice = "";
     [ObservableProperty] private bool isStandby = true;
+    [ObservableProperty] private string standbyText = "";
     [ObservableProperty] private bool showNameHint;
     [ObservableProperty] private bool showTargetView;
     [ObservableProperty] private string viewLabel = Loc.T("view.run");
@@ -55,7 +58,8 @@ public sealed partial class MainViewModel : ObservableObject
     private long? selectedPlayerId;
 
     public MainViewModel(CombatSessionManager sessions, IPacketService pipeline, IPacketCaptureDevice capture,
-        RingRecorder recorder, TrackingMode mode, RunTracker run, IAppSettingsService settings, MeterOptions options, ILogger<MainViewModel> logger)
+        RingRecorder recorder, TrackingMode mode, RunTracker run, PartyRoster roster, MeterSettings meterSettings,
+        IAppSettingsService settings, MeterOptions options, ILogger<MainViewModel> logger)
     {
         this.sessions = sessions;
         this.pipeline = pipeline;
@@ -63,6 +67,14 @@ public sealed partial class MainViewModel : ObservableObject
         this.recorder = recorder;
         this.mode = mode;
         this.run = run;
+        this.roster = roster;
+        this.meterSettings = meterSettings;
+        StandbyText = Loc.T("standby.text", meterSettings.HotkeyText);
+        meterSettings.Changed += (_, _) => Dispatcher.UIThread.Post(() =>
+        {
+            StandbyText = Loc.T("standby.text", meterSettings.HotkeyText);
+            Refresh();
+        });
         mode.Changed += (_, _) => Dispatcher.UIThread.Post(() =>
         {
             IsStandby = !mode.IsActive;
@@ -126,13 +138,22 @@ public sealed partial class MainViewModel : ObservableObject
         else
         {
             var snapshot = run.Snapshot();
-            TargetName = Loc.T("run.title");
+            TargetName = Loc.T("run.title", meterSettings.HotkeyText);
             Duration = FormatDuration(snapshot.Elapsed);
             PartyDps = Loc.T("footer.party", Format.Compact(snapshot.PartyDps));
             entries = snapshot.Players
                 .Select(p => new MeterEntry(p.PlayerId, p.Name, p.IsUser, p.IsIdentified, p.ClassId, p.ClassName,
                     p.Damage, p.Dps, p.Share))
                 .ToList();
+        }
+
+        if (meterSettings.PartyOnly)
+        {
+            // Fremde ausblenden und Anteile nur innerhalb der Gruppe rechnen
+            entries = entries.Where(e => roster.IsVisible(e.PlayerName, e.IsUser, e.IsIdentified)).ToList();
+            long sum = entries.Sum(e => e.TotalDamage);
+            entries = entries.Select(e => e with { DamagePercentage = sum > 0 ? e.TotalDamage * 100.0 / sum : 0 }).ToList();
+            PartyDps = Loc.T("footer.party", Format.Compact(entries.Sum(e => e.DamagePerSecond)));
         }
 
         UpdatePlayers(entries);
@@ -327,6 +348,11 @@ public sealed partial class MainViewModel : ObservableObject
 
     [RelayCommand]
     private void OpenSetup() => SetupRequested?.Invoke(this, EventArgs.Empty);
+
+    [RelayCommand]
+    private void OpenSettings() => SettingsRequested?.Invoke(this, EventArgs.Empty);
+
+    public event EventHandler? SettingsRequested;
 
     /// <summary>Overlay-Knopf „Npcap installieren“ → App öffnet das Einrichtungsfenster.</summary>
     public event EventHandler? SetupRequested;

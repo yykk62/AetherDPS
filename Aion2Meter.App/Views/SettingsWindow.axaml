@@ -1,0 +1,72 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Aion2Meter.App.ViewModels"
+        xmlns:l="using:Aion2Meter.App.Services"
+        x:Class="Aion2Meter.App.Views.SettingsWindow"
+        x:DataType="vm:SettingsViewModel"
+        Title="{l:T settings.title}"
+        Width="460" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterScreen" Topmost="True"
+        Background="#141820" Icon="/Assets/icon.ico">
+
+  <Window.Styles>
+    <Style Selector="TextBlock">
+      <Setter Property="Foreground" Value="#E6E8EC" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+    <Style Selector="TextBlock.dim">
+      <Setter Property="Foreground" Value="#8E96A3" />
+      <Setter Property="FontSize" Value="11" />
+    </Style>
+    <Style Selector="TextBlock.label">
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="FontSize" Value="13" />
+    </Style>
+    <Style Selector="Button.primary">
+      <Setter Property="Background" Value="#E0A84A" />
+      <Setter Property="Foreground" Value="#141820" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Padding" Value="22,8" />
+      <Setter Property="CornerRadius" Value="6" />
+    </Style>
+  </Window.Styles>
+
+  <StackPanel Margin="28,24" Spacing="20">
+    <TextBlock Text="{l:T settings.heading}" FontSize="20" FontWeight="SemiBold" />
+
+    <!-- Hotkey -->
+    <StackPanel Spacing="6">
+      <TextBlock Classes="label" Text="{l:T settings.hotkey}" />
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBox Name="HotkeyBox" Text="{Binding HotkeyText}" IsReadOnly="True" FontSize="14" FontWeight="SemiBold"
+                 HorizontalContentAlignment="Center" Cursor="Hand" />
+        <Button Grid.Column="1" Content="{l:T settings.hotkey_reset}" Command="{Binding ResetHotkeyCommand}" Margin="8,0,0,0" />
+      </Grid>
+      <TextBlock Classes="dim" Text="{Binding HotkeyError}" Foreground="#E86A6A" IsVisible="{Binding HotkeyError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+      <TextBlock Classes="dim" Text="{l:T settings.hotkey_hint}" />
+    </StackPanel>
+
+    <!-- Deckkraft -->
+    <StackPanel Spacing="4">
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Classes="label" Text="{l:T settings.opacity}" />
+        <TextBlock Grid.Column="1" Text="{Binding OpacityPercent, StringFormat='{}{0:0} %'}" />
+      </Grid>
+      <Slider Minimum="20" Maximum="100" Value="{Binding OpacityPercent}" TickFrequency="5" IsSnapToTickEnabled="True" />
+    </StackPanel>
+
+    <!-- Gruppe / Name -->
+    <StackPanel Spacing="4">
+      <CheckBox IsChecked="{Binding PartyOnly}">
+        <TextBlock Classes="label" Text="{l:T settings.party_only}" />
+      </CheckBox>
+      <TextBlock Classes="dim" Text="{l:T settings.party_only_hint}" Margin="28,0,0,0" />
+    </StackPanel>
+
+    <CheckBox IsChecked="{Binding HideName}">
+      <TextBlock Classes="label" Text="{l:T settings.hide_name}" />
+    </CheckBox>
+
+    <Button Classes="primary" Content="{l:T settings.close}" HorizontalAlignment="Right" Name="CloseButton" />
+  </StackPanel>
+</Window>

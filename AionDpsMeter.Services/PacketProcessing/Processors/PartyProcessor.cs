@@ -25,6 +25,7 @@ namespace AionDpsMeter.Services.PacketProcessing.Processors
             {
                 foreach (var partyMember in list)
                     entityTracker.RegisterOrUpdateGlobalPlayer(partyMember);
+                entityTracker.RaisePartyUpdated(list); // Aion2Meter: Gruppenfilter
             }
         }
 

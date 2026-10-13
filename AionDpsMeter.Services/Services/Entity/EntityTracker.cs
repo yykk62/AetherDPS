@@ -137,6 +137,10 @@ namespace AionDpsMeter.Services.Services.Entity
 
         public Player? GetPlayerEntity(int sessionId) => sessionPlayers.GetValueOrDefault(sessionId);
 
+        // Aion2Meter: aktuelle Gruppenmitglieder (aus dem Gruppen-Paket) für den Filter "nur meine Gruppe".
+        public event Action<IReadOnlyList<Player>>? PartyUpdated;
+        public void RaisePartyUpdated(IReadOnlyList<Player> members) => PartyUpdated?.Invoke(members);
+
         // ----- Flow 2: server sends global player metadata, any time -----------
 
         public void RegisterOrUpdateGlobalPlayer(Player data)
