@@ -39,6 +39,7 @@ public sealed partial class HubViewModel : ObservableObject
     [ObservableProperty] private bool hasRun;
     [ObservableProperty] private string buffDiagnostics = "";
     [ObservableProperty] private string riftInfo = "";
+    [ObservableProperty] private bool gameRunning = true;
 
     [ObservableProperty] private string pingNow = "–";
     [ObservableProperty] private string pingAvg = "–";
@@ -87,6 +88,7 @@ public sealed partial class HubViewModel : ObservableObject
         ModeTitle = Loc.T(IsActive ? "hub.mode.active" : "hub.mode.standby");
         ModeText = Loc.T(IsActive ? "hub.mode.active_text" : "hub.mode.standby_text", meterSettings.HotkeyText);
         ToggleText = Loc.T(IsActive ? "hub.stop" : "hub.start");
+        GameRunning = Aion2Meter.App.Services.GameLauncher.IsRunning;
         var next = timerService.Items().Where(i => i.DueAt > DateTime.Now).MinBy(i => i.DueAt);
         RiftInfo = next is { DueAt: DateTime due }
             ? Loc.T("rift.hub", next.Name, FormatLeft(due - DateTime.Now), due.ToString("HH:mm"))
@@ -154,6 +156,9 @@ public sealed partial class HubViewModel : ObservableObject
 
     private static string FormatLeft(TimeSpan left) =>
         left.TotalHours >= 24 ? $"{(int)left.TotalDays} T {left.Hours} Std." : left.TotalHours >= 1 ? left.ToString(@"h\:mm\:ss") : left.ToString(@"mm\:ss");
+
+    [RelayCommand]
+    private void LaunchGame() => Aion2Meter.App.Services.GameLauncher.Launch();
 
     [RelayCommand]
     private void ToggleMeter() => mode.Toggle();

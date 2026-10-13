@@ -65,13 +65,14 @@
             <Button Grid.Column="1" Classes="primary" Content="{l:T timers.add_schedule}" Command="{Binding AddScheduleCommand}" />
           </Grid>
           <TextBlock Text="{l:T timers.schedules_hint}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
+          <TextBlock Text="{l:T timers.inactive_hint}" Foreground="#E0A84A" FontSize="11" TextWrapping="Wrap" />
           <ItemsControl ItemsSource="{Binding Schedules}">
             <ItemsControl.ItemTemplate>
               <DataTemplate x:DataType="vm:ScheduleEditor">
                 <Border CornerRadius="6" Background="#14FFFFFF" Padding="10,8" Margin="0,0,0,6">
                   <StackPanel Spacing="6">
                     <Grid ColumnDefinitions="Auto,*,130">
-                      <CheckBox IsChecked="{Binding Enabled}" ToolTip.Tip="{l:T timers.enabled}" VerticalAlignment="Center" />
+                      <CheckBox IsChecked="{Binding Enabled}" Content="{l:T timers.enabled}" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="SemiBold" />
                       <TextBox Grid.Column="1" Text="{Binding Name}" FontWeight="SemiBold" Margin="0,0,8,0" />
                       <ComboBox Grid.Column="2" ItemsSource="{Binding Categories}" SelectedItem="{Binding Category}" HorizontalAlignment="Stretch" />
                     </Grid>

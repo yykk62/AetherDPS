@@ -60,6 +60,14 @@ public partial class App : Application
             window = Services.GetRequiredService<MainWindow>();
             hub = Services.GetRequiredService<HubWindow>();
 
+            // Charakter aus der letzten Sitzung (gilt, solange das Spiel nicht neu gestartet wurde)
+            var restored = Services.GetRequiredService<SelfIdentity>().Restore(GameLauncher.StartedAt());
+            Serilog.Log.Information("Charakter wiederhergestellt: {Restored}", restored);
+            var startSettings = Services.GetRequiredService<MeterSettings>();
+            if (startSettings.LaunchGameWithMeter && !GameLauncher.IsRunning
+                && Services.GetRequiredService<MeterOptions>().ReplayFile is null)
+                GameLauncher.Launch();
+
             mode = Services.GetRequiredService<TrackingMode>();
             mode.Changed += (_, _) => Dispatcher.UIThread.Post(() =>
             {

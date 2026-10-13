@@ -16,6 +16,7 @@ public sealed class FeatureTests : IDisposable
     {
         using var host = NewHost();
         var archive = host.Get<RunArchive>();
+        host.Get<MeterSettings>().PartyOnly = false;   // Testspieler sind keine „du“-Charaktere
         var mode = host.Mode;
         host.Feed(SyntheticPackets.Heartbeat(), 1_000);
         mode.Activate();
@@ -112,6 +113,37 @@ public sealed class FeatureTests : IDisposable
         var me = host.Get<AionDpsMeter.Services.Services.Entity.EntityTracker>().GetPlayerEntity(101);
         Assert.Equal("Testheld", me?.Name);                            // gespeicherter Name
         Assert.True(me?.IsUser);
+    }
+
+    [Fact]
+    public void Solo_ohne_erkannten_Charakter_zeigt_niemanden()
+    {
+        using var host = NewHost();
+        var settings = host.Get<MeterSettings>();
+        settings.PartyOnly = true;
+        var strangers = new List<MeterLine>
+        {
+            new(1, "Fremder", false, true, 11, "Gladiator", 50_000, 0, 0),
+            new(2, "Player_2", false, false, 14, "Ranger", 7_000, 0, 0),
+        };
+        Assert.Empty(MeterFilter.Apply(strangers, host.Get<PartyRoster>(), settings).Lines);
+    }
+
+    [Fact]
+    public void Gespeicherter_Charakter_wird_nur_in_derselben_Spielsitzung_wiederhergestellt()
+    {
+        Directory.CreateDirectory(dataDir);
+        File.WriteAllText(Path.Combine(dataDir, "aion2meter.json"),
+            """{ "CharacterName": "Testheld", "CharacterSessionId": 9669, "CharacterSeenAt": "2026-10-13T18:00:00" }""");
+        using var host = NewHost();
+        var self = host.Get<SelfIdentity>();
+        var entities = host.Get<AionDpsMeter.Services.Services.Entity.EntityTracker>();
+
+        Assert.False(self.Restore(DateTime.Parse("2026-10-13 19:00")));   // Spiel danach neu gestartet
+        Assert.False(entities.IsCurrentPlayer(9669));
+        Assert.True(self.Restore(DateTime.Parse("2026-10-13 16:20")));    // gleiche Spielsitzung
+        Assert.True(entities.IsCurrentPlayer(9669));
+        Assert.Equal("Testheld", entities.GetPlayerEntity(9669)?.Name);
     }
 
     [Fact]

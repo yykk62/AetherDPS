@@ -25,6 +25,7 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly PartyRoster roster;
     private readonly MeterSettings meterSettings;
     private readonly TimerService timers;
+    private readonly SelfIdentity self;
     private readonly IAppSettingsService settings;
     private readonly MeterOptions options;
     private readonly ILogger<MainViewModel> logger;
@@ -59,7 +60,7 @@ public sealed partial class MainViewModel : ObservableObject
     private long? selectedPlayerId;
 
     public MainViewModel(CombatSessionManager sessions, IPacketService pipeline, IPacketCaptureDevice capture,
-        RingRecorder recorder, TrackingMode mode, RunTracker run, PartyRoster roster, MeterSettings meterSettings, TimerService timers,
+        RingRecorder recorder, TrackingMode mode, RunTracker run, PartyRoster roster, MeterSettings meterSettings, TimerService timers, SelfIdentity self,
         IAppSettingsService settings, MeterOptions options, ILogger<MainViewModel> logger)
     {
         this.sessions = sessions;
@@ -71,6 +72,7 @@ public sealed partial class MainViewModel : ObservableObject
         this.roster = roster;
         this.meterSettings = meterSettings;
         this.timers = timers;
+        this.self = self;
         StandbyText = Loc.T("standby.text", meterSettings.HotkeyText);
         meterSettings.Changed += (_, _) => Dispatcher.UIThread.Post(() =>
         {
@@ -150,12 +152,15 @@ public sealed partial class MainViewModel : ObservableObject
         }
 
         // Fremde ausblenden (Gruppenmodus) und namenlose Beschwörungen ihrem Besitzer zuschlagen.
+        bool userKnown = self.SelfId is not null || entries.Any(e => e.IsUser);
         var merge = MeterFilter.Apply(entries, roster, meterSettings);
         entries = merge.Lines;
         mergedSummons = merge.MergedInto;
         PartyDps = Loc.T("footer.party", Format.Compact(entries.Sum(e => e.DamagePerSecond)));
 
         UpdatePlayers(entries);
+        // Solange dein Charakter unbekannt ist, erklären, wie er erkannt wird.
+        ShowNameHint = !userKnown;
         if (ShowDetails) UpdateSkills();
     }
 
@@ -243,8 +248,6 @@ public sealed partial class MainViewModel : ObservableObject
             foreach (var row in ordered) Players.Add(row);
         }
         HasPlayers = Players.Count > 0;
-        // Eigener Name kommt nur bei Login/Teleport – solange er fehlt, kurz erklären.
-        ShowNameHint = HasPlayers && !stats.Any(p => p.IsUser);
     }
 
     private string DisplayName(MeterLine p)

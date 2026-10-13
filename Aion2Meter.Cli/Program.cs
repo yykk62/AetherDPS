@@ -22,6 +22,8 @@ switch (args[0])
         return Replay(file);
     case "analyze":
         return Analyze(file);
+    case "dump":
+        return Dump(file, args.Length > 2 ? args[2] : null);
     case "demo":
         WriteDemo(file);
         Console.WriteLine($"Demo-Mitschnitt geschrieben: {file}");
@@ -144,4 +146,37 @@ static void WriteDemo(string path)
             chunks.Add(new RawChunk(start + 250 + t, "demo", SyntheticPackets.Heartbeat()));
     }
     CaptureFile.Write(path, chunks, ["Demo – künstlich erzeugt, kein echter Spielverkehr"]);
+}
+
+// Diagnose: alle (entpackten) Pakete durchsuchen – z. B. nach dem eigenen Charakternamen.
+static int Dump(string path, string? needle)
+{
+    var dataDir = Path.Combine(Path.GetTempPath(), "aion2meter-cli");
+    using var host = new MeterHost(new MeterOptions { DataDir = dataDir, ReplayFile = path, ReplaySpeed = 0 });
+    var processor = host.Get<AionDpsMeter.Services.PacketProcessing.PacketProcessor>();
+    var process = typeof(AionDpsMeter.Services.PacketProcessing.PacketProcessor).GetMethod("ProcessPacket",
+        System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
+    var needleBytes = needle is null ? null : System.Text.Encoding.UTF8.GetBytes(needle);
+    var counts = new Dictionary<ushort, int>();
+    int hits = 0;
+    host.StreamBuffer.PacketExtracted += (_, e) =>
+    {
+        var frames = (System.Collections.IEnumerable)process.Invoke(processor, [e.Payload])!;
+        foreach (AionDpsMeter.Services.PacketProcessing.Routing.Packet frame in frames)
+        {
+            var data = frame.Data;
+            int pos = 0;
+            while (pos < data.Length && (data[pos] & 0x80) != 0) pos++;
+            pos++;
+            if (pos + 2 > data.Length) continue;
+            ushort op = (ushort)(data[pos] | (data[pos + 1] << 8));
+            counts[op] = counts.GetValueOrDefault(op) + 1;
+            if (needleBytes is not null && data.AsSpan().IndexOf(needleBytes) >= 0 && hits++ < 20)
+                Console.WriteLine($"TREFFER 0x{op:X4} len={data.Length}: {Convert.ToHexString(data.AsSpan(0, Math.Min(data.Length, 120)))}");
+        }
+    };
+    ((ReplayCaptureDevice)host.Capture).PlayToEnd();
+    Console.WriteLine($"Treffer: {hits}");
+    foreach (var (op, n) in counts.OrderByDescending(x => x.Value).Take(30)) Console.WriteLine($"  0x{op:X4} {n,6}");
+    return 0;
 }

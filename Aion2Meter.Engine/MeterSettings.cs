@@ -32,6 +32,13 @@ public sealed class MeterSettings
     public string? CharacterServer { get; set; }
     public int CharacterClassId { get; set; }
 
+    /// <summary>Session-ID des Charakters beim letzten Login/Teleport – gilt, solange das Spiel nicht neu gestartet wurde.</summary>
+    public int CharacterSessionId { get; set; }
+    public DateTime? CharacterSeenAt { get; set; }
+
+    /// <summary>AION 2 über Steam mitstarten, wenn der Meter startet (und das Spiel noch nicht läuft).</summary>
+    public bool LaunchGameWithMeter { get; set; }
+
     private string? path;
 
     public event EventHandler? Changed;

@@ -47,14 +47,39 @@ public sealed class SelfIdentity
 
     private bool Known => SelfId is int id && entities.IsCurrentPlayer(id);
 
+    /// <summary>
+    /// Beim Start: Charakter aus der letzten Sitzung wiederherstellen – nur wenn das Spiel seitdem
+    /// nicht neu gestartet wurde (die Session-ID gilt bis Logout/Teleport).
+    /// </summary>
+    public bool Restore(DateTime? gameStartedAt)
+    {
+        if (settings.CharacterName is null || settings.CharacterSessionId <= 0 || settings.CharacterSeenAt is not DateTime seen) return false;
+        if (gameStartedAt is not DateTime started || started > seen) return false;
+        try
+        {
+            applying = true;
+            entities.SetSessionPlayerName(settings.CharacterSessionId, settings.CharacterName, 0, settings.CharacterServer ?? "", isUser: true);
+        }
+        finally
+        {
+            applying = false;
+        }
+        SelfId = settings.CharacterSessionId;
+        Guessed = true;
+        Changed?.Invoke(this, EventArgs.Empty);
+        return true;
+    }
+
     private void OnUserIdentified(int sessionId, string name, string server)
     {
         SelfId = sessionId;
         Guessed = applying;
-        if (!applying && name != Placeholder && (settings.CharacterName != name || settings.CharacterServer != server))
+        if (!applying && name != Placeholder)
         {
             settings.CharacterName = name;
             settings.CharacterServer = server;
+            settings.CharacterSessionId = sessionId;
+            settings.CharacterSeenAt = DateTime.Now;
             settings.Save();
         }
         Changed?.Invoke(this, EventArgs.Empty);
@@ -72,6 +97,17 @@ public sealed class SelfIdentity
             vote = recentCooldowns.TryGetValue(hit.Skill.Id, out var cdAt) && hit.DateTime - cdAt <= PairWindow && hit.DateTime >= cdAt;
         }
         if (vote) Vote(entityId, classId);
+
+        // Wiederhergestellter oder geschätzter Charakter trifft mit fremder Klasse → war falsch
+        if (entityId == SelfId && Guessed && classId > 0 && settings.CharacterClassId > 0 && classId != settings.CharacterClassId)
+        {
+            try { applying = true; entities.SetSessionPlayerName(entityId, $"Player_{entityId}", 0, "", isUser: false); }
+            finally { applying = false; }
+            SelfId = null;
+            Guessed = false;
+            Changed?.Invoke(this, EventArgs.Empty);
+            return;
+        }
 
         // Klasse des sicher erkannten Charakters merken
         if (entityId == SelfId && !Guessed && classId > 0 && settings.CharacterClassId != classId)

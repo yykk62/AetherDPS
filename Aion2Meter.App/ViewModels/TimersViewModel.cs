@@ -116,6 +116,10 @@ public sealed partial class ScheduleEditor : ObservableObject
 
     public string Summary => Original is null ? "neu" : Original.Describe();
 
+    private bool enabledTouched;
+
+    partial void OnEnabledChanged(bool value) => enabledTouched = true;
+
     [RelayCommand]
     private void Save()
     {
@@ -142,6 +146,10 @@ public sealed partial class ScheduleEditor : ObservableObject
         if (Fr) days.Add(DayOfWeek.Friday);
         if (Sa) days.Add(DayOfWeek.Saturday);
         if (So) days.Add(DayOfWeek.Sunday);
+
+        // Wer einen (inaktiven) Zeitplan bearbeitet und speichert, will ihn nutzen – außer der
+        // Haken „aktiv“ wurde bewusst geändert.
+        if (!Enabled && !enabledTouched) Enabled = true;
 
         var entry = new ScheduleEntry
         {

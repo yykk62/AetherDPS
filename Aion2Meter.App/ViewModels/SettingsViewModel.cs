@@ -24,6 +24,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private bool hideName;
     [ObservableProperty] private bool screenshotEnabled;
     [ObservableProperty] private bool buffBarEnabled;
+    [ObservableProperty] private bool launchGameWithMeter;
 
     public SettingsViewModel(MeterSettings meter, IAppSettingsService upstream)
     {
@@ -36,6 +37,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         hideName = upstream.IsNicknameHidden;
         screenshotEnabled = meter.ScreenshotEnabled;
         buffBarEnabled = meter.BuffBarEnabled;
+        launchGameWithMeter = meter.LaunchGameWithMeter;
     }
 
     partial void OnOpacityPercentChanged(double value) => upstream.WindowOpacity = value / 100.0;
@@ -49,6 +51,12 @@ public sealed partial class SettingsViewModel : ObservableObject
     partial void OnScreenshotEnabledChanged(bool value)
     {
         meter.ScreenshotEnabled = value;
+        meter.Save();
+    }
+
+    partial void OnLaunchGameWithMeterChanged(bool value)
+    {
+        meter.LaunchGameWithMeter = value;
         meter.Save();
     }
 

@@ -64,6 +64,14 @@
       <Slider Minimum="20" Maximum="100" Value="{Binding OpacityPercent}" TickFrequency="5" IsSnapToTickEnabled="True" />
     </StackPanel>
 
+    <!-- Spiel mitstarten -->
+    <StackPanel Spacing="4">
+      <CheckBox IsChecked="{Binding LaunchGameWithMeter}">
+        <TextBlock Classes="label" Text="{l:T settings.launch_game}" />
+      </CheckBox>
+      <TextBlock Classes="dim" Text="{l:T settings.launch_game_hint}" Margin="28,0,0,0" />
+    </StackPanel>
+
     <!-- Buff-Leiste -->
     <StackPanel Spacing="4">
       <CheckBox IsChecked="{Binding BuffBarEnabled}">
