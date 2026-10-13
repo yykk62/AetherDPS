@@ -56,6 +56,10 @@ public static class MeterServices
         services.AddSingleton<RunTracker>();
         services.AddSingleton<PartyRoster>();
         services.AddSingleton<ConnectionMonitor>();
+        services.AddSingleton<RunArchive>();
+        services.AddSingleton<TimerService>();
+        services.AddSingleton<ChecklistService>();
+        services.AddSingleton<LiveTimers>();
         services.AddSingleton(_ => MeterSettings.Load(options.DataDir));
         services.AddSingleton<TrackingMode>();
         return services;

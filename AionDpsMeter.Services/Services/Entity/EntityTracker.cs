@@ -141,6 +141,10 @@ namespace AionDpsMeter.Services.Services.Entity
         public event Action<IReadOnlyList<Player>>? PartyUpdated;
         public void RaisePartyUpdated(IReadOnlyList<Player> members) => PartyUpdated?.Invoke(members);
 
+        // Aion2Meter: Tod einer beliebigen Einheit (Boss-Timer).
+        public event Action<int>? EntityDied;
+        public void RaiseEntityDied(int entityId) => EntityDied?.Invoke(entityId);
+
         // ----- Flow 2: server sends global player metadata, any time -----------
 
         public void RegisterOrUpdateGlobalPlayer(Player data)

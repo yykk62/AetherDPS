@@ -80,8 +80,8 @@
 
       <!-- DPS-Meter -->
       <TabItem Header="{l:T hub.tab.dps}">
-        <ScrollViewer Padding="12,4,22,22" HorizontalScrollBarVisibility="Disabled">
-          <StackPanel Spacing="14">
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Spacing="14" Margin="12,4,22,22">
             <Border Classes="card">
               <Grid ColumnDefinitions="Auto,*,Auto">
                 <Ellipse Width="12" Height="12" VerticalAlignment="Center" Margin="0,0,12,0"
@@ -135,10 +135,26 @@
         </ScrollViewer>
       </TabItem>
 
+      <TabItem Header="{l:T hub.tab.runs}">
+        <views:RunsView DataContext="{Binding Runs}" />
+      </TabItem>
+
+      <TabItem Header="{l:T hub.tab.party}">
+        <views:PartyView DataContext="{Binding Party}" />
+      </TabItem>
+
+      <TabItem Header="{l:T hub.tab.timers}">
+        <views:TimersView DataContext="{Binding Timers}" />
+      </TabItem>
+
+      <TabItem Header="{l:T hub.tab.checklist}">
+        <views:ChecklistView DataContext="{Binding Checklist}" />
+      </TabItem>
+
       <!-- Verbindung -->
       <TabItem Header="{l:T hub.tab.connection}">
-        <ScrollViewer Padding="12,4,22,22" HorizontalScrollBarVisibility="Disabled">
-          <StackPanel Spacing="14">
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Spacing="14" Margin="12,4,22,22">
             <Grid ColumnDefinitions="*,*,*,*,*">
               <Border Grid.Column="0" Classes="tile"><StackPanel><TextBlock Classes="dim" FontSize="11" Text="{l:T conn.now}" /><TextBlock Text="{Binding PingNow}" FontSize="20" FontWeight="SemiBold" /></StackPanel></Border>
               <Border Grid.Column="1" Classes="tile"><StackPanel><TextBlock Classes="dim" FontSize="11" Text="{l:T conn.avg}" /><TextBlock Text="{Binding PingAvg}" FontSize="20" FontWeight="SemiBold" /></StackPanel></Border>
@@ -188,8 +204,8 @@
 
       <!-- Einstellungen -->
       <TabItem Header="{l:T hub.tab.settings}">
-        <ScrollViewer Padding="12,4,22,22" HorizontalScrollBarVisibility="Disabled">
-          <Border Classes="card" HorizontalAlignment="Left" VerticalAlignment="Top" MinWidth="460">
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+          <Border Classes="card" HorizontalAlignment="Left" VerticalAlignment="Top" MinWidth="460" Margin="12,4,22,22">
             <views:SettingsView DataContext="{Binding Settings}" />
           </Border>
         </ScrollViewer>

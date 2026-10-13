@@ -64,6 +64,14 @@
       <Slider Minimum="20" Maximum="100" Value="{Binding OpacityPercent}" TickFrequency="5" IsSnapToTickEnabled="True" />
     </StackPanel>
 
+    <!-- Buff-Leiste -->
+    <StackPanel Spacing="4">
+      <CheckBox IsChecked="{Binding BuffBarEnabled}">
+        <TextBlock Classes="label" Text="{l:T settings.buffbar}" />
+      </CheckBox>
+      <TextBlock Classes="dim" Text="{l:T settings.buffbar_hint}" Margin="28,0,0,0" />
+    </StackPanel>
+
     <!-- Gruppe / Name -->
     <StackPanel Spacing="4">
       <CheckBox IsChecked="{Binding PartyOnly}">

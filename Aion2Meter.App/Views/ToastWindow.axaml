@@ -1,0 +1,16 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Aion2Meter.App.Views.ToastWindow"
+        SystemDecorations="None" ShowActivated="False" Topmost="True" ShowInTaskbar="False"
+        CanResize="False" Width="320" SizeToContent="Height"
+        TransparencyLevelHint="Transparent" Background="Transparent">
+  <Border Background="#F2141820" BorderBrush="#99E0A84A" BorderThickness="1" CornerRadius="8" Padding="14,10">
+    <Grid ColumnDefinitions="Auto,*">
+      <Image Source="/Assets/icon.png" Width="26" Height="26" VerticalAlignment="Top" Margin="0,2,10,0" />
+      <StackPanel Grid.Column="1" Spacing="2">
+        <TextBlock Name="TitleText" FontWeight="SemiBold" FontSize="14" Foreground="#E0A84A" TextWrapping="Wrap" />
+        <TextBlock Name="BodyText" FontSize="12" Foreground="#E6E8EC" TextWrapping="Wrap" />
+      </StackPanel>
+    </Grid>
+  </Border>
+</Window>

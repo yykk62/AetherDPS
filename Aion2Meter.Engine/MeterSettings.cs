@@ -24,6 +24,9 @@ public sealed class MeterSettings
     public uint ScreenshotKey { get; set; } = 0x53;
     public string ScreenshotText { get; set; } = "STRG+S";
 
+    /// <summary>Buff-/Abklingzeit-Leiste unter dem Meter (nur im aktiven Modus sichtbar).</summary>
+    public bool BuffBarEnabled { get; set; } = true;
+
     private string? path;
 
     public event EventHandler? Changed;

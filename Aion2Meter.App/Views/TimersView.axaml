@@ -1,0 +1,77 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Aion2Meter.App.ViewModels"
+             xmlns:l="using:Aion2Meter.App.Services"
+             x:Class="Aion2Meter.App.Views.TimersView"
+             x:DataType="vm:TimersViewModel">
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="12" Margin="12,4,22,22">
+      <Border Classes="card">
+        <StackPanel Spacing="8">
+          <TextBlock Classes="h2" Text="{l:T timers.title}" />
+          <ItemsControl ItemsSource="{Binding Rows}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:TimerRow">
+                <Border CornerRadius="4" Background="#14FFFFFF" Padding="10,6" Margin="0,0,0,4">
+                  <StackPanel Spacing="6">
+                    <Grid ColumnDefinitions="26,*,Auto,Auto">
+                      <TextBlock Text="{Binding Icon}" FontSize="15" Foreground="#E0A84A" VerticalAlignment="Center" />
+                      <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding Detail}" Classes="dim" FontSize="11" />
+                      </StackPanel>
+                      <TextBlock Grid.Column="2" Text="{Binding Remaining}" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" Margin="12,0"
+                                 Foreground="{Binding IsDue, Converter={x:Static l:BoolBrush.DueGreenElseText}}" />
+                      <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                        <Button Classes="secondary" Content="{l:T timers.start}" Command="{Binding StartCommand}" IsVisible="{Binding IsCustom}" />
+                        <Button Classes="secondary" Content="✕" Command="{Binding RemoveCommand}" IsVisible="{Binding IsCustom}" ToolTip.Tip="{l:T timers.remove}" />
+                        <Button Classes="secondary" Content="✕" Command="{Binding RemoveCommand}" IsVisible="{Binding IsBoss}" ToolTip.Tip="{l:T timers.remove}" />
+                      </StackPanel>
+                    </Grid>
+                    <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding NeedsRespawn}" Margin="26,0,0,0">
+                      <TextBlock Text="{l:T timers.respawn}" Classes="dim" VerticalAlignment="Center" FontSize="12" />
+                      <TextBox Text="{Binding RespawnMinutes}" Width="70" Watermark="Min." />
+                      <Button Classes="secondary" Content="{l:T timers.save}" Command="{Binding SaveRespawnCommand}" />
+                      <Button Classes="secondary" Content="{l:T timers.ignore}" Command="{Binding IgnoreCommand}" ToolTip.Tip="{l:T timers.ignore_hint}" />
+                    </StackPanel>
+                  </StackPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <TextBlock Text="{l:T timers.boss_note}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
+        </StackPanel>
+      </Border>
+
+      <Border Classes="card">
+        <StackPanel Spacing="8">
+          <TextBlock Classes="h2" Text="{l:T timers.custom}" />
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <TextBox Text="{Binding NewName}" Width="220" Watermark="{l:T timers.custom_name}" />
+            <TextBox Text="{Binding NewMinutes}" Width="80" Watermark="Min." />
+            <Button Classes="primary" Content="{l:T timers.add}" Command="{Binding AddCustomCommand}" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <Border Classes="card">
+        <StackPanel Spacing="8">
+          <TextBlock Classes="h2" Text="{l:T timers.settings}" />
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="{l:T timers.rift_anchor}" VerticalAlignment="Center" />
+            <TextBox Text="{Binding RiftAnchor}" Width="70" />
+            <TextBlock Text="{l:T timers.rift_interval}" VerticalAlignment="Center" Margin="10,0,0,0" />
+            <TextBox Text="{Binding RiftInterval}" Width="50" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <CheckBox IsChecked="{Binding RiftReminder}" Content="{l:T timers.rift_reminder}" />
+            <TextBlock Text="{l:T timers.reminder_minutes}" VerticalAlignment="Center" Margin="10,0,0,0" />
+            <TextBox Text="{Binding ReminderMinutes}" Width="50" />
+            <Button Classes="secondary" Content="{l:T timers.save}" Command="{Binding SaveSettingsCommand}" />
+          </StackPanel>
+          <TextBlock Text="{l:T timers.rift_note}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

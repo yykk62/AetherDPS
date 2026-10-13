@@ -20,6 +20,16 @@ Die Einstellungen, die Kampf-Historie, die Logs und die Mitschnitte liegen unter
 
 ## Bedienung
 
+**Reiter im Hauptfenster:**
+- **DPS-Meter:** Status und aktueller Lauf
+- **Läufe:** Archiv aller Läufe mit Boss-Zeiten, Bestzeit 🏆, Vergleich mit deinem Durchschnitt, Kampfanalyse pro Spieler (Aktivität, Tode, Skills, Buff-Laufzeit) sowie „Als Bild/Text kopieren“ für Discord
+- **Gruppe:** Mitglieder mit Server, Stufe und Kampfkraft (nur für dich sichtbar)
+- **Timer:** Riss-Countdown, Feldboss-Timer (Kill wird automatisch erkannt) und eigene Timer, jeweils mit Erinnerung
+- **Checkliste:** Tägliches und Wöchentliches mit automatischem Reset und Erinnerung
+- **Verbindung** und **Einstellungen**
+
+Dazu kommt eine **Buff-Leiste** unter dem Meter mit deinen Buffs (gold) und Abklingzeiten (blau).
+
 Beim Start öffnet sich das **Hauptfenster** mit den Reitern DPS-Meter, Verbindung und Einstellungen. Wer es schließt, lässt den Meter im Tray weiterlaufen. Der Reiter **Verbindung** zeigt deinen Spiel-Ping als Verlauf mit Lag-Spitzen und neu gesendeten Paketen. „Verbindung prüfen“ sagt dir, ob ein Problem im Heimnetz, beim Internetanbieter oder auf dem Weg zum Spielserver liegt.
 
 | Was | Wie |

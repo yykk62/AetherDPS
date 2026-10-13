@@ -50,6 +50,11 @@ internal static class Program
             services.AddSingleton<SetupViewModel>();
             services.AddSingleton<SettingsViewModel>();
             services.AddSingleton<HubViewModel>();
+            services.AddSingleton<RunsViewModel>();
+            services.AddSingleton<PartyViewModel>();
+            services.AddSingleton<TimersViewModel>();
+            services.AddSingleton<ChecklistViewModel>();
+            services.AddSingleton<BuffBarViewModel>();
             services.AddSingleton<HubWindow>();
             App.Services = services.BuildServiceProvider();
 

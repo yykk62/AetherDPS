@@ -70,6 +70,34 @@ public partial class App : Application
             hotkey = new GameHotkey(Services.GetRequiredService<MeterSettings>());
             hotkey.Pressed += (_, _) => Dispatcher.UIThread.Post(() => mode.Toggle());
             hotkey.ScreenshotPressed += (_, foreground) => TakeScreenshot(foreground);
+
+            // Erinnerungen (Timer, Checkliste) und Buff-Leiste
+            var timerService = Services.GetRequiredService<TimerService>();
+            var checklist = Services.GetRequiredService<ChecklistService>();
+            timerService.Reminder += (title, text) => Dispatcher.UIThread.Post(() => ShowToast(title, text));
+            checklist.Reminder += (title, text) => Dispatcher.UIThread.Post(() => ShowToast(title, text));
+            var meterSettings = Services.GetRequiredService<MeterSettings>();
+            var buffVm = Services.GetRequiredService<BuffBarViewModel>();
+            buffBar = new BuffBarWindow(buffVm);
+            new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, (_, _) =>
+            {
+                timerService.Tick();
+                checklist.Tick();
+            }).Start();
+            new DispatcherTimer(TimeSpan.FromMilliseconds(200), DispatcherPriority.Background, (_, _) =>
+            {
+                bool show = mode.IsActive && meterSettings.BuffBarEnabled && window.IsVisible;
+                if (show) buffVm.Refresh();
+                if (show && buffVm.HasItems)
+                {
+                    buffBar.FollowBelow(window);
+                    if (!buffBar.IsVisible) buffBar.Show();
+                }
+                else if (buffBar.IsVisible)
+                {
+                    buffBar.Hide();
+                }
+            }).Start();
         }
         desktop.MainWindow = hub;
         viewModel!.Start();
@@ -85,7 +113,7 @@ public partial class App : Application
         ShowHub(HubTabDps);
     }
 
-    private const int HubTabDps = 0, HubTabConnection = 1, HubTabSettings = 2;
+    private const int HubTabDps = HubViewModel.TabDps, HubTabSettings = HubViewModel.TabSettings;
     private TrackingMode? mode;
     private GameHotkey? hotkey;
     private HubWindow? hub;
@@ -93,6 +121,14 @@ public partial class App : Application
     private void ShowHub(int tab) => hub?.ShowTab(tab);
 
     private ScreenshotWindow? screenshotWindow;
+    private BuffBarWindow? buffBar;
+    private ToastWindow? toast;
+
+    private void ShowToast(string title, string text)
+    {
+        toast ??= new ToastWindow();
+        toast.ShowMessage(title, text);
+    }
 
     /// <summary>Spiel-Bildschirm aufnehmen (Hintergrund-Thread) und auf dem anderen Monitor zeigen.</summary>
     private void TakeScreenshot(IntPtr foreground) => Task.Run(() =>

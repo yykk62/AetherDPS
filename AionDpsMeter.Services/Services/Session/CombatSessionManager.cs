@@ -16,6 +16,10 @@ namespace AionDpsMeter.Services.Services.Session
 
         // Aion2Meter: jeder gezählte Treffer (nach Boss-Filter und Beschwörungs-Zuordnung) – für den Lauf-Modus.
         public event Action<PlayerDamage>? DamageRecorded;
+        // Aion2Meter: Buffs, Abklingzeiten und Spielertode für Buff-Leiste und Kampfanalyse.
+        public event Action<BuffEvent>? BuffRecorded;
+        public event Action<TimedEvent>? SkillCooldownRecorded;
+        public event Action<int>? PlayerDied;
 
         private readonly ConcurrentDictionary<int, TargetEntry> targetEntries = new();
         private readonly ActiveTargetResolver targetResolver;
@@ -168,6 +172,7 @@ namespace AionDpsMeter.Services.Services.Session
 
         public void RegisterPlayerDeath(int playerId)
         {
+            PlayerDied?.Invoke(playerId);
             GetActiveTargetSession()?.RegisterPlayerDeath(playerId);
         }
 
@@ -277,6 +282,7 @@ namespace AionDpsMeter.Services.Services.Session
 
         public void ProcessBuffEvent(BuffEvent buffEvent)
         {
+            BuffRecorded?.Invoke(buffEvent);
             try
             {
                 lock (lockObject)
@@ -300,6 +306,7 @@ namespace AionDpsMeter.Services.Services.Session
 
         public void RegisterSkillCdEvent(TimedEvent skillCdEvent)
         {
+            SkillCooldownRecorded?.Invoke(skillCdEvent);
             skillCdEventTracker.Register(skillCdEvent);
         }
 

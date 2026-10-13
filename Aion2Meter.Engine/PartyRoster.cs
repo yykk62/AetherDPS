@@ -11,6 +11,8 @@ public sealed class PartyRoster
 {
     private readonly Lock gate = new();
     private HashSet<string> names = new(StringComparer.Ordinal);
+    private IReadOnlyList<PartyMember> members = [];
+    private DateTime? updatedAt;
 
     public PartyRoster(EntityTracker entities)
     {
@@ -19,11 +21,26 @@ public sealed class PartyRoster
 
     public int Count { get { lock (gate) return names.Count; } }
 
+    public IReadOnlyList<PartyMember> Members { get { lock (gate) return members; } }
+
+    public DateTime? UpdatedAt { get { lock (gate) return updatedAt; } }
+
+    public event EventHandler? Updated;
+
     private void OnPartyUpdated(IReadOnlyList<Player> members)
     {
         var updated = new HashSet<string>(members.Select(m => m.Name).Where(n => !string.IsNullOrWhiteSpace(n)),
             StringComparer.Ordinal);
-        lock (gate) names = updated;
+        var list = members.Where(m => !string.IsNullOrWhiteSpace(m.Name))
+            .Select(m => new PartyMember(m.Name, m.ServerName, m.CharacterLevel, m.CombatPower))
+            .ToList();
+        lock (gate)
+        {
+            names = updated;
+            this.members = list;
+            updatedAt = DateTime.Now;
+        }
+        Updated?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>
@@ -40,3 +57,6 @@ public sealed class PartyRoster
         }
     }
 }
+
+/// <summary>Gruppenmitglied laut Gruppen-Paket (Name, Server, Stufe, Kampfkraft).</summary>
+public sealed record PartyMember(string Name, string ServerName, int Level, int CombatPower);

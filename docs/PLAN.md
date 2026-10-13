@@ -23,7 +23,10 @@
 
 ## Phase 5: Ausbau
 - [x] Hauptfenster mit Reitern (DPS-Meter, Verbindung, Einstellungen), Verbindungs-Monitor mit Ping-Verlauf und Diagnose (13.10.)
-- [ ] Timer: Risse nach Plan (EU-Zeiten prüfen), Feldbosse automatisch beim Kill erkannt, Abyss-Bosse als Kalender
+- [x] Timer: Risse nach Plan, Feldbosse automatisch beim Kill erkannt (Respawn-Dauer trägt der Nutzer einmal ein), eigene Timer, Erinnerungs-Popups (13.10.)
+- [x] Lauf-Archiv mit Bestzeiten, Boss-Zeiten, Vergleich, Kampfanalyse, Teilen als Bild/Text (13.10.)
+- [x] Gruppen-Check, Daily-/Weekly-Checkliste, Buff-/Abklingzeit-Leiste (13.10.)
+- [ ] Im Spiel prüfen: EU-Risszeiten, Reset-Zeiten, Buff-Leiste im Spiel, Feldboss-Erkennung, Zahlen gegen den Spiel-Meter
 - [ ] Item-Datenbank (Datenquelle klären: NC-Web-API mit Deutsch vs. Spieldateien)
 - [ ] Interaktive Karte, vorher eine kurze Aufnahme: Welche Pakete kommen beim Einsammeln? Positionen anderer Spieler NIE anzeigen
 - [x] Einstellungen: Hotkey, Deckkraft, nur meine Gruppe, „Du“ statt Name

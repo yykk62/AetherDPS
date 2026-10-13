@@ -21,6 +21,11 @@ public sealed class TrackingMode
         PacketOpcodes.MobSummon,
         PacketOpcodes.RemainHp,
         PacketOpcodes.ServerTime,
+        // für Buff-Leiste und Boss-Timer (keine Kampfaufzeichnung – der Lauf zählt nur im aktiven Modus)
+        PacketOpcodes.EntityDeath,
+        PacketOpcodes.BuffEffectA,
+        PacketOpcodes.BuffEffectB,
+        PacketOpcodes.SkillCd,
     ];
 
     private readonly CombatSessionManager sessions;

@@ -19,6 +19,12 @@ public sealed partial class HubViewModel : ObservableObject
 
     public MainViewModel Overlay { get; }
     public SettingsViewModel Settings { get; }
+    public RunsViewModel Runs { get; }
+    public PartyViewModel Party { get; }
+    public TimersViewModel Timers { get; }
+    public ChecklistViewModel Checklist { get; }
+
+    public const int TabDps = 0, TabRuns = 1, TabParty = 2, TabTimers = 3, TabChecklist = 4, TabConnection = 5, TabSettings = 6;
     public ObservableCollection<PlayerRow> RunPlayers { get; } = [];
     public ObservableCollection<DiagnosisRow> DiagnosisRows { get; } = [];
 
@@ -43,7 +49,8 @@ public sealed partial class HubViewModel : ObservableObject
     [ObservableProperty] private string diagnosisText = "";
 
     public HubViewModel(TrackingMode mode, RunTracker run, ConnectionMonitor monitor, MeterSettings meterSettings,
-        PartyRoster roster, MainViewModel overlay, SettingsViewModel settings)
+        PartyRoster roster, MainViewModel overlay, SettingsViewModel settings,
+        RunsViewModel runs, PartyViewModel party, TimersViewModel timers, ChecklistViewModel checklist)
     {
         this.mode = mode;
         this.run = run;
@@ -52,6 +59,10 @@ public sealed partial class HubViewModel : ObservableObject
         this.roster = roster;
         Overlay = overlay;
         Settings = settings;
+        Runs = runs;
+        Party = party;
+        Timers = timers;
+        Checklist = checklist;
         mode.Changed += (_, _) => Dispatcher.UIThread.Post(Refresh);
         timer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, (_, _) => Refresh());
     }
@@ -70,8 +81,15 @@ public sealed partial class HubViewModel : ObservableObject
         ModeTitle = Loc.T(IsActive ? "hub.mode.active" : "hub.mode.standby");
         ModeText = Loc.T(IsActive ? "hub.mode.active_text" : "hub.mode.standby_text", meterSettings.HotkeyText);
         ToggleText = Loc.T(IsActive ? "hub.stop" : "hub.start");
-        RefreshRun();
-        RefreshConnection();
+        switch (SelectedTab)
+        {
+            case TabDps: RefreshRun(); break;
+            case TabRuns: Runs.Tick(); break;
+            case TabParty: Party.Refresh(); break;
+            case TabTimers: Timers.Tick(); break;
+            case TabChecklist: Checklist.Refresh(); break;
+            case TabConnection: RefreshConnection(); break;
+        }
     }
 
     private void RefreshRun()
@@ -120,6 +138,8 @@ public sealed partial class HubViewModel : ObservableObject
         SpikeThreshold = stats.SpikeThreshold;
         ServerText = monitor.ServerAddress is { } ip ? Loc.T("conn.server", ip) : "";
     }
+
+    partial void OnSelectedTabChanged(int value) => Refresh();
 
     [RelayCommand]
     private void ToggleMeter() => mode.Toggle();

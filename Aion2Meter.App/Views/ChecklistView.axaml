@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Aion2Meter.App.ViewModels"
+             xmlns:l="using:Aion2Meter.App.Services"
+             x:Class="Aion2Meter.App.Views.ChecklistView"
+             x:DataType="vm:ChecklistViewModel">
+  <UserControl.DataTemplates>
+    <DataTemplate x:DataType="vm:ChecklistRow">
+      <Grid ColumnDefinitions="*,Auto" Margin="0,1">
+        <CheckBox IsChecked="{Binding IsDone}" Content="{Binding Text}" />
+        <Button Grid.Column="1" Classes="secondary" Content="✕" Padding="8,2" Command="{Binding RemoveCommand}" ToolTip.Tip="{l:T check.remove}" />
+      </Grid>
+    </DataTemplate>
+  </UserControl.DataTemplates>
+
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="12" Margin="12,4,22,22">
+      <Grid ColumnDefinitions="*,12,*">
+        <Border Classes="card" VerticalAlignment="Top">
+          <StackPanel Spacing="6">
+            <TextBlock Classes="h2" Text="{l:T check.daily}" />
+            <TextBlock Text="{Binding DailyInfo}" Classes="dim" FontSize="11" />
+            <ItemsControl ItemsSource="{Binding Daily}" />
+          </StackPanel>
+        </Border>
+        <Border Grid.Column="2" Classes="card" VerticalAlignment="Top">
+          <StackPanel Spacing="6">
+            <TextBlock Classes="h2" Text="{l:T check.weekly}" />
+            <TextBlock Text="{Binding WeeklyInfo}" Classes="dim" FontSize="11" />
+            <ItemsControl ItemsSource="{Binding Weekly}" />
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <Border Classes="card">
+        <StackPanel Spacing="8">
+          <TextBlock Classes="h2" Text="{l:T check.add_title}" />
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBox Text="{Binding NewText}" Width="280" Watermark="{l:T check.add_hint}" />
+            <CheckBox IsChecked="{Binding NewIsWeekly}" Content="{l:T check.weekly_short}" />
+            <Button Classes="primary" Content="{l:T check.add}" Command="{Binding AddCommand}" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <Border Classes="card">
+        <StackPanel Spacing="8">
+          <TextBlock Classes="h2" Text="{l:T check.resets}" />
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="{l:T check.daily_reset}" VerticalAlignment="Center" />
+            <ComboBox ItemsSource="{Binding Hours}" SelectedIndex="{Binding DailyHour}" Width="90" />
+            <TextBlock Text="{l:T check.weekly_reset}" VerticalAlignment="Center" Margin="16,0,0,0" />
+            <ComboBox ItemsSource="{Binding Days}" SelectedIndex="{Binding WeeklyDay}" Width="130" />
+            <ComboBox ItemsSource="{Binding Hours}" SelectedIndex="{Binding WeeklyHour}" Width="90" />
+          </StackPanel>
+          <TextBlock Text="{l:T check.reset_note}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>
