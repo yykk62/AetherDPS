@@ -27,6 +27,11 @@ public sealed class MeterSettings
     /// <summary>Buff-/Abklingzeit-Leiste unter dem Meter (nur im aktiven Modus sichtbar).</summary>
     public bool BuffBarEnabled { get; set; } = true;
 
+    /// <summary>Zuletzt erkannter eigener Charakter – damit der Name auch ohne Teleport stimmt.</summary>
+    public string? CharacterName { get; set; }
+    public string? CharacterServer { get; set; }
+    public int CharacterClassId { get; set; }
+
     private string? path;
 
     public event EventHandler? Changed;

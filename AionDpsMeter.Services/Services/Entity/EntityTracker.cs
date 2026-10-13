@@ -132,6 +132,7 @@ namespace AionDpsMeter.Services.Services.Entity
             player.IsUser = isUser || name == currentUserName;
 
             if (isUser) SetCurrentUser(name);
+            if (isUser) UserIdentified?.Invoke(sessionId, name, player.ServerName); // Aion2Meter: Charakter merken
             TryFallbackLinkByName(name);
         }
 
@@ -140,6 +141,9 @@ namespace AionDpsMeter.Services.Services.Entity
         // Aion2Meter: aktuelle Gruppenmitglieder (aus dem Gruppen-Paket) für den Filter "nur meine Gruppe".
         public event Action<IReadOnlyList<Player>>? PartyUpdated;
         public void RaisePartyUpdated(IReadOnlyList<Player> members) => PartyUpdated?.Invoke(members);
+
+        // Aion2Meter: eigener Charakter erkannt (Session-ID, Name, Server) – wird dauerhaft gespeichert.
+        public event Action<int, string, string>? UserIdentified;
 
         // Aion2Meter: Tod einer beliebigen Einheit (Boss-Timer).
         public event Action<int>? EntityDied;

@@ -16,6 +16,7 @@ public sealed partial class HubViewModel : ObservableObject
     private readonly MeterSettings meterSettings;
     private readonly PartyRoster roster;
     private readonly LiveTimers live;
+    private readonly TimerService timerService;
     private readonly DispatcherTimer timer;
 
     public MainViewModel Overlay { get; }
@@ -37,6 +38,7 @@ public sealed partial class HubViewModel : ObservableObject
     [ObservableProperty] private string runSummary = "";
     [ObservableProperty] private bool hasRun;
     [ObservableProperty] private string buffDiagnostics = "";
+    [ObservableProperty] private string riftInfo = "";
 
     [ObservableProperty] private string pingNow = "–";
     [ObservableProperty] private string pingAvg = "–";
@@ -52,7 +54,7 @@ public sealed partial class HubViewModel : ObservableObject
 
     public HubViewModel(TrackingMode mode, RunTracker run, ConnectionMonitor monitor, MeterSettings meterSettings,
         PartyRoster roster, MainViewModel overlay, SettingsViewModel settings,
-        RunsViewModel runs, PartyViewModel party, TimersViewModel timers, ChecklistViewModel checklist, LiveTimers live)
+        RunsViewModel runs, PartyViewModel party, TimersViewModel timers, ChecklistViewModel checklist, LiveTimers live, TimerService timerService)
     {
         this.mode = mode;
         this.run = run;
@@ -60,6 +62,7 @@ public sealed partial class HubViewModel : ObservableObject
         this.meterSettings = meterSettings;
         this.roster = roster;
         this.live = live;
+        this.timerService = timerService;
         Overlay = overlay;
         Settings = settings;
         Runs = runs;
@@ -84,6 +87,9 @@ public sealed partial class HubViewModel : ObservableObject
         ModeTitle = Loc.T(IsActive ? "hub.mode.active" : "hub.mode.standby");
         ModeText = Loc.T(IsActive ? "hub.mode.active_text" : "hub.mode.standby_text", meterSettings.HotkeyText);
         ToggleText = Loc.T(IsActive ? "hub.stop" : "hub.start");
+        var nextRift = TimerService.NextRift(DateTime.Now, timerService.Settings.RiftAnchor, timerService.Settings.RiftIntervalHours);
+        var left = nextRift - DateTime.Now;
+        RiftInfo = Loc.T("rift.hub", left.TotalHours >= 1 ? left.ToString(@"h\:mm\:ss") : left.ToString(@"mm\:ss"), nextRift.ToString("HH:mm"));
         switch (SelectedTab)
         {
             case TabDps: RefreshRun(); break;
@@ -98,15 +104,13 @@ public sealed partial class HubViewModel : ObservableObject
     private void RefreshRun()
     {
         var d = live.Diagnostics();
-        var self = d.Self is null ? "noch unbekannt (Teleport oder einen Skill benutzen)" : d.SelfGuessed ? $"{d.Self} (über Abklingzeiten erkannt)" : d.Self;
-        BuffDiagnostics = $"Buff-Leiste: {d.OwnBuffEvents} eigene von {d.BuffEvents} Buffs, {d.CooldownEvents} Abklingzeiten empfangen · dein Charakter: {self}";
+        var self = d.Self is null ? "noch unbekannt – wird beim ersten Skill im laufenden Meter erkannt" : d.SelfGuessed ? $"{d.Self} (wiedererkannt)" : d.Self;
+        BuffDiagnostics = $"Dein Charakter: {self} · Buff-Leiste: {d.OwnBuffEvents} eigene von {d.BuffEvents} empfangenen Buffs";
         var snapshot = run.Snapshot();
         var lines = snapshot.Players
             .Select(p => new MeterLine(p.PlayerId, p.Name, p.IsUser, p.IsIdentified, p.ClassId, p.ClassName, p.Damage, p.Dps, p.Share))
             .ToList();
-        if (meterSettings.PartyOnly)
-            lines = lines.Where(l => roster.IsVisible(l.PlayerName, l.IsUser, l.IsIdentified)).ToList();
-        var players = SummonMerger.Merge(lines, dropUnmerged: meterSettings.PartyOnly && roster.Count > 0).Lines
+        var players = MeterFilter.Apply(lines, roster, meterSettings).Lines
             .Where(p => p.IsIdentified || p.DamagePercentage > 1).Take(8).ToList();
         HasRun = players.Count > 0;
         var duration = snapshot.Elapsed.TotalHours >= 1 ? snapshot.Elapsed.ToString(@"h\:mm\:ss") : snapshot.Elapsed.ToString(@"mm\:ss");

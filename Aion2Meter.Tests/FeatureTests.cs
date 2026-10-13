@@ -76,22 +76,26 @@ public sealed class FeatureTests : IDisposable
     }
 
     [Fact]
-    public void Buff_Leiste_erkennt_eigenen_Charakter_ueber_Abklingzeiten()
+    public void Charakter_wird_ohne_Teleport_wiedererkannt_und_Buffs_nachgetragen()
     {
+        // gespeicherter Charakter aus einer früheren Sitzung
+        Directory.CreateDirectory(dataDir);
+        File.WriteAllText(Path.Combine(dataDir, "aion2meter.json"),
+            """{ "CharacterName": "Testheld", "CharacterServer": "EU-1", "CharacterClassId": 11 }""");
+
         using var host = NewHost();
         var live = host.Get<LiveTimers>();
         host.Mode.Activate();
         host.Feed(SyntheticPackets.Heartbeat(), 1_000);
 
-        // Eigener Charakter (101) ist Upstream unbekannt (kein Login/Teleport gesehen)
-        var buff = new AionDpsMeter.Core.Models.BuffEvent
+        // Buff auf 101 – Upstream weiß noch nicht, dass 101 du bist
+        host.Sessions.ProcessBuffEvent(new AionDpsMeter.Core.Models.BuffEvent
         {
             EntityId = 101, BuffId = 11000100, BuffName = "Kampfrausch", DurationMs = 20_000, AppliedAt = DateTime.Now, CasterId = 101,
-        };
-        host.Sessions.ProcessBuffEvent(buff);
-        Assert.DoesNotContain(live.Active(), i => i.Name == "Kampfrausch");
+        });
+        Assert.Empty(live.Active());
 
-        // 101 trifft mit Skill X, kurz danach kommt die Abklingzeit für Skill X → 101 bin ich
+        // 101 trifft mit Skill X, danach kommt die Abklingzeit für Skill X → 101 bist du
         host.Feed(SyntheticPackets.Damage(5001, 101, 11000001, 1_000), 1_100);
         var skill = AionDpsMeter.Core.GameData.Services.GameDataProvider.Instance.GetSkillOrDefault(11000001);
         host.Sessions.RegisterSkillCdEvent(new AionDpsMeter.Services.Services.Timed.TimedEvent
@@ -99,10 +103,28 @@ public sealed class FeatureTests : IDisposable
             Id = (uint)skill.Id, Name = skill.Name, IconUrl = "", Duration = TimeSpan.FromSeconds(8),
         });
 
-        var active = live.Active();
-        Assert.Contains(active, i => i.Kind == LiveKind.Buff && i.Name == "Kampfrausch");   // nachgetragen
-        Assert.Contains(active, i => i.Kind == LiveKind.Cooldown);
-        Assert.True(live.Diagnostics().SelfGuessed);
+        Assert.Contains(live.Active(), i => i.Name == "Kampfrausch");   // nachgetragen
+        var me = host.Get<AionDpsMeter.Services.Services.Entity.EntityTracker>().GetPlayerEntity(101);
+        Assert.Equal("Testheld", me?.Name);                            // gespeicherter Name
+        Assert.True(me?.IsUser);
+    }
+
+    [Fact]
+    public void Solo_zeigt_nur_dich_und_deine_Beschwoerungen()
+    {
+        using var host = NewHost();
+        var settings = host.Get<MeterSettings>();
+        settings.PartyOnly = true;
+        var lines = new List<MeterLine>
+        {
+            new(1, "Ich", true, true, 16, "Elementalist", 10_000, 0, 0),
+            new(2, "Fremder", false, true, 11, "Gladiator", 50_000, 0, 0),
+            new(3, "Player_3", false, false, 16, "Elementalist", 2_000, 0, 0),   // mein Geist
+            new(4, "Player_4", false, false, 14, "Ranger", 7_000, 0, 0),         // fremder, noch namenlos
+        };
+        var result = MeterFilter.Apply(lines, host.Get<PartyRoster>(), settings);
+        var only = Assert.Single(result.Lines);
+        Assert.Equal(12_000, only.TotalDamage);
     }
 
     [Fact]

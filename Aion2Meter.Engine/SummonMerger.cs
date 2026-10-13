@@ -17,6 +17,9 @@ public static class SummonMerger
 {
     public sealed record Result(List<MeterLine> Lines, Dictionary<long, List<long>> MergedInto);
 
+    private const int SpiritClass = 10, SorcererClass = 15, ElementalistClass = 16;
+    private static readonly HashSet<int> SummonerClasses = [SpiritClass, SorcererClass, ElementalistClass];
+
     public static Result Merge(IReadOnlyList<MeterLine> lines, bool dropUnmerged = false)
     {
         var identified = lines.Where(l => l.IsIdentified).ToList();
@@ -26,7 +29,12 @@ public static class SummonMerger
 
         foreach (var line in lines.Where(l => !l.IsIdentified))
         {
-            var owners = identified.Where(p => p.ClassId == line.ClassId && line.ClassId != 0).ToList();
+            // Nur Klassen mit Beschwörungen – sonst würde z. B. ein fremder namenloser Waldläufer
+            // deinem Schaden zugeschlagen. Klasse 10 = Geist des Beschwörers (16).
+            int ownerClass = line.ClassId == SpiritClass ? ElementalistClass : line.ClassId;
+            var owners = SummonerClasses.Contains(line.ClassId)
+                ? identified.Where(p => p.ClassId == ownerClass).ToList()
+                : [];
             if (owners.Count == 1)
             {
                 var owner = owners[0].PlayerId;

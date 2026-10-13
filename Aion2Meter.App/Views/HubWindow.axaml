@@ -89,6 +89,7 @@
                 <StackPanel Grid.Column="1" Spacing="3" Margin="0,0,16,0">
                   <TextBlock Text="{Binding ModeTitle}" FontSize="17" FontWeight="SemiBold" />
                   <TextBlock Text="{Binding ModeText}" Classes="dim" TextWrapping="Wrap" />
+                  <TextBlock Text="{Binding RiftInfo}" Foreground="#E0A84A" FontSize="12" TextWrapping="Wrap" Margin="0,4,0,0" />
                 </StackPanel>
                 <Button Grid.Column="2" Classes="primary" Content="{Binding ToggleText}" Command="{Binding ToggleMeterCommand}" VerticalAlignment="Center" />
               </Grid>

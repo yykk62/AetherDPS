@@ -57,9 +57,7 @@ public sealed class RunArchive
         var lines = snapshot.Players
             .Select(p => new MeterLine(p.PlayerId, p.Name, p.IsUser, p.IsIdentified, p.ClassId, p.ClassName, p.Damage, p.Dps, p.Share))
             .ToList();
-        if (settings.PartyOnly)
-            lines = lines.Where(l => roster.IsVisible(l.PlayerName, l.IsUser, l.IsIdentified)).ToList();
-        var merge = SummonMerger.Merge(lines, dropUnmerged: settings.PartyOnly && roster.Count > 0);
+        var merge = MeterFilter.Apply(lines, roster, settings);
 
         var byId = snapshot.Players.ToDictionary(p => (long)p.PlayerId);
         var players = merge.Lines

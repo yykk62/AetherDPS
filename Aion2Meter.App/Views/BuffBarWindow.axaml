@@ -11,7 +11,7 @@
       <ItemsControl.ItemTemplate>
         <DataTemplate x:DataType="vm:BuffBarRow">
           <Panel Height="18" Margin="0,1">
-            <ProgressBar MinHeight="0" Height="18" Maximum="1" Value="{Binding Fraction}" Foreground="{Binding Brush}"
+            <ProgressBar MinHeight="0" Height="18" Maximum="1" Value="{Binding Fraction}" Foreground="#E0A84A"
                          Background="#22FFFFFF" CornerRadius="3" Opacity="0.55" />
             <Grid ColumnDefinitions="*,Auto" Margin="6,0" VerticalAlignment="Center">
               <TextBlock Text="{Binding Name}" FontSize="11" Foreground="#E6E8EC" TextTrimming="CharacterEllipsis" />

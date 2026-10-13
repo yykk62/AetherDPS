@@ -24,6 +24,7 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly RunTracker run;
     private readonly PartyRoster roster;
     private readonly MeterSettings meterSettings;
+    private readonly TimerService timers;
     private readonly IAppSettingsService settings;
     private readonly MeterOptions options;
     private readonly ILogger<MainViewModel> logger;
@@ -51,6 +52,7 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty] private string notice = "";
     [ObservableProperty] private bool isStandby = true;
     [ObservableProperty] private string standbyText = "";
+    [ObservableProperty] private string riftText = "";
     [ObservableProperty] private bool showNameHint;
     [ObservableProperty] private bool showTargetView;
     [ObservableProperty] private string viewLabel = Loc.T("view.run");
@@ -58,7 +60,7 @@ public sealed partial class MainViewModel : ObservableObject
     private long? selectedPlayerId;
 
     public MainViewModel(CombatSessionManager sessions, IPacketService pipeline, IPacketCaptureDevice capture,
-        RingRecorder recorder, TrackingMode mode, RunTracker run, PartyRoster roster, MeterSettings meterSettings,
+        RingRecorder recorder, TrackingMode mode, RunTracker run, PartyRoster roster, MeterSettings meterSettings, TimerService timers,
         IAppSettingsService settings, MeterOptions options, ILogger<MainViewModel> logger)
     {
         this.sessions = sessions;
@@ -69,6 +71,7 @@ public sealed partial class MainViewModel : ObservableObject
         this.run = run;
         this.roster = roster;
         this.meterSettings = meterSettings;
+        this.timers = timers;
         StandbyText = Loc.T("standby.text", meterSettings.HotkeyText);
         meterSettings.Changed += (_, _) => Dispatcher.UIThread.Post(() =>
         {
@@ -117,6 +120,7 @@ public sealed partial class MainViewModel : ObservableObject
     private void Refresh()
     {
         UpdateStatus();
+        RiftText = RiftCountdown(timers);
 
         var target = sessions.GetActiveTargetInfo();
         HasTarget = target is not null;
@@ -148,16 +152,22 @@ public sealed partial class MainViewModel : ObservableObject
         }
 
         // Fremde ausblenden (Gruppenmodus) und namenlose Beschwörungen ihrem Besitzer zuschlagen.
-        bool partyKnown = roster.Count > 0;
-        if (meterSettings.PartyOnly)
-            entries = entries.Where(e => roster.IsVisible(e.PlayerName, e.IsUser, e.IsIdentified)).ToList();
-        var merge = SummonMerger.Merge(entries, dropUnmerged: meterSettings.PartyOnly && partyKnown);
+        var merge = MeterFilter.Apply(entries, roster, meterSettings);
         entries = merge.Lines;
         mergedSummons = merge.MergedInto;
         PartyDps = Loc.T("footer.party", Format.Compact(entries.Sum(e => e.DamagePerSecond)));
 
         UpdatePlayers(entries);
         if (ShowDetails) UpdateSkills();
+    }
+
+    /// <summary>„Riss 1:23:45“ – Countdown bis zum nächsten Raumzeit-Riss.</summary>
+    public static string RiftCountdown(TimerService timers)
+    {
+        var now = DateTime.Now;
+        var next = TimerService.NextRift(now, timers.Settings.RiftAnchor, timers.Settings.RiftIntervalHours);
+        var left = next - now;
+        return Loc.T("rift.short", left.TotalHours >= 1 ? left.ToString(@"h\:mm\:ss") : left.ToString(@"mm\:ss"));
     }
 
     private static string FormatDuration(TimeSpan t) =>
