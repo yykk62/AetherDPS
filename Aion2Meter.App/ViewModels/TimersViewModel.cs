@@ -67,11 +67,17 @@ public sealed partial class TimerRow(TimersViewModel owner, TimerItem item) : Ob
     private void HideInOverlay() => owner.SetOverlay(Item, false);
 }
 
-/// <summary>Bearbeitbare Kopie eines Zeitplans (gespeichert erst mit „Speichern“).</summary>
+/// <summary>
+/// Bearbeitbarer Zeitplan – jede Änderung wird sofort gespeichert (Haken, Tage, Kategorie
+/// direkt; Texte kurz nach dem Tippen, sobald sie gültig sind). Kein „Speichern“-Knopf nötig.
+/// </summary>
 public sealed partial class ScheduleEditor : ObservableObject
 {
     private readonly TimersViewModel owner;
-    public ScheduleEntry? Original { get; }
+    private readonly Avalonia.Threading.DispatcherTimer saveTimer;
+    private bool loading = true;
+
+    public ScheduleEntry? Original { get; private set; }
 
     [ObservableProperty] private string name;
     [ObservableProperty] private string category;
@@ -112,15 +118,27 @@ public sealed partial class ScheduleEditor : ObservableObject
         fr = e.Days.Contains(DayOfWeek.Friday);
         sa = e.Days.Contains(DayOfWeek.Saturday);
         so = e.Days.Contains(DayOfWeek.Sunday);
+        saveTimer = new Avalonia.Threading.DispatcherTimer { Interval = TimeSpan.FromMilliseconds(700) };
+        saveTimer.Tick += (_, _) =>
+        {
+            saveTimer.Stop();
+            Save();
+        };
+        loading = false;
+        // Neuer Zeitplan: gleich anlegen, damit er sofort erscheint
+        if (original is null) Save();
     }
 
-    public string Summary => Original is null ? "neu" : Original.Describe();
+    protected override void OnPropertyChanged(System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+        if (loading || e.PropertyName is nameof(Error) or nameof(Unconfirmed)) return;
+        bool isText = e.PropertyName is nameof(Name) or nameof(TimesText) or nameof(IntervalText);
+        saveTimer.Stop();
+        if (isText) saveTimer.Start();   // beim Tippen kurz warten
+        else Save();                     // Haken, Tage, Kategorie sofort
+    }
 
-    private bool enabledTouched;
-
-    partial void OnEnabledChanged(bool value) => enabledTouched = true;
-
-    [RelayCommand]
     private void Save()
     {
         var times = TimesText.Split([',', ';', ' '], StringSplitOptions.RemoveEmptyEntries)
@@ -147,23 +165,25 @@ public sealed partial class ScheduleEditor : ObservableObject
         if (Sa) days.Add(DayOfWeek.Saturday);
         if (So) days.Add(DayOfWeek.Sunday);
 
-        // Wer einen (inaktiven) Zeitplan bearbeitet und speichert, will ihn nutzen – außer der
-        // Haken „aktiv“ wurde bewusst geändert.
-        if (!Enabled && !enabledTouched) Enabled = true;
-
         var entry = new ScheduleEntry
         {
             Name = Name.Trim(), Category = Category, Enabled = Enabled, ShowInOverlay = ShowInOverlay, Reminder = Reminder,
             Times = times!, IntervalHours = interval, Days = days,
             // wer die Zeiten selbst angepasst hat, hat sie bestätigt
-            Unconfirmed = Unconfirmed && Original is not null && TimesText == string.Join(", ", Original.Times),
+            Unconfirmed = Unconfirmed && Original is not null && times.SequenceEqual(Original.Times),
         };
         Error = "";
+        Unconfirmed = entry.Unconfirmed;
         owner.SaveSchedule(Original, entry);
+        Original = entry;
     }
 
     [RelayCommand]
-    private void Delete() => owner.DeleteSchedule(this);
+    private void Delete()
+    {
+        saveTimer.Stop();
+        owner.DeleteSchedule(this);
+    }
 }
 
 /// <summary>Reiter „Timer“: alle Timer, Zeitplan-Editor, Feldbosse, eigene Timer.</summary>
@@ -252,9 +272,9 @@ public sealed partial class TimersViewModel : ObservableObject
 
     public void SaveSchedule(ScheduleEntry? original, ScheduleEntry updated)
     {
+        // Editoren NICHT neu aufbauen – sonst verliert das Textfeld beim Tippen den Fokus
         if (original is null) timers.AddSchedule(updated);
         else timers.ReplaceSchedule(original, updated);
-        ReloadSchedules();
     }
 
     public void DeleteSchedule(ScheduleEditor editor)

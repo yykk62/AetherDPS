@@ -95,7 +95,6 @@
                     <WrapPanel>
                       <CheckBox IsChecked="{Binding ShowInOverlay}" Content="{l:T timers.in_overlay}" Margin="0,0,14,0" />
                       <CheckBox IsChecked="{Binding Reminder}" Content="{l:T timers.remind}" Margin="0,0,14,0" />
-                      <Button Classes="primary" Content="{l:T timers.save}" Command="{Binding SaveCommand}" Margin="0,0,6,0" />
                       <Button Classes="secondary" Content="{l:T timers.delete}" Command="{Binding DeleteCommand}" />
                       <TextBlock Text="{l:T timers.unconfirmed_badge}" Foreground="#E0A84A" FontSize="11" VerticalAlignment="Center" Margin="10,0,0,0"
                                  IsVisible="{Binding Unconfirmed}" />

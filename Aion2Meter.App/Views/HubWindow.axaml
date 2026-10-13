@@ -90,8 +90,8 @@
                   <TextBlock Text="{Binding ModeTitle}" FontSize="17" FontWeight="SemiBold" />
                   <TextBlock Text="{Binding ModeText}" Classes="dim" TextWrapping="Wrap" />
                   <TextBlock Text="{Binding RiftInfo}" Foreground="#E0A84A" FontSize="12" TextWrapping="Wrap" Margin="0,4,0,0" />
-                  <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,8,0,0" IsVisible="{Binding !GameRunning}">
-                    <Button Classes="secondary" Content="{l:T hub.launch}" Command="{Binding LaunchGameCommand}" />
+                  <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,8,0,0">
+                    <Button Classes="secondary" Content="{Binding LaunchText}" Command="{Binding LaunchGameCommand}" IsEnabled="{Binding !GameRunning}" />
                     <TextBlock Text="{l:T hub.launch_hint}" Classes="dim" FontSize="11" TextWrapping="Wrap" VerticalAlignment="Center" MaxWidth="380" />
                   </StackPanel>
                 </StackPanel>
