@@ -24,11 +24,13 @@ public sealed class TrackingMode
     ];
 
     private readonly CombatSessionManager sessions;
+    private readonly RunTracker run;
     private volatile bool active;
 
-    public TrackingMode(PacketDispatchService dispatch, CombatSessionManager sessions)
+    public TrackingMode(PacketDispatchService dispatch, CombatSessionManager sessions, RunTracker run)
     {
         this.sessions = sessions;
+        this.run = run;
         dispatch.Gate = opcode => active || AllowedInStandby.Contains(opcode);
     }
 
@@ -41,6 +43,7 @@ public sealed class TrackingMode
     {
         if (active) return;
         sessions.Reset();
+        run.Start();
         active = true;
         Changed?.Invoke(this, EventArgs.Empty);
     }
@@ -50,6 +53,7 @@ public sealed class TrackingMode
     {
         if (!active) return;
         active = false;
+        run.Stop();
         sessions.CompleteAndPersistActiveSessions();
         Changed?.Invoke(this, EventArgs.Empty);
     }

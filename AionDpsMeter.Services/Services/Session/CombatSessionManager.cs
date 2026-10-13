@@ -14,6 +14,9 @@ namespace AionDpsMeter.Services.Services.Session
     {
         public event EventHandler<int>? PingUpdated;
 
+        // Aion2Meter: jeder gezählte Treffer (nach Boss-Filter und Beschwörungs-Zuordnung) – für den Lauf-Modus.
+        public event Action<PlayerDamage>? DamageRecorded;
+
         private readonly ConcurrentDictionary<int, TargetEntry> targetEntries = new();
         private readonly ActiveTargetResolver targetResolver;
         private readonly EntityTracker entityTracker;
@@ -257,6 +260,7 @@ namespace AionDpsMeter.Services.Services.Session
                     if (entityTracker.IsSummon(damageEvent.SourceEntity.Id) &&
                         !ResolveSummonSource(damageEvent))
                         return;
+                    DamageRecorded?.Invoke(damageEvent);
                     RouteToTargetEntry(damageEvent);
 
                     // Check all other entries for idle timeout on each new event

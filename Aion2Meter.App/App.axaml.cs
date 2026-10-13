@@ -57,6 +57,7 @@ public partial class App : Application
             mode = Services.GetRequiredService<TrackingMode>();
             mode.Changed += (_, _) => Dispatcher.UIThread.Post(() =>
             {
+                Serilog.Log.Information("Modus: {Modus}", mode.IsActive ? "aktiv" : "Bereitschaft");
                 if (mode.IsActive) window.Show();
                 else window.Hide();
             });

@@ -21,6 +21,7 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly IPacketCaptureDevice capture;
     private readonly RingRecorder recorder;
     private readonly TrackingMode mode;
+    private readonly RunTracker run;
     private readonly IAppSettingsService settings;
     private readonly MeterOptions options;
     private readonly ILogger<MainViewModel> logger;
@@ -48,17 +49,20 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty] private string notice = "";
     [ObservableProperty] private bool isStandby = true;
     [ObservableProperty] private bool showNameHint;
+    [ObservableProperty] private bool showTargetView;
+    [ObservableProperty] private string viewLabel = Loc.T("view.run");
 
     private long? selectedPlayerId;
 
     public MainViewModel(CombatSessionManager sessions, IPacketService pipeline, IPacketCaptureDevice capture,
-        RingRecorder recorder, TrackingMode mode, IAppSettingsService settings, MeterOptions options, ILogger<MainViewModel> logger)
+        RingRecorder recorder, TrackingMode mode, RunTracker run, IAppSettingsService settings, MeterOptions options, ILogger<MainViewModel> logger)
     {
         this.sessions = sessions;
         this.pipeline = pipeline;
         this.capture = capture;
         this.recorder = recorder;
         this.mode = mode;
+        this.run = run;
         mode.Changed += (_, _) => Dispatcher.UIThread.Post(() =>
         {
             IsStandby = !mode.IsActive;
@@ -101,24 +105,45 @@ public sealed partial class MainViewModel : ObservableObject
     private void Refresh()
     {
         UpdateStatus();
-        Duration = sessions.GetCombatDuration().ToString(@"mm\:ss");
-        PartyDps = Loc.T("footer.party", Format.Compact(sessions.GetPartyDps()));
 
         var target = sessions.GetActiveTargetInfo();
         HasTarget = target is not null;
-        if (target is not null)
+        TargetHpPercent = target is { HpTotal: > 0 } ? (double)target.HpCurrent / target.HpTotal * 100 : 0;
+        string targetName = target is null ? Loc.T("target.none")
+            : target.MobCode == 0 ? Loc.T("target.unknown") : GermanGameData.MobName(target);
+
+        List<MeterEntry> entries;
+        if (ShowTargetView)
         {
-            TargetName = target.MobCode == 0 ? Loc.T("target.unknown") : GermanGameData.MobName(target);
-            TargetHpPercent = target.HpTotal > 0 ? (double)target.HpCurrent / target.HpTotal * 100 : 0;
+            TargetName = targetName;
+            Duration = sessions.GetCombatDuration().ToString(@"mm\:ss");
+            PartyDps = Loc.T("footer.party", Format.Compact(sessions.GetPartyDps()));
+            entries = sessions.PlayerStats
+                .Select(p => new MeterEntry(p.PlayerId, p.PlayerName, p.IsUser, p.IsIdentified, p.ClassId, p.ClassName,
+                    p.TotalDamage, p.DamagePerSecond, p.DamagePercentage))
+                .ToList();
         }
         else
         {
-            TargetName = Loc.T("target.none");
+            var snapshot = run.Snapshot();
+            TargetName = Loc.T("run.title");
+            Duration = FormatDuration(snapshot.Elapsed);
+            PartyDps = Loc.T("footer.party", Format.Compact(snapshot.PartyDps));
+            entries = snapshot.Players
+                .Select(p => new MeterEntry(p.PlayerId, p.Name, p.IsUser, p.IsIdentified, p.ClassId, p.ClassName,
+                    p.Damage, p.Dps, p.Share))
+                .ToList();
         }
 
-        UpdatePlayers();
+        UpdatePlayers(entries);
         if (ShowDetails) UpdateSkills();
     }
+
+    private static string FormatDuration(TimeSpan t) =>
+        t.TotalHours >= 1 ? t.ToString(@"h\:mm\:ss") : t.ToString(@"mm\:ss");
+
+    private sealed record MeterEntry(long PlayerId, string PlayerName, bool IsUser, bool IsIdentified, int ClassId,
+        string ClassName, long TotalDamage, double DamagePerSecond, double DamagePercentage);
 
     private void UpdateStatus()
     {
@@ -157,9 +182,9 @@ public sealed partial class MainViewModel : ObservableObject
         }
     }
 
-    private void UpdatePlayers()
+    private void UpdatePlayers(List<MeterEntry> all)
     {
-        var stats = sessions.PlayerStats
+        var stats = all
             .Where(p => p.IsIdentified || p.DamagePercentage > 1)
             .OrderByDescending(p => p.TotalDamage)
             .ToList();
@@ -202,7 +227,7 @@ public sealed partial class MainViewModel : ObservableObject
         ShowNameHint = HasPlayers && !stats.Any(p => p.IsUser);
     }
 
-    private string DisplayName(PlayerStats p)
+    private string DisplayName(MeterEntry p)
     {
         if (p.IsUser && settings.IsNicknameHidden) return Loc.T("player.you");
         if (string.IsNullOrWhiteSpace(p.PlayerName) || p.PlayerName.StartsWith("Player_", StringComparison.Ordinal))
@@ -220,17 +245,42 @@ public sealed partial class MainViewModel : ObservableObject
         }
 
         DetailsTitle = Loc.T("details.title", row.Name);
-        var skillStats = sessions.GetPlayerSkillStats(id).OrderByDescending(s => s.TotalDamage).Take(12).ToList();
-        long top = skillStats.Count > 0 ? skillStats[0].TotalDamage : 0;
-        var rows = skillStats.Select(s => new SkillRow(
-            s.SkillName, Format.Compact(s.TotalDamage), Format.Percent(s.DamagePercentage), s.HitCount,
-            Format.Percent(s.CriticalRate), top > 0 ? (double)s.TotalDamage / top * 100 : 0)).ToList();
+        var rows = ShowTargetView ? TargetSkills(id) : RunSkills((int)id);
 
         if (!rows.SequenceEqual(Skills))
         {
             Skills.Clear();
             foreach (var r in rows) Skills.Add(r);
         }
+    }
+
+    private List<SkillRow> TargetSkills(long id)
+    {
+        var skillStats = sessions.GetPlayerSkillStats(id).OrderByDescending(s => s.TotalDamage).Take(12).ToList();
+        long top = skillStats.Count > 0 ? skillStats[0].TotalDamage : 0;
+        return skillStats.Select(s => new SkillRow(
+            s.SkillName, Format.Compact(s.TotalDamage), Format.Percent(s.DamagePercentage), s.HitCount,
+            Format.Percent(s.CriticalRate), top > 0 ? (double)s.TotalDamage / top * 100 : 0)).ToList();
+    }
+
+    private List<SkillRow> RunSkills(int id)
+    {
+        var skillStats = run.Skills(id).Take(12).ToList();
+        long top = skillStats.Count > 0 ? skillStats[0].Damage : 0;
+        return skillStats.Select(s => new SkillRow(
+            s.Name, Format.Compact(s.Damage), Format.Percent(s.Share), s.Hits,
+            Format.Percent(s.CritRate), top > 0 ? (double)s.Damage / top * 100 : 0)).ToList();
+    }
+
+    [RelayCommand]
+    private void ToggleView()
+    {
+        ShowTargetView = !ShowTargetView;
+        ViewLabel = Loc.T(ShowTargetView ? "view.target" : "view.run");
+        rowsById.Clear();
+        Players.Clear();
+        Skills.Clear();
+        Refresh();
     }
 
     [RelayCommand]
@@ -246,7 +296,7 @@ public sealed partial class MainViewModel : ObservableObject
     {
         ShowDetails = !ShowDetails;
         if (ShowDetails && selectedPlayerId is null)
-            selectedPlayerId = sessions.PlayerStats.FirstOrDefault(p => p.IsUser)?.PlayerId
+            selectedPlayerId = Players.FirstOrDefault(p => p.IsUser)?.PlayerId
                                ?? Players.FirstOrDefault()?.PlayerId;
         Refresh();
     }
@@ -255,6 +305,7 @@ public sealed partial class MainViewModel : ObservableObject
     private void Reset()
     {
         sessions.Reset();
+        if (mode.IsActive) run.Start();
         rowsById.Clear();
         Players.Clear();
         Skills.Clear();

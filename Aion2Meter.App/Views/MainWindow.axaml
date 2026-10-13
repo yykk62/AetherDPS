@@ -64,10 +64,11 @@
       <!-- Kopfzeile: Ziehen zum Verschieben -->
       <Grid Grid.Row="0" Name="Header" ColumnDefinitions="*,Auto" Margin="10,6,4,2" Background="Transparent">
         <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-          <TextBlock Text="{Binding TargetName}" FontWeight="SemiBold" FontSize="13" MaxWidth="180" TextTrimming="CharacterEllipsis" />
+          <TextBlock Text="{Binding TargetName}" FontWeight="SemiBold" FontSize="13" MaxWidth="150" TextTrimming="CharacterEllipsis" />
           <TextBlock Text="{Binding Duration}" Classes="dim" FontSize="12" />
         </StackPanel>
         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="0">
+          <Button Classes="icon" Content="{Binding ViewLabel}" Command="{Binding ToggleViewCommand}" ToolTip.Tip="{l:T view.tooltip}" FontSize="11" />
           <Button Classes="icon" Content="⟲" Command="{Binding ResetCommand}" ToolTip.Tip="{l:T header.reset}" />
           <ToggleButton Classes="icon" Content="☰" IsChecked="{Binding ShowDetails}" Command="{Binding ToggleDetailsCommand}" ToolTip.Tip="{l:T header.details}" />
           <ToggleButton Classes="icon" Name="ClickThroughButton" ToolTip.Tip="{l:T header.clickthrough}">

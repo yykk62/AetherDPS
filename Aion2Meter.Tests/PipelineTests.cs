@@ -112,6 +112,32 @@ public sealed class PipelineTests : IDisposable
     }
 
     [Fact]
+    public void Lauf_zaehlt_alle_Gegner_bis_zum_Stopp()
+    {
+        using var host = NewHost();
+        var mode = host.Mode;
+        host.Feed(SyntheticPackets.Heartbeat(), 1_000);
+        mode.Activate();
+
+        // Dungeon: drei verschiedene Mobs nacheinander
+        host.Feed(SyntheticPackets.Damage(5001, Gladiator, GladiatorSkill, 10_000), 1_100);
+        host.Feed(SyntheticPackets.Damage(5002, Gladiator, GladiatorSkill, 20_000), 1_200);
+        host.Feed(SyntheticPackets.Damage(5003, Cleric, ClericSkill, 4_000), 1_300);
+        host.Feed(SyntheticPackets.Damage(5003, Gladiator, GladiatorSkill, 30_000), 1_400);
+
+        var run = host.Run.Snapshot();
+        Assert.Equal(60_000, run.Players.Single(p => p.PlayerId == Gladiator).Damage);
+        Assert.Equal(4_000, run.Players.Single(p => p.PlayerId == Cleric).Damage);
+        Assert.Equal(64_000, run.TotalDamage);
+        // Die Zielansicht (Upstream) kennt nur den aktuellen Gegner
+        Assert.True(TotalOf(host, Gladiator) < 60_000);
+
+        mode.Standby();
+        host.Feed(SyntheticPackets.Damage(5004, Gladiator, GladiatorSkill, 99_999), 1_500);
+        Assert.Equal(64_000, host.Run.Snapshot().TotalDamage);   // nach dem Stopp eingefroren
+    }
+
+    [Fact]
     public void Deutsche_Namen_sind_geladen()
     {
         using var host = NewHost();

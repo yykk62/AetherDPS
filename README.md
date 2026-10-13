@@ -25,6 +25,7 @@ Die Einstellungen, die Kampf-Historie, die Logs und die Mitschnitte liegen unter
 | Meter starten / ausblenden | **STRG+W** im Spiel. Ohne STRG+W ist der Meter in Bereitschaft und zeichnet keine Kämpfe auf |
 | Verschieben | Kopfzeile ziehen |
 | Größe ändern | rechten oder unteren Rand ziehen |
+| Gesamt / Ziel | Knopf oben. **Gesamt** = aller Schaden seit STRG+W, zum Beispiel ein ganzer Dungeon. **Ziel** = nur der aktuelle Gegner |
 | Zurücksetzen | ⟲ |
 | Ausblenden (Bereitschaft) | ✕. Ganz beenden über das Tray-Symbol → „Beenden“ |
 | Skill-Details | ☰ oder auf einen Spieler klicken |
