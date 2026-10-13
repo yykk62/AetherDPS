@@ -2,7 +2,7 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
-## 0.2.0 (noch nicht veröffentlicht)
+## 0.2.0
 
 - **Neues Overlay:** Boss-Karte mit Lebensbalken, Kampfzeit und Toden, darunter schmale Spielerzeilen mit Kampfkraft und Anteil. Knöpfe nur unter der Maus, die Höhe passt sich an
 - **Mini-Leiste:** Ohne Kampf schrumpft der Meter auf Name, Server und Ping
