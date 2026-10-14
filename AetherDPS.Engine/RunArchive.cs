@@ -77,7 +77,7 @@ public sealed class RunArchive
         return new ArchivedRun(
             snapshot.StartedAt.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture),
             snapshot.StartedAt, snapshot.Elapsed.TotalSeconds, snapshot.CombatTime.TotalSeconds,
-            snapshot.Dungeon ?? lastKill?.Name ?? "Lauf", players.Sum(p => p.Damage), players.Sum(p => p.Dps), players,
+            snapshot.Dungeon ?? lastKill?.Name ?? Loc.T("runs.unnamed"), players.Sum(p => p.Damage), players.Sum(p => p.Dps), players,
             snapshot.Bosses.ToList());
     }
 
@@ -148,15 +148,15 @@ public sealed class RunArchive
     /// <summary>Text fürs Teilen (Discord: Code-Block, damit die Spalten stehen bleiben).</summary>
     public static string ToDiscordText(ArchivedRun run, Func<int, string, string> className)
     {
-        var de = CultureInfo.GetCultureInfo("de-DE");
+        var de = Loc.Culture;
         var sb = new StringBuilder();
-        sb.AppendLine($"**{run.Name}** – {run.StartedAt:dd.MM.yyyy HH:mm} – Dauer {Fmt(run.Duration)}");
+        sb.AppendLine($"**{run.Name}** – {run.StartedAt.ToString("g", de)} – {Loc.T("discord.duration")} {Fmt(run.Duration)}");
         sb.AppendLine("```");
-        sb.AppendLine($"{"#",-2} {"Spieler",-16} {"Klasse",-13} {"DPS",9} {"Schaden",12} {"Anteil",7}");
+        sb.AppendLine($"{"#",-2} {Loc.T("discord.player"),-16} {Loc.T("discord.class"),-13} {"DPS",9} {Loc.T("discord.damage"),12} {Loc.T("discord.share"),7}");
         int rank = 1;
         foreach (var p in run.Players)
         {
-            var name = p.Name.StartsWith("Player_", StringComparison.Ordinal) ? "Unbekannt" : p.Name;
+            var name = p.Name.StartsWith("Player_", StringComparison.Ordinal) ? Loc.T("common.unknown") : p.Name;
             sb.AppendLine($"{rank++,-2} {Cut(name, 16),-16} {Cut(className(p.ClassId, ""), 13),-13} " +
                           $"{p.Dps.ToString("N0", de),9} {p.Damage.ToString("N0", de),12} {p.Share.ToString("0.0", de),6}%");
         }

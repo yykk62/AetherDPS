@@ -202,13 +202,21 @@ public sealed class UiTests : IDisposable
         while (root is not null && !File.Exists(Path.Combine(root, "AetherDPS.slnx"))) root = Path.GetDirectoryName(root);
         Assert.NotNull(root);
         var missing = new List<string>();
-        foreach (var file in Directory.GetFiles(Path.Combine(root, "AetherDPS.App"), "*.*", SearchOption.AllDirectories)
-                     .Where(f => (f.EndsWith(".axaml") || f.EndsWith(".cs")) && !f.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}")))
+        var files = new[] { "AetherDPS.App", "AetherDPS.Engine" }
+            .SelectMany(dir => Directory.GetFiles(Path.Combine(root, dir), "*.*", SearchOption.AllDirectories))
+            .Where(f => (f.EndsWith(".axaml") || f.EndsWith(".cs")) && !f.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}"));
+        foreach (var file in files)
         {
             var text = File.ReadAllText(file);
-            foreach (Match m in Regex.Matches(text, @"(?:l:T |Loc\.T\("")([a-z0-9_]+\.[a-z0-9_.]+)"))
-                if (Loc.T(m.Groups[1].Value) == m.Groups[1].Value) missing.Add($"{Path.GetFileName(file)}: {m.Groups[1].Value}");
+            var keys = Regex.Matches(text, @"(?:l:T |Loc\.T\("")([a-z0-9_]+\.[a-z0-9_.]*[a-z0-9_])\b(?!\.)").Select(m => m.Groups[1].Value)
+                // auch Schlüssel in Bedingungen: Loc.T(x ? "a.b" : "c.d")
+                .Concat(Regex.Matches(text, @"Loc\.T\([^""()]*\? ""([a-z0-9_.]+)"" : ""([a-z0-9_.]+)""")
+                    .SelectMany(m => new[] { m.Groups[1].Value, m.Groups[2].Value }));
+            foreach (var key in keys)
+                if (Loc.T(key) == key) missing.Add($"{Path.GetFileName(file)}: {key}");
         }
+        foreach (var category in new[] { "Riss", "Weltboss", "Event", "Sonstiges" })
+            if (Loc.T("timer.cat." + category) == "timer.cat." + category) missing.Add("timer.cat." + category);
         Assert.Empty(missing);
     }
 

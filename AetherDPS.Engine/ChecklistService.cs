@@ -20,11 +20,11 @@ public sealed class ChecklistData
     public int ReminderMinutes { get; set; } = 30;
     public List<ChecklistItem> Items { get; set; } =
     [
-        new() { Text = "Tägliche Aufträge", Period = ChecklistPeriod.Daily },
-        new() { Text = "Tägliche Dungeons", Period = ChecklistPeriod.Daily },
-        new() { Text = "Raumzeit-Riss", Period = ChecklistPeriod.Daily },
-        new() { Text = "Wöchentliche Aufträge", Period = ChecklistPeriod.Weekly },
-        new() { Text = "Wöchentliche Dungeons", Period = ChecklistPeriod.Weekly },
+        new() { Text = Loc.T("check.default.daily_quests"), Period = ChecklistPeriod.Daily },
+        new() { Text = Loc.T("check.default.daily_dungeons"), Period = ChecklistPeriod.Daily },
+        new() { Text = Loc.T("schedule.default.rift"), Period = ChecklistPeriod.Daily },
+        new() { Text = Loc.T("check.default.weekly_quests"), Period = ChecklistPeriod.Weekly },
+        new() { Text = Loc.T("check.default.weekly_dungeons"), Period = ChecklistPeriod.Weekly },
     ];
 }
 
@@ -114,8 +114,7 @@ public sealed class ChecklistService
             int open;
             lock (gate) open = Data.Items.Count(i => i.Period == period && !IsDone(i, now));
             if (open == 0 || !reminded.Add($"{period}:{next:O}")) continue;
-            var label = period == ChecklistPeriod.Daily ? "Täglicher" : "Wöchentlicher";
-            Reminder?.Invoke($"{label} Reset um {next:HH:mm}", $"{open} Punkt(e) noch offen");
+            Reminder?.Invoke(Loc.T(period == ChecklistPeriod.Daily ? "check.reset_daily" : "check.reset_weekly", next), Loc.T("check.open_items", open));
         }
     }
 

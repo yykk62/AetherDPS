@@ -1,10 +1,11 @@
 using System.Globalization;
+using AetherDPS.Engine;
 
 namespace AetherDPS.App.Services;
 
 public static class Format
 {
-    private static readonly CultureInfo De = CultureInfo.GetCultureInfo("de-DE");
+    private static CultureInfo De => Loc.Culture;
 
     /// <summary>Kompakt mit deutschem Komma: 950 · 12,3K · 1,23M · 2,1B</summary>
     public static string Compact(double value) => double.IsFinite(value) ? CompactFinite(value) : "0";

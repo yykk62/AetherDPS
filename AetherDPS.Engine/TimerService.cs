@@ -133,13 +133,13 @@ public sealed class TimerService
                 {
                     var due = kill.KilledAt.AddMinutes(minutes);
                     list.Add(new TimerItem(TimerKind.Boss, kill.Name, "Feldboss", due, due > now ? due - now : TimeSpan.Zero,
-                        $"getötet {kill.KilledAt:HH:mm}", true, false));
+                        Loc.T("timer.killed_at", kill.KilledAt), true, false));
                 }
                 else
                 {
                     // ohne Respawn-Zeit nur im Reiter „Timer“ (zum Eintragen), nicht im Overlay
                     list.Add(new TimerItem(TimerKind.Boss, kill.Name, "Feldboss", null, null,
-                        $"getötet {kill.KilledAt:HH:mm} – Respawn-Zeit eintragen", false, false));
+                        Loc.T("timer.killed_set_respawn", kill.KilledAt), false, false));
                 }
             }
 
@@ -169,13 +169,13 @@ public sealed class TimerService
                 if (!Settings.BossRespawnMinutes.TryGetValue(kill.Name, out var minutes) || minutes <= 0) continue;
                 var due = kill.KilledAt.AddMinutes(minutes);
                 if (due - now <= lead && due > now.AddMinutes(-1) && remindedKeys.Add($"boss:{kill.Name}:{due:O}"))
-                    reminders.Add((kill.Name, $"erscheint um {due:HH:mm}"));
+                    reminders.Add((kill.Name, Loc.T("timer.appears_at", due)));
             }
 
             foreach (var custom in Settings.Custom)
             {
                 if (custom.EndsAt is DateTime e && e <= now && e > now.AddMinutes(-1) && remindedKeys.Add($"custom:{custom.Name}:{e:O}"))
-                    reminders.Add((custom.Name, "Timer abgelaufen"));
+                    reminders.Add((custom.Name, Loc.T("timer.expired")));
             }
         }
         foreach (var (title, text) in reminders) Reminder?.Invoke(title, text);

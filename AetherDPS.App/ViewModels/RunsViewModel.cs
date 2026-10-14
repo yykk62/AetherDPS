@@ -57,7 +57,7 @@ public sealed partial class RunsViewModel : ObservableObject
     {
         var keep = SelectedRun?.Id;
         Runs.Clear();
-        if (mode.IsActive) Runs.Add(new RunListItem(LiveId, "● Laufender Lauf", "aktualisiert sich live", false, true));
+        if (mode.IsActive) Runs.Add(new RunListItem(LiveId, "● " + Loc.T("runs.live_title"), Loc.T("runs.live_sub"), false, true));
         foreach (var run in archive.All())
         {
             var best = archive.BestOf(run.Name);
@@ -90,19 +90,18 @@ public sealed partial class RunsViewModel : ObservableObject
         HasRun = current is not null;
         if (current is null) return;
 
-        RunTitle = SelectedRun!.IsLive ? "Laufender Lauf" : current.Name;
-        RunSummary = $"{current.StartedAt:dd.MM.yyyy HH:mm} · Dauer {RunArchive.Fmt(current.Duration)} · " +
-                     $"Kampfzeit {RunArchive.Fmt(TimeSpan.FromSeconds(current.CombatSeconds))} · " +
-                     $"Gesamt {Format.Compact(current.TotalDamage)} · Gruppe {Format.Compact(current.PartyDps)}/s";
+        RunTitle = SelectedRun!.IsLive ? Loc.T("runs.live_title") : current.Name;
+        RunSummary = Loc.T("runs.summary", current.StartedAt.ToString("g", Loc.Culture), RunArchive.Fmt(current.Duration),
+            RunArchive.Fmt(TimeSpan.FromSeconds(current.CombatSeconds)), Format.Compact(current.TotalDamage), Format.Compact(current.PartyDps));
 
         var best = archive.BestOf(current.Name);
         var user = current.Players.FirstOrDefault(p => p.IsUser);
         var avg = archive.AverageUserDps(current.Name, current.Id);
         var parts = new List<string>();
         if (best is not null && current.BossesKilled > 0)
-            parts.Add(best.Id == current.Id ? "🏆 Bestzeit!" : $"Bestzeit {RunArchive.Fmt(best.Duration)} ({best.StartedAt:dd.MM.})");
+            parts.Add(best.Id == current.Id ? Loc.T("runs.best_new") : Loc.T("runs.best", RunArchive.Fmt(best.Duration), best.StartedAt.ToString("d", Loc.Culture)));
         if (user is not null && avg is double a && a > 0)
-            parts.Add($"Deine DPS {Format.Compact(user.Dps)}/s – {(user.Dps >= a ? "+" : "")}{(user.Dps / a - 1) * 100:0} % ggü. deinem Ø ({Format.Compact(a)}/s)");
+            parts.Add(Loc.T("runs.your_dps", Format.Compact(user.Dps), (user.Dps >= a ? "+" : "") + ((user.Dps / a - 1) * 100).ToString("0", Loc.Culture), Format.Compact(a)));
         Comparison = string.Join(" · ", parts);
 
         long top = current.Players.Count > 0 ? current.Players.Max(p => p.Damage) : 0;
@@ -144,21 +143,21 @@ public sealed partial class RunsViewModel : ObservableObject
         Buffs.Clear();
         if (p is null) return;
 
-        PlayerTitle = $"Kampfanalyse: {SelectedPlayer!.Name}";
+        PlayerTitle = Loc.T("runs.analysis_title", SelectedPlayer!.Name);
         var facts = new List<string>
         {
-            $"Aktiv {p.ActivityPercent:0} % der Kampfzeit",
-            p.Deaths == 0 ? "keine Tode" : $"{p.Deaths}× gestorben",
-            $"{p.Skills.Sum(s => s.Hits)} Treffer",
+            Loc.T("runs.active", p.ActivityPercent.ToString("0", Loc.Culture)),
+            p.Deaths == 0 ? Loc.T("runs.no_deaths") : Loc.T("runs.deaths", p.Deaths),
+            Loc.T("runs.hits", p.Skills.Sum(s => s.Hits)),
         };
         PlayerFacts = string.Join(" · ", facts);
 
         long top = p.Skills.Count > 0 ? p.Skills.Max(s => s.Damage) : 0;
         foreach (var s in p.Skills)
-            Skills.Add(new AnalysisRow(s.Name, $"{Format.Compact(s.Damage)} · {Format.Percent(s.Share)} · {s.Hits}× · Krit {s.CritRate:0} %",
+            Skills.Add(new AnalysisRow(s.Name, Loc.T("runs.skill_line", Format.Compact(s.Damage), Format.Percent(s.Share), s.Hits, s.CritRate.ToString("0", Loc.Culture)),
                 top > 0 ? s.Damage * 100.0 / top : 0));
         foreach (var b in p.Buffs)
-            Buffs.Add(new AnalysisRow(b.Name, $"{b.UptimePercent:0} % aktiv · {b.Applications}×", b.UptimePercent));
+            Buffs.Add(new AnalysisRow(b.Name, Loc.T("runs.buff_line", b.UptimePercent.ToString("0", Loc.Culture), b.Applications), b.UptimePercent));
         HasBuffs = Buffs.Count > 0;
     }
 
@@ -171,14 +170,14 @@ public sealed partial class RunsViewModel : ObservableObject
             ? d.MainWindow?.Clipboard : null;
         if (clipboard is null) return;
         await clipboard.SetTextAsync(text);
-        Notice = "Text kopiert – in Discord mit STRG+V einfügen.";
+        Notice = Loc.T("runs.copied_text");
     }
 
     [RelayCommand]
     private void CopyImage() => CopyImageRequested?.Invoke(this, EventArgs.Empty);
 
     public void ReportImageCopied(bool ok) =>
-        Notice = ok ? "Bild kopiert – in Discord mit STRG+V einfügen." : "Bild konnte nicht kopiert werden.";
+        Notice = ok ? Loc.T("runs.copied_image") : Loc.T("runs.copy_failed");
 
     [RelayCommand]
     private void DeleteRun()

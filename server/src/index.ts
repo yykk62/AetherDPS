@@ -2,7 +2,7 @@
 // Datenschutz: Dieser Worker speichert und protokolliert keine IP-Adressen, User-Agents,
 // Cookies oder sonstigen Kennungen. Es gibt bewusst keine console.*-Ausgaben.
 
-import { ADMIN_HTML } from "./admin.html";
+import { ADMIN_HTML } from "./admin-page";
 
 interface RateLimiter {
   limit(options: { key: string }): Promise<{ success: boolean }>;
@@ -74,7 +74,7 @@ async function readJson(req: Request, maxBytes: number): Promise<Json | number> 
     offset += c.byteLength;
   }
   try {
-    const v: unknown = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(buf));
+    const v: unknown = JSON.parse(new TextDecoder("utf-8", { fatal: true, ignoreBOM: false }).decode(buf));
     return v !== null && typeof v === "object" && !Array.isArray(v) ? (v as Json) : 400;
   } catch {
     return 400;

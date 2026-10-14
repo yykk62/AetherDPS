@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <None Include="Captures\**" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\AetherDPS.App\Lang\*.json" Link="Lang\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

@@ -111,14 +111,14 @@ public sealed partial class ScheduleEditor : ObservableObject
     {
         this.owner = owner;
         Original = original;
-        var e = original ?? new ScheduleEntry { Name = "Neuer Zeitplan", Category = "Event", Times = ["20:00"] };
+        var e = original ?? new ScheduleEntry { Name = Loc.T("timer.new_schedule"), Category = "Event", Times = ["20:00"] };
         name = e.Name;
         category = e.Category;
         enabled = e.Enabled;
         showInOverlay = e.ShowInOverlay;
         reminder = e.Reminder;
         timesText = string.Join(", ", e.Times);
-        intervalText = e.IntervalHours > 0 ? e.IntervalHours.ToString("0.##", CultureInfo.GetCultureInfo("de-DE")) : "";
+        intervalText = e.IntervalHours > 0 ? e.IntervalHours.ToString("0.##", Loc.Culture) : "";
         unconfirmed = e.Unconfirmed;
         mo = e.Days.Contains(DayOfWeek.Monday);
         di = e.Days.Contains(DayOfWeek.Tuesday);
@@ -155,13 +155,13 @@ public sealed partial class ScheduleEditor : ObservableObject
             .ToList();
         if (string.IsNullOrWhiteSpace(Name) || times.Count == 0 || times.Any(t => t is null))
         {
-            Error = "Name und mindestens eine Uhrzeit (z. B. 20:00, 23:00) eintragen.";
+            Error = Loc.T("timer.error_name");
             return;
         }
         double interval = 0;
-        if (!string.IsNullOrWhiteSpace(IntervalText) && !double.TryParse(IntervalText, CultureInfo.GetCultureInfo("de-DE"), out interval))
+        if (!string.IsNullOrWhiteSpace(IntervalText) && !double.TryParse(IntervalText, Loc.Culture, out interval) && !double.TryParse(IntervalText, CultureInfo.InvariantCulture, out interval))
         {
-            Error = "Takt als Zahl in Stunden, z. B. 3 – oder leer lassen.";
+            Error = Loc.T("timer.error_interval");
             return;
         }
 

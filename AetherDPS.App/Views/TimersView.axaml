@@ -74,7 +74,13 @@
                     <Grid ColumnDefinitions="Auto,*,130">
                       <CheckBox IsChecked="{Binding Enabled}" Content="{l:T timers.enabled}" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="SemiBold" />
                       <TextBox Grid.Column="1" Text="{Binding Name}" FontWeight="SemiBold" Margin="0,0,8,0" />
-                      <ComboBox Grid.Column="2" ItemsSource="{Binding Categories}" SelectedItem="{Binding Category}" HorizontalAlignment="Stretch" />
+                      <ComboBox Grid.Column="2" ItemsSource="{Binding Categories}" SelectedItem="{Binding Category}" HorizontalAlignment="Stretch">
+                        <ComboBox.ItemTemplate>
+                          <DataTemplate x:DataType="x:String">
+                            <TextBlock Text="{Binding Converter={x:Static l:LocKey.TimerCategory}}" />
+                          </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                      </ComboBox>
                     </Grid>
                     <WrapPanel>
                       <CheckBox Classes="day" IsChecked="{Binding Mo}" Content="Mo" />

@@ -45,14 +45,13 @@ public sealed class ScheduleEntry
         return null;
     }
 
-    private static readonly string[] Short = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
-
     /// <summary>„Mo, Do, Sa · 20:00, 23:00“ oder „alle 3 Std. ab 02:00“.</summary>
     public string Describe()
     {
         if (IntervalHours > 0)
-            return $"alle {IntervalHours.ToString("0.##", CultureInfo.GetCultureInfo("de-DE"))} Std. ab {Times.FirstOrDefault() ?? "–"}";
-        var days = Days.Count == 0 ? "täglich" : string.Join(", ", Days.OrderBy(d => ((int)d + 6) % 7).Select(d => Short[(int)d]));
+            return Loc.T("schedule.every", IntervalHours.ToString("0.##", Loc.Culture), Times.FirstOrDefault() ?? "–");
+        var days = Days.Count == 0 ? Loc.T("schedule.daily")
+            : string.Join(", ", Days.OrderBy(d => ((int)d + 6) % 7).Select(d => Loc.Culture.DateTimeFormat.AbbreviatedDayNames[(int)d]));
         return $"{days} · {string.Join(", ", Times)}";
     }
 
@@ -60,17 +59,17 @@ public sealed class ScheduleEntry
     [
         new()
         {
-            Name = "Raumzeit-Riss", Category = "Riss", Times = [riftAnchor], IntervalHours = riftInterval,
+            Name = Loc.T("schedule.default.rift"), Category = "Riss", Times = [riftAnchor], IntervalHours = riftInterval,
             Reminder = riftReminder, Unconfirmed = true,
         },
         new()
         {
-            Name = "Riss-Eroberung (PvP)", Category = "Riss", Enabled = false, Unconfirmed = true,
+            Name = Loc.T("schedule.default.rift_conquest"), Category = "Riss", Enabled = false, Unconfirmed = true,
             Days = [DayOfWeek.Monday, DayOfWeek.Thursday, DayOfWeek.Saturday], Times = ["20:00", "23:00"],
         },
         new()
         {
-            Name = "Abyss-Boss-Event", Category = "Weltboss", Enabled = false, Unconfirmed = true,
+            Name = Loc.T("schedule.default.abyss_boss"), Category = "Weltboss", Enabled = false, Unconfirmed = true,
             Days = [DayOfWeek.Wednesday, DayOfWeek.Saturday], Times = ["21:45", "22:15", "22:45"],
         },
     ];

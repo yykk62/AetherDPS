@@ -21,13 +21,12 @@ public sealed partial class ChecklistRow(ChecklistViewModel owner, ChecklistItem
 /// <summary>Reiter „Checkliste“: tägliche und wöchentliche Aufgaben mit automatischem Reset.</summary>
 public sealed partial class ChecklistViewModel : ObservableObject
 {
-    private static readonly string[] DayNames = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
     private readonly ChecklistService service;
     private bool loading;
 
     public ObservableCollection<ChecklistRow> Daily { get; } = [];
     public ObservableCollection<ChecklistRow> Weekly { get; } = [];
-    public IReadOnlyList<string> Days => DayNames;
+    public IReadOnlyList<string> Days => Loc.Culture.DateTimeFormat.DayNames;
     public IReadOnlyList<string> Hours { get; } = Enumerable.Range(0, 24).Select(h => $"{h:00}:00").ToList();
 
     [ObservableProperty] private string newText = "";

@@ -217,7 +217,7 @@ public sealed class RunTracker
             var parts = new List<(string Prefix, PlayerRun Run)>();
             if (players.TryGetValue(playerId, out var player)) parts.Add(("", player));
             foreach (var id in summonIds ?? [])
-                if (players.TryGetValue((int)id, out var summon)) parts.Add(("Beschwörung · ", summon));
+                if (players.TryGetValue((int)id, out var summon)) parts.Add((Loc.T("runs.summon_prefix"), summon));
             if (parts.Count == 0) return [];
 
             var skills = parts

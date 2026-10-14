@@ -76,13 +76,13 @@ public sealed class DeathRecap
     {
         if (entities.GetTargetMob(actorId) is { MobCode: > 0 } mob) return GameText.MobName(mob);
         if (entities.GetPlayerEntity(actorId) is { } player && !player.Name.StartsWith("Player_", StringComparison.Ordinal)) return player.Name;
-        return "Unbekannt";
+        return Loc.T("common.unknown");
     }
 
     private static string SkillName(int skillCode)
     {
-        if (skillCode == 0) return "Angriff";
+        if (skillCode == 0) return Loc.T("death.attack");
         var name = AionDpsMeter.Core.GameData.Services.GameDataProvider.Instance.GetSkillOrDefault(skillCode)?.Name;
-        return string.IsNullOrWhiteSpace(name) || name.StartsWith("Unknown", StringComparison.Ordinal) ? "Angriff" : name;
+        return string.IsNullOrWhiteSpace(name) || name.StartsWith("Unknown", StringComparison.Ordinal) ? Loc.T("death.attack") : name;
     }
 }

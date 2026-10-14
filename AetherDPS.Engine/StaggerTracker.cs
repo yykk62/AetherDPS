@@ -229,7 +229,7 @@ public sealed class StaggerTracker
         var shares = p.Shares.Select(kv =>
         {
             var player = entities.GetPlayerEntity(kv.Key);
-            var name = player is null || player.Name.StartsWith("Player_", StringComparison.Ordinal) ? "Unbekannt" : player.Name;
+            var name = player is null || player.Name.StartsWith("Player_", StringComparison.Ordinal) ? Loc.T("common.unknown") : player.Name;
             return new StaggerShare(name, self.SelfId == kv.Key || player?.IsUser == true, kv.Value.Values.Sum(v => v.Points),
                 kv.Value.Select(s => new StaggerSkill(SkillName(s.Key), s.Value.Points, s.Value.Count))
                     .OrderByDescending(s => s.Points).ToList());

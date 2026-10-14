@@ -165,8 +165,11 @@ function niceStep(x) {
   return Math.max(1, (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * p);
 }
 
+let lastSeries = null;
 function drawChart(series) {
-  const W = 640, H = 240, L = 44, R = 8, T = 10, B = 24;
+  lastSeries = series;
+  // Breite = Containerbreite, damit Schrift auf dem Handy nicht winzig skaliert wird.
+  const W = Math.max(300, Math.min(960, $("chart").clientWidth || 640)), H = 240, L = 40, R = 8, T = 10, B = 24;
   const iw = W - L - R, ih = H - T - B, bw = iw / series.length;
   const max = Math.max(1, ...series.map((d) => Math.max(d.users, d.new_installs)));
   const step = niceStep(max / 4), top = Math.ceil(max / step) * step;
@@ -310,6 +313,12 @@ function renderReport(r) {
 }
 
 // ---------- Start ----------
+
+let resizeTimer = 0;
+addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => { if (lastSeries) drawChart(lastSeries); }, 150);
+});
 
 for (const b of document.querySelectorAll("#filters button")) {
   b.addEventListener("click", () => {
