@@ -11,6 +11,7 @@ interface RateLimiter {
 export interface Env {
   DB: D1Database;
   REPORT_LIMIT: RateLimiter;
+  PING_LIMIT: RateLimiter;
   ADMIN_KEY?: string;
 }
 
@@ -95,6 +96,9 @@ async function keyMatches(given: string | null, expected: string | undefined): P
 // ---------- Öffentliche Endpunkte ----------
 
 async function ping(req: Request, env: Env): Promise<Response> {
+  // Gegen künstlich aufgeblähte Zahlen; die IP ist auch hier nur ein flüchtiger Schlüssel.
+  const { success } = await env.PING_LIMIT.limit({ key: req.headers.get("CF-Connecting-IP") ?? "unknown" });
+  if (!success) return empty(429);
   const b = await readJson(req, 1 * KB);
   if (typeof b === "number") return empty(400);
   const isNew = b.new ?? false;

@@ -90,7 +90,7 @@ Die exe entpackt Sprachdateien und Spieldaten beim ersten Start nach `%TEMP%\.ne
 - `CommunityService`: täglicher Zähler (`POST /v1/ping`, nur mit Zustimmung `MeterSettings.UsageStats`, höchstens einmal pro UTC-Tag), Fehlerberichte (`POST /v1/report`), `status.json` von GitHub (Nachrichten an alle, Discord-Link, optional neue Server-Adresse `api`). Test gegen lokalen Server: `AETHERDPS_API`, `AETHERDPS_STATUS`.
 - `ReportText`: Absturz merken (`absturz.txt` im Datenordner), Log lesen, Namen entfernen.
 - `PatchDetector`: 3000 Pakete ohne ein Grundpaket (Zeit, Spawn, Leben, Schaden, Karte) = Spiel-Update vermutet.
-- In der App: `CommunityController` (Hinweiskarten, Schleife alle 30 Min.), `ReportViewModel`/`ReportWindow`.
+- In der App: `CommunityController` (Hinweiskarten, Schleife alle 15 Min.), `ReportViewModel`/`ReportWindow`.
 
 Kosten: ein Worker-Aufruf pro Nutzer und Tag plus Fehlerberichte; `status.json` kommt von GitHub und kostet nichts.
 

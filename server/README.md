@@ -18,7 +18,7 @@ Dazu gibt es eine passwortgeschützte Admin-Seite (`/admin?key=…`) mit Statist
 
 **Nicht gespeichert und nicht protokolliert:** IP-Adressen, User-Agents, Geräte- oder Nutzerkennungen, Cookies. Der Worker setzt keine Cookies, hat keine `console`-Ausgaben, und Workers Logs/Logpush sind in `wrangler.jsonc` abgeschaltet.
 
-Die IP-Adresse wird nur bei `/v1/report` als flüchtiger Schlüssel für die Begrenzung auf 5 Berichte pro Minute verwendet (Cloudflare Rate Limiting API, Zähler nur im Arbeitsspeicher des Standorts). Sie wird nirgends abgelegt.
+Die IP-Adresse wird nur als flüchtiger Schlüssel für die Begrenzung verwendet (`/v1/report`: 5 pro Minute, `/v1/ping`: 3 pro Minute) (Cloudflare Rate Limiting API, Zähler nur im Arbeitsspeicher des Standorts). Sie wird nirgends abgelegt.
 
 Hinweise:
 

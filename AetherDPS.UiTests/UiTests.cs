@@ -47,10 +47,10 @@ public sealed class UiTests : IDisposable
     private ServiceProvider? provider;
     private long clock = 1_000;
 
-    private ServiceProvider Start()
+    private ServiceProvider Start(string language = "de")
     {
-        Loc.Load();
-        GameText.Apply();
+        Loc.Load(language);
+        GameText.Apply(language);
         Directory.CreateDirectory(dataDir);
         Environment.CurrentDirectory = dataDir;
         var settings = MeterSettings.Load(dataDir);
@@ -199,6 +199,38 @@ public sealed class UiTests : IDisposable
 
         Assert.NotNull(CommunityController.ChangelogSection("0.6.0"));
         Shot(new ReportWindow(provider!.GetRequiredService<ReportViewModel>()), "melden");
+    }
+
+    /// <summary>Jede Sprache einmal rendern – lange Texte dürfen nichts sprengen (Bilder mit AETHERDPS_SHOTS ansehen).</summary>
+    [AvaloniaFact]
+    public void Alle_Sprachen_rendern()
+    {
+        try
+        {
+            foreach (var lang in Loc.Available.Where(l => l != "de" && File.Exists(Path.Combine(AppContext.BaseDirectory, "Lang", l + ".json"))))
+            {
+                Start(lang);
+                BossFight();
+                var vm = provider!.GetRequiredService<MainViewModel>();
+                vm.Refresh();
+                Shot(Overlay(), $"{lang}_overlay");
+                var hub = provider!.GetRequiredService<HubViewModel>();
+                foreach (var (tab, name) in new[] { (HubViewModel.TabDps, "dps"), (HubViewModel.TabSettings, "einstellungen") })
+                {
+                    var window = new HubWindow(hub);
+                    hub.SelectedTab = tab;
+                    hub.Refresh();
+                    Shot(window, $"{lang}_hub_{name}");
+                }
+                provider.Dispose();
+                provider = null;
+            }
+        }
+        finally
+        {
+            Loc.Load("de");
+            GameText.Apply("de");
+        }
     }
 
     [AvaloniaFact]

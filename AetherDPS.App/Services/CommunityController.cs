@@ -14,7 +14,7 @@ namespace AetherDPS.App.Services;
 public sealed partial class CommunityController(
     CommunityService community, MeterSettings settings, MeterOptions options, PatchDetector patch, ReportViewModel report)
 {
-    private static readonly TimeSpan Interval = TimeSpan.FromMinutes(30);
+    private static readonly TimeSpan Interval = TimeSpan.FromMinutes(15);
 
     private HubViewModel? hub;
     private Action<string, string>? toast;
