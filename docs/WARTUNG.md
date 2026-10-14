@@ -39,6 +39,10 @@ Für `README.md` gilt `merge=ours` (siehe `.gitattributes`). Einmal pro Klon mus
 
 | `AionDpsMeter.Core/Data/ServerMap.cs` | `GetName` liefert `#<id>` statt `""` für unbekannte IDs | EU-Server fehlen in der Liste |
 
+| `AionDpsMeter.Services/PacketProcessing/Routing/PacketDispatchService.cs` | Property `Observer` (sieht jedes Paket vor dem Gate) | Dungeon-Erkennung (0x3616), Stagger-Leiste (0xE005) |
+| `AionDpsMeter.Services/Services/Session/CombatSessionManager.cs` | Event `RawDamage` + `RaiseRawDamage` | Todes-Rückblick, Stagger-Zuordnung (auch Treffer von Mobs) |
+| `AionDpsMeter.Services/PacketProcessing/Processors/DamagePacketProcessor.cs` | `RaiseRawDamage` nach dem Parsen; Skill-Code 0 nicht mehr verworfen, aber nicht als Spielerschaden gezählt | Mob-Angriffe auf dich |
+
 So wenig wie möglich in Upstream-Dateien ändern. Lieber in der Engine erweitern.
 
 ## Spieldaten

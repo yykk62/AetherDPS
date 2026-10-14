@@ -62,6 +62,10 @@ public static class MeterServices
         services.AddSingleton<ChecklistService>();
         services.AddSingleton<SelfIdentity>();
         services.AddSingleton<OwnSide>();
+        services.AddSingleton<ZoneTracker>();
+        services.AddSingleton<DeathRecap>();
+        services.AddSingleton<BuffWatcher>();
+        services.AddSingleton<StaggerTracker>();
         services.AddSingleton<LiveTimers>();
         services.AddSingleton(_ => MeterSettings.Load(options.DataDir));
         services.AddSingleton<TrackingMode>();

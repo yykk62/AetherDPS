@@ -48,6 +48,9 @@ public sealed class MeterSettings
     /// </summary>
     public bool AutoTrack { get; set; }
 
+    /// <summary>Kampf-Hinweise: Stagger-Phase (Ankündigung + Ergebnis), Todes-Rückblick, auslaufende Buffs.</summary>
+    public bool CombatHints { get; set; } = true;
+
     /// <summary>Neue Versionen von GitHub laden (geprüft per SHA-256) und beim nächsten Start installieren.</summary>
     public bool AutoUpdate { get; set; } = true;
 

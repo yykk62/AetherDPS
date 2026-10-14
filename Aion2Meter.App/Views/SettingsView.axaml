@@ -50,6 +50,14 @@
       <TextBlock Classes="dim" Text="{l:T settings.auto_track_hint}" Margin="28,0,0,0" />
     </StackPanel>
 
+    <!-- Kampf-Hinweise -->
+    <StackPanel Spacing="4">
+      <CheckBox IsChecked="{Binding CombatHints}">
+        <TextBlock Classes="label" Text="{l:T settings.combat_hints}" />
+      </CheckBox>
+      <TextBlock Classes="dim" Text="{l:T settings.combat_hints_hint}" Margin="28,0,0,0" />
+    </StackPanel>
+
     <!-- Screenshot-Hotkey -->
     <StackPanel Spacing="6">
       <CheckBox IsChecked="{Binding ScreenshotEnabled}">

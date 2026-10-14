@@ -38,7 +38,10 @@ namespace AionDpsMeter.Services.PacketProcessing.Processors
                 return;
             }
 
-            var playerDamage = BuildPlayerDamage(parsed.Data!);
+            var d = parsed.Data!;
+            sessionManager.RaiseRawDamage(d.TargetId, d.ActorId, d.SkillCode, d.Damage); // Aion2Meter: Todes-Rückblick
+            if (d.SkillCode == 0) return; // Aion2Meter: Mob-Angriff, kein Spielerschaden
+            var playerDamage = BuildPlayerDamage(d);
             if (playerDamage != null)
                 sessionManager.ProcessDamageEvent(playerDamage);
         }
@@ -101,7 +104,8 @@ namespace AionDpsMeter.Services.PacketProcessing.Processors
             if (actorId == targetId) return Fail(PacketProcessResult.ACTORID_EQUALS_TARGETID);
 
             var skillCode = reader.ReadU32();
-            if (!DataValidationHelper.IsReasonableSkillCode((int)skillCode)) return Fail(PacketProcessResult.SKILLCODE_ERROR);
+            // Aion2Meter: Skill 0 = normaler Angriff eines Mobs – für den Todes-Rückblick weiterlesen
+            if (skillCode != 0 && !DataValidationHelper.IsReasonableSkillCode((int)skillCode)) return Fail(PacketProcessResult.SKILLCODE_ERROR);
             reader.ReadU8(); // unknown
             var damageType = reader.ReadVarInt();
             var specialFlags = ReadSpecialBytesBlock(reader, switchValue);

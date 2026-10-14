@@ -127,7 +127,8 @@ public sealed partial class RunsViewModel : ObservableObject
         Bosses.Clear();
         foreach (var b in current.Bosses.Where(b => b.IsSignificant(current.TotalDamage)))
             Bosses.Add(new BossRow(b.Name,
-                Loc.T("runs.boss_detail", RunArchive.Fmt(b.StartOffset), RunArchive.Fmt(b.Duration), Format.Compact(b.Damage)),
+                Loc.T("runs.boss_detail", RunArchive.Fmt(b.StartOffset), RunArchive.Fmt(b.Duration), Format.Compact(b.Damage))
+                    + (b.Attempts > 1 ? " · " + Loc.T("runs.attempts", b.Attempts) : ""),
                 b.Killed));
 
         SelectedPlayer = Players.FirstOrDefault(p => p.PlayerId == selectedId)

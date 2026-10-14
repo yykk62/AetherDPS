@@ -1,5 +1,10 @@
 # AION-2-Protokoll (Server → Client)
 
+Neue Pakete findet die geführte Aufnahme (Tray → „Geführte Aufnahme starten“) zusammen mit
+`aion2meter-cli research <aufnahme.txt> [ausgabeordner]`: Opcodes je Abschnitt zwischen zwei F8-Marken,
+seltene Opcodes, erkannte Ereignisse. `AION2METER_FULL=E005,3616` schreibt komplette Pakete,
+`AION2METER_WINDOW=02:46:40-02:46:56` alle Pakete eines Zeitfensters. Ausgabe nie ins Repo (Spielernamen).
+
 Stand: Oktober 2026, ausgelesen aus RATmeter, NOIA2 und a2kit. Die maßgebliche Wahrheit ist der Code in
 `AionDpsMeter.Services/PacketProcessing`.
 
@@ -23,6 +28,9 @@ Stand: Oktober 2026, ausgelesen aus RATmeter, NOIA2 und a2kit. Die maßgebliche 
 | `0x3649` | Charakterwerte |
 | `0x9702` | Gruppe |
 | `0x3847` | Skill-Abklingzeit |
+| `0x3616` | Serverwechsel: neue Spielserver-Adresse als Text (z. B. `87.232.75.228`). Kommt beim Betreten und Verlassen eines Dungeons, nicht bei Teleports. Der Name des Dungeons steht nicht drin |
+| `0xE005` | Stagger-Leiste eines Bosses: `[Boss varint] 03 01 [Max u32] [Aktuell u32] [Zustand]`, Zustand 3 = angekündigt, 2 = läuft, 0/1 = vorbei. `[Boss] 00 03 02 00` = Leiste gebrochen. Jeder Skill senkt sie um einen festen Wert (Tabelle in `StaggerTracker`) |
+| `0x3804` mit Skill 0 | normaler Angriff eines Mobs (z. B. auf dich) – RATmeter verwirft ihn, wir nutzen ihn für den Todes-Rückblick |
 
 **Schadenspaket:**
 1. `target varint`

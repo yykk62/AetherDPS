@@ -291,6 +291,72 @@ public sealed class PipelineTests : IDisposable
     }
 
     [Fact]
+    public void Stagger_Phase_wird_erkannt_und_den_Spielern_zugeordnet()
+    {
+        const int Boss = 34083;
+        using var host = NewHost();
+        var stagger = host.Get<StaggerTracker>();
+        var announced = new List<string>();
+        var phases = new List<StaggerPhase>();
+        stagger.Announced += announced.Add;
+        stagger.Finished += phases.Add;
+
+        long t = 1_000;
+        host.Feed(SyntheticPackets.Heartbeat(), t);
+        // Phase 1: angekündigt, Zielpfeil (16) + Explosionspfeil (20) vom Waldläufer, Flammenauslöschung (50) vom Kantor … gebrochen
+        host.Feed(SyntheticPackets.Stagger(Boss, 100, 100, 3), t += 100);
+        host.Feed(SyntheticPackets.Stagger(Boss, 100, 100, 2), t += 100);
+        host.Feed(SyntheticPackets.Damage(Boss, Gladiator, 14010243, 26_000), t += 100);   // Zielpfeil
+        host.Feed(SyntheticPackets.Stagger(Boss, 100, 84, 2), t);
+        stagger.Tick();
+        Thread.Sleep(80);
+        host.Feed(SyntheticPackets.Damage(Boss, Cleric, 18220010, 1_300), t += 100);      // Flammenauslöschung
+        host.Feed(SyntheticPackets.Stagger(Boss, 100, 34, 2), t);
+        Thread.Sleep(80);
+        host.Feed(SyntheticPackets.Damage(Boss, Gladiator, 14360010, 8_000), t += 100);   // Explosionspfeil
+        host.Feed(SyntheticPackets.Stagger(Boss, 100, 14, 2), t);
+        Thread.Sleep(80);
+        host.Feed(SyntheticPackets.StaggerBroken(Boss), t += 100);
+
+        Assert.Single(announced);
+        var ok = Assert.Single(phases);
+        Assert.True(ok.Success);
+        Assert.Equal(36, ok.Shares.Single(s => s.Points == 36).Skills.Sum(k => k.Points));
+        Assert.Contains(ok.Shares, s => s.Points == 50);
+
+        // Phase 2: Leiste springt ohne Bruch zurück = verfehlt
+        Thread.Sleep(10);
+        host.Feed(SyntheticPackets.Stagger(Boss, 100, 100, 2), t += 100);
+        host.Feed(SyntheticPackets.Damage(Boss, Gladiator, 14010243, 26_000), t += 100);
+        host.Feed(SyntheticPackets.Stagger(Boss, 100, 84, 2), t);
+        Thread.Sleep(80);
+        host.Feed(SyntheticPackets.Stagger(Boss, 100, 100, 0), t += 100);
+        Assert.Equal(2, phases.Count);
+        Assert.False(phases[1].Success);
+        Assert.Equal(84, phases[1].Remaining);
+        Assert.Null(stagger.Current);
+    }
+
+    [Fact]
+    public void Dungeon_wird_am_Serverwechsel_erkannt()
+    {
+        using var host = NewHost();
+        var zones = host.Get<ZoneTracker>();
+        var changes = new List<bool>();
+        zones.Changed += changes.Add;
+
+        host.Feed(SyntheticPackets.Heartbeat(), 1_000);
+        host.Feed(SyntheticPackets.ServerSwitch("87.232.75.228"), 1_100);
+        Assert.True(zones.InInstance);
+        host.Feed(SyntheticPackets.ServerSwitch("193.202.112.110"), 1_200);
+        Assert.False(zones.InInstance);
+        host.Feed(SyntheticPackets.ServerSwitch("87.232.75.229"), 1_300);   // nächster Dungeon, andere Instanz
+        Assert.True(zones.InInstance);
+        Assert.Equal([true, false, true], changes);
+        Assert.Equal("87.232.75.228", ZoneTracker.ParseAddress(SyntheticPackets.ServerSwitch("87.232.75.228")));
+    }
+
+    [Fact]
     public void Echte_Mitschnitte_laufen_fehlerfrei_durch()
     {
         // Mitschnitte aus "Problem melden" landen in Captures/. Jeder muss sich

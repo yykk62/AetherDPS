@@ -20,6 +20,9 @@ namespace AionDpsMeter.Services.Services.Session
         public event Action<BuffEvent>? BuffRecorded;
         public event Action<TimedEvent>? SkillCooldownRecorded;
         public event Action<int>? PlayerDied;
+        // Aion2Meter: jeder geparste Treffer (Ziel, Angreifer, Skill, Schaden) – auch Mobs auf Spieler, für den Todes-Rückblick.
+        public event Action<int, int, int, long>? RawDamage;
+        public void RaiseRawDamage(int targetId, int actorId, int skillCode, long damage) => RawDamage?.Invoke(targetId, actorId, skillCode, damage);
 
         private readonly ConcurrentDictionary<int, TargetEntry> targetEntries = new();
         private readonly ActiveTargetResolver targetResolver;

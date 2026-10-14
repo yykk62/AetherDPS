@@ -8,6 +8,9 @@ namespace AionDpsMeter.Services.PacketProcessing.Routing
         // Aion2Meter: Filter pro Opcode (null = alles durchlassen).
         public Func<ushort, bool>? Gate { get; set; }
 
+        // Aion2Meter: sieht jedes Paket (auch in Bereitschaft), z. B. Serverwechsel = Dungeon.
+        public Action<ushort, byte[]>? Observer { get; set; }
+
         public void Dispatch(Packet packet)
         {
             if (!TryReadOpcode(packet.Data, out ushort opcode))
@@ -15,6 +18,8 @@ namespace AionDpsMeter.Services.PacketProcessing.Routing
                 logger.LogTrace("Broken packet, cannot read opcode.");
                 return;
             }
+
+            Observer?.Invoke(opcode, packet.Data);
 
             // Aion2Meter: Bereitschaftsmodus lässt nur bestimmte Opcodes durch.
             if (Gate is not null && !Gate(opcode)) return;

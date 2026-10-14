@@ -28,6 +28,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private bool launchGameWithMeter;
     [ObservableProperty] private bool autoUpdate;
     [ObservableProperty] private bool autoTrack;
+    [ObservableProperty] private bool combatHints;
     [ObservableProperty] private string updateStatus = "";
     [ObservableProperty] private bool updateReady;
 
@@ -42,6 +43,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         this.updates = updates;
         autoUpdate = meter.AutoUpdate;
         autoTrack = meter.AutoTrack;
+        combatHints = meter.CombatHints;
         VersionText = Loc.T("update.version", updates.Current);
         updates.Changed += (_, _) => Avalonia.Threading.Dispatcher.UIThread.Post(RefreshUpdate);
         RefreshUpdate();
@@ -72,6 +74,12 @@ public sealed partial class SettingsViewModel : ObservableObject
     partial void OnLaunchGameWithMeterChanged(bool value)
     {
         meter.LaunchGameWithMeter = value;
+        meter.Save();
+    }
+
+    partial void OnCombatHintsChanged(bool value)
+    {
+        meter.CombatHints = value;
         meter.Save();
     }
 

@@ -22,6 +22,8 @@ switch (args[0])
         return Replay(file);
     case "analyze":
         return Analyze(file);
+    case "research":
+        return Research.Run(file, args.Length > 2 ? args[2] : Path.Combine(Path.GetTempPath(), "aion2meter-research"));
     case "dump":
         return Dump(file, args.Length > 2 ? args[2] : null);
     case "demo":

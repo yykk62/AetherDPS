@@ -132,10 +132,16 @@
             <TextBlock Grid.Column="2" Text="{Binding HpPercentText}" FontSize="12" Classes="num" Margin="8,0,0,0" VerticalAlignment="Center" IsVisible="{Binding HasTarget}" />
           </Grid>
 
+          <!-- Stagger-Phase: Leiste, die ihr bis 0 bringen müsst -->
+          <Grid Grid.Row="2" Grid.Column="1" ColumnDefinitions="*,Auto" Margin="0,6,0,0" IsVisible="{Binding StaggerVisible}" ZIndex="1">
+            <ProgressBar Classes="bar" Height="6" CornerRadius="3" Value="{Binding StaggerPercent}" Foreground="#A970E8" Background="#22FFFFFF" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="1" Text="{Binding StaggerText}" FontSize="10" Foreground="#C9A8F2" Margin="8,0,0,0" />
+          </Grid>
+
           <!-- Zeile 3: Lebensbalken -->
           <ProgressBar Grid.Row="2" Grid.Column="1" Classes="bar" Height="4" CornerRadius="2" Margin="0,5,0,1"
                        Value="{Binding TargetHpPercent}" Foreground="#4FBF7A" Background="#14FFFFFF"
-                       IsVisible="{Binding HasTarget}" />
+                       IsVisible="{Binding ShowHpBar}" />
         </Grid>
       </Border>
 

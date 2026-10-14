@@ -2,6 +2,15 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
+## 0.4.0
+
+- **Stagger-Anzeige:** Die Stagger-Leiste des Bosses erscheint auf der Boss-Karte. Vor der Phase kommt ein Hinweis mit deinen stärksten Stagger-Skills, danach siehst du, ob es geklappt hat und wer wie viel beigetragen hat
+- **Todes-Rückblick:** Nach deinem Tod zeigt der Meter, wer dir in den letzten Sekunden wie viel Schaden gemacht hat, oder dass es ein Sofort-Tod durch eine Boss-Mechanik war (z. B. nach einer verfehlten Stagger-Phase)
+- **Dungeon-Erkennung:** Im Auto-Modus beginnt der Lauf beim Betreten eines Dungeons und endet beim Verlassen
+- **Versuche:** Neue Anläufe am Boss werden gezählt, auf der Boss-Karte und im Läufe-Archiv
+- **Buff-Hinweis**, wenn Essen oder Rollen auslaufen
+- Alle Hinweise lassen sich unter Einstellungen → „Kampf-Hinweise“ abschalten
+
 ## 0.3.1
 
 - **Updates ohne Umweg:** Der Meter sucht bei jedem Start nach einer neuen Version und installiert sie gleich (er startet kurz neu). Läuft er länger, sieht er stündlich nach

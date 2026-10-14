@@ -29,6 +29,7 @@
 | 👥 **Nur deine Gruppe** | Fremde in der Nähe erscheinen nie. Beschwörungen zählen zu ihrem Besitzer |
 | 🏆 **Läufe-Archiv** | Jeder Dungeon mit Boss-Zeiten, Bestzeit und Kampfanalyse, als Bild oder Text für Discord kopierbar |
 | ⏱ **Timer-Overlay** | Risse, Weltbosse, Events und Feldbosse mit Erinnerung, frei anpassbar |
+| 💥 **Stagger & Tode** | Stagger-Leiste des Bosses mit Hinweis vorher und Auswertung danach (wer hat wie viel beigetragen?). Nach deinem Tod: woran du gestorben bist |
 | ✅ **Checkliste** | Tägliches und Wöchentliches mit automatischem Reset |
 | 📶 **Verbindung** | Ping-Verlauf, Lag-Spitzen und eine Prüfung, ob das Problem bei dir, beim Anbieter oder beim Spielserver liegt |
 | 🖼 **Screenshot** | STRG+S zeigt das Spielbild sofort auf deinem zweiten Monitor |

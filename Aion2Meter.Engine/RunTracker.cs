@@ -15,6 +15,9 @@ public sealed class RunTracker
     /// <summary>Pausen bis zu dieser Länge zählen noch als Kampfzeit.</summary>
     public static readonly TimeSpan CombatGap = TimeSpan.FromSeconds(5);
 
+    /// <summary>So lange ohne Treffer auf einen Boss = der nächste Treffer ist ein neuer Versuch (nach einem Wipe).</summary>
+    public static readonly TimeSpan AttemptGap = TimeSpan.FromSeconds(15);
+
     /// <summary>Pausen eines Spielers bis zu dieser Länge zählen noch als „aktiv“.</summary>
     public static readonly TimeSpan ActivityGap = TimeSpan.FromSeconds(2);
 
@@ -112,6 +115,7 @@ public sealed class RunTracker
             int targetId = hit.TargetEntity.Id;
             if (!targets.TryGetValue(targetId, out var target))
                 targets[targetId] = target = new TargetRun(targetId, at);
+            else if (at - target.LastHit > AttemptGap) target.Attempts++;
             target.LastHit = at;
             target.Damage += hit.Damage;
         }
@@ -189,7 +193,8 @@ public sealed class RunTracker
                 startedAt is DateTime st ? x.Target.FirstHit - st : TimeSpan.Zero,
                 (x.Target.DiedAt ?? x.Target.LastHit) - x.Target.FirstHit,
                 x.Target.DiedAt is not null,
-                x.Target.Damage))
+                x.Target.Damage,
+                x.Target.Attempts))
             .Where(b => b.IsSignificant(total))
             .OrderBy(b => b.StartOffset)
             .ToList();
@@ -328,6 +333,7 @@ public sealed class RunTracker
         public DateTime LastHit { get; set; } = firstHit;
         public DateTime? DiedAt { get; set; }
         public long Damage { get; set; }
+        public int Attempts { get; set; } = 1;
     }
 }
 
@@ -338,7 +344,7 @@ public sealed record RunSkill(string Name, long Damage, double Share, int Hits, 
 
 public sealed record RunBuff(string Name, double UptimePercent, int Applications);
 
-public sealed record RunBoss(string Name, TimeSpan StartOffset, TimeSpan Duration, bool Killed, long Damage)
+public sealed record RunBoss(string Name, TimeSpan StartOffset, TimeSpan Duration, bool Killed, long Damage, int Attempts = 1)
 {
     /// <summary>
     /// Ein echter Bosskampf: besiegt oder mindestens 5 % des Laufschadens. Ein paar Streiftreffer

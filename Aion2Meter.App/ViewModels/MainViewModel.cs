@@ -30,6 +30,8 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly SelfIdentity self;
     private readonly EntityTracker entities;
     private readonly OwnSide own;
+    private readonly StaggerTracker stagger;
+    private readonly ZoneTracker zones;
 
     /// <summary>Letztes Ziel, das du oder deine Gruppe getroffen habt (Fremde zählen nicht).</summary>
     private volatile int ownTargetId;
@@ -77,6 +79,10 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty] private bool isBoss;
     [ObservableProperty] private string deathsText = "";
     [ObservableProperty] private bool hasDeaths;
+    [ObservableProperty] private bool staggerVisible;
+    [ObservableProperty] private bool showHpBar;
+    [ObservableProperty] private double staggerPercent;
+    [ObservableProperty] private string staggerText = "";
 
     /// <summary>Auto-Modus: zuletzt bekämpfter Boss – bleibt nach dem Kampf noch kurz stehen.</summary>
     private TargetCombatSession? shownBoss;
@@ -90,10 +96,12 @@ public sealed partial class MainViewModel : ObservableObject
 
     public MainViewModel(CombatSessionManager sessions, IPacketService pipeline, IPacketCaptureDevice capture,
         RingRecorder recorder, TrackingMode mode, RunTracker run, PartyRoster roster, MeterSettings meterSettings, TimerService timers, SelfIdentity self,
-        EntityTracker entities, OwnSide own, IAppSettingsService settings, MeterOptions options, ILogger<MainViewModel> logger)
+        EntityTracker entities, OwnSide own, StaggerTracker stagger, ZoneTracker zones, IAppSettingsService settings, MeterOptions options, ILogger<MainViewModel> logger)
     {
         this.entities = entities;
         this.own = own;
+        this.stagger = stagger;
+        this.zones = zones;
         sessions.DamageRecorded += hit =>
         {
             if (!own.IsOwn(hit.SourceEntity.Id)) return;
@@ -171,7 +179,8 @@ public sealed partial class MainViewModel : ObservableObject
             // Auto-Modus: der Boss (auch kurz nach seinem Tod), sonst das aktuelle Ziel
             var session = mode.AutoMode ? boss : OwnTargetSession(now);
             target = session is null ? null : entities.GetTargetMob(session.TargetId) ?? session.TargetInfo;
-            CardLabel = Loc.T("card.fight");
+            int attempt = session is null ? 0 : sessions.GetTargetHistory(session.TargetId).Count();
+            CardLabel = attempt > 1 ? Loc.T("card.fight_attempt", attempt) : Loc.T("card.fight");
             Duration = FormatDuration(session?.GetCombatDuration() ?? TimeSpan.Zero);
             entries = (session?.GetPlayerStats() ?? [])
                 .Select(p => new MeterLine(p.PlayerId, p.PlayerName, p.IsUser, p.IsIdentified, p.ClassId, p.ClassName,
@@ -196,6 +205,15 @@ public sealed partial class MainViewModel : ObservableObject
         HpPercentText = target is { HpTotal: > 0 } ? Format.Percent(TargetHpPercent) : "";
         TargetName = target is null ? Loc.T(ShowTargetView ? "target.none" : "run.title_short")
             : target.MobCode == 0 ? Loc.T("target.unknown") : GermanGameData.MobName(target);
+        // Stagger-Phase: Leiste auf der Boss-Karte
+        if (stagger.Current is { } st)
+        {
+            StaggerVisible = true;
+            StaggerPercent = st.Max > 0 ? st.Current * 100.0 / st.Max : 0;
+            StaggerText = Loc.T("card.stagger", st.Current, st.Max);
+        }
+        else StaggerVisible = false;
+        ShowHpBar = HasTarget && !StaggerVisible;
         int deaths = snapshot.Players.Sum(p => p.Deaths);
         HasDeaths = deaths > 0;
         DeathsText = Loc.T("card.deaths", deaths);
@@ -265,6 +283,7 @@ public sealed partial class MainViewModel : ObservableObject
         var server = !string.IsNullOrWhiteSpace(meterSettings.ServerName) ? meterSettings.ServerName : meterSettings.CharacterServer;
         if (!string.IsNullOrWhiteSpace(server)) parts.Add(server!);
         parts.Add(!IsConnected ? StatusText : pingMs >= 0 ? Loc.T("status.ping", pingMs) : Loc.T("status.connected"));
+        if (zones.InInstance) parts.Add(Loc.T("compact.dungeon"));
         parts.Add(Loc.T(mode.AutoMode ? "compact.auto" : "compact.waiting"));
         CompactInfo = string.Join(" · ", parts);
     }

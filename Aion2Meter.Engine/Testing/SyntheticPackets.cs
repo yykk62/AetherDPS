@@ -64,6 +64,41 @@ public static class SyntheticPackets
         return Frame(body);
     }
 
+    /// <summary>Stagger-Leiste eines Bosses (0xE005): Zustand 3 = angekündigt, 2 = läuft, 0 = vorbei.</summary>
+    public static byte[] Stagger(int bossId, int max, int current, byte state)
+    {
+        var body = new List<byte>();
+        AddU16(body, 0xE005);
+        AddVarInt(body, (uint)bossId);
+        body.AddRange([0x03, 0x01]);
+        AddU32(body, (uint)max);
+        AddU32(body, (uint)current);
+        body.Add(state);
+        return Frame(body);
+    }
+
+    /// <summary>Stagger-Leiste gebrochen (geschafft).</summary>
+    public static byte[] StaggerBroken(int bossId)
+    {
+        var body = new List<byte>();
+        AddU16(body, 0xE005);
+        AddVarInt(body, (uint)bossId);
+        body.AddRange([0x00, 0x03, 0x02, 0x00]);
+        return Frame(body);
+    }
+
+    /// <summary>Serverwechsel (0x3616) – die Adresse steht als Text im Paket.</summary>
+    public static byte[] ServerSwitch(string address)
+    {
+        var body = new List<byte>();
+        AddU16(body, 0x3616);
+        body.AddRange([0xDC, 0x10]);
+        body.Add((byte)address.Length);
+        body.AddRange(System.Text.Encoding.ASCII.GetBytes(address));
+        body.AddRange([0x10, 0x34, 0x62, 0x3B, 0x9F, 0x97, 0xAB, 0x0C]);
+        return Frame(body);
+    }
+
     /// <summary>LZ4-Container (Opcode FF FF) mit mehreren inneren Paketen.</summary>
     public static byte[] Compressed(params byte[][] inner)
     {

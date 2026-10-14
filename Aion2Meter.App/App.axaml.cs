@@ -128,9 +128,11 @@ public partial class App : Application
             {
                 timerService.Tick();
                 checklist.Tick();
+                Services.GetRequiredService<BuffWatcher>().Tick(DateTime.Now);
             }).Start();
             new DispatcherTimer(TimeSpan.FromMilliseconds(200), DispatcherPriority.Background, (_, _) =>
             {
+                Services.GetRequiredService<StaggerTracker>().Tick();
                 bool show = mode.IsCapturing && meterSettings.BuffBarEnabled && window.IsVisible;
                 if (show) buffVm.Refresh();
                 if (show && buffVm.HasItems)
@@ -152,6 +154,7 @@ public partial class App : Application
             timerOverlayVm.HideRequested += (_, _) => timersVm.OverlayVisible = false;
             timersVm.OverlayVisibilityChanged += (_, _) => UpdateTimerOverlay();
 
+            StartCombatHints(meterSettings);
             StartUpdates(meterSettings);
         }
         // Wiedergabe: nur das Overlay, das Hauptfenster öffnet sich nicht von selbst
@@ -295,6 +298,57 @@ public partial class App : Application
         Persist();
         InstallPendingUpdate();   // fertig geladenes Update gleich einspielen, gilt ab dem nächsten Start
         desktop?.Shutdown();
+    }
+
+    private StaggerPhase? lastStagger;
+
+    /// <summary>Stagger-Ankündigung und -Ergebnis, Todes-Rückblick, auslaufende Buffs – als kleine Einblendung.</summary>
+    private void StartCombatHints(MeterSettings settings)
+    {
+        var stagger = Services.GetRequiredService<StaggerTracker>();
+        stagger.Announced += boss => Dispatcher.UIThread.Post(() =>
+        {
+            if (!settings.CombatHints) return;
+            var best = stagger.BestOwnSkills();
+            ShowToast(Loc.T("hint.stagger_soon", boss), best.Count > 0
+                ? Loc.T("hint.stagger_skills", string.Join(", ", best.Select(b => $"{b.Skill} ({b.Points})")))
+                : Loc.T("hint.stagger_generic"));
+        });
+        stagger.Finished += phase => Dispatcher.UIThread.Post(() =>
+        {
+            lastStagger = phase;
+            Serilog.Log.Information("Stagger {Result} {Boss}: Rest {Rest}/{Max}", phase.Success ? "geschafft" : "verfehlt", phase.BossName, phase.Remaining, phase.Max);
+            if (settings.CombatHints) ShowToast(Loc.T(phase.Success ? "hint.stagger_ok" : "hint.stagger_fail", phase.BossName), StaggerSummary(phase));
+        });
+        Services.GetRequiredService<DeathRecap>().Died += report => Dispatcher.UIThread.Post(() =>
+        {
+            if (!settings.CombatHints) return;
+            string text;
+            if (report.TotalDamage == 0)
+                text = lastStagger is { Success: false } s && DateTime.Now - s.End < TimeSpan.FromSeconds(20)
+                    ? Loc.T("hint.death_mechanic_stagger", s.Remaining, s.Max)
+                    : Loc.T("hint.death_mechanic");
+            else
+                text = Loc.T("hint.death_damage", Format.Compact(report.TotalDamage), (int)report.Window.TotalSeconds) + "\n"
+                    + string.Join("\n", report.Hits.Take(3).Select(h => $"{h.Source} · {h.Skill}: {Format.Compact(h.Damage)} ({h.Count}×)"));
+            ShowToast(Loc.T("hint.death_title"), text);
+        });
+        Services.GetRequiredService<BuffWatcher>().Expired += name => Dispatcher.UIThread.Post(() =>
+        {
+            if (settings.CombatHints) ShowToast(Loc.T("hint.buff_title"), Loc.T("hint.buff", name));
+        });
+    }
+
+    private static string StaggerSummary(StaggerPhase phase)
+    {
+        int total = Math.Max(1, phase.Shares.Sum(s => s.Points));
+        var lines = new List<string>();
+        if (!phase.Success) lines.Add(Loc.T("hint.stagger_missing", phase.Remaining, phase.Max));
+        lines.Add(string.Join(" · ", phase.Shares.Take(5).Select(s =>
+            $"{(s.IsUser ? Loc.T("player.you") : s.Name)} {s.Points} ({s.Points * 100 / total} %)")));
+        if (phase.Shares.FirstOrDefault(s => s.IsUser) is { } me && me.Skills.Count > 0)
+            lines.Add(Loc.T("hint.stagger_yours", string.Join(", ", me.Skills.Take(4).Select(k => $"{k.Skill} {k.Points}"))));
+        return string.Join("\n", lines);
     }
 
     private bool updateNotified;
