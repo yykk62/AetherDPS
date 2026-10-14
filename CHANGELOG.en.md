@@ -6,7 +6,7 @@ Newest versions first.
 
 - **New name: AetherDPS.** Settings, runs and timers carry over on first start, updates keep working as before
 - **Dungeons by name:** the meter knows which dungeon you are in (including difficulty). Runs are named after the dungeon, and the mini bar shows it
-- **10 languages:** German, English, French, Spanish, Portuguese, Russian, Japanese, Korean and Chinese for skills, monsters, classes and servers (Settings → Language). The interface is available in German and English, more to come
+- **10 languages:** German, English, French, Spanish, Portuguese, Russian, Japanese, Korean and Chinese (Simplified and Traditional) for the interface and for skills, monsters, classes, dungeons and servers (Settings → Language, default: same as Windows)
 - **All EU server names** instead of numbers
 - **Report a problem** sends your description and, if you like, the log straight to the developer. No account, no email. Player names are removed first
 - **Crash reports:** if the meter crashed, it asks on the next start whether it may send a report

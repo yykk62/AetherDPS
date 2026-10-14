@@ -6,7 +6,7 @@ Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des G
 
 - **Neuer Name: AetherDPS.** Einstellungen, Läufe und Timer werden beim ersten Start übernommen, Updates laufen wie gewohnt weiter
 - **Dungeons mit Namen:** Der Meter erkennt, in welchem Dungeon du bist (inklusive Schwierigkeit). Läufe heißen nach dem Dungeon, die Mini-Leiste zeigt ihn an
-- **10 Sprachen:** Deutsch, Englisch, Französisch, Spanisch, Portugiesisch, Russisch, Japanisch, Koreanisch und Chinesisch für Skills, Monster, Klassen und Server (Einstellungen → Sprache). Die Oberfläche gibt es auf Deutsch und Englisch, weitere folgen
+- **10 Sprachen:** Deutsch, Englisch, Französisch, Spanisch, Portugiesisch, Russisch, Japanisch, Koreanisch und Chinesisch (vereinfacht und traditionell), für die Oberfläche und für Skills, Monster, Klassen, Dungeons und Server (Einstellungen → Sprache, Standard: wie Windows)
 - **Alle EU-Servernamen** statt Nummern
 - **Problem melden** schickt deine Beschreibung und auf Wunsch das Log direkt an den Entwickler, ohne Konto und ohne E-Mail. Namen von Spielern werden vorher entfernt
 - **Absturzberichte:** Ist der Meter abgestürzt, fragt er beim nächsten Start, ob er einen Bericht senden darf
