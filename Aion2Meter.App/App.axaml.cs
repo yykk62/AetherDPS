@@ -315,9 +315,10 @@ public partial class App : Application
                 ShowToast(Loc.T("update.ready_title"), Loc.T("update.ready_toast", p.Version));
             }
         });
+        var startedAt = DateTime.Now;
         _ = Task.Run(async () =>
         {
-            await Task.Delay(TimeSpan.FromSeconds(20));
+            await Task.Delay(TimeSpan.FromSeconds(3));
             while (true)
             {
                 if (settings.AutoUpdate)
@@ -325,8 +326,20 @@ public partial class App : Application
                     var state = await updates.CheckAndDownloadAsync();
                     Serilog.Log.Information("Update-Prüfung: {State} (neueste: {Latest}) {Error}",
                         state, updates.Latest?.Version, updates.Error ?? "");
+                    // Direkt nach dem Start gefunden: gleich installieren und neu starten –
+                    // da läuft noch kein Kampf, und niemand muss in die Einstellungen.
+                    if (state == UpdateState.Ready && DateTime.Now - startedAt < TimeSpan.FromMinutes(3))
+                        Dispatcher.UIThread.Post(() =>
+                        {
+                            var run = Services.GetRequiredService<RunTracker>();
+                            if (mode is { IsActive: false } && !run.IsRunning)
+                            {
+                                Serilog.Log.Information("Update beim Start gefunden – installiere und starte neu");
+                                RestartForUpdate();
+                            }
+                        });
                 }
-                await Task.Delay(TimeSpan.FromHours(6));
+                await Task.Delay(TimeSpan.FromHours(1));
             }
         });
     }

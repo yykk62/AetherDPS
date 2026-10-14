@@ -2,6 +2,10 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
+## 0.3.1
+
+- **Updates ohne Umweg:** Der Meter sucht bei jedem Start nach einer neuen Version und installiert sie gleich (er startet kurz neu). Läuft er länger, sieht er stündlich nach
+
 ## 0.3.0
 
 - **Nur eigene Kämpfe:** Die Boss-Karte zeigt nur Gegner, die du oder deine Gruppe angreifen. Fremde Kämpfe in der Nähe lassen sie nicht mehr springen

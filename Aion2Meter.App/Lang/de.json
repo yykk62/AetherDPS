@@ -231,7 +231,7 @@
   "update.heading": "Updates",
   "update.version": "Version {0}",
   "update.auto": "Automatisch aktualisieren",
-  "update.auto_hint": "Sieht beim Start und alle 6 Stunden auf GitHub nach einer neuen Version, lädt sie herunter, prüft die Prüfsumme und installiert sie beim nächsten Start des Meters. Von dir wird dabei nichts gesendet.",
+  "update.auto_hint": "Sieht bei jedem Start und danach stündlich auf GitHub nach einer neuen Version und prüft die Prüfsumme. Beim Start wird sie sofort installiert (der Meter startet kurz neu), später erst beim nächsten Start. Von dir wird dabei nichts gesendet.",
   "update.check": "Jetzt nach Updates suchen",
   "update.restart": "Jetzt neu starten und aktualisieren",
   "update.restart_short": "Neu starten",

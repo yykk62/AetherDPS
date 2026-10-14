@@ -61,7 +61,7 @@ So wenig wie möglich in Upstream-Dateien ändern. Lieber in der Engine erweiter
 3. `.github/workflows/aion2meter-release.yml` baut mit `tools/release.ps1` (Tests, `dotnet publish`, eine einzige exe), schreibt `Aion2Meter.exe.sha256` und legt das GitHub-Release mit dem Text aus dem CHANGELOG an.
 
 **Auto-Update** (`Aion2Meter.Engine/Updates/UpdateService.cs`, `Aion2Meter.App/Services/AppUpdate.cs`):
-- Fragt `api.github.com/repos/yykk62/Aion2Meter/releases/latest` ab (beim Start nach 20 s, dann alle 6 Std.). Drafts und Pre-Releases werden ignoriert.
+- Fragt `api.github.com/repos/yykk62/Aion2Meter/releases/latest` ab (3 s nach dem Start, dann stündlich). Wird beim Start (erste 3 Min.) eine neue Version fertig geladen und läuft kein Lauf, installiert der Meter sie sofort und startet neu. Drafts und Pre-Releases werden ignoriert.
 - Lädt `Aion2Meter.exe` nach `%LOCALAPPDATA%\Aion2Meter\Update` und übernimmt sie nur, wenn der SHA-256 zu `Aion2Meter.exe.sha256` **und** zum `digest`, den GitHub für das Asset meldet, passt.
 - Installiert wird beim Beenden über das Tray, beim nächsten Start oder per Knopf „Neu starten“: Die laufende exe wird in `.old` umbenannt, die neue an ihre Stelle kopiert. Bei einem Fehler wird zurückgerollt.
 - Nur Builds aus `dotnet publish` aktualisieren sich selbst (Konstante `SELF_UPDATE`). Debug-Builds aus dem Repo tun es nie.

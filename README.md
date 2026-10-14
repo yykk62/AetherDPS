@@ -55,7 +55,7 @@
 - **Voraussetzung:** Windows 10 oder 11 (64 Bit) und Npcap (richtet der Meter beim ersten Start selbst ein)
 - **Wohin damit?** In einen eigenen Ordner, zum Beispiel `Dokumente\Aion2Meter`, nicht in den Download-Ordner und nicht nach `C:\Programme` (dort darf sich die Datei nicht selbst aktualisieren)
 - **Windows-Warnung „Der Computer wurde durch Windows geschützt“:** Die Datei ist noch nicht digital signiert. Auf „Weitere Informationen“ → „Trotzdem ausführen“ klicken. Wer sichergehen will, vergleicht die SHA-256-Prüfsumme mit der Angabe auf der Release-Seite: `Get-FileHash Aion2Meter.exe`
-- **Updates kommen automatisch:** Der Meter sieht beim Start und alle 6 Stunden auf GitHub nach, lädt neue Versionen herunter, prüft die Prüfsumme und installiert sie beim nächsten Start. Abschaltbar unter Einstellungen → Updates. Dabei wird nur die öffentliche Release-Seite abgefragt, von dir wird nichts gesendet
+- **Updates kommen automatisch:** Der Meter sieht bei jedem Start auf GitHub nach und installiert eine neue Version gleich dort (er startet kurz neu). Läuft er länger, schaut er stündlich nach und installiert beim nächsten Start. Abschaltbar unter Einstellungen → Updates. Dabei wird nur die öffentliche Release-Seite abgefragt, von dir wird nichts gesendet
 
 ## Installation
 
