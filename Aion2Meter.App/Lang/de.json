@@ -78,7 +78,7 @@
   "timers.unconfirmed_note": "* = Vorlage mit Zeiten aus Korea bzw. der Community, für EU nicht bestätigt. Unter „Zeitpläne“ anpassen.",
   "timer_overlay.title": "Timer",
   "timer_overlay.add": "Timer oder Zeitplan hinzufügen / bearbeiten",
-  "timer_overlay.empty": "Keine Timer – mit + hinzufügen",
+  "timer_overlay.empty": "Keine Timer – Rechtsklick auf einen Timer löst ihn als eigene Leiste.",
   "timer_overlay.hide": "Im Overlay ausblenden",
   "timer_overlay.edit": "Bearbeiten …",
   "timer_overlay.remove": "Entfernen",
@@ -240,5 +240,13 @@
   "settings.section.display": "Anzeige",
   "settings.section.start": "Start",
   "hub.character": "Dein Charakter: {0}",
-  "hub.character_unknown": "Dein Charakter ist noch nicht erkannt. Er wird beim Login oder nach einem Teleport erkannt und danach gemerkt."
+  "hub.character_unknown": "Dein Charakter ist noch nicht erkannt. Er wird beim Login oder nach einem Teleport erkannt und danach gemerkt.",
+  "timer_overlay.detach": "Als eigene Leiste lösen",
+  "timer_overlay.attach": "Zurück in die Gruppe",
+  "timer_overlay.lock": "Sperren: Gruppe und gelöste Leisten lassen Mausklicks ins Spiel durch. Zum Entsperren wieder aufs Schloss klicken.",
+  "warning.title": "STAGGER",
+  "warning.points": "{0} / {1}",
+  "warning.seconds": "{0} s",
+  "settings.stagger_warning": "Große Stagger-Warnung",
+  "settings.stagger_warning_hint": "Blendet während einer Stagger-Phase oben in der Bildmitte halbtransparent die Leiste und die geschätzte Restzeit ein. Klicks gehen hindurch."
 }

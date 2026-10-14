@@ -2,6 +2,12 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
+## 0.5.0
+
+- **Timer neu:** Die Timer-Gruppe ist eine schmale Leiste, die so groß ist wie ihr Inhalt. Jeder Timer lässt sich per Rechtsklick als **eigene Leiste lösen** und frei auf dem Bildschirm verteilen, die Gruppe verschiebt man als Ganzes. Das Schloss sperrt Gruppe und Leisten zusammen
+- **Dungeon-Bosse** erscheinen nicht mehr als Feldboss-Timer. Bosse ohne Respawn-Zeit stehen nur noch im Reiter „Timer“
+- **Große Stagger-Warnung** (Einstellungen → Anzeige, standardmäßig aus): oben in der Bildmitte, halbtransparent, mit Stagger-Leiste und geschätzter Restzeit
+
 ## 0.4.1
 
 - **Aufgeräumt:** Einstellungen in Abschnitte gegliedert (Bedienung, Erfassung, Anzeige, Start, Updates), Texte überarbeitet

@@ -136,6 +136,7 @@ public partial class App : Application
             new DispatcherTimer(TimeSpan.FromMilliseconds(200), DispatcherPriority.Background, (_, _) =>
             {
                 Services.GetRequiredService<StaggerTracker>().Tick();
+                UpdateStaggerWarning(meterSettings);
                 bool show = mode.IsCapturing && meterSettings.BuffBarEnabled && window.IsVisible;
                 if (show) buffVm.Refresh();
                 if (show && buffVm.HasItems)
@@ -220,12 +221,8 @@ public partial class App : Application
     private void UpdateTimerOverlay()
     {
         if (timerOverlay is null || timersVm is null) return;
-        if (timersVm.OverlayVisible && !timerOverlay.IsVisible) timerOverlay.Show();
-        else if (!timersVm.OverlayVisible && timerOverlay.IsVisible)
-        {
-            timerOverlay.SaveBounds();
-            timerOverlay.Hide();
-        }
+        if (timersVm.OverlayVisible) timerOverlay.ShowAll();
+        else timerOverlay.HideAll();
     }
 
     private void OnToggleTimerOverlay(object? sender, EventArgs e)
@@ -304,6 +301,21 @@ public partial class App : Application
     }
 
     private StaggerPhase? lastStagger;
+    private StaggerWarningWindow? staggerWarning;
+
+    /// <summary>Große Stagger-Warnung (Einstellung, Standard aus) – nur solange eine Phase läuft.</summary>
+    private void UpdateStaggerWarning(MeterSettings settings)
+    {
+        var vm = Services.GetRequiredService<StaggerWarningViewModel>();
+        vm.Refresh();
+        bool show = settings.StaggerWarning && vm.IsActive;
+        if (show)
+        {
+            staggerWarning ??= new StaggerWarningWindow(vm);
+            if (!staggerWarning.IsVisible) staggerWarning.Show();
+        }
+        else if (staggerWarning?.IsVisible == true) staggerWarning.Hide();
+    }
 
     /// <summary>Stagger-Ankündigung und -Ergebnis, Todes-Rückblick, auslaufende Buffs – als kleine Einblendung.</summary>
     private void StartCombatHints(MeterSettings settings)

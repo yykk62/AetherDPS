@@ -149,6 +149,7 @@ public static class AppServices
         services.AddSingleton<BuffBarViewModel>();
         services.AddSingleton<TimerOverlayViewModel>();
         services.AddSingleton<HubWindow>();
+        services.AddSingleton<StaggerWarningViewModel>();
         return services;
     }
 }

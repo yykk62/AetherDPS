@@ -20,6 +20,10 @@ public static class BoolBrush
     public static readonly IValueConverter DueGreenElseText =
         new FuncValueConverter<bool, IBrush>(due => due ? Green : Text);
 
+    /// <summary>Stagger-Warnung: unter 5 s rot, sonst hell.</summary>
+    public static readonly IValueConverter HurryRedElseText =
+        new FuncValueConverter<bool, IBrush>(hurry => hurry ? Red : Brushes.White);
+
     public static readonly IValueConverter ErrorRedElseText =
         new FuncValueConverter<bool, IBrush>(error => error ? Red : Text);
 }

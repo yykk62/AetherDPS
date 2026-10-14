@@ -24,6 +24,7 @@ public sealed partial class TimerRow(TimersViewModel owner, TimerItem item) : Ob
     public string Detail => Item.Detail ?? "";
     public bool IsBoss => Item.Kind == TimerKind.Boss;
     public bool IsCustom => Item.Kind == TimerKind.Custom;
+    public bool IsSchedule => Item.Kind == TimerKind.Schedule;
     public bool NeedsRespawn => IsBoss && Item.DueAt is null;
 
     [ObservableProperty] private string remaining = "";
@@ -65,6 +66,14 @@ public sealed partial class TimerRow(TimersViewModel owner, TimerItem item) : Ob
 
     [RelayCommand]
     private void HideInOverlay() => owner.SetOverlay(Item, false);
+
+    /// <summary>Als eigene, frei verschiebbare Leiste anzeigen.</summary>
+    [RelayCommand]
+    private void Detach() => owner.Service.SetDetached(Item.Name, true);
+
+    /// <summary>Zurück in die Timer-Gruppe.</summary>
+    [RelayCommand]
+    private void Attach() => owner.Service.SetDetached(Item.Name, false);
 }
 
 /// <summary>

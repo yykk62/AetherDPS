@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <AssemblyName>Aion2Meter</AssemblyName>
     <RootNamespace>Aion2Meter.App</RootNamespace>
-    <Version>0.4.1</Version>
+    <Version>0.5.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <ApplicationIcon>Assets\icon.ico</ApplicationIcon>

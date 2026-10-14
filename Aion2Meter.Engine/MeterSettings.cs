@@ -51,6 +51,9 @@ public sealed class MeterSettings
     /// <summary>Kampf-Hinweise: Stagger-Phase (Ankündigung + Ergebnis), Todes-Rückblick, auslaufende Buffs.</summary>
     public bool CombatHints { get; set; } = true;
 
+    /// <summary>Große, halbtransparente Stagger-Warnung mitten im Bild (Restzeit + Leiste). Standard: aus.</summary>
+    public bool StaggerWarning { get; set; }
+
     /// <summary>Neue Versionen von GitHub laden (geprüft per SHA-256) und beim nächsten Start installieren.</summary>
     public bool AutoUpdate { get; set; } = true;
 

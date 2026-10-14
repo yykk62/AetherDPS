@@ -33,6 +33,9 @@ public sealed class TimerSettings
     public double? OverlayTop { get; set; }
     public double? OverlayWidth { get; set; }
     public double? OverlayHeight { get; set; }
+
+    /// <summary>Einzeln gelöste Timer (eigene Leiste) mit Position [x, y] – Schlüssel = Name.</summary>
+    public Dictionary<string, double[]> Detached { get; set; } = [];
 }
 
 public enum TimerKind { Schedule, Boss, Custom }
@@ -66,8 +69,11 @@ public sealed class TimerService
     public event Action<string, string>? Reminder;
     public event EventHandler? Changed;
 
-    public TimerService(MeterOptions options, EntityTracker entities)
+    private readonly ZoneTracker zones;
+
+    public TimerService(MeterOptions options, EntityTracker entities, ZoneTracker zones)
     {
+        this.zones = zones;
         file = Path.Combine(options.DataDir, "timer.json");
         this.entities = entities;
         Settings = Load(file);
@@ -83,6 +89,8 @@ public sealed class TimerService
     {
         var mob = entities.GetTargetMob(entityId);
         if (mob is null || mob.MobCode <= 0 || !mob.IsBoss || mob.IsDummy) return;
+        // Bosse im Dungeon sind keine Feldbosse – die kommen nicht wieder (14.10.: Phantom-Lakshmi u. a. im Overlay)
+        if (zones.InInstance) return;
         var name = GermanGameData.MobName(mob);
         lock (gate)
         {
@@ -129,8 +137,9 @@ public sealed class TimerService
                 }
                 else
                 {
+                    // ohne Respawn-Zeit nur im Reiter „Timer“ (zum Eintragen), nicht im Overlay
                     list.Add(new TimerItem(TimerKind.Boss, kill.Name, "Feldboss", null, null,
-                        $"getötet {kill.KilledAt:HH:mm} – Respawn-Zeit eintragen", true, false));
+                        $"getötet {kill.KilledAt:HH:mm} – Respawn-Zeit eintragen", false, false));
                 }
             }
 
@@ -228,6 +237,21 @@ public sealed class TimerService
         Save();
     }
 
+    public bool IsDetached(string name) { lock (gate) return Settings.Detached.ContainsKey(name); }
+
+    public double[]? DetachedPosition(string name) { lock (gate) return Settings.Detached.GetValueOrDefault(name); }
+
+    /// <summary>Timer als eigene Leiste lösen (Position null = neben der Gruppe) oder zurück in die Gruppe.</summary>
+    public void SetDetached(string name, bool detached, double[]? position = null)
+    {
+        lock (gate)
+        {
+            if (detached) Settings.Detached[name] = position ?? Settings.Detached.GetValueOrDefault(name) ?? [];
+            else Settings.Detached.Remove(name);
+        }
+        Save();
+    }
+
     public void SetOverlayFlag(TimerKind kind, string name, bool show)
     {
         if (kind != TimerKind.Schedule) return;
@@ -251,8 +275,21 @@ public sealed class TimerService
 
     public void Save()
     {
-        lock (gate) File.WriteAllText(file, JsonSerializer.Serialize(Settings, Json));
+        SaveQuiet();
         Changed?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>Nur speichern (z. B. Fensterpositionen), ohne die Timer-Listen neu aufzubauen.</summary>
+    public void SaveQuiet()
+    {
+        try
+        {
+            lock (gate) File.WriteAllText(file, JsonSerializer.Serialize(Settings, Json));
+        }
+        catch (IOException)
+        {
+            // kurz gesperrt – beim nächsten Speichern klappt es
+        }
     }
 
     private static TimerSettings Load(string path)

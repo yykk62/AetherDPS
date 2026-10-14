@@ -83,11 +83,23 @@ public sealed class StaggerTracker
     /// <summary>Uhr – für die Auswertung von Mitschnitten auf Paketzeit umstellbar.</summary>
     public Func<DateTime> Clock { get; set; } = () => DateTime.Now;
 
-    /// <summary>Aktuelle Phase (Boss, Leiste aktuell/max), null = keine.</summary>
-    public (string Boss, int Current, int Max, DateTime Start)? Current
+    /// <summary>
+    /// Aktuelle Phase (Boss, Leiste aktuell/max, Start, erwartetes Ende), null = keine.
+    /// Das Ende ist geschätzt: Dauer der letzten verfehlten Phase dieses Bosses, sonst 18 s (Aufnahme 14.10.).
+    /// </summary>
+    public (string Boss, int Current, int Max, DateTime Start, DateTime ExpectedEnd)? Current
     {
-        get { lock (gate) return phase is { } p ? (BossName(p.Boss), p.Current, p.Max, p.Start) : null; }
+        get
+        {
+            lock (gate)
+                return phase is { } p
+                    ? (BossName(p.Boss), p.Current, p.Max, p.Start, p.Start + durations.GetValueOrDefault(p.Boss, DefaultDuration))
+                    : null;
+        }
     }
+
+    public static readonly TimeSpan DefaultDuration = TimeSpan.FromSeconds(18);
+    private readonly Dictionary<int, TimeSpan> durations = [];
 
     /// <summary>Phase angekündigt (einige Sekunden vorher) – Zeit, die großen Stagger-Skills aufzuheben.</summary>
     public event Action<string>? Announced;
@@ -224,6 +236,9 @@ public sealed class StaggerTracker
         }).OrderByDescending(s => s.Points).ToList();
         lastEnded = (p.Boss, now);
         bool success = p.Broken || p.Current <= 0;
+        // Verfehlt = die Zeit ist abgelaufen → so lang dauert eine Phase bei diesem Boss
+        if (!success && now - p.Start is var length && length > TimeSpan.FromSeconds(5) && length < TimeSpan.FromSeconds(60))
+            durations[p.Boss] = length;
         return new StaggerPhase(p.Boss, BossName(p.Boss), p.Max, success ? 0 : p.Current, success, p.Start, now, shares);
     }
 

@@ -1,9 +1,9 @@
+using System.Collections.Specialized;
 using Aion2Meter.App.Services;
 using Aion2Meter.App.ViewModels;
 using Aion2Meter.Engine;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
@@ -11,8 +11,9 @@ using Avalonia.Threading;
 namespace Aion2Meter.App.Views;
 
 /// <summary>
-/// Timer-Overlay: verschiebbar (Kopfzeile ziehen), skalierbar (Rand ziehen), sperrbar wie der
-/// DPS-Meter (Schloss bleibt klickbar). Position und Größe merkt es sich in timer.json.
+/// Timer-Gruppe: verschiebbar (Kopf ziehen), Höhe passt sich an, sperrbar wie der DPS-Meter
+/// (Schloss bleibt klickbar). Einzeln gelöste Timer bekommen je eine eigene Leiste
+/// (<see cref="TimerBarWindow"/>), die mit der Gruppe ein- und ausgeblendet wird.
 /// </summary>
 public partial class TimerOverlayWindow : Window
 {
@@ -20,6 +21,8 @@ public partial class TimerOverlayWindow : Window
     private readonly TimerService? service;
     private readonly DispatcherTimer? lockTimer;
     private readonly DispatcherTimer? tickTimer;
+    private readonly Dictionary<string, TimerBarWindow> bars = [];
+    private bool shown;
 
     public TimerOverlayWindow() => InitializeComponent();
 
@@ -28,7 +31,7 @@ public partial class TimerOverlayWindow : Window
         DataContext = viewModel;
         this.service = service;
         settings = service.Settings;
-        RestoreBounds();
+        RestorePosition();
 
         Header.PointerPressed += (_, e) =>
         {
@@ -43,10 +46,67 @@ public partial class TimerOverlayWindow : Window
         Opened += (_, _) => tickTimer.Start();
         Closing += (_, _) => SaveBounds();
         PositionChanged += (_, _) => ScheduleSave();
-        SizeChanged += (_, _) => ScheduleSave();
+        NotifyCollectionChangedEventHandler onDetached = (_, _) => SyncBars();
+        viewModel.Detached.CollectionChanged += onDetached;
+        Closed += (_, _) =>
+        {
+            viewModel.Detached.CollectionChanged -= onDetached;
+            foreach (var bar in bars.Values) bar.Close();
+            bars.Clear();
+        };
     }
 
     private TimerOverlayViewModel ViewModel => (TimerOverlayViewModel)DataContext!;
+
+    /// <summary>Gruppe und alle gelösten Leisten zeigen.</summary>
+    public void ShowAll()
+    {
+        shown = true;
+        if (!IsVisible) Show();
+        SyncBars();
+    }
+
+    /// <summary>Gruppe und alle gelösten Leisten ausblenden.</summary>
+    public void HideAll()
+    {
+        shown = false;
+        SaveBounds();
+        Hide();
+        foreach (var bar in bars.Values) bar.Hide();
+    }
+
+    private void SyncBars()
+    {
+        if (!shown) return;   // ausgeblendet: Leisten entstehen beim nächsten ShowAll
+        var wanted = ViewModel.Detached.ToDictionary(r => r.Item.Name);
+        foreach (var name in bars.Keys.Where(n => !wanted.ContainsKey(n)).ToList())
+        {
+            bars[name].Close();
+            bars.Remove(name);
+        }
+        int index = 0;
+        foreach (var (name, row) in wanted)
+        {
+            if (!bars.TryGetValue(name, out var bar))
+            {
+                bar = new TimerBarWindow(row, service!, ViewModel, DefaultBarPosition(index));
+                bars[name] = bar;
+            }
+            else bar.DataContext = row;
+            bar.SetClickThrough(ViewModel.IsClickThrough);
+            if (shown && !bar.IsVisible) bar.Show();
+            index++;
+        }
+    }
+
+    /// <summary>Neue Leisten erscheinen untereinander links neben der Gruppe.</summary>
+    private PixelPoint DefaultBarPosition(int index)
+    {
+        int x = Position.X - 240;
+        if (Screens.ScreenFromWindow(this) is { } screen && x < screen.WorkingArea.X)
+            x = Position.X + (int)(Bounds.Width * screen.Scaling) + 10;   // links kein Platz → rechts daneben
+        return new PixelPoint(x, Position.Y + index * 36);
+    }
 
     private void SetClickThrough(bool enabled)
     {
@@ -55,6 +115,7 @@ public partial class TimerOverlayWindow : Window
         if (enabled) lockTimer?.Start();
         else lockTimer?.Stop();
         ClickThrough.Set(this, enabled && !ClickThrough.IsCursorOver(LockButton));
+        foreach (var bar in bars.Values) bar.SetClickThrough(enabled);
     }
 
     private void OnRowReleased(object? sender, PointerReleasedEventArgs e)
@@ -77,28 +138,19 @@ public partial class TimerOverlayWindow : Window
         saveTimer.Start();
     }
 
-    private void RestoreBounds()
+    private void RestorePosition()
     {
         if (settings is null) return;
-        if (settings.OverlayWidth is double w && settings.OverlayHeight is double h && w > 100 && h > 60)
-        {
-            Width = w;
-            Height = h;
-        }
         if (settings.OverlayLeft is double x && settings.OverlayTop is double y)
         {
             WindowStartupLocation = WindowStartupLocation.Manual;
             Position = new PixelPoint((int)x, (int)y);
         }
-        else
+        else if (Screens.Primary is { } screen)
         {
             // Standard: rechts oben auf dem Hauptbildschirm
-            var screen = Screens.Primary;
-            if (screen is not null)
-            {
-                WindowStartupLocation = WindowStartupLocation.Manual;
-                Position = new PixelPoint(screen.WorkingArea.Right - (int)(Width * screen.Scaling) - 24, screen.WorkingArea.Y + 120);
-            }
+            WindowStartupLocation = WindowStartupLocation.Manual;
+            Position = new PixelPoint(screen.WorkingArea.Right - (int)(Width * screen.Scaling) - 24, screen.WorkingArea.Y + 120);
         }
     }
 
@@ -107,20 +159,6 @@ public partial class TimerOverlayWindow : Window
         if (settings is null || service is null || !IsVisible) return;
         settings.OverlayLeft = Position.X;
         settings.OverlayTop = Position.Y;
-        settings.OverlayWidth = Width;
-        settings.OverlayHeight = Height;
-        service.Save();
-    }
-
-    protected override void OnPointerPressed(PointerPressedEventArgs e)
-    {
-        base.OnPointerPressed(e);
-        // Rand-Ziehen zum Skalieren (Fenster hat keine Systemränder)
-        var p = e.GetPosition(this);
-        const double grip = 8;
-        bool right = p.X >= Bounds.Width - grip, bottom = p.Y >= Bounds.Height - grip;
-        if (right && bottom) BeginResizeDrag(WindowEdge.SouthEast, e);
-        else if (right) BeginResizeDrag(WindowEdge.East, e);
-        else if (bottom) BeginResizeDrag(WindowEdge.South, e);
+        service.SaveQuiet();
     }
 }

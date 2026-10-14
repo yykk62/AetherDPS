@@ -153,6 +153,38 @@ public sealed class UiTests : IDisposable
     }
 
     [AvaloniaFact]
+    public void Timer_Gruppe_und_gelöste_Leiste()
+    {
+        Start();
+        var service = provider!.GetRequiredService<TimerService>();
+        service.AddCustom("Gildenboss", 42);
+        service.StartCustom("Gildenboss");
+        var vm = provider!.GetRequiredService<TimerOverlayViewModel>();
+        vm.Tick();
+        Shot(new TimerOverlayWindow(vm, service), "timer_gruppe");
+
+        var row = vm.Rows.First(r => r.Item.Name == "Gildenboss");
+        row.DetachCommand.Execute(null);
+        Dispatcher.UIThread.RunJobs();
+        var bar = vm.Detached.Single();
+        Assert.DoesNotContain(vm.Rows, r => r.Item.Name == "Gildenboss");
+        Shot(new TimerBarWindow(bar, service, vm, new PixelPoint(0, 0)), "timer_leiste");
+    }
+
+    [AvaloniaFact]
+    public void Stagger_Warnung()
+    {
+        Start();
+        BossFight();
+        Feed(SyntheticPackets.Stagger(Boss, 317, 317, 2));
+        Feed(SyntheticPackets.Stagger(Boss, 317, 120, 2));
+        var vm = provider!.GetRequiredService<StaggerWarningViewModel>();
+        vm.Refresh();
+        Assert.True(vm.IsActive);
+        Shot(new StaggerWarningWindow(vm), "stagger_warnung");
+    }
+
+    [AvaloniaFact]
     public void Einblendung()
     {
         Start();
