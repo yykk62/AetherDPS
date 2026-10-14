@@ -112,6 +112,8 @@ public partial class App : Application
             };
             new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, (_, _) => mode.Tick(DateTime.Now)).Start();
             hotkey.ScreenshotPressed += (_, foreground) => TakeScreenshot(foreground);
+            hotkey.MarkerPressed += (_, _) => Dispatcher.UIThread.Post(() => researchVm?.Done());
+            Services.GetRequiredService<HubViewModel>().ResearchRequested += (_, _) => StartResearch();
 
             // Erinnerungen (Timer, Checkliste) und Buff-Leiste
             var timerService = Services.GetRequiredService<TimerService>();
@@ -378,6 +380,37 @@ public partial class App : Application
     }
 
     private void OnTrayClicked(object? sender, EventArgs e) => ShowHub(HubTabDps);
+
+    private ResearchViewModel? researchVm;
+    private ResearchWindow? researchWindow;
+
+    /// <summary>Geführte Aufnahme: Schritt-Fenster oben mittig, F8 = Schritt erledigt.</summary>
+    private void StartResearch()
+    {
+        if (researchWindow is not null)
+        {
+            researchWindow.Show();
+            return;
+        }
+        researchVm ??= Services.GetRequiredService<ResearchViewModel>();
+        researchWindow = new ResearchWindow(researchVm);
+        EventHandler? finished = null;
+        finished = (_, _) =>
+        {
+            researchVm.Finished -= finished;
+            GameHotkey.MarkerEnabled = false;
+            researchWindow?.Close();
+            researchWindow = null;
+            var file = Services.GetRequiredService<Aion2Meter.Engine.Capture.ResearchRecorder>().FilePath;
+            ShowToast(Loc.T("research.finished_title"), Loc.T("research.finished", Path.GetFileName(file ?? "")));
+        };
+        researchVm.Finished += finished;
+        GameHotkey.MarkerEnabled = true;
+        researchVm.Begin(Services.GetRequiredService<MeterOptions>().DataDir);
+        researchWindow.Show();
+    }
+
+    private void OnResearch(object? sender, EventArgs e) => StartResearch();
 
     private void OnToggleOverlay(object? sender, EventArgs e)
     {

@@ -175,6 +175,12 @@ public sealed partial class HubViewModel : ObservableObject
     [RelayCommand]
     private void RestartForUpdate() => AppUpdate.RequestRestart();
 
+    /// <summary>Geführte Aufnahme starten – die App öffnet das Schritt-Fenster.</summary>
+    public event EventHandler? ResearchRequested;
+
+    [RelayCommand]
+    private void StartResearch() => ResearchRequested?.Invoke(this, EventArgs.Empty);
+
     [RelayCommand]
     private void ReportProblem() => Overlay.ReportProblem();
 

@@ -29,6 +29,12 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly TimerService timers;
     private readonly SelfIdentity self;
     private readonly EntityTracker entities;
+    private readonly OwnSide own;
+
+    /// <summary>Letztes Ziel, das du oder deine Gruppe getroffen habt (Fremde zählen nicht).</summary>
+    private volatile int ownTargetId;
+    private long ownTargetAtTicks;
+    private static readonly TimeSpan OwnTargetTimeout = TimeSpan.FromSeconds(60);
     private readonly IAppSettingsService settings;
     private readonly MeterOptions options;
     private readonly ILogger<MainViewModel> logger;
@@ -84,9 +90,16 @@ public sealed partial class MainViewModel : ObservableObject
 
     public MainViewModel(CombatSessionManager sessions, IPacketService pipeline, IPacketCaptureDevice capture,
         RingRecorder recorder, TrackingMode mode, RunTracker run, PartyRoster roster, MeterSettings meterSettings, TimerService timers, SelfIdentity self,
-        EntityTracker entities, IAppSettingsService settings, MeterOptions options, ILogger<MainViewModel> logger)
+        EntityTracker entities, OwnSide own, IAppSettingsService settings, MeterOptions options, ILogger<MainViewModel> logger)
     {
         this.entities = entities;
+        this.own = own;
+        sessions.DamageRecorded += hit =>
+        {
+            if (!own.IsOwn(hit.SourceEntity.Id)) return;
+            ownTargetId = hit.TargetEntity.Id;
+            Interlocked.Exchange(ref ownTargetAtTicks, DateTime.Now.Ticks);
+        };
         this.sessions = sessions;
         this.pipeline = pipeline;
         this.capture = capture;
@@ -156,7 +169,7 @@ public sealed partial class MainViewModel : ObservableObject
         if (ShowTargetView)
         {
             // Auto-Modus: der Boss (auch kurz nach seinem Tod), sonst das aktuelle Ziel
-            var session = mode.AutoMode ? boss : sessions.GetActiveTargetSession();
+            var session = mode.AutoMode ? boss : OwnTargetSession(now);
             target = session is null ? null : entities.GetTargetMob(session.TargetId) ?? session.TargetInfo;
             CardLabel = Loc.T("card.fight");
             Duration = FormatDuration(session?.GetCombatDuration() ?? TimeSpan.Zero);
@@ -167,7 +180,7 @@ public sealed partial class MainViewModel : ObservableObject
         }
         else
         {
-            target = sessions.GetActiveTargetInfo();
+            target = OwnTargetId(now) is int id ? entities.GetTargetMob(id) : null;
             CardLabel = Loc.T(mode.AutoMode ? "card.run_auto" : "card.run");
             Duration = FormatDuration(snapshot.Elapsed);
             entries = snapshot.Players
@@ -212,7 +225,7 @@ public sealed partial class MainViewModel : ObservableObject
             return null;
         }
         // Neuer Boss – oder derselbe, der nach dem Zuklappen wieder getroffen wird
-        if (sessions.GetActiveTargetSession() is { } active && active.TargetInfo.IsBoss && active != shownBoss
+        if (OwnTargetSession(now) is { } active && active.TargetInfo.IsBoss && active != shownBoss
             && !(active == expiredBoss && active.LastHitTime == expiredBossLastHit))
         {
             shownBoss = active;
@@ -234,6 +247,13 @@ public sealed partial class MainViewModel : ObservableObject
         return shownBoss;
     }
 
+    private int? OwnTargetId(DateTime now) =>
+        ownTargetId != 0 && now - new DateTime(Interlocked.Read(ref ownTargetAtTicks)) <= OwnTargetTimeout ? ownTargetId : null;
+
+    /// <summary>Kampf gegen das Ziel, das du/deine Gruppe zuletzt getroffen habt.</summary>
+    private TargetCombatSession? OwnTargetSession(DateTime now) =>
+        OwnTargetId(now) is int id ? sessions.GetTargetHistory(id).LastOrDefault() : null;
+
     private void UpdateSelf()
     {
         var name = self.Name ?? meterSettings.CharacterName;
@@ -242,7 +262,8 @@ public sealed partial class MainViewModel : ObservableObject
         int classId = self.SelfId is int id && entities.GetPlayerEntity(id)?.CharacterClass?.Id is { } c ? (int)c : meterSettings.CharacterClassId;
         SelfIcon = classId > 0 ? ClassVisuals.Icon(classId) : null;
         var parts = new List<string>();
-        if (!string.IsNullOrWhiteSpace(meterSettings.CharacterServer)) parts.Add(meterSettings.CharacterServer!);
+        var server = !string.IsNullOrWhiteSpace(meterSettings.ServerName) ? meterSettings.ServerName : meterSettings.CharacterServer;
+        if (!string.IsNullOrWhiteSpace(server)) parts.Add(server!);
         parts.Add(!IsConnected ? StatusText : pingMs >= 0 ? Loc.T("status.ping", pingMs) : Loc.T("status.connected"));
         parts.Add(Loc.T(mode.AutoMode ? "compact.auto" : "compact.waiting"));
         CompactInfo = string.Join(" · ", parts);

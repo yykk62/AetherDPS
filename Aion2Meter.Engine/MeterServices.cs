@@ -53,6 +53,7 @@ public static class MeterServices
         services.AddPacketProcessingRouting();
         services.AddSingleton<IPacketService, PacketPipelineService>();
         services.AddSingleton<RingRecorder>();
+        services.AddSingleton<ResearchRecorder>();
         services.AddSingleton<RunTracker>();
         services.AddSingleton<PartyRoster>();
         services.AddSingleton<ConnectionMonitor>();
@@ -60,6 +61,7 @@ public static class MeterServices
         services.AddSingleton<TimerService>();
         services.AddSingleton<ChecklistService>();
         services.AddSingleton<SelfIdentity>();
+        services.AddSingleton<OwnSide>();
         services.AddSingleton<LiveTimers>();
         services.AddSingleton(_ => MeterSettings.Load(options.DataDir));
         services.AddSingleton<TrackingMode>();

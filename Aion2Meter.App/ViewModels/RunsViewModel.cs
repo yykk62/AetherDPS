@@ -9,7 +9,7 @@ namespace Aion2Meter.App.ViewModels;
 
 public sealed record RunListItem(string Id, string Title, string Subtitle, bool IsBest, bool IsLive);
 
-public sealed record BossRow(string Name, string Time, string Duration, bool Killed);
+public sealed record BossRow(string Name, string Detail, bool Killed);
 
 public sealed record AnalysisRow(string Name, string Value, double BarPercent);
 
@@ -125,8 +125,10 @@ public sealed partial class RunsViewModel : ObservableObject
         }
 
         Bosses.Clear();
-        foreach (var b in current.Bosses)
-            Bosses.Add(new BossRow(b.Name, "+" + RunArchive.Fmt(b.StartOffset), RunArchive.Fmt(b.Duration), b.Killed));
+        foreach (var b in current.Bosses.Where(b => b.IsSignificant(current.TotalDamage)))
+            Bosses.Add(new BossRow(b.Name,
+                Loc.T("runs.boss_detail", RunArchive.Fmt(b.StartOffset), RunArchive.Fmt(b.Duration), Format.Compact(b.Damage)),
+                b.Killed));
 
         SelectedPlayer = Players.FirstOrDefault(p => p.PlayerId == selectedId)
                          ?? Players.FirstOrDefault(p => p.IsUser) ?? Players.FirstOrDefault();

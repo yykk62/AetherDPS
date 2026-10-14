@@ -109,6 +109,7 @@ internal static class Program
             services.AddSingleton<BuffBarViewModel>();
             services.AddSingleton<TimerOverlayViewModel>();
             services.AddSingleton<HubWindow>();
+            services.AddSingleton<ResearchViewModel>();
             App.Services = services.BuildServiceProvider();
 
             return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);

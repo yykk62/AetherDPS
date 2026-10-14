@@ -190,6 +190,7 @@ public sealed class RunTracker
                 (x.Target.DiedAt ?? x.Target.LastHit) - x.Target.FirstHit,
                 x.Target.DiedAt is not null,
                 x.Target.Damage))
+            .Where(b => b.IsSignificant(total))
             .OrderBy(b => b.StartOffset)
             .ToList();
 
@@ -337,7 +338,14 @@ public sealed record RunSkill(string Name, long Damage, double Share, int Hits, 
 
 public sealed record RunBuff(string Name, double UptimePercent, int Applications);
 
-public sealed record RunBoss(string Name, TimeSpan StartOffset, TimeSpan Duration, bool Killed, long Damage);
+public sealed record RunBoss(string Name, TimeSpan StartOffset, TimeSpan Duration, bool Killed, long Damage)
+{
+    /// <summary>
+    /// Ein echter Bosskampf: besiegt oder mindestens 5 % des Laufschadens. Ein paar Streiftreffer
+    /// (13.10.: „Verfaulter Kutar“ mit 2.690 von 728.660 Schaden) zählen nicht.
+    /// </summary>
+    public bool IsSignificant(long runDamage) => Killed || runDamage <= 0 || Damage * 20 >= runDamage;
+}
 
 public sealed record RunSnapshot(bool Started, bool Stopped, DateTime StartedAt, TimeSpan Elapsed, TimeSpan CombatTime,
     long TotalDamage, double PartyDps, IReadOnlyList<RunPlayer> Players, IReadOnlyList<RunBoss> Bosses);

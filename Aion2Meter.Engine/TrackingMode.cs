@@ -39,15 +39,17 @@ public sealed class TrackingMode
     private readonly CombatSessionManager sessions;
     private readonly RunTracker run;
     private readonly EntityTracker entities;
+    private readonly OwnSide own;
     private volatile bool active;
     private volatile bool auto;
 
     public TrackingMode(PacketDispatchService dispatch, CombatSessionManager sessions, RunTracker run,
-        EntityTracker entities, MeterSettings settings)
+        EntityTracker entities, MeterSettings settings, OwnSide own)
     {
         this.sessions = sessions;
         this.run = run;
         this.entities = entities;
+        this.own = own;
         dispatch.Gate = opcode => active || auto || AllowedInStandby.Contains(opcode);
         SetAutoMode(settings.AutoTrack);
         settings.Changed += (_, _) => SetAutoMode(settings.AutoTrack);
@@ -78,8 +80,10 @@ public sealed class TrackingMode
         Changed?.Invoke(this, EventArgs.Empty);
     }
 
+    /// <summary>Du oder deine Gruppe treffen einen Boss – Fremde, die nebenan einen Feldboss schlagen, zählen nicht.</summary>
     private bool IsBossHit(PlayerDamage hit) =>
-        entities.GetTargetMob(hit.TargetEntity.Id) is { MobCode: > 0 } mob && mob.IsBoss;
+        own.IsOwn(hit.SourceEntity.Id)
+        && entities.GetTargetMob(hit.TargetEntity.Id) is { MobCode: > 0 } mob && mob.IsBoss;
 
     /// <summary>Auto-Modus: Lauf nach längerer Kampfpause abschließen (→ Archiv). Einmal pro Sekunde aufrufen.</summary>
     public void Tick(DateTime now)

@@ -234,6 +234,12 @@ public sealed class PipelineTests : IDisposable
         Assert.False(run.IsRunning);
 
         host.Feed(SyntheticPackets.MobInfo(Boss, Ruthilis, 10_000_000), t += 100);
+        // Ein Fremder (nicht du, nicht deine Gruppe) schlägt den Boss → kein Lauf
+        host.Feed(SyntheticPackets.Damage(Boss, Gladiator, GladiatorSkill, 1_000), t += 100);
+        Assert.False(run.IsRunning);
+
+        // „Nur meine Gruppe“ aus → jeder zählt als eigen
+        host.Get<MeterSettings>().PartyOnly = false;
         host.Feed(SyntheticPackets.Damage(Boss, Gladiator, GladiatorSkill, 50_000), t += 100);
         host.Feed(SyntheticPackets.RemainHp(Boss, 9_950_000), t += 100);
         Assert.True(run.IsRunning);
@@ -253,6 +259,35 @@ public sealed class PipelineTests : IDisposable
         Assert.True(run.IsRunning);
         mode.Tick(now + TrackingMode.AutoRunEnd + TimeSpan.FromSeconds(1));
         Assert.False(run.IsRunning);
+    }
+
+    [Fact]
+    public void Gefuehrte_Aufnahme_schreibt_alles_mit_Marken_und_laesst_sich_abspielen()
+    {
+        string file;
+        using (var host = NewHost())
+        {
+            var recorder = host.Get<ResearchRecorder>();
+            file = recorder.Start(Path.Combine(dataDir, "Mitschnitte"), "test");
+            host.Feed(SyntheticPackets.Heartbeat(), 1_000);
+            host.Feed(SyntheticPackets.Damage(Mob, Gladiator, GladiatorSkill, 4_000), 1_100);
+            recorder.Next(done: true, "Lumiel");     // Server
+            recorder.Next(done: false);              // Relog übersprungen
+            host.Feed(SyntheticPackets.Damage(Mob, Gladiator, GladiatorSkill, 6_000), 1_200);
+            recorder.Stop();
+            host.Feed(SyntheticPackets.Damage(Mob, Gladiator, GladiatorSkill, 9_999), 1_300);   // nach dem Stopp: nicht mehr drin
+            Assert.False(recorder.IsRecording);
+        }
+
+        var marks = ResearchRecorder.ReadMarks(file).ToList();
+        Assert.Equal(["start", "server", "relog", "ende"], marks.Select(m => m.Key));
+        Assert.Equal("Lumiel", marks[1].Text);
+        Assert.Equal("übersprungen", marks[2].Result);
+        Assert.Equal(3, CaptureFile.Read(file).Count());
+
+        using var replay = NewHost(file);
+        ((ReplayCaptureDevice)replay.Capture).PlayToEnd();
+        Assert.Equal(10_000, replay.Sessions.PlayerStats.Sum(p => p.TotalDamage));
     }
 
     [Fact]

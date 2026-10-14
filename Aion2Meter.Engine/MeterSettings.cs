@@ -39,6 +39,9 @@ public sealed class MeterSettings
     /// <summary>AION 2 über Steam mitstarten, wenn der Meter startet (und das Spiel noch nicht läuft).</summary>
     public bool LaunchGameWithMeter { get; set; }
 
+    /// <summary>Servername, den du selbst eingetragen hast (EU-Server fehlen in den Spieldaten).</summary>
+    public string? ServerName { get; set; }
+
     /// <summary>
     /// Automatisch erfassen: Jeder Bosskampf startet die Aufzeichnung von selbst, ohne Hotkey.
     /// Das Overlay bleibt dann als schmale Leiste sichtbar und klappt im Kampf auf.

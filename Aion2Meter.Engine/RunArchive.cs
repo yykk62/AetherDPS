@@ -72,7 +72,8 @@ public sealed class RunArchive
             })
             .ToList();
 
-        var lastKill = snapshot.Bosses.LastOrDefault(b => b.Killed) ?? snapshot.Bosses.LastOrDefault();
+        var bosses = snapshot.Bosses.Where(b => b.IsSignificant(snapshot.TotalDamage)).ToList();
+        var lastKill = bosses.LastOrDefault(b => b.Killed) ?? bosses.LastOrDefault();
         return new ArchivedRun(
             snapshot.StartedAt.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture),
             snapshot.StartedAt, snapshot.Elapsed.TotalSeconds, snapshot.CombatTime.TotalSeconds,
@@ -159,10 +160,11 @@ public sealed class RunArchive
             sb.AppendLine($"{rank++,-2} {Cut(name, 16),-16} {Cut(className(p.ClassId, ""), 13),-13} " +
                           $"{p.Dps.ToString("N0", de),9} {p.Damage.ToString("N0", de),12} {p.Share.ToString("0.0", de),6}%");
         }
-        if (run.Bosses.Count > 0)
+        var bosses = run.Bosses.Where(b => b.IsSignificant(run.TotalDamage)).ToList();
+        if (bosses.Count > 0)
         {
             sb.AppendLine();
-            foreach (var b in run.Bosses)
+            foreach (var b in bosses)
                 sb.AppendLine($"{(b.Killed ? "✔" : "✘")} {Cut(b.Name, 28),-28} {Fmt(b.Duration)}");
         }
         sb.AppendLine("```");

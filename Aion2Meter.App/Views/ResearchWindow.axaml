@@ -1,0 +1,50 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Aion2Meter.App.ViewModels"
+        xmlns:l="using:Aion2Meter.App.Services"
+        x:Class="Aion2Meter.App.Views.ResearchWindow"
+        x:DataType="vm:ResearchViewModel"
+        Title="{l:T research.title}"
+        Width="400" SizeToContent="Height"
+        SystemDecorations="None" Topmost="True" CanResize="False" ShowActivated="False" ShowInTaskbar="False"
+        TransparencyLevelHint="Transparent" Background="Transparent"
+        Icon="/Assets/icon.ico">
+  <Window.Styles>
+    <Style Selector="TextBlock">
+      <Setter Property="Foreground" Value="#EEF0F3" />
+    </Style>
+    <Style Selector="TextBlock.dim">
+      <Setter Property="Foreground" Value="#8E96A3" />
+    </Style>
+    <Style Selector="Button">
+      <Setter Property="Padding" Value="12,5" />
+      <Setter Property="CornerRadius" Value="5" />
+    </Style>
+    <Style Selector="Button.primary">
+      <Setter Property="Background" Value="#E0A84A" />
+      <Setter Property="Foreground" Value="#141820" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+  </Window.Styles>
+
+  <Border Name="Root" Background="#F0141820" CornerRadius="8" BorderBrush="#E0A84A" BorderThickness="1" Padding="14,10">
+    <StackPanel Spacing="8">
+      <!-- Kopf: Ziehen zum Verschieben -->
+      <Grid Name="Header" ColumnDefinitions="Auto,*,Auto" Background="Transparent">
+        <Ellipse Width="9" Height="9" Fill="#E05A5A" VerticalAlignment="Center" Margin="0,0,8,0" />
+        <TextBlock Grid.Column="1" Text="{Binding Progress}" FontSize="12" Classes="dim" VerticalAlignment="Center" />
+        <TextBlock Grid.Column="2" Text="{Binding Stats}" FontSize="11" Classes="dim" VerticalAlignment="Center" />
+      </Grid>
+
+      <TextBlock Text="{Binding Task}" FontSize="15" FontWeight="SemiBold" TextWrapping="Wrap" />
+      <TextBlock Text="{Binding Why}" FontSize="11" Classes="dim" TextWrapping="Wrap" />
+      <TextBox Text="{Binding Answer}" Watermark="{l:T research.server_watermark}" IsVisible="{Binding AsksText}" />
+
+      <Grid ColumnDefinitions="Auto,Auto,*,Auto" Margin="0,4,0,0">
+        <Button Classes="primary" Content="{l:T research.done}" Command="{Binding DoneCommand}" />
+        <Button Grid.Column="1" Content="{l:T research.skip}" Command="{Binding SkipCommand}" Margin="6,0,0,0" />
+        <Button Grid.Column="3" Content="{l:T research.stop}" Command="{Binding StopCommand}" />
+      </Grid>
+    </StackPanel>
+  </Border>
+</Window>

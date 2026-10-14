@@ -18,6 +18,7 @@
             <NativeMenuItem Header="{l:T tray.clickthrough}" Click="OnToggleClickThrough" />
             <NativeMenuItemSeparator />
             <NativeMenuItem Header="{l:T tray.report}" Click="OnReport" />
+            <NativeMenuItem Header="{l:T tray.research}" Click="OnResearch" />
             <NativeMenuItem Header="{l:T tray.settings}" Click="OnSettings" />
             <NativeMenuItem Header="{l:T tray.setup}" Click="OnSetup" />
             <NativeMenuItem Header="{l:T tray.folder}" Click="OnOpenFolder" />
