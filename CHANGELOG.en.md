@@ -2,6 +2,10 @@
 
 Newest versions first.
 
+## 0.6.1
+
+- **Fixed:** after updating from 0.5.0 the meter no longer started (it cleaned up its own unpacked files on start). If this hit you: [download AetherDPS.exe again](https://github.com/yykk62/AetherDPS/releases/latest) – your settings and runs are kept
+
 ## 0.6.0
 
 - **New name: AetherDPS.** Settings, runs and timers carry over on first start, updates keep working as before

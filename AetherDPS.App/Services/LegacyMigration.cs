@@ -42,13 +42,29 @@ public static class LegacyMigration
         }
     }
 
-    /// <summary>Entpackte Dateien der alten Version (%TEMP%\.net\Aion2Meter) wegräumen.</summary>
-    public static void CleanupOldExtraction()
+    /// <summary>
+    /// Entpackte Dateien älterer Versionen wegräumen. Die exe entpackt sich nach
+    /// %TEMP%\.net\&lt;Name der exe&gt;\&lt;hash&gt; – der Name hängt an der Datei: Nach dem Update aus 0.5.0
+    /// heißt sie weiter Aion2Meter.exe. Der eigene Ordner wird deshalb NIE gelöscht, egal unter welchem
+    /// Namen (0.6.0 löschte ihn beim Start und stürzte ab, Bericht #1 vom 14.10.2026).
+    /// </summary>
+    public static void CleanupExtractions(string baseDir)
     {
         try
         {
-            var dir = Path.Combine(Path.GetTempPath(), ".net", OldName);
-            if (Directory.Exists(dir)) Directory.Delete(dir, recursive: true);
+            var current = new DirectoryInfo(baseDir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+            var net = current.Parent?.Parent;
+            if (net is null || net.Name != ".net") return;   // nur die veröffentlichte Einzeldatei
+            foreach (var app in new[] { "AetherDPS", OldName })
+            {
+                var dir = new DirectoryInfo(Path.Combine(net.FullName, app));
+                if (!dir.Exists) continue;
+                foreach (var version in dir.GetDirectories())
+                {
+                    if (version.FullName.Equals(current.FullName, StringComparison.OrdinalIgnoreCase)) continue;
+                    try { version.Delete(recursive: true); } catch (Exception) { /* wird noch benutzt */ }
+                }
+            }
         }
         catch (Exception)
         {

@@ -2,6 +2,10 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
+## 0.6.1
+
+- **Behoben:** Nach dem Update von 0.5.0 startete der Meter nicht mehr (er räumte beim Start seine eigenen entpackten Dateien weg). Wer davon betroffen ist: [AetherDPS.exe neu herunterladen](https://github.com/yykk62/AetherDPS/releases/latest) – Einstellungen und Läufe bleiben erhalten
+
 ## 0.6.0
 
 - **Neuer Name: AetherDPS.** Einstellungen, Läufe und Timer werden beim ersten Start übernommen, Updates laufen wie gewohnt weiter

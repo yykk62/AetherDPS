@@ -30,31 +30,6 @@ public static class AppUpdate
 
     public static void StartAgain() =>
         Process.Start(new ProcessStartInfo(ExePath, RestartArg) { UseShellExecute = false });
-
-    /// <summary>
-    /// Die exe entpackt Sprachdateien und Spieldaten nach %TEMP%\.net\AetherDPS\&lt;hash&gt;.
-    /// Ordner älterer Versionen bleiben sonst für immer liegen.
-    /// </summary>
-    public static void CleanupExtractedVersions()
-    {
-        try
-        {
-            var current = new DirectoryInfo(AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar));
-            var parent = current.Parent;
-            if (parent is null || !parent.Name.Equals("AetherDPS", StringComparison.OrdinalIgnoreCase)
-                || parent.Parent?.Name != ".net")
-                return;
-            foreach (var dir in parent.GetDirectories())
-            {
-                if (dir.FullName.Equals(current.FullName, StringComparison.OrdinalIgnoreCase)) continue;
-                try { dir.Delete(recursive: true); } catch (Exception) { /* wird noch benutzt */ }
-            }
-        }
-        catch (Exception)
-        {
-            // nur Aufräumen
-        }
-    }
 }
 
 /// <summary>

@@ -82,8 +82,7 @@ internal static class Program
             if (AppUpdate.CanSelfUpdate && options.ReplayFile is null)
             {
                 UpdateService.CleanupOld(AppUpdate.ExePath);
-                Task.Run(AppUpdate.CleanupExtractedVersions);
-                Task.Run(LegacyMigration.CleanupOldExtraction);
+                Task.Run(() => LegacyMigration.CleanupExtractions(AppContext.BaseDirectory));
                 // Beim letzten Mal geladenes Update jetzt einspielen, bevor irgendwas läuft.
                 if (updates.Pending is { } pending)
                 {

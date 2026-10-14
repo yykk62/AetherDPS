@@ -249,6 +249,23 @@ public sealed class UiTests : IDisposable
     }
 
     [Fact]
+    public void Aufraeumen_loescht_nie_den_eigenen_Entpack_Ordner()
+    {
+        // Nach dem Update aus 0.5.0 heißt die exe weiter Aion2Meter.exe → entpackt nach .net\Aion2Meter\<hash>
+        var net = Path.Combine(dataDir, ".net");
+        var current = Directory.CreateDirectory(Path.Combine(net, "Aion2Meter", "neu")).FullName;
+        File.WriteAllText(Path.Combine(current, "skills.json"), "{}");
+        var oldLegacy = Directory.CreateDirectory(Path.Combine(net, "Aion2Meter", "alt")).FullName;
+        var oldNew = Directory.CreateDirectory(Path.Combine(net, "AetherDPS", "alt")).FullName;
+
+        LegacyMigration.CleanupExtractions(current + Path.DirectorySeparatorChar);
+
+        Assert.True(File.Exists(Path.Combine(current, "skills.json")));
+        Assert.False(Directory.Exists(oldLegacy));
+        Assert.False(Directory.Exists(oldNew));
+    }
+
+    [Fact]
     public void Alle_Texte_der_Oberflaeche_existieren()
     {
         Loc.Load();
