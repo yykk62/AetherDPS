@@ -7,4 +7,5 @@
   <Project Path="Aion2Meter.App/Aion2Meter.App.csproj" />
   <Project Path="Aion2Meter.Cli/Aion2Meter.Cli.csproj" />
   <Project Path="Aion2Meter.Tests/Aion2Meter.Tests.csproj" />
+  <Project Path="Aion2Meter.UiTests/Aion2Meter.UiTests.csproj" />
 </Solution>

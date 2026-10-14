@@ -2,6 +2,14 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
+## 0.4.1
+
+- **Aufgeräumt:** Einstellungen in Abschnitte gegliedert (Bedienung, Erfassung, Anzeige, Start, Updates), Texte überarbeitet
+- Boss-Karte: voller Bossname, Leben kompakt am Balken
+- Läufe: Boss-Zeilen zweizeilig und gut lesbar
+- Stabiler: Fehler im Hintergrund werden geloggt statt den Meter zu beenden
+- Die geführte Aufnahme (Werkzeug für die Entwicklung) ist aus der Oberfläche entfernt
+
 ## 0.4.0
 
 - **Stagger-Anzeige:** Die Stagger-Leiste des Bosses erscheint auf der Boss-Karte. Danach siehst du, ob es geklappt hat und wer wie viel beigetragen hat

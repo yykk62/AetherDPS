@@ -40,6 +40,14 @@ internal static class Program
                 rollingInterval: RollingInterval.Day, retainedFileCountLimit: 7, formatProvider: CultureInfo.InvariantCulture)
             .CreateLogger();
 
+        // Fehler irgendwo im Hintergrund sollen den Meter nicht beenden – nur ins Log
+        AppDomain.CurrentDomain.UnhandledException += (_, e) => Log.Fatal(e.ExceptionObject as Exception, "Unbehandelter Fehler");
+        TaskScheduler.UnobservedTaskException += (_, e) =>
+        {
+            Log.Error(e.Exception, "Fehler in einer Hintergrund-Aufgabe");
+            e.SetObserved();
+        };
+
         SingleInstance? instance = null;
         try
         {
@@ -97,19 +105,7 @@ internal static class Program
             services.AddLogging(b => b.AddSerilog(dispose: false));
             services.AddAion2Meter(options);
             services.AddSingleton(updates);
-            services.AddSingleton<MainViewModel>();
-            services.AddSingleton<MainWindow>();
-            services.AddSingleton<SetupViewModel>();
-            services.AddSingleton<SettingsViewModel>();
-            services.AddSingleton<HubViewModel>();
-            services.AddSingleton<RunsViewModel>();
-            services.AddSingleton<PartyViewModel>();
-            services.AddSingleton<TimersViewModel>();
-            services.AddSingleton<ChecklistViewModel>();
-            services.AddSingleton<BuffBarViewModel>();
-            services.AddSingleton<TimerOverlayViewModel>();
-            services.AddSingleton<HubWindow>();
-            services.AddSingleton<ResearchViewModel>();
+            services.AddAion2MeterUi();
             App.Services = services.BuildServiceProvider();
 
             return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
@@ -134,4 +130,25 @@ internal static class Program
 
     public static AppBuilder BuildAvaloniaApp() =>
         AppBuilder.Configure<App>().UsePlatformDetect().WithInterFont().LogToTrace();
+}
+
+public static class AppServices
+{
+    /// <summary>Fenster und ViewModels – auch von den UI-Tests genutzt.</summary>
+    public static IServiceCollection AddAion2MeterUi(this IServiceCollection services)
+    {
+        services.AddSingleton<MainViewModel>();
+        services.AddSingleton<MainWindow>();
+        services.AddSingleton<SetupViewModel>();
+        services.AddSingleton<SettingsViewModel>();
+        services.AddSingleton<HubViewModel>();
+        services.AddSingleton<RunsViewModel>();
+        services.AddSingleton<PartyViewModel>();
+        services.AddSingleton<TimersViewModel>();
+        services.AddSingleton<ChecklistViewModel>();
+        services.AddSingleton<BuffBarViewModel>();
+        services.AddSingleton<TimerOverlayViewModel>();
+        services.AddSingleton<HubWindow>();
+        return services;
+    }
 }

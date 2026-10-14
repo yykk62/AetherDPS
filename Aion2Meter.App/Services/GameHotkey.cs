@@ -35,12 +35,6 @@ public sealed partial class GameHotkey : IDisposable
     /// <summary>Während in den Einstellungen ein neuer Hotkey aufgenommen wird.</summary>
     public static volatile bool Suspended;
 
-    /// <summary>Während der geführten Aufnahme: F8 = Schritt erledigt, F9 = Schritt überspringen.</summary>
-    public static volatile bool MarkerEnabled;
-
-    public event EventHandler? MarkerPressed;
-    public event EventHandler? SkipPressed;
-
     /// <summary>Meter starten/stoppen. Wird auf einem Hintergrund-Thread ausgelöst.</summary>
     public event EventHandler? Pressed;
 
@@ -56,10 +50,6 @@ public sealed partial class GameHotkey : IDisposable
                 _ => Pressed?.Invoke(this, EventArgs.Empty)),
             new Slot(0xA3, 300, () => settings.ScreenshotEnabled ? (settings.ScreenshotModifiers, settings.ScreenshotKey) : (0u, 0u),
                 fg => ScreenshotPressed?.Invoke(this, fg)),
-            new Slot(0xA4, 800, () => MarkerEnabled ? (0u, 0x77u) : (0u, 0u),   // F8
-                _ => MarkerPressed?.Invoke(this, EventArgs.Empty)),
-            new Slot(0xA5, 800, () => MarkerEnabled ? (0u, 0x78u) : (0u, 0u),   // F9
-                _ => SkipPressed?.Invoke(this, EventArgs.Empty)),
         ];
         thread = new Thread(Loop) { IsBackground = true, Name = "GameHotkey" };
         thread.Start();

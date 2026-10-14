@@ -40,7 +40,7 @@ public sealed partial class HubViewModel : ObservableObject
     [ObservableProperty] private string toggleText = "";
     [ObservableProperty] private string runSummary = "";
     [ObservableProperty] private bool hasRun;
-    [ObservableProperty] private string buffDiagnostics = "";
+    [ObservableProperty] private string characterLine = "";
     [ObservableProperty] private string riftInfo = "";
     [ObservableProperty] private bool gameRunning = true;
     [ObservableProperty] private string launchText = "";
@@ -88,7 +88,7 @@ public sealed partial class HubViewModel : ObservableObject
 
     public void StopRefreshing() => timer.Stop();
 
-    private void Refresh()
+    internal void Refresh()
     {
         IsActive = mode.IsCapturing;
         IsAuto = mode.AutoMode;
@@ -115,9 +115,10 @@ public sealed partial class HubViewModel : ObservableObject
 
     private void RefreshRun()
     {
-        var d = live.Diagnostics();
-        var self = d.Self is null ? "noch unbekannt – wird beim ersten Skill im laufenden Meter erkannt" : d.SelfGuessed ? $"{d.Self} (wiedererkannt)" : d.Self;
-        BuffDiagnostics = $"Dein Charakter: {self} · Buff-Leiste: {d.OwnBuffEvents} eigene von {d.BuffEvents} empfangenen Buffs · Abklingzeit-Pakete: {d.CooldownPackets}";
+        var self = live.Diagnostics().Self ?? meterSettings.CharacterName;
+        var server = EuServers.Display(!string.IsNullOrWhiteSpace(meterSettings.ServerName) ? meterSettings.ServerName : meterSettings.CharacterServer);
+        CharacterLine = string.IsNullOrWhiteSpace(self) ? Loc.T("hub.character_unknown")
+            : Loc.T("hub.character", string.IsNullOrEmpty(server) ? self : $"{self} · {server}");
         var snapshot = run.Snapshot();
         var lines = snapshot.Players
             .Select(p => new MeterLine(p.PlayerId, p.Name, p.IsUser, p.IsIdentified, p.ClassId, p.ClassName, p.Damage, p.Dps, p.Share))
@@ -174,12 +175,6 @@ public sealed partial class HubViewModel : ObservableObject
 
     [RelayCommand]
     private void RestartForUpdate() => AppUpdate.RequestRestart();
-
-    /// <summary>Geführte Aufnahme starten – die App öffnet das Schritt-Fenster.</summary>
-    public event EventHandler? ResearchRequested;
-
-    [RelayCommand]
-    private void StartResearch() => ResearchRequested?.Invoke(this, EventArgs.Empty);
 
     [RelayCommand]
     private void ReportProblem() => Overlay.ReportProblem();

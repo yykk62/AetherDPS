@@ -4,6 +4,8 @@ Ein deutscher, quelloffener DPS-Meter für AION 2 (EU), als Fork von RATmeter (G
 
 - **Lesen:** `docs/WARTUNG.md` (Aufbau, Upstream-Merge, Patch-Liste), `docs/PROTOKOLL.md`, `docs/PLAN.md` (nächste Schritte)
 - **Bauen und testen:** `dotnet build Aion2Meter.slnx`, `dotnet test Aion2Meter.Tests`. Es braucht das .NET-10-SDK. `dotnet` liegt nicht im PATH, also den vollen Pfad `C:\Program Files\dotnet\dotnet.exe` verwenden.
+- **Oberfläche ohne Bildschirm prüfen:** `dotnet test Aion2Meter.UiTests` rendert alle Fenster unsichtbar. Mit `AION2METER_SHOTS=<ordner>` werden die Bilder gespeichert. So lässt sich das Aussehen prüfen, ohne dass Fenster über einem laufenden Spiel aufgehen
+- **Nie echte Fenster öffnen, solange AION2.exe läuft** (der Nutzer spielt dann). Wiedergaben laufen mit eigenem Datenordner
 - **Ohne Spiel testen:** `aion2meter-cli demo x.txt`, danach `Aion2Meter.exe --replay x.txt`
 - **Upstream-Dateien** (`AionDpsMeter.*`) nur minimal ändern und jede Änderung in die Tabelle in `docs/WARTUNG.md` eintragen
 - **Mitschnitte** enthalten Spielernamen. Sie werden nie committet und nie öffentlich geteilt.

@@ -126,10 +126,9 @@
           </Grid>
 
           <!-- Zeile 2: Name + Leben -->
-          <Grid Grid.Row="1" Grid.Column="1" ColumnDefinitions="*,Auto,Auto" Margin="0,1,0,0">
+          <Grid Grid.Row="1" Grid.Column="1" ColumnDefinitions="*,Auto" Margin="0,1,0,0">
             <TextBlock Text="{Binding TargetName}" FontSize="13" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
-            <TextBlock Grid.Column="1" Text="{Binding HpText}" FontSize="10" Classes="dim" Margin="8,0,0,0" VerticalAlignment="Center" IsVisible="{Binding HasTarget}" />
-            <TextBlock Grid.Column="2" Text="{Binding HpPercentText}" FontSize="12" Classes="num" Margin="8,0,0,0" VerticalAlignment="Center" IsVisible="{Binding HasTarget}" />
+            <TextBlock Grid.Column="1" Text="{Binding HpPercentText}" FontSize="12" Classes="num" Margin="8,0,0,0" VerticalAlignment="Center" IsVisible="{Binding HasTarget}" />
           </Grid>
 
           <!-- Stagger-Phase: Leiste, die ihr bis 0 bringen müsst -->
@@ -139,9 +138,11 @@
           </Grid>
 
           <!-- Zeile 3: Lebensbalken -->
-          <ProgressBar Grid.Row="2" Grid.Column="1" Classes="bar" Height="4" CornerRadius="2" Margin="0,5,0,1"
-                       Value="{Binding TargetHpPercent}" Foreground="#4FBF7A" Background="#14FFFFFF"
-                       IsVisible="{Binding ShowHpBar}" />
+          <Grid Grid.Row="2" Grid.Column="1" ColumnDefinitions="*,Auto" Margin="0,5,0,0" IsVisible="{Binding ShowHpBar}">
+            <ProgressBar Classes="bar" Height="4" CornerRadius="2" VerticalAlignment="Center"
+                         Value="{Binding TargetHpPercent}" Foreground="#4FBF7A" Background="#14FFFFFF" />
+            <TextBlock Grid.Column="1" Text="{Binding HpText}" FontSize="10" Classes="dim" Margin="8,0,0,0" />
+          </Grid>
         </Grid>
       </Border>
 

@@ -48,7 +48,7 @@ public sealed partial class PartyViewModel : ObservableObject
         {
             int classId = classes.GetValueOrDefault(m.Name);
             Members.Add(new PartyRow(
-                m.Name, m.ServerName, m.Level > 0 ? m.Level.ToString() : "–",
+                m.Name, EuServers.Display(m.ServerName), m.Level > 0 ? m.Level.ToString() : "–",
                 m.CombatPower > 0 ? m.CombatPower.ToString("N0", System.Globalization.CultureInfo.GetCultureInfo("de-DE")) : "–",
                 classId > 0 ? GermanGameData.ClassName(classId, "") : "",
                 classId > 0 ? ClassVisuals.Icon(classId) : null,

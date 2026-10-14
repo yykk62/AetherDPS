@@ -102,6 +102,7 @@ Beim Start öffnet sich das **Hauptfenster** mit den Reitern DPS-Meter, Verbindu
 ```
 dotnet build Aion2Meter.slnx
 dotnet test Aion2Meter.Tests
+dotnet test Aion2Meter.UiTests      # rendert alle Fenster unsichtbar; AION2METER_SHOTS=<ordner> speichert Bilder
 Aion2Meter.App\bin\Debug\net10.0\Aion2Meter.exe --replay <mitschnitt.txt> [--speed 1]
 Aion2Meter.Cli\bin\Debug\net10.0\aion2meter-cli.exe replay|demo <datei>
 ```

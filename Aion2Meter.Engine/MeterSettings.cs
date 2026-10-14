@@ -78,8 +78,15 @@ public sealed class MeterSettings
 
     public void Save()
     {
-        if (path is not null)
-            File.WriteAllText(path, JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping }));
+        try
+        {
+            if (path is not null)
+                File.WriteAllText(path, JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping }));
+        }
+        catch (IOException)
+        {
+            // z. B. kurz von einem Virenscanner gesperrt – beim nächsten Speichern klappt es
+        }
         Changed?.Invoke(this, EventArgs.Empty);
     }
 }

@@ -165,7 +165,7 @@ public sealed partial class MainViewModel : ObservableObject
         try { pipeline.Stop(); } catch (Exception ex) { logger.LogWarning(ex, "Stop"); }
     }
 
-    private void Refresh()
+    internal void Refresh()
     {
         UpdateStatus();
 
@@ -201,7 +201,7 @@ public sealed partial class MainViewModel : ObservableObject
         HasTarget = target is { HpTotal: > 0 };
         IsBoss = target is { MobCode: > 0 } && target.IsBoss;
         TargetHpPercent = target is { HpTotal: > 0 } ? Math.Clamp((double)target.HpCurrent / target.HpTotal * 100, 0, 100) : 0;
-        HpText = target is { HpTotal: > 0 } ? Format.Number(Math.Max(0, target.HpCurrent)) + " / " + Format.Number(target.HpTotal) : "";
+        HpText = target is { HpTotal: > 0 } ? Format.Compact(Math.Max(0, target.HpCurrent)) + " / " + Format.Compact(target.HpTotal) : "";
         HpPercentText = target is { HpTotal: > 0 } ? Format.Percent(TargetHpPercent) : "";
         TargetName = target is null ? Loc.T(ShowTargetView ? "target.none" : "run.title_short")
             : target.MobCode == 0 ? Loc.T("target.unknown") : GermanGameData.MobName(target);
@@ -281,7 +281,7 @@ public sealed partial class MainViewModel : ObservableObject
         SelfIcon = classId > 0 ? ClassVisuals.Icon(classId) : null;
         var parts = new List<string>();
         var server = !string.IsNullOrWhiteSpace(meterSettings.ServerName) ? meterSettings.ServerName : meterSettings.CharacterServer;
-        if (!string.IsNullOrWhiteSpace(server)) parts.Add(server!);
+        if (!string.IsNullOrWhiteSpace(server)) parts.Add(EuServers.Display(server));
         parts.Add(!IsConnected ? StatusText : pingMs >= 0 ? Loc.T("status.ping", pingMs) : Loc.T("status.connected"));
         if (zones.InInstance) parts.Add(Loc.T("compact.dungeon"));
         parts.Add(Loc.T(mode.AutoMode ? "compact.auto" : "compact.waiting"));

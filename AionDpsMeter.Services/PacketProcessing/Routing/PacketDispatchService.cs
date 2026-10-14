@@ -19,7 +19,8 @@ namespace AionDpsMeter.Services.PacketProcessing.Routing
                 return;
             }
 
-            Observer?.Invoke(opcode, packet.Data);
+            try { Observer?.Invoke(opcode, packet.Data); }
+            catch (Exception ex) { logger.LogError(ex, "Observer failed for opcode 0x{Opcode:X4}.", opcode); }
 
             // Aion2Meter: Bereitschaftsmodus lässt nur bestimmte Opcodes durch.
             if (Gate is not null && !Gate(opcode)) return;

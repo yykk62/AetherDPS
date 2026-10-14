@@ -37,6 +37,12 @@ public partial class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
         {
             desktop = lifetime;
+            // Fehler in der Oberfläche loggen statt abzustürzen
+            Dispatcher.UIThread.UnhandledException += (_, e) =>
+            {
+                Serilog.Log.Error(e.Exception, "Fehler in der Oberfläche");
+                e.Handled = true;
+            };
             desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             desktop.ShutdownRequested += (_, _) =>
             {
@@ -112,9 +118,6 @@ public partial class App : Application
             };
             new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, (_, _) => mode.Tick(DateTime.Now)).Start();
             hotkey.ScreenshotPressed += (_, foreground) => TakeScreenshot(foreground);
-            hotkey.MarkerPressed += (_, _) => Dispatcher.UIThread.Post(() => researchVm?.Done());
-            hotkey.SkipPressed += (_, _) => Dispatcher.UIThread.Post(() => researchVm?.SkipCommand.Execute(null));
-            Services.GetRequiredService<HubViewModel>().ResearchRequested += (_, _) => StartResearch();
 
             // Erinnerungen (Timer, Checkliste) und Buff-Leiste
             var timerService = Services.GetRequiredService<TimerService>();
@@ -311,7 +314,7 @@ public partial class App : Application
         {
             lastStagger = phase;
             Serilog.Log.Information("Stagger {Result} {Boss}: Rest {Rest}/{Max}", phase.Success ? "geschafft" : "verfehlt", phase.BossName, phase.Remaining, phase.Max);
-            if (settings.CombatHints) ShowToast(Loc.T(phase.Success ? "hint.stagger_ok" : "hint.stagger_fail", phase.BossName), StaggerSummary(phase));
+            if (settings.CombatHints) ShowToast(Loc.T(phase.Success ? "hint.stagger_ok" : "hint.stagger_fail"), StaggerSummary(phase));
         });
         Services.GetRequiredService<DeathRecap>().Died += report => Dispatcher.UIThread.Post(() =>
         {
@@ -334,11 +337,11 @@ public partial class App : Application
 
     private static string StaggerSummary(StaggerPhase phase)
     {
-        int total = Math.Max(1, phase.Shares.Sum(s => s.Points));
-        var lines = new List<string>();
-        if (!phase.Success) lines.Add(Loc.T("hint.stagger_missing", phase.Remaining, phase.Max));
-        lines.Add(string.Join(" · ", phase.Shares.Take(5).Select(s =>
-            $"{(s.IsUser ? Loc.T("player.you") : s.Name)} {s.Points} ({s.Points * 100 / total} %)")));
+        var lines = new List<string>
+        {
+            phase.Success ? phase.BossName : Loc.T("hint.stagger_missing", phase.BossName, phase.Remaining, phase.Max),
+            string.Join(" · ", phase.Shares.Take(5).Select(s => $"{(s.IsUser ? Loc.T("player.you") : s.Name)} {s.Points}")),
+        };
         if (phase.Shares.FirstOrDefault(s => s.IsUser) is { } me && me.Skills.Count > 0)
             lines.Add(Loc.T("hint.stagger_yours", string.Join(", ", me.Skills.Take(4).Select(k => $"{k.Skill} {k.Points}"))));
         return string.Join("\n", lines);
@@ -441,37 +444,6 @@ public partial class App : Application
     }
 
     private void OnTrayClicked(object? sender, EventArgs e) => ShowHub(HubTabDps);
-
-    private ResearchViewModel? researchVm;
-    private ResearchWindow? researchWindow;
-
-    /// <summary>Geführte Aufnahme: Schritt-Fenster oben mittig, F8 = Schritt erledigt.</summary>
-    private void StartResearch()
-    {
-        if (researchWindow is not null)
-        {
-            researchWindow.Show();
-            return;
-        }
-        researchVm ??= Services.GetRequiredService<ResearchViewModel>();
-        researchWindow = new ResearchWindow(researchVm);
-        EventHandler? finished = null;
-        finished = (_, _) =>
-        {
-            researchVm.Finished -= finished;
-            GameHotkey.MarkerEnabled = false;
-            researchWindow?.Close();
-            researchWindow = null;
-            var file = Services.GetRequiredService<Aion2Meter.Engine.Capture.ResearchRecorder>().FilePath;
-            ShowToast(Loc.T("research.finished_title"), Loc.T("research.finished", Path.GetFileName(file ?? "")));
-        };
-        researchVm.Finished += finished;
-        GameHotkey.MarkerEnabled = true;
-        researchVm.Begin(Services.GetRequiredService<MeterOptions>().DataDir);
-        researchWindow.Show();
-    }
-
-    private void OnResearch(object? sender, EventArgs e) => StartResearch();
 
     private void OnToggleOverlay(object? sender, EventArgs e)
     {

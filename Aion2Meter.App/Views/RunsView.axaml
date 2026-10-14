@@ -73,11 +73,13 @@
             <ItemsControl ItemsSource="{Binding Bosses}">
               <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="vm:BossRow">
-                  <Grid ColumnDefinitions="22,*,Auto" Margin="2,1">
+                  <Grid ColumnDefinitions="22,*" Margin="2,3">
                     <TextBlock Text="✔" Foreground="#4CC36A" IsVisible="{Binding Killed}" ToolTip.Tip="{l:T runs.boss_killed}" />
                     <TextBlock Text="✘" Foreground="#E86A6A" IsVisible="{Binding !Killed}" ToolTip.Tip="{l:T runs.boss_not_killed}" />
-                    <TextBlock Grid.Column="1" Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
-                    <TextBlock Grid.Column="2" Text="{Binding Detail}" Classes="dim" TextAlignment="Right" Margin="12,0,0,0" />
+                    <StackPanel Grid.Column="1">
+                      <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                      <TextBlock Text="{Binding Detail}" Classes="dim" FontSize="11" />
+                    </StackPanel>
                   </Grid>
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
