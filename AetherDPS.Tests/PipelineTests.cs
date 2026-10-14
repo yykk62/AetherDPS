@@ -380,6 +380,33 @@ public sealed class PipelineTests : IDisposable
     }
 
     [Fact]
+    public void Patch_Erkennung_bei_unbekannten_Paketen()
+    {
+        using var host = NewHost();
+        var patch = host.Get<AetherDPS.Engine.Community.PatchDetector>();
+        var changes = new List<bool>();
+        patch.Changed += changes.Add;
+        host.Feed(SyntheticPackets.Heartbeat(), 1_000);
+        var unknown = SyntheticPackets.ServerSwitch("1.2.3.4");   // kein Grundpaket
+        for (int i = 0; i < AetherDPS.Engine.Community.PatchDetector.Threshold; i++) host.Feed(unknown, 1_001 + i);
+        Assert.True(patch.LikelyBroken);
+        host.Feed(SyntheticPackets.MapLoad(1010), 9_000);
+        Assert.False(patch.LikelyBroken);
+        Assert.Equal([true, false], changes);
+    }
+
+    [Fact]
+    public void Namen_werden_aus_Berichten_entfernt()
+    {
+        var text = @"Eigener Charakter: Testheld (#12) Gruppe: Testheld, Kleriker99 C:\Users\" + Environment.UserName + @"\AppData";
+        var clean = AetherDPS.Engine.Community.ReportText.Scrub(text, ["Testheld", "Kleriker99", "Player_5", null]);
+        Assert.DoesNotContain("Testheld", clean);
+        Assert.DoesNotContain("Kleriker99", clean);
+        Assert.Contains("Spieler 1", clean);
+        Assert.DoesNotContain(@"\Users\" + Environment.UserName + @"\", clean);
+    }
+
+    [Fact]
     public void Servernamen_folgen_der_Sprache()
     {
         try
@@ -408,8 +435,10 @@ public sealed class PipelineTests : IDisposable
         foreach (var file in Directory.GetFiles(dir, "*.txt"))
         {
             using var host = NewHost(file);
+            var patch = host.Get<AetherDPS.Engine.Community.PatchDetector>();
             ((ReplayCaptureDevice)host.Capture).PlayToEnd();
             Assert.True(host.Sessions.PlayerStats.Sum(p => p.TotalDamage) > 0, $"kein Schaden in {Path.GetFileName(file)}");
+            Assert.False(patch.LikelyBroken, $"Patch-Erkennung schlägt fälschlich an: {Path.GetFileName(file)}");
         }
     }
 

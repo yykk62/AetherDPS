@@ -160,6 +160,11 @@ public partial class App : Application
 
             StartCombatHints(meterSettings);
             StartUpdates(meterSettings);
+            var hubVm = Services.GetRequiredService<HubViewModel>();
+            hubVm.ReportRequested += (_, _) => ShowReport();
+            bool replay = Services.GetRequiredService<MeterOptions>().ReplayFile is not null;
+            if (!replay)
+                Services.GetRequiredService<CommunityController>().Start(hubVm, ShowToast, askConsent: AppUpdate.CanSelfUpdate);
         }
         // Wiedergabe: nur das Overlay, das Hauptfenster öffnet sich nicht von selbst
         bool isReplay = Services.GetRequiredService<MeterOptions>().ReplayFile is not null;
@@ -397,7 +402,7 @@ public partial class App : Application
                             if (mode is { IsActive: false } && !run.IsRunning)
                             {
                                 Serilog.Log.Information("Update beim Start gefunden – installiere und starte neu");
-                                RestartForUpdate();
+                                RestartForUpdate(onlyIfInstalled: true);
                             }
                         });
                 }
@@ -424,12 +429,20 @@ public partial class App : Application
         }
     }
 
-    /// <summary>Knopf „Jetzt neu starten“: speichern, Update einspielen, neue Version starten.</summary>
-    private void RestartForUpdate()
+    /// <summary>
+    /// Knopf „Jetzt neu starten“ (Update oder neue Sprache): speichern, ggf. Update einspielen, neu starten.
+    /// <paramref name="onlyIfInstalled"/>: automatischer Neustart beim Start – klappt die Installation nicht, weiterlaufen.
+    /// </summary>
+    private void RestartForUpdate() => RestartForUpdate(onlyIfInstalled: false);
+
+    private void RestartForUpdate(bool onlyIfInstalled)
     {
+        bool installed = InstallPendingUpdate();
+        if (!installed && onlyIfInstalled) return;
         if (hub is not null) hub.AllowClose = true;
         Persist();
-        if (InstallPendingUpdate()) AppUpdate.StartNewVersion();
+        if (installed) AppUpdate.StartNewVersion();
+        else AppUpdate.StartAgain();
         desktop?.Shutdown();
     }
 
@@ -470,7 +483,22 @@ public partial class App : Application
     private void OnToggleClickThrough(object? sender, EventArgs e) =>
         window?.SetClickThrough(!window.IsClickThrough);
 
-    private void OnReport(object? sender, EventArgs e) => viewModel?.ReportProblem();
+    private void OnReport(object? sender, EventArgs e) => ShowReport();
+
+    private ReportWindow? reportWindow;
+
+    /// <summary>„Problem melden“ (Tray und Hauptfenster).</summary>
+    private void ShowReport()
+    {
+        if (Services.GetRequiredService<MeterOptions>().ReplayFile is not null) return;
+        if (reportWindow is { IsVisible: true })
+        {
+            reportWindow.Activate();
+            return;
+        }
+        reportWindow = new ReportWindow(Services.GetRequiredService<ReportViewModel>());
+        reportWindow.Show();
+    }
 
     private void OnSetup(object? sender, EventArgs e) => ShowSetup();
 

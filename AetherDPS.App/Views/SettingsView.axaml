@@ -46,6 +46,19 @@
 
   <StackPanel Spacing="14" MaxWidth="620" HorizontalAlignment="Left">
 
+    <!-- ===== Sprache ===== -->
+    <Border Classes="card">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="section" Text="{l:T settings.section.language}" />
+        <ComboBox ItemsSource="{Binding Languages}" SelectedItem="{Binding SelectedLanguage}" MinWidth="240" />
+        <TextBlock Classes="dim" Text="{l:T settings.language_hint}" />
+        <StackPanel Orientation="Horizontal" Spacing="10" IsVisible="{Binding LanguageChanged}">
+          <TextBlock Text="{l:T settings.language_restart_hint}" Foreground="#E0A84A" VerticalAlignment="Center" />
+          <Button Classes="primary" Content="{l:T settings.language_restart}" Command="{Binding RestartCommand}" />
+        </StackPanel>
+      </StackPanel>
+    </Border>
+
     <!-- ===== Bedienung ===== -->
     <Border Classes="card">
       <StackPanel Spacing="16">
@@ -164,6 +177,23 @@
         </WrapPanel>
         <TextBlock Classes="dim" Text="{Binding UpdateStatus}"
                    IsVisible="{Binding UpdateStatus, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+      </StackPanel>
+    </Border>
+
+    <!-- ===== Datenschutz ===== -->
+    <Border Classes="card">
+      <StackPanel Spacing="10">
+        <TextBlock Classes="section" Text="{l:T settings.section.privacy}" />
+        <StackPanel Spacing="4">
+          <CheckBox IsChecked="{Binding UsageStats}">
+            <TextBlock Classes="label" Text="{l:T settings.usage_stats}" />
+          </CheckBox>
+          <TextBlock Classes="hint" Text="{l:T settings.usage_stats_hint}" />
+          <Border Background="#0E1117" CornerRadius="4" Padding="10,6" Margin="28,4,0,0">
+            <SelectableTextBlock Text="{Binding UsageStatsExample}" FontFamily="Consolas,monospace" FontSize="11" Foreground="#C8CDD6" TextWrapping="Wrap" />
+          </Border>
+        </StackPanel>
+        <TextBlock Classes="dim" Text="{l:T settings.privacy_hint}" />
       </StackPanel>
     </Border>
 

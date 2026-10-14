@@ -2,6 +2,19 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
+## 0.6.0
+
+- **Neuer Name: AetherDPS.** Einstellungen, Läufe und Timer werden beim ersten Start übernommen, Updates laufen wie gewohnt weiter
+- **Dungeons mit Namen:** Der Meter erkennt, in welchem Dungeon du bist (inklusive Schwierigkeit). Läufe heißen nach dem Dungeon, die Mini-Leiste zeigt ihn an
+- **10 Sprachen:** Deutsch, Englisch, Französisch, Spanisch, Portugiesisch, Russisch, Japanisch, Koreanisch und Chinesisch für Skills, Monster, Klassen und Server (Einstellungen → Sprache). Die Oberfläche gibt es auf Deutsch und Englisch, weitere folgen
+- **Alle EU-Servernamen** statt Nummern
+- **Problem melden** schickt deine Beschreibung und auf Wunsch das Log direkt an den Entwickler, ohne Konto und ohne E-Mail. Namen von Spielern werden vorher entfernt
+- **Absturzberichte:** Ist der Meter abgestürzt, fragt er beim nächsten Start, ob er einen Bericht senden darf
+- **Spiel-Update erkannt:** Versteht der Meter die Spieldaten nach einem Patch nicht mehr, sagt er das, statt einfach leer zu bleiben
+- **Nachrichten vom Entwickler** (z. B. „Update kommt heute Abend“) erscheinen im Hauptfenster
+- **Anonyme Nutzungszahl** (freiwillig, fragt beim Start): einmal am Tag ein Signal mit Version und Sprache, ohne Namen oder Kennung
+- „Was ist neu“ nach jedem Update
+
 ## 0.5.0
 
 - **Timer neu:** Die Timer-Gruppe ist eine schmale Leiste, die so groß ist wie ihr Inhalt. Jeder Timer lässt sich per Rechtsklick als **eigene Leiste lösen** und frei auf dem Bildschirm verteilen, die Gruppe verschiebt man als Ganzes. Das Schloss sperrt Gruppe und Leisten zusammen

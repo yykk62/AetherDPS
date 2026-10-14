@@ -1,6 +1,8 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "aetherdps-api",
+  "workers_dev": true,
+  "preview_urls": false,
   "main": "src/index.ts",
   "compatibility_date": "2026-09-01",
 
@@ -16,7 +18,7 @@
       "binding": "DB",
       "database_name": "aetherdps",
       // Nach `wrangler d1 create aetherdps` die ausgegebene ID hier eintragen.
-      "database_id": "REPLACE_ME"
+      "database_id": "f25930e6-32e4-4189-a305-b4622dbef9e7"
     }
   ],
 

@@ -477,17 +477,6 @@ public sealed partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public void ReportProblem()
-    {
-        var dir = Path.Combine(options.DataDir, "Mitschnitte");
-        var path = recorder.SaveSnapshot(dir, "Problem melden", typeof(MainViewModel).Assembly.GetName().Version?.ToString() ?? "?");
-        Notice = path is null ? Loc.T("report.empty") : Loc.T("report.saved", Path.GetFileName(path));
-        noticeUntil = DateTime.Now.AddSeconds(8);
-        if (path is not null) OpenFolder(dir);
-        Refresh();
-    }
-
-    [RelayCommand]
     private void OpenSetup() => SetupRequested?.Invoke(this, EventArgs.Empty);
 
     [RelayCommand]

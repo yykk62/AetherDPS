@@ -96,6 +96,8 @@ static class Research
 
         var zones = host.Get<ZoneTracker>();
         zones.Changed += entered => events.Add((now, entered ? $"Dungeon betreten: {zones.DungeonName ?? "?"} (Karte {zones.MapId}, {zones.InstanceAddress})" : $"Dungeon verlassen (Karte {zones.MapId})"));
+        host.Get<AetherDPS.Engine.Community.PatchDetector>().Changed += broken =>
+            events.Add((now, broken ? "Patch-Erkennung: versteht die Pakete nicht mehr" : "Patch-Erkennung: wieder in Ordnung"));
         var dispatch = host.Get<AionDpsMeter.Services.PacketProcessing.Routing.PacketDispatchService>();
         var previousObserver = dispatch.Observer;
         dispatch.Observer = (op, data) =>

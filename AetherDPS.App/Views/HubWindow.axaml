@@ -6,7 +6,7 @@
         x:Class="AetherDPS.App.Views.HubWindow"
         x:DataType="vm:HubViewModel"
         Title="{l:T hub.title}"
-        Width="860" Height="600" MinWidth="680" MinHeight="460"
+        Width="860" Height="660" MinWidth="680" MinHeight="460"
         WindowStartupLocation="CenterScreen"
         Background="#11141B" Icon="/Assets/icon.ico">
 
@@ -68,7 +68,7 @@
     </Style>
   </Window.Styles>
 
-  <Grid RowDefinitions="Auto,*">
+  <Grid RowDefinitions="Auto,Auto,*">
     <!-- Kopf -->
     <Grid ColumnDefinitions="*,Auto" Margin="22,16,22,4">
       <StackPanel Orientation="Horizontal" Spacing="10">
@@ -77,14 +77,47 @@
         <TextBlock Text="{l:T hub.close_hint}" Classes="dim" FontSize="11" VerticalAlignment="Center" Margin="12,2,0,0" />
       </StackPanel>
       <!-- Update bereit -->
-      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center"
-                  IsVisible="{Binding UpdateBanner, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-        <TextBlock Text="{Binding UpdateBanner}" Foreground="#E0A84A" FontSize="12" VerticalAlignment="Center" />
-        <Button Classes="primary" Content="{l:T update.restart_short}" Command="{Binding RestartForUpdateCommand}" />
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+        <StackPanel Orientation="Horizontal" Spacing="8"
+                    IsVisible="{Binding UpdateBanner, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+          <TextBlock Text="{Binding UpdateBanner}" Foreground="#E0A84A" FontSize="12" VerticalAlignment="Center" />
+          <Button Classes="primary" Content="{l:T update.restart_short}" Command="{Binding RestartForUpdateCommand}" />
+        </StackPanel>
+        <Button Classes="secondary" Content="{l:T hub.discord}" Command="{Binding OpenDiscordCommand}"
+                IsVisible="{Binding DiscordUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
       </StackPanel>
     </Grid>
 
-    <TabControl Grid.Row="1" TabStripPlacement="Left" SelectedIndex="{Binding SelectedTab}" Margin="10,6,0,0">
+    <!-- Hinweiskarten: Zustimmung, Absturz, Was ist neu, Nachrichten an alle, Spiel-Update -->
+    <ScrollViewer Grid.Row="1" MaxHeight="240" HorizontalScrollBarVisibility="Disabled" Margin="22,6,22,0">
+    <ItemsControl ItemsSource="{Binding Notices}">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate x:DataType="vm:HubNotice">
+          <Border CornerRadius="8" Padding="16,12" Margin="0,0,0,8" BorderThickness="1"
+                  Background="{Binding IsWarning, Converter={x:Static l:BoolBrush.WarningElseCard}}"
+                  BorderBrush="{Binding IsWarning, Converter={x:Static l:BoolBrush.WarningBorderElseCard}}">
+            <Grid ColumnDefinitions="*,Auto">
+              <StackPanel Spacing="6">
+                <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="14" TextWrapping="Wrap" />
+                <TextBlock Text="{Binding Text}" Classes="dim" TextWrapping="Wrap" />
+                <Border IsVisible="{Binding HasDetail}" Background="#0E1117" CornerRadius="4" Padding="10,6">
+                  <SelectableTextBlock Text="{Binding Detail}" FontFamily="Consolas,monospace" FontSize="12" Foreground="#C8CDD6" TextWrapping="Wrap" />
+                </Border>
+                <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,2,0,0">
+                  <Button Classes="primary" Content="{Binding PrimaryText}" Command="{Binding Primary}" IsVisible="{Binding HasPrimary}" />
+                  <Button Classes="secondary" Content="{Binding SecondaryText}" Command="{Binding Secondary}" IsVisible="{Binding HasSecondary}" />
+                </StackPanel>
+              </StackPanel>
+              <Button Grid.Column="1" Content="✕" Command="{Binding Close}" IsVisible="{Binding CanClose}"
+                      VerticalAlignment="Top" Background="Transparent" Padding="8,2" />
+            </Grid>
+          </Border>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+    </ScrollViewer>
+
+    <TabControl Grid.Row="2" TabStripPlacement="Left" SelectedIndex="{Binding SelectedTab}" Margin="10,6,0,0">
 
       <!-- DPS-Meter -->
       <TabItem Header="{l:T hub.tab.dps}">

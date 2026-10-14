@@ -3,6 +3,7 @@ using AetherDPS.App.Services;
 using AetherDPS.App.ViewModels;
 using AetherDPS.App.Views;
 using AetherDPS.Engine;
+using AetherDPS.Engine.Community;
 using AetherDPS.Engine.Updates;
 using Avalonia;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,8 +41,13 @@ internal static class Program
                 rollingInterval: RollingInterval.Day, retainedFileCountLimit: 7, formatProvider: CultureInfo.InvariantCulture)
             .CreateLogger();
 
-        // Fehler irgendwo im Hintergrund sollen den Meter nicht beenden – nur ins Log
-        AppDomain.CurrentDomain.UnhandledException += (_, e) => Log.Fatal(e.ExceptionObject as Exception, "Unbehandelter Fehler");
+        // Fehler irgendwo im Hintergrund sollen den Meter nicht beenden – nur ins Log.
+        // Echte Abstürze merken: beim nächsten Start wird angeboten, einen Fehlerbericht zu senden.
+        AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+        {
+            Log.Fatal(e.ExceptionObject as Exception, "Unbehandelter Fehler");
+            if (e.IsTerminating && e.ExceptionObject is Exception ex) ReportText.WriteCrash(dataDir, ex);
+        };
         TaskScheduler.UnobservedTaskException += (_, e) =>
         {
             Log.Error(e.Exception, "Fehler in einer Hintergrund-Aufgabe");
@@ -59,11 +65,12 @@ internal static class Program
             };
             var version = typeof(Program).Assembly.GetName().Version ?? new Version(0, 0, 0);
             bool justUpdated = args.Contains(AppUpdate.UpdatedArg);
+            bool restarted = args.Contains(AppUpdate.RestartArg);
 
             // Wiedergaben dürfen neben dem echten Meter laufen, sonst nur eine Instanz.
             if (options.ReplayFile is null)
             {
-                instance = SingleInstance.TryAcquire(waitForPrevious: justUpdated);
+                instance = SingleInstance.TryAcquire(waitForPrevious: justUpdated || restarted);
                 if (instance is null)
                 {
                     Log.Information("Meter läuft schon – Hauptfenster der laufenden Instanz geöffnet");
@@ -95,10 +102,11 @@ internal static class Program
                 }
             }
 
-            Loc.Load();
-            GameText.Apply();
-            Log.Information("Start {Version}, deutsche Skills: {Count}, Replay: {Replay}, nach Update: {Updated}",
-                version, GameText.PatchedSkillCount, options.ReplayFile ?? "nein", justUpdated);
+            var language = Loc.Resolve(MeterSettings.Load(dataDir).Language);
+            Loc.Load(language);
+            GameText.Apply(language);
+            Log.Information("Start {Version}, Sprache {Language} ({Count} Skills übersetzt), Replay: {Replay}, nach Update: {Updated}",
+                version, language, GameText.PatchedSkillCount, options.ReplayFile ?? "nein", justUpdated);
             App.JustUpdated = justUpdated;
             App.Instance = instance;
 
@@ -114,6 +122,7 @@ internal static class Program
         catch (Exception ex)
         {
             Log.Fatal(ex, "Absturz");
+            ReportText.WriteCrash(dataDir, ex);
             return 1;
         }
         finally
@@ -151,6 +160,10 @@ public static class AppServices
         services.AddSingleton<TimerOverlayViewModel>();
         services.AddSingleton<HubWindow>();
         services.AddSingleton<StaggerWarningViewModel>();
+        services.AddSingleton(sp => new CommunityService(sp.GetRequiredService<MeterSettings>(),
+            typeof(Program).Assembly.GetName().Version ?? new Version(0, 0, 0)));
+        services.AddSingleton<ReportViewModel>();
+        services.AddSingleton<CommunityController>();
         return services;
     }
 }

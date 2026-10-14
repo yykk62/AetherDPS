@@ -63,6 +63,7 @@ public static class MeterServices
         services.AddSingleton<SelfIdentity>();
         services.AddSingleton<OwnSide>();
         services.AddSingleton<ZoneTracker>();
+        services.AddSingleton<Community.PatchDetector>();
         services.AddSingleton<DeathRecap>();
         services.AddSingleton<BuffWatcher>();
         services.AddSingleton<StaggerTracker>();

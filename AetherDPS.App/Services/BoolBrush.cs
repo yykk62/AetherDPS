@@ -26,6 +26,13 @@ public static class BoolBrush
 
     public static readonly IValueConverter ErrorRedElseText =
         new FuncValueConverter<bool, IBrush>(error => error ? Red : Text);
+
+    /// <summary>Hinweiskarten im Hauptfenster: Warnung bernsteinfarben getönt, sonst normale Karte.</summary>
+    public static readonly IValueConverter WarningElseCard =
+        new FuncValueConverter<bool, IBrush>(warning => new SolidColorBrush(Color.Parse(warning ? "#2A2418" : "#191E28")));
+
+    public static readonly IValueConverter WarningBorderElseCard =
+        new FuncValueConverter<bool, IBrush>(warning => new SolidColorBrush(Color.Parse(warning ? "#7A5A22" : "#2E3746")));
 }
 
 /// <summary>Schritt-Kreis: erledigt = grün, aktiv = gold, später = grau.</summary>

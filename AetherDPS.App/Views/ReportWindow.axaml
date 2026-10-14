@@ -1,0 +1,59 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AetherDPS.App.ViewModels"
+        xmlns:l="using:AetherDPS.App.Services"
+        x:Class="AetherDPS.App.Views.ReportWindow"
+        x:DataType="vm:ReportViewModel"
+        Title="{l:T report.title}"
+        Width="560" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterScreen"
+        Background="#141820" Icon="/Assets/icon.ico">
+
+  <Window.Styles>
+    <Style Selector="TextBlock">
+      <Setter Property="Foreground" Value="#E6E8EC" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+    <Style Selector="TextBlock.dim">
+      <Setter Property="Foreground" Value="#8E96A3" />
+      <Setter Property="FontSize" Value="12" />
+    </Style>
+    <Style Selector="Button.primary">
+      <Setter Property="Background" Value="#E0A84A" />
+      <Setter Property="Foreground" Value="#141820" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Padding" Value="20,9" />
+      <Setter Property="CornerRadius" Value="6" />
+    </Style>
+    <Style Selector="Button.secondary">
+      <Setter Property="Padding" Value="16,9" />
+      <Setter Property="CornerRadius" Value="6" />
+    </Style>
+  </Window.Styles>
+
+  <StackPanel Margin="24,20" Spacing="12">
+    <TextBlock Text="{l:T report.title}" FontSize="18" FontWeight="SemiBold" />
+    <TextBlock Classes="dim" Text="{l:T report.intro}" />
+
+    <TextBox Text="{Binding Message}" Watermark="{l:T report.placeholder}" AcceptsReturn="True" TextWrapping="Wrap"
+             Height="110" MaxLength="4000" IsEnabled="{Binding !IsSent}" />
+
+    <CheckBox IsChecked="{Binding AttachLog}" IsEnabled="{Binding !IsSent}">
+      <TextBlock Text="{l:T report.attach_log}" />
+    </CheckBox>
+    <Expander Header="{l:T report.preview}" IsVisible="{Binding AttachLog}" HorizontalAlignment="Stretch">
+      <TextBox Text="{Binding LogPreview}" IsReadOnly="True" FontFamily="Consolas,monospace" FontSize="11"
+               TextWrapping="NoWrap" Height="180" />
+    </Expander>
+    <TextBlock Classes="dim" Text="{l:T report.privacy}" />
+
+    <TextBlock Text="{Binding Status}" IsVisible="{Binding Status, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+               Foreground="{Binding StatusIsError, Converter={x:Static l:BoolBrush.ErrorRedElseText}}" />
+
+    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+      <Button Classes="secondary" Content="{l:T report.close}" Command="{Binding CloseCommand}" />
+      <Button Classes="primary" Content="{l:T report.send}" Command="{Binding SendCommand}" IsVisible="{Binding !IsSent}"
+              IsEnabled="{Binding !IsSending}" />
+    </StackPanel>
+  </StackPanel>
+</Window>

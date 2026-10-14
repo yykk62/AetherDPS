@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <AssemblyName>AetherDPS</AssemblyName>
     <RootNamespace>AetherDPS.App</RootNamespace>
-    <Version>0.5.0</Version>
+    <Version>0.6.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
@@ -29,6 +29,12 @@
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <DefineConstants>$(DefineConstants);SELF_UPDATE</DefineConstants>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- „Was ist neu“ nach einem Update -->
+    <EmbeddedResource Include="..\CHANGELOG.md" LogicalName="CHANGELOG.md" />
+    <EmbeddedResource Include="..\CHANGELOG.en.md" LogicalName="CHANGELOG.en.md" />
+  </ItemGroup>
 
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />

@@ -10,6 +10,11 @@ namespace AetherDPS.App.ViewModels;
 
 public enum HotkeySlot { Meter, Screenshot }
 
+public sealed record LanguageOption(string Code, string Name)
+{
+    public override string ToString() => Name;
+}
+
 public sealed partial class SettingsViewModel : ObservableObject
 {
     private readonly MeterSettings meter;
@@ -32,14 +37,31 @@ public sealed partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private bool staggerWarning;
     [ObservableProperty] private string updateStatus = "";
     [ObservableProperty] private bool updateReady;
+    [ObservableProperty] private LanguageOption selectedLanguage;
+    [ObservableProperty] private bool languageChanged;
+    [ObservableProperty] private bool usageStats;
+
+    public IReadOnlyList<LanguageOption> Languages { get; } =
+    [
+        new("auto", Loc.T("settings.language_auto")),
+        new("de", "Deutsch"), new("en", "English"), new("fr", "Français"), new("es", "Español"), new("pt", "Português"),
+        new("ru", "Русский"), new("ja", "日本語"), new("ko", "한국어"), new("zh-Hans", "简体中文"), new("zh-Hant", "繁體中文"),
+    ];
+
+    /// <summary>Was der Zähler sendet – steht unter dem Schalter.</summary>
+    public string UsageStatsExample { get; }
 
     private readonly UpdateService updates;
     public string VersionText { get; }
     public bool CanSelfUpdate { get; } = AppUpdate.CanSelfUpdate;
 
-    public SettingsViewModel(MeterSettings meter, IAppSettingsService upstream, UpdateService updates)
+    public SettingsViewModel(MeterSettings meter, IAppSettingsService upstream, UpdateService updates, Engine.Community.CommunityService community)
     {
         this.meter = meter;
+        selectedLanguage = Languages.FirstOrDefault(l => l.Code == meter.Language) ?? Languages[0];
+        usageStats = meter.UsageStats == true;
+        UsageStatsExample = Loc.T("settings.usage_stats_example", community.PingExample());
+        meter.Changed += (_, _) => UsageStats = meter.UsageStats == true;
         this.upstream = upstream;
         this.updates = updates;
         autoUpdate = meter.AutoUpdate;
@@ -60,6 +82,25 @@ public sealed partial class SettingsViewModel : ObservableObject
     }
 
     partial void OnOpacityPercentChanged(double value) => upstream.WindowOpacity = value / 100.0;
+
+    partial void OnSelectedLanguageChanged(LanguageOption value)
+    {
+        if (value is null || meter.Language == value.Code) return;
+        meter.Language = value.Code;
+        meter.Save();
+        LanguageChanged = Loc.Resolve(value.Code) != Loc.Language;
+    }
+
+    partial void OnUsageStatsChanged(bool value)
+    {
+        if (meter.UsageStats == value) return;
+        meter.UsageStats = value;
+        meter.Save();
+    }
+
+    /// <summary>Neue Sprache gilt nach einem Neustart.</summary>
+    [RelayCommand]
+    private void Restart() => AppUpdate.RequestRestart();
 
     partial void OnPartyOnlyChanged(bool value)
     {
@@ -165,7 +206,7 @@ public sealed partial class SettingsViewModel : ObservableObject
 
         uint mods = 0;
         var parts = new List<string>();
-        if (modifiers.HasFlag(KeyModifiers.Control)) { mods |= MeterSettings.ModControl; parts.Add("STRG"); }
+        if (modifiers.HasFlag(KeyModifiers.Control)) { mods |= MeterSettings.ModControl; parts.Add(Loc.T("key.ctrl")); }
         if (modifiers.HasFlag(KeyModifiers.Alt)) { mods |= MeterSettings.ModAlt; parts.Add("ALT"); }
         if (modifiers.HasFlag(KeyModifiers.Shift)) { mods |= MeterSettings.ModShift; parts.Add("SHIFT"); }
 
@@ -199,10 +240,10 @@ public sealed partial class SettingsViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void ResetHotkey() => Apply(HotkeySlot.Meter, MeterSettings.ModControl, 0x57, "STRG+W");
+    private void ResetHotkey() => Apply(HotkeySlot.Meter, MeterSettings.ModControl, 0x57, Loc.T("key.ctrl") + "+W");
 
     [RelayCommand]
-    private void ResetScreenshotHotkey() => Apply(HotkeySlot.Screenshot, MeterSettings.ModControl, 0x53, "STRG+S");
+    private void ResetScreenshotHotkey() => Apply(HotkeySlot.Screenshot, MeterSettings.ModControl, 0x53, Loc.T("key.ctrl") + "+S");
 
     private void SetText(HotkeySlot slot, string text)
     {

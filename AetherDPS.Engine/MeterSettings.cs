@@ -57,6 +57,21 @@ public sealed class MeterSettings
     /// <summary>Neue Versionen von GitHub laden (geprüft per SHA-256) und beim nächsten Start installieren.</summary>
     public bool AutoUpdate { get; set; } = true;
 
+    /// <summary>Sprache der Oberfläche und Spieltexte („auto“ = wie Windows). Gilt nach Neustart.</summary>
+    public string Language { get; set; } = "auto";
+
+    /// <summary>Anonymer Nutzungszähler: null = noch nicht gefragt, sonst die Antwort.</summary>
+    public bool? UsageStats { get; set; }
+
+    /// <summary>UTC-Tag des letzten Zähler-Signals („2026-10-15“) – höchstens eins pro Tag.</summary>
+    public string? LastPingDay { get; set; }
+
+    /// <summary>Version beim letzten Start – ist sie neuer, zeigt der Meter „Was ist neu“.</summary>
+    public string? LastSeenVersion { get; set; }
+
+    /// <summary>Schon angezeigte Nachrichten an alle (Ids aus status.json).</summary>
+    public List<string> SeenMessages { get; set; } = [];
+
     private string? path;
 
     public event EventHandler? Changed;
@@ -76,7 +91,17 @@ public sealed class MeterSettings
             settings = new MeterSettings();
         }
         settings.path = file;
+        // Tastennamen in der Sprache der Oberfläche („STRG+W“ ↔ „CTRL+W“)
+        settings.HotkeyText = LocalizeKeys(settings.HotkeyText);
+        settings.ScreenshotText = LocalizeKeys(settings.ScreenshotText);
         return settings;
+    }
+
+    private static string LocalizeKeys(string text)
+    {
+        var parts = text.Split('+');
+        if (parts.Length > 1 && parts[0] is "STRG" or "CTRL") parts[0] = Loc.T("key.ctrl");
+        return string.Join('+', parts);
     }
 
     public void Save()

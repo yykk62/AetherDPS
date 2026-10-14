@@ -45,6 +45,13 @@ public sealed partial class HubViewModel : ObservableObject
     [ObservableProperty] private bool gameRunning = true;
     [ObservableProperty] private string launchText = "";
     [ObservableProperty] private string updateBanner = "";
+    [ObservableProperty] private string? discordUrl;
+
+    /// <summary>Hinweiskarten oben (Zustimmung, Absturz, Was ist neu, Nachrichten, Spiel-Update).</summary>
+    public ObservableCollection<HubNotice> Notices { get; } = [];
+
+    /// <summary>„Problem melden“ öffnet das Meldefenster (App).</summary>
+    public event EventHandler? ReportRequested;
 
     [ObservableProperty] private string pingNow = "–";
     [ObservableProperty] private string pingAvg = "–";
@@ -165,7 +172,26 @@ public sealed partial class HubViewModel : ObservableObject
     partial void OnSelectedTabChanged(int value) => Refresh();
 
     private static string FormatLeft(TimeSpan left) =>
-        left.TotalHours >= 24 ? $"{(int)left.TotalDays} T {left.Hours} Std." : left.TotalHours >= 1 ? left.ToString(@"h\:mm\:ss") : left.ToString(@"mm\:ss");
+        left.TotalHours >= 24 ? Loc.T("time.days_hours", (int)left.TotalDays, left.Hours) : left.TotalHours >= 1 ? left.ToString(@"h\:mm\:ss") : left.ToString(@"mm\:ss");
+
+    /// <summary>Karte zeigen; eine Karte mit derselben Id wird ersetzt.</summary>
+    public void ShowNotice(HubNotice notice)
+    {
+        notice.Close = new RelayCommand(() => RemoveNotice(notice.Id));
+        RemoveNotice(notice.Id);
+        Notices.Insert(0, notice);
+    }
+
+    public void RemoveNotice(string id)
+    {
+        foreach (var n in Notices.Where(n => n.Id == id).ToList()) Notices.Remove(n);
+    }
+
+    [RelayCommand]
+    private void OpenDiscord()
+    {
+        if (DiscordUrl is { } url) AetherDPS.App.Services.Browser.Open(url);
+    }
 
     [RelayCommand]
     private void LaunchGame() => AetherDPS.App.Services.GameLauncher.Launch();
@@ -177,7 +203,7 @@ public sealed partial class HubViewModel : ObservableObject
     private void RestartForUpdate() => AppUpdate.RequestRestart();
 
     [RelayCommand]
-    private void ReportProblem() => Overlay.ReportProblem();
+    private void ReportProblem() => ReportRequested?.Invoke(this, EventArgs.Empty);
 
     [RelayCommand]
     private void OpenDataFolder() => Overlay.OpenDataFolder();

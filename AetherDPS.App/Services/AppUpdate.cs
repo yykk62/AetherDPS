@@ -25,6 +25,12 @@ public static class AppUpdate
     public static void StartNewVersion() =>
         Process.Start(new ProcessStartInfo(ExePath, UpdatedArg) { UseShellExecute = false });
 
+    /// <summary>Neustart ohne Update (z. B. neue Sprache) – wartet wie nach einem Update auf die alte Instanz.</summary>
+    public const string RestartArg = "--restart";
+
+    public static void StartAgain() =>
+        Process.Start(new ProcessStartInfo(ExePath, RestartArg) { UseShellExecute = false });
+
     /// <summary>
     /// Die exe entpackt Sprachdateien und Spieldaten nach %TEMP%\.net\AetherDPS\&lt;hash&gt;.
     /// Ordner älterer Versionen bleiben sonst für immer liegen.

@@ -185,6 +185,23 @@ public sealed class UiTests : IDisposable
     }
 
     [AvaloniaFact]
+    public void Hinweiskarten_und_Meldefenster()
+    {
+        Start();
+        var hub = provider!.GetRequiredService<HubViewModel>();
+        var community = provider!.GetRequiredService<CommunityController>();
+        community.Attach(hub, (_, _) => { });
+        community.ShowConsent();
+        hub.ShowNotice(new HubNotice { Id = "patch", Title = Loc.T("patch.title"), Text = Loc.T("patch.text"), IsWarning = true });
+        Assert.Equal(2, hub.Notices.Count);
+        hub.DiscordUrl = "https://discord.gg/beispiel";
+        Shot(new HubWindow(hub), "hub_hinweise");
+
+        Assert.NotNull(CommunityController.ChangelogSection("0.6.0"));
+        Shot(new ReportWindow(provider!.GetRequiredService<ReportViewModel>()), "melden");
+    }
+
+    [AvaloniaFact]
     public void Einblendung()
     {
         Start();
