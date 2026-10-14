@@ -53,8 +53,15 @@ So wenig wie möglich in Upstream-Dateien ändern. Lieber in der Engine erweiter
 
 ## Fehler aus „Problem melden“ bearbeiten
 
-1. Der Nutzer schickt `%LOCALAPPDATA%\AetherDPS\Mitschnitte\problem_*.txt` und die Logs aus `...\logs`.
-2. Zum Reproduzieren: `aetherdps-cli replay problem_….txt` oder die App mit `--replay`.
+„Problem melden“ und Absturzberichte landen im Worker (`server/`, Cloudflare D1). Ansehen und abhaken unter
+`https://aetherdps-api.pixel6269.workers.dev/admin?key=…` (Schlüssel in `~/.secrets/aetherdps.env`), per API:
+`GET /admin/api/reports?key=…&status=open`, einzeln mit Log `GET /admin/api/reports/<id>?key=…`,
+erledigt `POST /admin/api/reports/<id>/status?key=…` mit `{"status":"closed","note":"…"}`.
+Die Logs darin sind bereinigt (Namen → „Spieler 1“ …, `ReportText.Scrub`).
+
+Für Paket-Probleme braucht es einen Mitschnitt, den der Meter nicht verschickt (enthält Namen):
+1. Der Nutzer schickt `%LOCALAPPDATA%\AetherDPS\Mitschnitte\*.txt` auf anderem Weg (z. B. Discord-DM).
+2. Zum Reproduzieren: `aetherdps-cli replay <datei>` oder die App mit `--replay`.
 3. Den Mitschnitt nach `AetherDPS.Tests/Captures/` legen. Der Test `Echte_Mitschnitte_laufen_fehlerfrei_durch` spielt alle Mitschnitte dort ab.
    **Der Ordner ist per .gitignore ausgeschlossen**, weil Mitschnitte Spielernamen enthalten. Er wird nie committet.
 
@@ -73,6 +80,18 @@ So wenig wie möglich in Upstream-Dateien ändern. Lieber in der Engine erweiter
 
 Die exe entpackt Sprachdateien und Spieldaten beim ersten Start nach `%TEMP%\.net\AetherDPS\<hash>`. Ordner älterer Versionen räumt der Meter beim Start weg.
 
-**Nur ein Meter gleichzeitig:** Ein zweiter Start holt das Hauptfenster der laufenden Instanz nach vorn (Mutex `Local\AetherDPS`). Wiedergaben mit `--replay` sind davon ausgenommen.
+**Nur ein Meter gleichzeitig:** Ein zweiter Start holt das Hauptfenster der laufenden Instanz nach vorn (Mutex `Local\Aion2Meter` – bewusst der alte Name, damit die neue Version nach dem Update von 0.5.0 auf die alte wartet). Wiedergaben mit `--replay` sind davon ausgenommen.
+
+**Umbenennung (0.6.0):** Bis 0.5.0 hieß alles „Aion2Meter“. Alte Versionen suchen im Release nach `Aion2Meter.exe`, deshalb lädt die Pipeline dieselbe Datei zusätzlich unter diesem Namen hoch (`tools/release.ps1`). Kann entfallen, wenn die Nutzungszahlen keine Version ≤ 0.5.0 mehr zeigen. Der alte Datenordner zieht beim ersten Start um (`LegacyMigration`). GitHub leitet `yykk62/Aion2Meter` auf `yykk62/AetherDPS` um.
+
+## Community-Funktionen
+
+`AetherDPS.Engine/Community/` – alles, was ins Netz geht:
+- `CommunityService`: täglicher Zähler (`POST /v1/ping`, nur mit Zustimmung `MeterSettings.UsageStats`, höchstens einmal pro UTC-Tag), Fehlerberichte (`POST /v1/report`), `status.json` von GitHub (Nachrichten an alle, Discord-Link, optional neue Server-Adresse `api`). Test gegen lokalen Server: `AETHERDPS_API`, `AETHERDPS_STATUS`.
+- `ReportText`: Absturz merken (`absturz.txt` im Datenordner), Log lesen, Namen entfernen.
+- `PatchDetector`: 3000 Pakete ohne ein Grundpaket (Zeit, Spawn, Leben, Schaden, Karte) = Spiel-Update vermutet.
+- In der App: `CommunityController` (Hinweiskarten, Schleife alle 30 Min.), `ReportViewModel`/`ReportWindow`.
+
+Kosten: ein Worker-Aufruf pro Nutzer und Tag plus Fehlerberichte; `status.json` kommt von GitHub und kostet nichts.
 
 **Signatur:** Die exe ist noch nicht signiert, deshalb warnt SmartScreen. Kostenlos für Open-Source-Projekte geht das über die SignPath Foundation (Antrag mit öffentlichem Repo nötig). Wäre ein Schritt in der Release-Pipeline.

@@ -5,8 +5,9 @@
 <h1 align="center">AetherDPS</h1>
 
 <p align="center">
-  <b>Der kostenlose DPS-Meter und Begleiter für AION 2, auf Deutsch und für die EU-Server gebaut.</b><br />
-  Ohne Abo, ohne Konto, ohne Werbung. Alles bleibt auf deinem PC.
+  <b>Der kostenlose DPS-Meter und Begleiter für AION 2, für die EU-Server gebaut.</b><br />
+  Ohne Abo, ohne Konto, ohne Werbung. Deine Kampfdaten bleiben auf deinem PC.<br />
+  <sub>🌍 Deutsch · English · Français · Español · Português · Русский · 日本語 · 한국어 · 中文</sub>
 </p>
 
 <p align="center">
@@ -15,6 +16,8 @@
   <a href="#bedienung">Bedienung</a>
   ·
   <a href="#häufige-fragen">Häufige Fragen</a>
+  ·
+  <a href="#in-english">English</a>
 </p>
 
 <p align="center">
@@ -26,6 +29,7 @@
 | | |
 |---|---|
 | ⚔ **DPS-Meter** | Boss mit Lebensbalken, darunter Schaden, DPS, Anteil und Kampfkraft jedes Gruppenmitglieds. Skill-Details per Klick. Start mit STRG+W oder automatisch bei jedem Boss |
+| 🗺 **Dungeons** | Der Meter erkennt, in welchem Dungeon du bist (mit Schwierigkeit), und benennt Läufe danach |
 | 👥 **Nur deine Gruppe** | Fremde in der Nähe erscheinen nie. Beschwörungen zählen zu ihrem Besitzer |
 | 🏆 **Läufe-Archiv** | Jeder Dungeon mit Boss-Zeiten, Bestzeit und Kampfanalyse, als Bild oder Text für Discord kopierbar |
 | ⏱ **Timer-Overlay** | Risse, Weltbosse, Events und Feldbosse mit Erinnerung, frei anpassbar |
@@ -33,7 +37,8 @@
 | ✅ **Checkliste** | Tägliches und Wöchentliches mit automatischem Reset |
 | 📶 **Verbindung** | Ping-Verlauf, Lag-Spitzen und eine Prüfung, ob das Problem bei dir, beim Anbieter oder beim Spielserver liegt |
 | 🖼 **Screenshot** | STRG+S zeigt das Spielbild sofort auf deinem zweiten Monitor |
-| 🔄 **Updates** | Neue Versionen kommen von selbst, geprüft per Prüfsumme |
+| 🌍 **10 Sprachen** | Oberfläche, Skills, Monster, Klassen, Dungeons und alle Servernamen in deiner Sprache |
+| 🔄 **Updates** | Neue Versionen kommen von selbst, geprüft per Prüfsumme. Nach einem Spiel-Patch sagt dir der Meter Bescheid, statt einfach leer zu bleiben |
 
 ## Häufige Fragen
 
@@ -41,13 +46,20 @@
 
 **Was kostet das?** Nichts. Der Quellcode ist offen (GPL-3.0), jeder kann nachsehen, was das Programm tut.
 
-**Werden meine Daten hochgeladen?** Nein. Es gibt kein Konto, keine Telemetrie und keine Bestenliste. Die einzige Verbindung nach außen ist die Update-Prüfung auf GitHub, und die lässt sich abschalten.
+**Werden meine Daten hochgeladen?** Deine Kampfdaten, Läufe und Mitschnitte nie. Es gibt kein Konto und keine Bestenliste. Nach außen geht nur:
+- die **Update-Prüfung** und das Lesen von Neuigkeiten auf GitHub (es wird nichts gesendet),
+- eine **anonyme Nutzungszahl**, nur wenn du beim ersten Start zustimmst: einmal am Tag `{"v":"0.6.0","lang":"de","new":false}`, also Version, Sprache und ob es die erste Nutzung ist. Keine Namen, kein Server, keine Kennung. Jederzeit abschaltbar unter Einstellungen → Datenschutz,
+- **Fehlerberichte**, nur wenn du selbst auf „Senden“ klickst. Namen von Spielern werden vorher entfernt, und du siehst vorher, was rausgeht.
+
+Der Server dafür ist offen einsehbar im Ordner [`server/`](server/) und speichert keine IP-Adressen.
 
 **Warum warnt Windows beim ersten Start?** Die Datei ist noch nicht digital signiert, das ist in Arbeit. Klick auf „Weitere Informationen“ → „Trotzdem ausführen“.
 
 **Was ist Npcap?** Ein kostenloser Treiber, mit dem Programme den Netzwerkverkehr mitlesen können (auch Wireshark nutzt ihn). Der Meter richtet ihn beim ersten Start mit einem Klick ein.
 
-**Etwas stimmt nicht?** Tray-Symbol → „Problem melden“ speichert die letzten 5 Minuten. Dann ein [Issue öffnen](https://github.com/yykk62/AetherDPS/issues) und die Datei anhängen. Achtung: Darin stehen die Namen der Spieler um dich herum.
+**Etwas stimmt nicht?** Hauptfenster oder Tray-Symbol → „Problem melden“. Kurz beschreiben, Senden klicken, fertig. Kein Konto und keine E-Mail nötig. Alternativ ein [Issue auf GitHub öffnen](https://github.com/yykk62/AetherDPS/issues).
+
+**Nach einem Spiel-Patch zeigt der Meter nichts mehr?** Das passiert, wenn sich die Daten des Spiels ändern. Der Meter erkennt das und sagt Bescheid. Die angepasste Version kommt meist schnell und installiert sich von selbst.
 
 ## Download
 
@@ -95,7 +107,8 @@ Beim Start öffnet sich das **Hauptfenster** mit den Reitern DPS-Meter, Verbindu
 | Einstellungen | ⚙ oder Tray-Symbol: Hotkey ändern, Deckkraft, nur meine Gruppe (Standard: an), „Du“ statt Name |
 | Screenshot auf den Zweitbildschirm | **STRG+S** im Spiel (änderbar). Der Spiel-Bildschirm erscheint im Vollbild auf dem anderen Monitor, jeder neue ersetzt das alte Bild. Klick oder ESC blendet aus |
 | AION 2 starten | Knopf im Hauptfenster oder Einstellung „AION 2 mit dem Meter starten“ (Steam). Läuft der Meter beim Login schon, kennt er deinen Charakter sofort |
-| Fehler melden | Tray-Symbol → „Problem melden“ |
+| Fehler melden | Hauptfenster oder Tray-Symbol → „Problem melden“ |
+| Sprache | Einstellungen → Sprache (Standard: wie Windows) |
 
 ## Für Entwickler
 
@@ -107,7 +120,7 @@ AetherDPS.App\bin\Debug\net10.0\AetherDPS.exe --replay <mitschnitt.txt> [--speed
 AetherDPS.Cli\bin\Debug\net10.0\aetherdps-cli.exe replay|demo <datei>
 ```
 
-Aufbau und Wartung stehen in [docs/WARTUNG.md](docs/WARTUNG.md), das Protokoll in [docs/PROTOKOLL.md](docs/PROTOKOLL.md).
+Aufbau und Wartung stehen in [docs/WARTUNG.md](docs/WARTUNG.md), das Protokoll in [docs/PROTOKOLL.md](docs/PROTOKOLL.md). Der kleine Server für Nutzungszahl und Fehlerberichte liegt in [`server/`](server/) (Cloudflare Worker), Nachrichten an alle stehen in [`status.json`](status.json).
 
 **Release bauen:** `powershell -ExecutionPolicy Bypass -File tools\release.ps1` → `artifacts\release\AetherDPS.exe` + `.sha256`.
 **Veröffentlichen:** Version in `AetherDPS.App.csproj` und `CHANGELOG.md` eintragen, dann `git tag v0.2.0` und `git push origin v0.2.0`. GitHub Actions baut, testet und legt das Release an.
@@ -115,8 +128,24 @@ Aufbau und Wartung stehen in [docs/WARTUNG.md](docs/WARTUNG.md), das Protokoll i
 ## Danke an
 
 - **[RATmeter](https://github.com/Kuroukihime/AIon2-Dps-Meter)** von Kuroukihime (GPL-3.0): Netzwerkmitschnitt, Paketverarbeitung, Kampf-Sessions und die Mob-/Skill-Datenbank. Dieses Projekt ist ein Fork davon.
-- **[A2Tools](https://github.com/taengu/A2Tools-DPS-Meter)** von taengu (GPL-3.0): deutsche Skill- und Mob-Namen
+- **[A2Tools](https://github.com/taengu/A2Tools-DPS-Meter)** von taengu (GPL-3.0): Skill-, NPC-, Buff-, Dungeon- und Servernamen in 10 Sprachen sowie die Erkenntnis, wie man den Kartenwechsel (und damit den Dungeon) im Netzwerkverkehr erkennt
+- **[Daevalog](https://github.com/Seralth/Daevalog)** von Seralth (GPL-3.0): Buff-Daten, über A2Tools übernommen
 - Klassen-Icons: © NCSOFT. Es sind die Icons aus AION 2, übernommen aus RATmeter und als Fan-Inhalt verwendet. Sie fallen nicht unter die GPL.
+
+## In English
+
+**AetherDPS** is a free, open-source DPS meter and companion overlay for AION 2, built for the EU servers and available in 10 languages (Settings → Language).
+
+- **DPS meter** with boss card, damage, DPS, share and combat power for your party only, skill details, stagger analysis and death recap
+- **Run archive** named after the dungeon, with boss times, best time and combat analysis, copyable for Discord
+- **Timers** for rifts, world bosses, events and field bosses, **checklist**, **connection monitor**, **second-screen screenshot**
+- **Automatic updates**, a warning after game patches, and **Report a problem** straight from the app
+
+**Download:** [AetherDPS.exe](https://github.com/yykk62/AetherDPS/releases/latest), a single file with no installation needed (Windows 10/11, 64-bit). On first start it sets up Npcap with one click.
+
+**Privacy:** your combat data never leaves your PC. The only outgoing data is the update check, an optional anonymous daily usage count (version and language only, opt-in) and problem reports you send yourself. The server code is in [`server/`](server/).
+
+**Is it allowed?** The meter only reads network traffic passively. It does not modify the game, read game memory or send anything to the game. It is an unofficial fan project, not affiliated with NCSOFT. Use at your own risk.
 
 ## Lizenz
 
