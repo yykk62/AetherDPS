@@ -25,6 +25,7 @@
 ## Phase 5: Ausbau
 - [x] Hauptfenster mit Reitern (DPS-Meter, Verbindung, Einstellungen), Verbindungs-Monitor mit Ping-Verlauf und Diagnose (13.10.)
 - [x] Timer: Risse nach Plan, Feldbosse automatisch beim Kill erkannt (Respawn-Dauer trägt der Nutzer einmal ein), eigene Timer, Erinnerungs-Popups (13.10.)
+- [x] Feldboss-Liste mit Server-Zeiten (0x9101), Zeitlimit im Dungeon, Erfassungsquote, erlittener Schaden, Discord-Webhook, EU-Termine (14.10., 0.6.0)
 - [x] Lauf-Archiv mit Bestzeiten, Boss-Zeiten, Vergleich, Kampfanalyse, Teilen als Bild/Text (13.10.)
 - [x] Gruppen-Check, Daily-/Weekly-Checkliste, Buff-/Abklingzeit-Leiste (13.10.)
 - [ ] Im Spiel prüfen: EU-Risszeiten, Reset-Zeiten, Buff-Leiste im Spiel, Feldboss-Erkennung, Zahlen gegen den Spiel-Meter
@@ -35,6 +36,19 @@
 - [ ] Kampfanalyse nach dem Kampf (Rotation, Uptime der Buffs)
 - [ ] Mitlesen ohne Npcap über das in Windows eingebaute pktmon (Idee von a2kit)
 - [ ] Spendenlink (Ko-fi)
+
+## Offen: braucht Testdaten vom Nutzer (Aufnahme heute Abend, Stand 14.10.2026)
+Gefunden in der Recherche (Korea/Taiwan/Global, nur offene Lizenzen), aber noch nicht an EU-Daten bestätigt.
+Aufnahme: Meter offen lassen (Mitschnitte laufen im Ring mit), danach „Problem melden“ bzw. Mitschnitt aus `%LOCALAPPDATA%\AetherDPS\Mitschnitte`.
+- [ ] **Bewerber-Scouter**: selbst eine Gruppe über die Gruppensuche öffnen, ein paar Bewerbungen kommen lassen, annehmen/ablehnen. Pakete `07 97` Anfrage (Name, Klasse, Kampfkraft, Server), `25 97` zurückgezogen, `0B 97` angenommen, `09 97` abgelehnt (TK-open-public MIT, Waffle MIT)
+- [ ] **Heilung / Schilde** als eigene Ansicht: Dungeon mit Heiler in der Gruppe. `05 38` Effekt 0x01/0x09/0x0B = Heilung (cyberbadger GPL)
+- [ ] **Boss-Zauberleiste** mit FLÄCHE/TÖDLICH: Bosskampf mit Mechaniken. `09 38` Cast mit Dauer (SkeeveAN MIT, docs/protocol/combat-frames.md)
+- [ ] **Rotation / Zeitleiste** pro Spieler und Lauf-Vergleich (aus `02 38` Skill-Einsatz)
+- [ ] **Kinah pro Stunde**: eine Weile farmen und Beute aufheben. `1b 56` / `11 56` (Nyerk GPL, Waffle CurrencyItemParser MIT)
+- [ ] **Checkliste automatisch abhaken** über Eintritts-Tickets: Login + einen Dungeon betreten. `0b 61` Login-Liste, `0c 61` Änderungen, Ticket 60000001 = Od-Energie (SkeeveAN docs/protocol/ticket-frames.md)
+- [ ] **Kampf an/aus** (`21 8D`) für exakte Pull-Zeiten und Wipes – Daten schon in der Aufnahme vom 14.10., Abgleich mit Versuchs-Erkennung
+- [ ] **Abyss-Feldbosse**: Liste in der Abyss mit offener Karte (Slots 2001–2008, 2201–2205; Zuordnung Waffle vs. SkeeveAN widersprüchlich)
+- [ ] Riss-Zeiten nach der Zeitumstellung am 25.10. prüfen
 
 ## Phase 6: Bot-Radar (Idee vom 13.10.2026)
 Ziel: Bots an Farm-Spots erkennen und mit Beweisen melden. Das Tool liest nur passiv mit, es sendet nie etwas und meldet nie automatisch.
