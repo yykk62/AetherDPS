@@ -113,6 +113,7 @@ public partial class App : Application
             new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, (_, _) => mode.Tick(DateTime.Now)).Start();
             hotkey.ScreenshotPressed += (_, foreground) => TakeScreenshot(foreground);
             hotkey.MarkerPressed += (_, _) => Dispatcher.UIThread.Post(() => researchVm?.Done());
+            hotkey.SkipPressed += (_, _) => Dispatcher.UIThread.Post(() => researchVm?.SkipCommand.Execute(null));
             Services.GetRequiredService<HubViewModel>().ResearchRequested += (_, _) => StartResearch();
 
             // Erinnerungen (Timer, Checkliste) und Buff-Leiste

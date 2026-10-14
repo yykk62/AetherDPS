@@ -209,7 +209,7 @@
   "research.progress": "Aufnahme läuft · Schritt {0} von {1}",
   "research.why": "Wofür: {0}",
   "research.done": "Erledigt (F8)",
-  "research.skip": "Überspringen",
+  "research.skip": "Überspringen (F9)",
   "research.stop": "Aufnahme beenden",
   "research.server_watermark": "z. B. Lumiel",
   "research.finished_title": "Aufnahme gespeichert",

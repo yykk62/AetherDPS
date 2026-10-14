@@ -12,6 +12,8 @@ public sealed record ResearchStep(string Key, string Task, string Why, bool Asks
 /// bei jedem erledigten Schritt eine Marke. So lässt sich hinterher genau sagen, welches Paket
 /// beim Dungeon-Betreten, beim Tod, bei Beute usw. kam. Bleibt lokal – enthält Spielernamen.
 /// Marken stehen als Kommentar im Mitschnitt: <c># MARK|ZEIT|SCHLÜSSEL|ergebnis|Text</c>.
+/// Auswertung: Die Marke kommt NACH der Aktion, oft einige Sekunden bis Minuten später
+/// (der Spieler drückt F8 hinterher). Also im Fenster zwischen vorheriger und dieser Marke suchen.
 /// </summary>
 public sealed class ResearchRecorder
 {

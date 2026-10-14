@@ -8,7 +8,7 @@ Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des G
 - **Auto-Modus** startet nur, wenn du oder deine Gruppe einen Boss angreifen
 - **Läufe:** Boss-Zeilen sind beschriftet („ab 1:04 · 0:08 lang · 2,7K Schaden“). Bosse mit ein paar Streiftreffern zählen nicht mehr und geben dem Lauf keinen Namen
 - **Server:** Unbekannte (EU-)Server erscheinen als Nummer, eigener Servername eintragbar
-- **Geführte Aufnahme** (Hauptfenster oder Tray): Der Meter führt dich durch ein paar Schritte im Spiel und setzt mit F8 Marken. Hilft, neue Funktionen zu bauen. Bleibt auf deinem PC
+- **Geführte Aufnahme** (Hauptfenster oder Tray): Der Meter führt dich durch ein paar Schritte im Spiel und setzt mit F8 Marken, F9 überspringt einen Schritt. Hilft, neue Funktionen zu bauen. Bleibt auf deinem PC
 
 ## 0.2.0
 
