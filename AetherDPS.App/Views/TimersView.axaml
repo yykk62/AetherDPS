@@ -14,13 +14,31 @@
   <ScrollViewer HorizontalScrollBarVisibility="Disabled">
     <StackPanel Spacing="12" Margin="12,4,22,22">
 
+      <!-- Overlay und Erinnerungen -->
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="{l:T timers.overlay_title}" />
+          <WrapPanel>
+            <TextBlock Text="{l:T timers.overlay_mode}" VerticalAlignment="Center" Margin="0,0,8,6" />
+            <ComboBox ItemsSource="{Binding OverlayModes}" SelectedItem="{Binding SelectedOverlayMode}" MinWidth="220" Margin="0,0,14,6" />
+            <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding IsSoonMode}" Margin="0,0,0,6">
+              <TextBox Text="{Binding SoonMinutes}" Width="50" />
+              <TextBlock Text="{l:T timers.overlay_soon_minutes}" VerticalAlignment="Center" />
+            </StackPanel>
+          </WrapPanel>
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <TextBlock Text="{l:T timers.reminder_minutes}" VerticalAlignment="Center" />
+            <TextBox Text="{Binding ReminderMinutes}" Width="50" />
+            <Button Classes="secondary" Content="{l:T timers.save}" Command="{Binding SaveReminderCommand}" />
+          </StackPanel>
+          <TextBlock Text="{l:T timers.overlay_hint}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
+        </StackPanel>
+      </Border>
+
       <!-- Alle Timer -->
       <Border Classes="card">
         <StackPanel Spacing="8">
-          <Grid ColumnDefinitions="*,Auto">
-            <TextBlock Classes="h2" Text="{l:T timers.title}" />
-            <CheckBox Grid.Column="1" IsChecked="{Binding OverlayVisible}" Content="{l:T timers.overlay_visible}" />
-          </Grid>
+          <TextBlock Classes="h2" Text="{l:T timers.title}" />
           <ItemsControl ItemsSource="{Binding Rows}">
             <ItemsControl.ItemTemplate>
               <DataTemplate x:DataType="vm:TimerRow">
@@ -52,7 +70,6 @@
               </DataTemplate>
             </ItemsControl.ItemTemplate>
           </ItemsControl>
-          <TextBlock Text="{l:T timers.unconfirmed_note}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
           <TextBlock Text="{l:T timers.boss_note}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
         </StackPanel>
       </Border>
@@ -88,58 +105,23 @@
         </StackPanel>
       </Border>
 
-      <!-- Zeitpläne -->
+      <!-- Feste Termine -->
       <Border Classes="card">
         <StackPanel Spacing="8">
-          <Grid ColumnDefinitions="*,Auto">
-            <TextBlock Classes="h2" Text="{l:T timers.schedules}" VerticalAlignment="Center" />
-            <Button Grid.Column="1" Classes="primary" Content="{l:T timers.add_schedule}" Command="{Binding AddScheduleCommand}" />
-          </Grid>
+          <TextBlock Classes="h2" Text="{l:T timers.schedules}" />
           <TextBlock Text="{l:T timers.schedules_hint}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
-          <TextBlock Text="{l:T timers.inactive_hint}" Foreground="#E0A84A" FontSize="11" TextWrapping="Wrap" />
           <ItemsControl ItemsSource="{Binding Schedules}">
             <ItemsControl.ItemTemplate>
-              <DataTemplate x:DataType="vm:ScheduleEditor">
-                <Border CornerRadius="6" Background="#14FFFFFF" Padding="10,8" Margin="0,0,0,6">
-                  <StackPanel Spacing="6">
-                    <Grid ColumnDefinitions="Auto,*,130">
-                      <CheckBox IsChecked="{Binding Enabled}" Content="{l:T timers.enabled}" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="SemiBold" />
-                      <TextBox Grid.Column="1" Text="{Binding Name}" FontWeight="SemiBold" Margin="0,0,8,0" />
-                      <ComboBox Grid.Column="2" ItemsSource="{Binding Categories}" SelectedItem="{Binding Category}" HorizontalAlignment="Stretch">
-                        <ComboBox.ItemTemplate>
-                          <DataTemplate x:DataType="x:String">
-                            <TextBlock Text="{Binding Converter={x:Static l:LocKey.TimerCategory}}" />
-                          </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                      </ComboBox>
-                    </Grid>
-                    <WrapPanel>
-                      <CheckBox Classes="day" IsChecked="{Binding Mo}" Content="Mo" />
-                      <CheckBox Classes="day" IsChecked="{Binding Di}" Content="Di" />
-                      <CheckBox Classes="day" IsChecked="{Binding Mi}" Content="Mi" />
-                      <CheckBox Classes="day" IsChecked="{Binding Don}" Content="Do" />
-                      <CheckBox Classes="day" IsChecked="{Binding Fr}" Content="Fr" />
-                      <CheckBox Classes="day" IsChecked="{Binding Sa}" Content="Sa" />
-                      <CheckBox Classes="day" IsChecked="{Binding So}" Content="So" />
-                      <TextBlock Text="{l:T timers.days_hint}" Classes="dim" FontSize="11" VerticalAlignment="Center" />
-                    </WrapPanel>
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                      <TextBlock Text="{l:T timers.times}" VerticalAlignment="Center" />
-                      <TextBox Text="{Binding TimesText}" Width="170" Watermark="20:00, 23:00" />
-                      <TextBlock Text="{l:T timers.interval}" VerticalAlignment="Center" Margin="8,0,0,0" />
-                      <TextBox Text="{Binding IntervalText}" Width="55" Watermark="–" />
+              <DataTemplate x:DataType="vm:ScheduleToggle">
+                <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                  <CheckBox IsChecked="{Binding Enabled}">
+                    <StackPanel>
+                      <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                      <TextBlock Text="{Binding Detail}" Classes="dim" FontSize="11" />
                     </StackPanel>
-                    <WrapPanel>
-                      <CheckBox IsChecked="{Binding ShowInOverlay}" Content="{l:T timers.in_overlay}" Margin="0,0,14,0" />
-                      <CheckBox IsChecked="{Binding Reminder}" Content="{l:T timers.remind}" Margin="0,0,14,0" />
-                      <Button Classes="secondary" Content="{l:T timers.delete}" Command="{Binding DeleteCommand}" />
-                      <TextBlock Text="{l:T timers.unconfirmed_badge}" Foreground="#E0A84A" FontSize="11" VerticalAlignment="Center" Margin="10,0,0,0"
-                                 IsVisible="{Binding Unconfirmed}" />
-                    </WrapPanel>
-                    <TextBlock Text="{Binding Error}" Foreground="#E86A6A" FontSize="12"
-                               IsVisible="{Binding Error, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-                  </StackPanel>
-                </Border>
+                  </CheckBox>
+                  <CheckBox Grid.Column="1" IsChecked="{Binding Reminder}" Content="{l:T timers.remind}" IsEnabled="{Binding Enabled}" />
+                </Grid>
               </DataTemplate>
             </ItemsControl.ItemTemplate>
           </ItemsControl>
@@ -154,11 +136,6 @@
             <TextBox Text="{Binding NewName}" Width="220" Watermark="{l:T timers.custom_name}" />
             <TextBox Text="{Binding NewMinutes}" Width="80" Watermark="Min." />
             <Button Classes="primary" Content="{l:T timers.add}" Command="{Binding AddCustomCommand}" />
-          </StackPanel>
-          <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,6,0,0">
-            <TextBlock Text="{l:T timers.reminder_minutes}" VerticalAlignment="Center" />
-            <TextBox Text="{Binding ReminderMinutes}" Width="50" />
-            <Button Classes="secondary" Content="{l:T timers.save}" Command="{Binding SaveReminderCommand}" />
           </StackPanel>
         </StackPanel>
       </Border>

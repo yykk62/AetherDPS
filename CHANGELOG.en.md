@@ -2,6 +2,13 @@
 
 Newest versions first.
 
+## 0.6.3
+
+- **Timers as tiles:** every timer in the overlay is a small tile (name on top, time large). Right-click the header: **columns** (1–4, e.g. 2×2 or 3×2), **detach all** or **attach all**. Drag single tiles anywhere – drop them on the group to put them back
+- **Overlay only shortly before:** besides "always" and "off" there is "only show shortly before" (default 5 minutes). Reminders come either way
+- **Fixed events instead of the schedule editor:** Space-Time Rift and Artifact Siege are built in and can only be switched on or off. Use custom timers for everything else
+- **Field bosses of your own faction only:** Elyos see Verteron, Asmodians Altgard, both see the Abyss
+
 ## 0.6.2
 
 - **Fixed:** if the meter started before the game, or while Steam was downloading an update, it could lock onto the wrong network traffic and then showed nothing at all (no field bosses either). It now finds the game server reliably and searches again by itself if nothing comes from the game

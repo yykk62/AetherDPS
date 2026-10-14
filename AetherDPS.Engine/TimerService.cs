@@ -32,6 +32,15 @@ public sealed class TimerSettings
 
     // Timer-Overlay
     public bool OverlayVisible { get; set; } = true;
+
+    /// <summary>„always“ = immer, „soon“ = nur kurz vor einem Termin, „off“ = aus. Leer = aus OverlayVisible übernehmen.</summary>
+    public string? OverlayMode { get; set; }
+
+    /// <summary>Modus „soon“: so viele Minuten vorher erscheint der Timer.</summary>
+    public int OverlaySoonMinutes { get; set; } = 5;
+
+    /// <summary>Spalten der Timer-Gruppe (1–4).</summary>
+    public int OverlayColumns { get; set; } = 1;
     public double? OverlayLeft { get; set; }
     public double? OverlayTop { get; set; }
     public double? OverlayWidth { get; set; }
@@ -85,20 +94,30 @@ public sealed class TimerService
         file = Path.Combine(options.DataDir, "timer.json");
         this.entities = entities;
         Settings = Load(file);
-        if (Settings.Schedules is null)
+        if (Settings.DefaultsVersion < 2)
         {
-            Settings.Schedules = ScheduleEntry.Defaults(Settings.RiftAnchor, Settings.RiftIntervalHours, Settings.RiftReminder);
-            Settings.DefaultsVersion = 1;
+            // Ab 0.6.3 nur noch die festen Termine aus dem Katalog (an/aus). An/aus und Erinnerung werden übernommen.
+            var old = Settings.Schedules ?? [];
+            var builtins = ScheduleEntry.Builtins();
+            foreach (var b in builtins)
+            {
+                var match = old.FirstOrDefault(o => o.Id == b.Id)
+                    ?? (b.Id == "rift" ? old.FirstOrDefault(o => o.Category == "Riss" && o.IntervalHours > 0) : null)
+                    ?? old.FirstOrDefault(o => o.Name == b.Name);
+                if (match is not null)
+                {
+                    b.Enabled = match.Enabled;
+                    b.Reminder = match.Reminder;
+                    b.ShowInOverlay = match.ShowInOverlay;
+                }
+                else if (b.Id == "rift")
+                {
+                    b.Reminder = Settings.RiftReminder;
+                }
+            }
+            Settings.Schedules = builtins;
+            Settings.DefaultsVersion = 2;
             if (File.Exists(file)) Save();
-        }
-        else if (Settings.DefaultsVersion < 1)
-        {
-            // Bis 0.5.0 gab es zwei geschätzte Vorlagen; unverändert (aus, unbestätigt) → durch die EU-Termine ersetzen
-            Settings.Schedules.RemoveAll(s => s.Unconfirmed && !s.Enabled && s.Category is "Riss" or "Weltboss" && s.IntervalHours == 0);
-            foreach (var e in ScheduleEntry.EuEvents())
-                if (Settings.Schedules.All(s => s.Name != e.Name)) Settings.Schedules.Add(e);
-            Settings.DefaultsVersion = 1;
-            Save();
         }
         entities.EntityDied += OnEntityDied;
     }
@@ -143,7 +162,7 @@ public sealed class TimerService
             foreach (var s in Settings.Schedules!.Where(s => s.Enabled))
             {
                 var next = s.Next(now);
-                list.Add(new TimerItem(TimerKind.Schedule, s.Name, s.Category, next, next - now, s.Describe(),
+                list.Add(new TimerItem(TimerKind.Schedule, s.DisplayName, s.Category, next, next - now, s.Describe(),
                     s.ShowInOverlay, s.Unconfirmed));
             }
 
@@ -195,7 +214,7 @@ public sealed class TimerService
             foreach (var s in Settings.Schedules!.Where(s => s.Enabled && s.Reminder))
             {
                 if (s.Next(now) is DateTime next && next - now <= lead && remindedKeys.Add($"plan:{s.Name}:{next:O}"))
-                    reminders.Add((s.Name, Loc.T("timer.reminder", next, Math.Ceiling((next - now).TotalMinutes))));
+                    reminders.Add((s.DisplayName, Loc.T("timer.reminder", next, Math.Ceiling((next - now).TotalMinutes))));
             }
 
             foreach (var kill in Settings.Kills)
@@ -256,26 +275,14 @@ public sealed class TimerService
         Save();
     }
 
-    public void AddSchedule(ScheduleEntry entry)
-    {
-        lock (gate) Settings.Schedules!.Add(entry);
-        Save();
-    }
-
-    public void ReplaceSchedule(ScheduleEntry old, ScheduleEntry updated)
+    /// <summary>Festen Termin an-/abschalten bzw. Erinnerung setzen.</summary>
+    public void SetSchedule(ScheduleEntry entry, bool enabled, bool reminder)
     {
         lock (gate)
         {
-            int i = Settings.Schedules!.IndexOf(old);
-            if (i >= 0) Settings.Schedules[i] = updated;
-            else Settings.Schedules.Add(updated);
+            entry.Enabled = enabled;
+            entry.Reminder = reminder;
         }
-        Save();
-    }
-
-    public void RemoveSchedule(ScheduleEntry entry)
-    {
-        lock (gate) Settings.Schedules!.Remove(entry);
         Save();
     }
 

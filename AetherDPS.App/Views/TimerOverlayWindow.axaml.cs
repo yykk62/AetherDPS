@@ -58,6 +58,22 @@ public partial class TimerOverlayWindow : Window
 
     private TimerOverlayViewModel ViewModel => (TimerOverlayViewModel)DataContext!;
 
+    public bool HasContent => ViewModel.HasContent;
+
+    /// <summary>Losgelassene Kachel über der Gruppe? Dann zurück in die Gruppe (Andocken).</summary>
+    public bool TryDock(TimerBarWindow bar)
+    {
+        if (!IsVisible) return false;
+        var scaling = Screens.ScreenFromWindow(this)?.Scaling ?? 1;
+        var group = new PixelRect(Position, PixelSize.FromSize(Bounds.Size, scaling));
+        var tile = new PixelRect(bar.Position, PixelSize.FromSize(bar.Bounds.Size, scaling));
+        var center = tile.Center;
+        var area = new PixelRect(group.X - 12, group.Y - 12, group.Width + 24, group.Height + 24);
+        if (!area.Contains(center)) return false;
+        if (bar.DataContext is TimerRow row) service?.SetDetached(row.Item.Name, false);
+        return true;
+    }
+
     /// <summary>Gruppe und alle gelösten Leisten zeigen.</summary>
     public void ShowAll()
     {
@@ -89,7 +105,7 @@ public partial class TimerOverlayWindow : Window
         {
             if (!bars.TryGetValue(name, out var bar))
             {
-                bar = new TimerBarWindow(row, service!, ViewModel, DefaultBarPosition(index));
+                bar = new TimerBarWindow(row, service!, ViewModel, DefaultBarPosition(index), TryDock);
                 bars[name] = bar;
             }
             else bar.DataContext = row;
@@ -102,10 +118,10 @@ public partial class TimerOverlayWindow : Window
     /// <summary>Neue Leisten erscheinen untereinander links neben der Gruppe.</summary>
     private PixelPoint DefaultBarPosition(int index)
     {
-        int x = Position.X - 240;
+        int x = Position.X - 160;
         if (Screens.ScreenFromWindow(this) is { } screen && x < screen.WorkingArea.X)
             x = Position.X + (int)(Bounds.Width * screen.Scaling) + 10;   // links kein Platz → rechts daneben
-        return new PixelPoint(x, Position.Y + index * 36);
+        return new PixelPoint(x, Position.Y + index * 60);
     }
 
     private void SetClickThrough(bool enabled)

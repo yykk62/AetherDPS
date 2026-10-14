@@ -164,9 +164,16 @@ public sealed class UiTests : IDisposable
         var service = provider!.GetRequiredService<TimerService>();
         service.AddCustom("Gildenboss", 42);
         service.StartCustom("Gildenboss");
+        service.AddCustom("Pause", 15);
+        service.StartCustom("Pause");
+        service.AddCustom("Buff-Essen", 30);
+        service.StartCustom("Buff-Essen");
         var vm = provider!.GetRequiredService<TimerOverlayViewModel>();
         vm.Tick();
         Shot(new TimerOverlayWindow(vm, service), "timer_gruppe");
+        vm.SetColumnsCommand.Execute("2");
+        Shot(new TimerOverlayWindow(vm, service), "timer_gruppe_2spalten");
+        vm.SetColumnsCommand.Execute("1");
 
         var row = vm.Rows.First(r => r.Item.Name == "Gildenboss");
         row.DetachCommand.Execute(null);

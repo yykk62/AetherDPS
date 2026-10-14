@@ -2,6 +2,13 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
+## 0.6.3
+
+- **Timer als Kacheln:** Im Overlay ist jeder Timer eine kleine Kachel (Name oben, Zeit groß). Rechtsklick auf den Kopf: **Spalten** (1–4, z. B. 2×2 oder 3×2), **alle einzeln lösen** oder **alle zurück**. Einzelne Kacheln frei ziehen – zum Zurücklegen einfach wieder auf die Gruppe ziehen
+- **Overlay nur kurz vorher:** Neben „immer“ und „aus“ gibt es „nur kurz vorher anzeigen“ (Standard 5 Minuten). Erinnerungen kommen in jedem Fall
+- **Feste Termine statt Zeitplan-Editor:** Raumzeit-Riss und Artefakt-Belagerung sind fest hinterlegt und nur noch an-/abwählbar. Für alles andere gibt es eigene Timer
+- **Feldbosse nur der eigenen Seite:** Elyos sehen Verteron, Asmodier Altgard, beide die Abyss
+
 ## 0.6.2
 
 - **Behoben:** Startete der Meter vor dem Spiel oder lud Steam gerade ein Update, konnte er sich auf den falschen Netzwerkverkehr festlegen und zeigte dann gar nichts mehr an (auch keine Feldbosse). Jetzt erkennt er den Spielserver zuverlässig und sucht von selbst neu, wenn vom Spiel nichts kommt

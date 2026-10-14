@@ -181,15 +181,24 @@ public sealed class FeatureTests : IDisposable
     }
 
     [Fact]
-    public void Alte_Riss_Einstellung_wird_in_Zeitplaene_uebernommen()
+    public void Alte_Zeitplaene_werden_zu_festen_Terminen()
     {
         Directory.CreateDirectory(dataDir);
-        File.WriteAllText(Path.Combine(dataDir, "timer.json"), """{ "RiftAnchor": "01:30", "RiftIntervalHours": 2 }""");
+        // Stand 0.5.0: Riss mit eigener Zeit (aus, ohne Erinnerung) + geschätzte Vorlage
+        File.WriteAllText(Path.Combine(dataDir, "timer.json"), """
+            { "Schedules": [
+                { "Name": "Raumzeit-Riss", "Category": "Riss", "Times": ["01:30"], "IntervalHours": 2, "Enabled": false, "Reminder": false },
+                { "Name": "Riss-Eroberung (PvP)", "Category": "Riss", "Times": ["20:00"], "Unconfirmed": true, "Enabled": false } ] }
+            """);
         using var host = NewHost();
-        var rift = host.Get<TimerService>().Schedules.First();
-        Assert.Equal("Raumzeit-Riss", rift.Name);
-        Assert.Equal(["01:30"], rift.Times);
-        Assert.Equal(2, rift.IntervalHours);
+        var schedules = host.Get<TimerService>().Schedules;
+        Assert.Equal(["rift", "artifact_siege"], schedules.Select(s => s.Id));
+        var rift = schedules[0];
+        Assert.Equal("Raumzeit-Riss", rift.DisplayName);
+        Assert.Equal(["02:00"], rift.Times);   // feste EU-Zeit statt eigener
+        Assert.Equal(3, rift.IntervalHours);
+        Assert.False(rift.Enabled);            // An/aus bleibt erhalten
+        Assert.False(rift.Reminder);
     }
 
     [Fact]

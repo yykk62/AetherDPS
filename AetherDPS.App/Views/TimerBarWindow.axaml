@@ -9,21 +9,22 @@
         SystemDecorations="None" Topmost="True" CanResize="False" ShowActivated="False" ShowInTaskbar="False"
         TransparencyLevelHint="Transparent" Background="Transparent" Icon="/Assets/icon.ico">
 
-  <!-- Ein einzelner Timer als eigene Leiste: ziehen = verschieben, Rechtsklick = zurück in die Gruppe -->
+  <!-- Ein einzelner Timer als Kachel: ziehen = verschieben, auf die Gruppe ziehen oder Rechtsklick = zurück in die Gruppe -->
   <Border Name="Root" Background="#E6141820" CornerRadius="6" BorderBrush="#2A3240" BorderThickness="1"
-          Padding="9,5" MinWidth="170" Cursor="SizeAll">
+          Padding="9,5,9,6" Width="146" Cursor="SizeAll">
     <Border.ContextMenu>
       <ContextMenu>
         <MenuItem Header="{l:T timer_overlay.attach}" Command="{Binding AttachCommand}" />
         <MenuItem Header="{l:T timer_overlay.edit}" Click="OnEditClicked" />
       </ContextMenu>
     </Border.ContextMenu>
-    <Grid ColumnDefinitions="18,*,Auto">
-      <TextBlock Text="{Binding Icon}" Foreground="#E0A84A" FontSize="12" VerticalAlignment="Center" />
-      <TextBlock Grid.Column="1" Text="{Binding Name}" Foreground="#EEF0F3" FontSize="12" FontWeight="SemiBold"
-                 MaxWidth="170" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
-      <TextBlock Grid.Column="2" Text="{Binding Remaining}" FontSize="12" FontWeight="SemiBold" Margin="10,0,0,0" VerticalAlignment="Center"
+    <StackPanel>
+      <StackPanel Orientation="Horizontal" Spacing="4">
+        <TextBlock Text="{Binding Icon}" Foreground="#E0A84A" FontSize="10" VerticalAlignment="Center" />
+        <TextBlock Text="{Binding Name}" Foreground="#8E96A3" FontSize="10.5" FontWeight="SemiBold" MaxWidth="106" TextTrimming="CharacterEllipsis" />
+      </StackPanel>
+      <TextBlock Text="{Binding Remaining}" FontSize="16" FontWeight="Bold"
                  Foreground="{Binding IsSoon, Converter={x:Static l:BoolBrush.DueGreenElseText}}" />
-    </Grid>
+    </StackPanel>
   </Border>
 </Window>

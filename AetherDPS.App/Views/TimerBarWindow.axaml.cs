@@ -17,7 +17,8 @@ public partial class TimerBarWindow : Window
 
     public TimerBarWindow() => InitializeComponent();
 
-    public TimerBarWindow(TimerRow row, TimerService service, TimerOverlayViewModel overlay, PixelPoint fallback) : this()
+    public TimerBarWindow(TimerRow row, TimerService service, TimerOverlayViewModel overlay, PixelPoint fallback,
+        Func<TimerBarWindow, bool>? dock = null) : this()
     {
         DataContext = row;
         this.service = service;
@@ -27,7 +28,9 @@ public partial class TimerBarWindow : Window
 
         Root.PointerPressed += (_, e) =>
         {
-            if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) BeginMoveDrag(e);
+            if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
+            BeginMoveDrag(e);   // kehrt unter Windows erst nach dem Loslassen zurück
+            dock?.Invoke(this);
         };
         saveTimer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, (_, _) =>
         {

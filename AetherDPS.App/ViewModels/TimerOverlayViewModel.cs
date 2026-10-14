@@ -30,22 +30,68 @@ public sealed partial class TimerOverlayViewModel : ObservableObject
     public TimerOverlayViewModel(TimersViewModel timers)
     {
         this.timers = timers;
+        columns = Math.Clamp(timers.Service.Settings.OverlayColumns, 1, 4);
         timers.Service.Changed += (_, _) => Avalonia.Threading.Dispatcher.UIThread.Post(Rebuild);
         Rebuild();
     }
 
     public TimerService Service => timers.Service;
 
+    /// <summary>Spalten der Gruppe (1–4), per Rechtsklick auf den Kopf.</summary>
+    [ObservableProperty] private int columns;
+
+    partial void OnColumnsChanged(int value)
+    {
+        if (timers.Service.Settings.OverlayColumns == value) return;
+        timers.Service.Settings.OverlayColumns = value;
+        timers.Service.SaveQuiet();
+    }
+
+    [RelayCommand]
+    private void SetColumns(string count) => Columns = Math.Clamp(int.Parse(count), 1, 4);
+
+    /// <summary>Alle Timer als einzelne Kacheln lösen.</summary>
+    [RelayCommand]
+    private void DetachAll()
+    {
+        foreach (var row in Rows.ToList()) timers.Service.SetDetached(row.Item.Name, true);
+    }
+
+    /// <summary>Alle einzelnen Kacheln zurück in die Gruppe.</summary>
+    [RelayCommand]
+    private void AttachAll()
+    {
+        foreach (var row in Detached.ToList()) timers.Service.SetDetached(row.Item.Name, false);
+    }
+
+    /// <summary>Etwas anzuzeigen? (Modus „nur kurz vorher“ blendet sonst aus.)</summary>
+    public bool HasContent => Rows.Count > 0 || Detached.Count > 0;
+
+    private bool Visible(TimerItem item, DateTime now)
+    {
+        if (!item.ShowInOverlay) return false;
+        if (timers.OverlayMode != "soon") return true;
+        // Nur kurz vorher – und eine Minute danach, damit „jetzt“ noch zu sehen ist
+        return item.DueAt is DateTime due && due - now <= TimeSpan.FromMinutes(timers.OverlaySoonMinutes) && now - due <= TimeSpan.FromMinutes(1);
+    }
+
     private void Rebuild()
     {
+        var now = DateTime.Now;
         var items = timers.Service.Items()
-            .Where(i => i.ShowInOverlay)
+            .Where(i => Visible(i, now))
             .OrderBy(i => i.DueAt ?? DateTime.MaxValue)
             .ToList();
         Sync(Rows, items.Where(i => !timers.Service.IsDetached(i.Name)).Take(MaxRows));
         Sync(Detached, items.Where(i => timers.Service.IsDetached(i.Name)));
         HasRows = Rows.Count > 0;
-        Tick();
+        UpdateRows(now);
+    }
+
+    private void UpdateRows(DateTime now)
+    {
+        foreach (var row in Rows) row.Update(now);
+        foreach (var row in Detached) row.Update(now);
     }
 
     /// <summary>Liste nur ändern, wo sich etwas geändert hat – sonst flackern die Leisten-Fenster.</summary>
@@ -70,13 +116,13 @@ public sealed partial class TimerOverlayViewModel : ObservableObject
     public void Tick()
     {
         var now = DateTime.Now;
-        if (Rows.Concat(Detached).Any(r => r.Item.Kind == TimerKind.Schedule && r.Item.DueAt is DateTime due && due <= now))
+        if (timers.OverlayMode == "soon"
+            || Rows.Concat(Detached).Any(r => r.Item.Kind == TimerKind.Schedule && r.Item.DueAt is DateTime due && due <= now))
         {
             Rebuild();
             return;
         }
-        foreach (var row in Rows) row.Update(now);
-        foreach (var row in Detached) row.Update(now);
+        UpdateRows(now);
     }
 
     [RelayCommand]

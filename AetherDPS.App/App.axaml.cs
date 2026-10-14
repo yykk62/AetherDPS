@@ -131,6 +131,11 @@ public partial class App : Application
             {
                 timerService.Tick();
                 checklist.Tick();
+                if (timersVm?.OverlayMode == "soon")
+                {
+                    Services.GetRequiredService<TimerOverlayViewModel>().Tick();
+                    UpdateTimerOverlay();
+                }
                 Services.GetRequiredService<BuffWatcher>().Tick(DateTime.Now);
             }).Start();
             new DispatcherTimer(TimeSpan.FromMilliseconds(200), DispatcherPriority.Background, (_, _) =>
@@ -155,7 +160,7 @@ public partial class App : Application
             var timerOverlayVm = Services.GetRequiredService<TimerOverlayViewModel>();
             timerOverlay = new TimerOverlayWindow(timerOverlayVm, timerService);
             timerOverlayVm.EditRequested += (_, _) => ShowHub(HubViewModel.TabTimers);
-            timerOverlayVm.HideRequested += (_, _) => timersVm.OverlayVisible = false;
+            timerOverlayVm.HideRequested += (_, _) => timersVm.HideOverlay();
             timersVm.OverlayVisibilityChanged += (_, _) => UpdateTimerOverlay();
 
             StartCombatHints(meterSettings);
@@ -226,13 +231,23 @@ public partial class App : Application
     private void UpdateTimerOverlay()
     {
         if (timerOverlay is null || timersVm is null) return;
-        if (timersVm.OverlayVisible) timerOverlay.ShowAll();
+        // „Nur kurz vorher“: zeigen, sobald ein Termin in den nächsten Minuten ansteht
+        bool show = timersVm.OverlayMode switch
+        {
+            "always" => true,
+            "soon" => timerOverlay.HasContent,
+            _ => false,
+        };
+        if (show) timerOverlay.ShowAll();
         else timerOverlay.HideAll();
     }
 
     private void OnToggleTimerOverlay(object? sender, EventArgs e)
     {
-        if (timersVm is not null) timersVm.OverlayVisible = !timersVm.OverlayVisible;
+        // Tray: aus ↔ an (an = der zuletzt gewählte Modus, sonst „immer“)
+        if (timersVm is null) return;
+        if (timersVm.OverlayMode == "off") timersVm.SelectedOverlayMode = timersVm.OverlayModes[0];
+        else timersVm.HideOverlay();
     }
 
     private ScreenshotWindow? screenshotWindow;

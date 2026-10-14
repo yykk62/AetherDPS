@@ -5,7 +5,7 @@
         x:Class="AetherDPS.App.Views.TimerOverlayWindow"
         x:DataType="vm:TimerOverlayViewModel"
         Title="{l:T timer_overlay.title}"
-        Width="250" SizeToContent="Height"
+        SizeToContent="WidthAndHeight" MinWidth="150"
         SystemDecorations="None" Topmost="True" CanResize="False" ShowActivated="False" ShowInTaskbar="False"
         TransparencyLevelHint="Transparent" Background="Transparent" Icon="/Assets/icon.ico">
 
@@ -28,11 +28,13 @@
     <Style Selector="TextBlock.dim">
       <Setter Property="Foreground" Value="#8E96A3" />
     </Style>
+    <!-- Kachel: Name oben klein, Restzeit groß darunter -->
     <Style Selector="Border.row">
       <Setter Property="Background" Value="#26000000" />
-      <Setter Property="CornerRadius" Value="4" />
-      <Setter Property="Margin" Value="0,0,0,3" />
-      <Setter Property="Padding" Value="7,4" />
+      <Setter Property="CornerRadius" Value="5" />
+      <Setter Property="Margin" Value="2" />
+      <Setter Property="Padding" Value="8,4,8,5" />
+      <Setter Property="Width" Value="138" />
       <Setter Property="Cursor" Value="Hand" />
     </Style>
     <Style Selector="Border.row:pointerover">
@@ -45,6 +47,18 @@
     <StackPanel Spacing="4">
       <!-- Kopf: Ziehen = ganze Gruppe verschieben -->
       <Grid Name="Header" ColumnDefinitions="*,Auto" Background="Transparent" Margin="2,0,0,0">
+        <Grid.ContextMenu>
+          <ContextMenu>
+            <MenuItem Header="{l:T timer_overlay.columns}">
+              <MenuItem Header="1" Command="{Binding SetColumnsCommand}" CommandParameter="1" />
+              <MenuItem Header="2" Command="{Binding SetColumnsCommand}" CommandParameter="2" />
+              <MenuItem Header="3" Command="{Binding SetColumnsCommand}" CommandParameter="3" />
+              <MenuItem Header="4" Command="{Binding SetColumnsCommand}" CommandParameter="4" />
+            </MenuItem>
+            <MenuItem Header="{l:T timer_overlay.detach_all}" Command="{Binding DetachAllCommand}" />
+            <MenuItem Header="{l:T timer_overlay.attach_all}" Command="{Binding AttachAllCommand}" />
+          </ContextMenu>
+        </Grid.ContextMenu>
         <TextBlock Text="{l:T timer_overlay.title}" Classes="dim" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" />
         <StackPanel Grid.Column="1" Orientation="Horizontal">
           <StackPanel Orientation="Horizontal" IsVisible="{Binding #Root.IsPointerOver}">
@@ -64,6 +78,11 @@
       </Grid>
 
       <ItemsControl ItemsSource="{Binding Rows}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <UniformGrid Columns="{ReflectionBinding Columns}" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
         <ItemsControl.ItemTemplate>
           <DataTemplate x:DataType="vm:TimerRow">
             <Border Classes="row" PointerReleased="OnRowReleased" ToolTip.Tip="{Binding At}">
@@ -75,12 +94,14 @@
                   <MenuItem Header="{l:T timer_overlay.remove}" Command="{Binding RemoveCommand}" IsVisible="{Binding !IsSchedule}" />
                 </ContextMenu>
               </Border.ContextMenu>
-              <Grid ColumnDefinitions="18,*,Auto">
-                <TextBlock Text="{Binding Icon}" Foreground="#E0A84A" FontSize="12" VerticalAlignment="Center" />
-                <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
-                <TextBlock Grid.Column="2" Text="{Binding Remaining}" FontSize="12" FontWeight="SemiBold" Margin="8,0,0,0" VerticalAlignment="Center"
+              <StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                  <TextBlock Text="{Binding Icon}" Foreground="#E0A84A" FontSize="10" VerticalAlignment="Center" />
+                  <TextBlock Text="{Binding Name}" Classes="dim" FontSize="10.5" FontWeight="SemiBold" MaxWidth="104" TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+                <TextBlock Text="{Binding Remaining}" FontSize="16" FontWeight="Bold"
                            Foreground="{Binding IsSoon, Converter={x:Static l:BoolBrush.DueGreenElseText}}" />
-              </Grid>
+              </StackPanel>
             </Border>
           </DataTemplate>
         </ItemsControl.ItemTemplate>

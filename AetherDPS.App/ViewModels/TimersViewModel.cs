@@ -76,126 +76,29 @@ public sealed partial class TimerRow(TimersViewModel owner, TimerItem item) : Ob
     private void Attach() => owner.Service.SetDetached(Item.Name, false);
 }
 
-/// <summary>
-/// Bearbeitbarer Zeitplan – jede Änderung wird sofort gespeichert (Haken, Tage, Kategorie
-/// direkt; Texte kurz nach dem Tippen, sobald sie gültig sind). Kein „Speichern“-Knopf nötig.
-/// </summary>
-public sealed partial class ScheduleEditor : ObservableObject
+/// <summary>Fester Termin (Riss, Belagerung …) – nur an/aus und Erinnerung, die Zeiten stimmen von selbst.</summary>
+public sealed partial class ScheduleToggle : ObservableObject
 {
     private readonly TimersViewModel owner;
-    private readonly Avalonia.Threading.DispatcherTimer saveTimer;
-    private bool loading = true;
+    public ScheduleEntry Entry { get; }
+    public string Name => Entry.DisplayName;
+    public string Detail => Entry.Describe();
 
-    public ScheduleEntry? Original { get; private set; }
-
-    [ObservableProperty] private string name;
-    [ObservableProperty] private string category;
     [ObservableProperty] private bool enabled;
-    [ObservableProperty] private bool showInOverlay;
     [ObservableProperty] private bool reminder;
-    [ObservableProperty] private string timesText;
-    [ObservableProperty] private string intervalText;
-    [ObservableProperty] private bool unconfirmed;
-    [ObservableProperty] private bool mo;
-    [ObservableProperty] private bool di;
-    [ObservableProperty] private bool mi;
-    [ObservableProperty] private bool don;
-    [ObservableProperty] private bool fr;
-    [ObservableProperty] private bool sa;
-    [ObservableProperty] private bool so;
-    [ObservableProperty] private string error = "";
 
-    public IReadOnlyList<string> Categories { get; } = ["Riss", "Weltboss", "Event", "Sonstiges"];
-
-    public ScheduleEditor(TimersViewModel owner, ScheduleEntry? original)
+    public ScheduleToggle(TimersViewModel owner, ScheduleEntry entry)
     {
         this.owner = owner;
-        Original = original;
-        var e = original ?? new ScheduleEntry { Name = Loc.T("timer.new_schedule"), Category = "Event", Times = ["20:00"] };
-        name = e.Name;
-        category = e.Category;
-        enabled = e.Enabled;
-        showInOverlay = e.ShowInOverlay;
-        reminder = e.Reminder;
-        timesText = string.Join(", ", e.Times);
-        intervalText = e.IntervalHours > 0 ? e.IntervalHours.ToString("0.##", Loc.Culture) : "";
-        unconfirmed = e.Unconfirmed;
-        mo = e.Days.Contains(DayOfWeek.Monday);
-        di = e.Days.Contains(DayOfWeek.Tuesday);
-        mi = e.Days.Contains(DayOfWeek.Wednesday);
-        don = e.Days.Contains(DayOfWeek.Thursday);
-        fr = e.Days.Contains(DayOfWeek.Friday);
-        sa = e.Days.Contains(DayOfWeek.Saturday);
-        so = e.Days.Contains(DayOfWeek.Sunday);
-        saveTimer = new Avalonia.Threading.DispatcherTimer { Interval = TimeSpan.FromMilliseconds(700) };
-        saveTimer.Tick += (_, _) =>
-        {
-            saveTimer.Stop();
-            Save();
-        };
-        loading = false;
-        // Neuer Zeitplan: gleich anlegen, damit er sofort erscheint
-        if (original is null) Save();
+        Entry = entry;
+        enabled = entry.Enabled;
+        reminder = entry.Reminder;
     }
 
-    protected override void OnPropertyChanged(System.ComponentModel.PropertyChangedEventArgs e)
-    {
-        base.OnPropertyChanged(e);
-        if (loading || e.PropertyName is nameof(Error) or nameof(Unconfirmed)) return;
-        bool isText = e.PropertyName is nameof(Name) or nameof(TimesText) or nameof(IntervalText);
-        saveTimer.Stop();
-        if (isText) saveTimer.Start();   // beim Tippen kurz warten
-        else Save();                     // Haken, Tage, Kategorie sofort
-    }
-
-    private void Save()
-    {
-        var times = TimesText.Split([',', ';', ' '], StringSplitOptions.RemoveEmptyEntries)
-            .Select(t => TimeSpan.TryParse(t, CultureInfo.InvariantCulture, out var ts) ? ts.ToString(@"hh\:mm") : null)
-            .ToList();
-        if (string.IsNullOrWhiteSpace(Name) || times.Count == 0 || times.Any(t => t is null))
-        {
-            Error = Loc.T("timer.error_name");
-            return;
-        }
-        double interval = 0;
-        if (!string.IsNullOrWhiteSpace(IntervalText) && !double.TryParse(IntervalText, Loc.Culture, out interval) && !double.TryParse(IntervalText, CultureInfo.InvariantCulture, out interval))
-        {
-            Error = Loc.T("timer.error_interval");
-            return;
-        }
-
-        var days = new List<DayOfWeek>();
-        if (Mo) days.Add(DayOfWeek.Monday);
-        if (Di) days.Add(DayOfWeek.Tuesday);
-        if (Mi) days.Add(DayOfWeek.Wednesday);
-        if (Don) days.Add(DayOfWeek.Thursday);
-        if (Fr) days.Add(DayOfWeek.Friday);
-        if (Sa) days.Add(DayOfWeek.Saturday);
-        if (So) days.Add(DayOfWeek.Sunday);
-
-        var entry = new ScheduleEntry
-        {
-            Name = Name.Trim(), Category = Category, Enabled = Enabled, ShowInOverlay = ShowInOverlay, Reminder = Reminder,
-            Times = times!, IntervalHours = interval, Days = days,
-            // wer die Zeiten selbst angepasst hat, hat sie bestätigt
-            Unconfirmed = Unconfirmed && Original is not null && times.SequenceEqual(Original.Times),
-        };
-        Error = "";
-        Unconfirmed = entry.Unconfirmed;
-        owner.SaveSchedule(Original, entry);
-        Original = entry;
-    }
-
-    [RelayCommand]
-    private void Delete()
-    {
-        saveTimer.Stop();
-        owner.DeleteSchedule(this);
-    }
+    partial void OnEnabledChanged(bool value) => owner.UpdateSchedule(Entry, value, Reminder);
+    partial void OnReminderChanged(bool value) => owner.UpdateSchedule(Entry, Enabled, value);
 }
 
-/// <summary>Reiter „Timer“: alle Timer, Zeitplan-Editor, Feldbosse, eigene Timer.</summary>
 /// <summary>Ein Feldboss im Reiter „Timer“: Stern = im Overlay und mit Erinnerung.</summary>
 public sealed partial class FieldBossRow(FieldBosses service, FieldBossInfo boss) : ObservableObject
 {
@@ -231,6 +134,11 @@ public sealed partial class FieldBossRow(FieldBosses service, FieldBossInfo boss
     private void ToggleFavorite() => service.SetFavorite(Boss.Npc, !IsFavorite);
 }
 
+public sealed record OverlayModeOption(string Code, string Name)
+{
+    public override string ToString() => Name;
+}
+
 public sealed class FieldBossGroup(string name, bool expanded)
 {
     public string Name { get; } = name;
@@ -249,23 +157,44 @@ public sealed partial class TimersViewModel : ObservableObject
     [ObservableProperty] private bool fieldBossesKnown;
 
     public ObservableCollection<TimerRow> Rows { get; } = [];
-    public ObservableCollection<ScheduleEditor> Schedules { get; } = [];
+    public ObservableCollection<ScheduleToggle> Schedules { get; } = [];
 
     [ObservableProperty] private string newName = "";
     [ObservableProperty] private string newMinutes = "";
     [ObservableProperty] private string reminderMinutes;
-    [ObservableProperty] private bool overlayVisible;
 
     /// <summary>Timer-Overlay ein/aus (die App reagiert darauf).</summary>
     public event EventHandler? OverlayVisibilityChanged;
 
-    public TimersViewModel(TimerService timers, FieldBosses fieldBosses)
+    private readonly MeterSettings meterSettings;
+
+    public IReadOnlyList<OverlayModeOption> OverlayModes { get; } =
+    [
+        new("always", Loc.T("timers.overlay_always")),
+        new("soon", Loc.T("timers.overlay_soon")),
+        new("off", Loc.T("timers.overlay_off")),
+    ];
+
+    [ObservableProperty] private OverlayModeOption selectedOverlayMode;
+    [ObservableProperty] private bool isSoonMode;
+    [ObservableProperty] private string soonMinutes;
+
+    /// <summary>„always“, „soon“ oder „off“.</summary>
+    public string OverlayMode => SelectedOverlayMode.Code;
+
+    public int OverlaySoonMinutes => Math.Max(1, timers.Settings.OverlaySoonMinutes);
+
+    public TimersViewModel(TimerService timers, FieldBosses fieldBosses, MeterSettings meterSettings)
     {
         this.timers = timers;
         this.fieldBosses = fieldBosses;
+        this.meterSettings = meterSettings;
+        var mode = timers.Settings.OverlayMode ?? (timers.Settings.OverlayVisible ? "always" : "off");
+        selectedOverlayMode = OverlayModes.FirstOrDefault(m => m.Code == mode) ?? OverlayModes[0];
+        isSoonMode = selectedOverlayMode.Code == "soon";
+        soonMinutes = timers.Settings.OverlaySoonMinutes.ToString(CultureInfo.InvariantCulture);
         BuildFieldBosses();
         reminderMinutes = timers.Settings.ReminderMinutes.ToString(CultureInfo.InvariantCulture);
-        overlayVisible = timers.Settings.OverlayVisible;
         timers.Changed += (_, _) => Avalonia.Threading.Dispatcher.UIThread.Post(Rebuild);
         Rebuild();
         ReloadSchedules();
@@ -284,7 +213,7 @@ public sealed partial class TimersViewModel : ObservableObject
     public void ReloadSchedules()
     {
         Schedules.Clear();
-        foreach (var s in timers.Schedules) Schedules.Add(new ScheduleEditor(this, s));
+        foreach (var s in timers.Schedules) Schedules.Add(new ScheduleToggle(this, s));
     }
 
     public void Tick()
@@ -300,13 +229,28 @@ public sealed partial class TimersViewModel : ObservableObject
         UpdateFieldBosses(now);
     }
 
-    // Eltnen und Morheim gibt es in der EU noch nicht – erscheinen erst, wenn der Server sie schickt
+    // Eltnen und Morheim gibt es in der EU noch nicht – erscheinen erst, wenn der Server sie schickt.
+    // Verteron/Eltnen sind Elyos-Gebiete, Altgard/Morheim Asmodier-Gebiete, die Abyss teilen sich beide.
     private static readonly HashSet<int> EuMaps = [1010, 1110, 20, 22];
+    private static readonly HashSet<int> ElyosMaps = [1010, 1011], AsmodianMaps = [1110, 1111];
 
     private List<int> shownMaps = [];
 
-    private List<int> VisibleMaps(Dictionary<int, FieldBossView> views) => fieldBosses.Maps
-        .Where(map => EuMaps.Contains(map.Id) || HasData(map, views)).Select(m => m.Id).ToList();
+    /// <summary>Server 13xx = Elyos, 23xx = Asmodier (EU); unbekannt = beide.</summary>
+    private HashSet<int>? OtherFactionMaps()
+    {
+        var server = meterSettings.CharacterServer;
+        if (server is null || !server.StartsWith('#') || !int.TryParse(server.AsSpan(1), out var id)) return null;
+        return (id / 1000) switch { 1 => AsmodianMaps, 2 => ElyosMaps, _ => null };
+    }
+
+    private List<int> VisibleMaps(Dictionary<int, FieldBossView> views)
+    {
+        var other = OtherFactionMaps();
+        return fieldBosses.Maps
+            .Where(map => (EuMaps.Contains(map.Id) && other?.Contains(map.Id) != true) || HasData(map, views))
+            .Select(m => m.Id).ToList();
+    }
 
     private static bool HasData(FieldBossMap map, Dictionary<int, FieldBossView> views) =>
         map.Bosses.Any(b => views.TryGetValue(b.Slot, out var v) && v.Status is not (FieldBossStatus.Unknown or FieldBossStatus.Scheduled));
@@ -336,12 +280,26 @@ public sealed partial class TimersViewModel : ObservableObject
         FieldBossesKnown = fieldBosses.HasData;
     }
 
-    partial void OnOverlayVisibleChanged(bool value)
+    partial void OnSelectedOverlayModeChanged(OverlayModeOption value)
     {
-        timers.Settings.OverlayVisible = value;
+        if (value is null) return;
+        IsSoonMode = value.Code == "soon";
+        timers.Settings.OverlayMode = value.Code;
+        timers.Settings.OverlayVisible = value.Code != "off";
         timers.Save();
         OverlayVisibilityChanged?.Invoke(this, EventArgs.Empty);
     }
+
+    partial void OnSoonMinutesChanged(string value)
+    {
+        if (!int.TryParse(value, out var m) || m is < 1 or > 180 || m == timers.Settings.OverlaySoonMinutes) return;
+        timers.Settings.OverlaySoonMinutes = m;
+        timers.Save();
+        OverlayVisibilityChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>✕ im Overlay: aus.</summary>
+    public void HideOverlay() => SelectedOverlayMode = OverlayModes.First(m => m.Code == "off");
 
     [RelayCommand]
     private void AddCustom()
@@ -355,9 +313,6 @@ public sealed partial class TimersViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void AddSchedule() => Schedules.Insert(0, new ScheduleEditor(this, null));
-
-    [RelayCommand]
     private void SaveReminder()
     {
         if (int.TryParse(ReminderMinutes, out var m) && m >= 0)
@@ -367,18 +322,7 @@ public sealed partial class TimersViewModel : ObservableObject
         }
     }
 
-    public void SaveSchedule(ScheduleEntry? original, ScheduleEntry updated)
-    {
-        // Editoren NICHT neu aufbauen – sonst verliert das Textfeld beim Tippen den Fokus
-        if (original is null) timers.AddSchedule(updated);
-        else timers.ReplaceSchedule(original, updated);
-    }
-
-    public void DeleteSchedule(ScheduleEditor editor)
-    {
-        if (editor.Original is not null) timers.RemoveSchedule(editor.Original);
-        Schedules.Remove(editor);
-    }
+    public void UpdateSchedule(ScheduleEntry entry, bool enabled, bool reminder) => timers.SetSchedule(entry, enabled, reminder);
 
     public void SetRespawn(string boss, int minutes) => timers.SetBossRespawn(boss, minutes);
     public void Ignore(string boss) => timers.IgnoreBoss(boss);

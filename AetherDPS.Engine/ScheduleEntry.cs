@@ -55,32 +55,25 @@ public sealed class ScheduleEntry
         return $"{days} · {string.Join(", ", Times)}";
     }
 
-    public static List<ScheduleEntry> Defaults(string riftAnchor, double riftInterval, bool riftReminder) =>
-    [
-        new()
-        {
-            Name = Loc.T("schedule.default.rift"), Category = "Riss", Times = [riftAnchor], IntervalHours = riftInterval,
-            Reminder = riftReminder, Unconfirmed = true,
-        },
-        .. EuEvents(),
-    ];
+    /// <summary>Fester Termin aus dem Katalog (<see cref="Builtins"/>); leer = selbst angelegt (alt).</summary>
+    public string? Id { get; set; }
+
+    /// <summary>Anzeigename: feste Termine in der gewählten Sprache.</summary>
+    public string DisplayName => Id is { } id ? Loc.T("schedule.default." + id) : Name;
 
     /// <summary>
-    /// EU-Termine (Europe/Berlin) nach TheLoop705/aion2dps (GPL-3.0-or-later, data/timers.json): die
-    /// Artefakt-Belagerung hat die spieleigene Bossliste bestätigt, die Dimensions-Invasion ist eine
-    /// Schätzung der Community. Die Abyss-Bosse (Nahma, Vollstrecker, Kaira) stehen bei den Feldbossen.
+    /// Die festen EU-Termine (Europe/Berlin), die sicher stimmen – an- und abwählbar, nicht bearbeitbar.
+    /// Raumzeit-Riss alle 3 Std. ab 02:00 und Artefakt-Belagerung Mo/Do/Sa 21:00 nach TheLoop705/aion2dps
+    /// (GPL-3.0-or-later; die Belagerung bestätigt die spieleigene Bossliste). Abyss-Bosse (Nahma,
+    /// Vollstrecker, Kaira) stehen mit ihren festen Zeiten bei den Feldbossen.
     /// </summary>
-    public static List<ScheduleEntry> EuEvents() =>
+    public static List<ScheduleEntry> Builtins() =>
     [
+        new() { Id = "rift", Name = Loc.T("schedule.default.rift"), Category = "Riss", Times = ["02:00"], IntervalHours = 3 },
         new()
         {
-            Name = Loc.T("schedule.default.artifact_siege"), Category = "Event", Reminder = false,
+            Id = "artifact_siege", Name = Loc.T("schedule.default.artifact_siege"), Category = "Event",
             Days = [DayOfWeek.Monday, DayOfWeek.Thursday, DayOfWeek.Saturday], Times = ["21:00"],
-        },
-        new()
-        {
-            Name = Loc.T("schedule.default.invasion"), Category = "Event", Enabled = false, Unconfirmed = true, Reminder = false,
-            Times = ["00:30"], IntervalHours = 1,
         },
     ];
 }
