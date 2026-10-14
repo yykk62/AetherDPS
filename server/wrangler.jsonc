@@ -1,0 +1,29 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "aetherdps-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-01",
+
+  // Keine Wrangler-Telemetrie.
+  "send_metrics": false,
+
+  // Wir versprechen, nichts zu protokollieren: Workers Logs und Logpush bleiben aus.
+  "observability": { "enabled": false },
+  "logpush": false,
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "aetherdps",
+      // Nach `wrangler d1 create aetherdps` die ausgegebene ID hier eintragen.
+      "database_id": "REPLACE_ME"
+    }
+  ],
+
+  // Begrenzung für /v1/report: 5 Berichte pro Minute je Absender (nur im Speicher, nichts wird gespeichert).
+  "ratelimits": [
+    { "name": "REPORT_LIMIT", "namespace_id": "1001", "simple": { "limit": 5, "period": 60 } }
+  ]
+
+  // Secret (nicht hier eintragen!): ADMIN_KEY  ->  `wrangler secret put ADMIN_KEY`
+}

@@ -32,6 +32,7 @@ public sealed class TrackingMode
         PacketOpcodes.BuffEffectB,
         PacketOpcodes.SkillCd,
         ZoneTracker.OpServerSwitch,
+        ZoneTracker.OpMapLoad,
     ];
 
     /// <summary>Auto-Modus: so lange ohne Kampf, dann gilt der Lauf (Dungeon) als beendet.</summary>
@@ -54,6 +55,7 @@ public sealed class TrackingMode
             if (entered) run.Start();
             else run.Stop();
         };
+        run.DungeonSource = () => zones.DungeonName;
         this.sessions = sessions;
         this.run = run;
         this.entities = entities;

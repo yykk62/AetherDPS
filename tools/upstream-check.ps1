@@ -38,7 +38,7 @@ if ($neu) {
 }
 
 # Deutsche Skill-/Mob-Namen (A2Tools)
-& powershell -NoProfile -ExecutionPolicy Bypass -File tools\update-german-data.ps1
+& powershell -NoProfile -ExecutionPolicy Bypass -File tools\update-game-data.ps1
 if (git status --porcelain AetherDPS.Engine/GameData) {
     git add AetherDPS.Engine/GameData
     git commit -q -m 'Wartung: deutsche Spieldaten aktualisiert (A2Tools)'

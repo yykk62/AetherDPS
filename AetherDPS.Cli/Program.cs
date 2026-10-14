@@ -43,7 +43,7 @@ int Replay(string path)
     device.PlayToEnd();
 
     var target = host.Sessions.GetActiveTargetInfo();
-    Console.WriteLine($"Ziel: {(target is null ? "–" : GermanGameData.MobName(target))}");
+    Console.WriteLine($"Ziel: {(target is null ? "–" : GameText.MobName(target))}");
     var stats = host.Sessions.PlayerStats.OrderByDescending(p => p.TotalDamage).ToList();
     if (stats.Count == 0)
     {
@@ -54,7 +54,7 @@ int Replay(string path)
     Console.WriteLine($"{"Spieler",-22} {"Klasse",-14} {"Schaden",14} {"Anteil",7}");
     foreach (var p in stats)
     {
-        Console.WriteLine($"{p.PlayerName,-22} {GermanGameData.ClassName(p.ClassId, p.ClassName),-14} " +
+        Console.WriteLine($"{p.PlayerName,-22} {GameText.ClassName(p.ClassId, p.ClassName),-14} " +
                           $"{p.TotalDamage.ToString("N0", de),14} {p.DamagePercentage.ToString("F1", de),6}%");
         foreach (var s in host.Sessions.GetPlayerSkillStats(p.PlayerId).OrderByDescending(s => s.TotalDamage).Take(3))
             Console.WriteLine($"    {s.SkillName,-30} {s.TotalDamage.ToString("N0", de),12}  {s.HitCount}×");

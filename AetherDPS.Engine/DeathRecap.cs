@@ -74,7 +74,7 @@ public sealed class DeathRecap
 
     private string SourceName(int actorId)
     {
-        if (entities.GetTargetMob(actorId) is { MobCode: > 0 } mob) return GermanGameData.MobName(mob);
+        if (entities.GetTargetMob(actorId) is { MobCode: > 0 } mob) return GameText.MobName(mob);
         if (entities.GetPlayerEntity(actorId) is { } player && !player.Name.StartsWith("Player_", StringComparison.Ordinal)) return player.Name;
         return "Unbekannt";
     }

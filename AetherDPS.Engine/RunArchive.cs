@@ -19,7 +19,7 @@ public sealed record ArchivedRun(
 /// <summary>
 /// Speichert jeden Lauf (STRG+W … STRG+W) als JSON in &lt;Datenordner&gt;\Laeufe.
 /// Spielerliste wie im Overlay: Beschwörungen zugeschlagen, im Gruppenmodus nur die Gruppe.
-/// Bestzeit = kürzester Lauf mit demselben Namen (Name = letzter getöteter Boss).
+/// Bestzeit = kürzester Lauf mit demselben Namen (Name = Dungeon, sonst letzter getöteter Boss).
 /// </summary>
 public sealed class RunArchive
 {
@@ -77,7 +77,7 @@ public sealed class RunArchive
         return new ArchivedRun(
             snapshot.StartedAt.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture),
             snapshot.StartedAt, snapshot.Elapsed.TotalSeconds, snapshot.CombatTime.TotalSeconds,
-            lastKill?.Name ?? "Lauf", players.Sum(p => p.Damage), players.Sum(p => p.Dps), players,
+            snapshot.Dungeon ?? lastKill?.Name ?? "Lauf", players.Sum(p => p.Damage), players.Sum(p => p.Dps), players,
             snapshot.Bosses.ToList());
     }
 

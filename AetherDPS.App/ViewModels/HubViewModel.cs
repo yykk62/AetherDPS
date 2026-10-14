@@ -136,7 +136,7 @@ public sealed partial class HubViewModel : ObservableObject
             RunPlayers.Add(new PlayerRow(p.PlayerId)
             {
                 Name = p.PlayerName.StartsWith("Player_", StringComparison.Ordinal) ? Loc.T("player.unknown", p.PlayerId) : p.PlayerName,
-                ClassName = GermanGameData.ClassName(p.ClassId, p.ClassName),
+                ClassName = GameText.ClassName(p.ClassId, p.ClassName),
                 ClassBrush = ClassVisuals.Brush(p.ClassId),
                 ClassIcon = ClassVisuals.Icon(p.ClassId),
                 Dps = Format.Compact(p.DamagePerSecond) + "/s",

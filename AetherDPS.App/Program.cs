@@ -96,9 +96,9 @@ internal static class Program
             }
 
             Loc.Load();
-            GermanGameData.Apply();
+            GameText.Apply();
             Log.Information("Start {Version}, deutsche Skills: {Count}, Replay: {Replay}, nach Update: {Updated}",
-                version, GermanGameData.PatchedSkillCount, options.ReplayFile ?? "nein", justUpdated);
+                version, GameText.PatchedSkillCount, options.ReplayFile ?? "nein", justUpdated);
             App.JustUpdated = justUpdated;
             App.Instance = instance;
 

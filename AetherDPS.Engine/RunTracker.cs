@@ -29,6 +29,7 @@ public sealed class RunTracker
     private DateTime? startedAt;
     private DateTime? stoppedAt;
     private DateTime? lastHit;
+    private string? dungeon;
     private TimeSpan combatTime;
 
     /// <summary>Nach dem Stopp eines Laufs mit Schaden (für das Archiv).</summary>
@@ -51,6 +52,9 @@ public sealed class RunTracker
     /// </summary>
     public Func<PlayerDamage, bool>? AutoStart { get; set; }
 
+    /// <summary>Name des aktuellen Dungeons (ZoneTracker); der erste im Lauf gesehene benennt den Lauf.</summary>
+    public Func<string?>? DungeonSource { get; set; }
+
     /// <summary>Letzter Treffer im laufenden Lauf.</summary>
     public DateTime? LastHit { get { lock (gate) return lastHit; } }
 
@@ -67,6 +71,7 @@ public sealed class RunTracker
         startedAt = start;
         stoppedAt = null;
         lastHit = null;
+        dungeon = null;
         combatTime = TimeSpan.Zero;
     }
 
@@ -93,6 +98,7 @@ public sealed class RunTracker
                 if (AutoStart?.Invoke(hit) != true) return;
                 ResetLocked(hit.DateTime);
             }
+            dungeon ??= DungeonSource?.Invoke();
             var at = hit.DateTime;
 
             if (lastHit is DateTime previous && at - previous is var gap && gap > TimeSpan.Zero && gap <= CombatGap)
@@ -189,7 +195,7 @@ public sealed class RunTracker
             .Select(t => (Target: t, Mob: entities.GetTargetMob(t.Id)))
             .Where(x => x.Mob is { MobCode: > 0 } mob && mob.IsBoss && !mob.IsDummy)
             .Select(x => new RunBoss(
-                GermanGameData.MobName(x.Mob!),
+                GameText.MobName(x.Mob!),
                 startedAt is DateTime st ? x.Target.FirstHit - st : TimeSpan.Zero,
                 (x.Target.DiedAt ?? x.Target.LastHit) - x.Target.FirstHit,
                 x.Target.DiedAt is not null,
@@ -200,7 +206,7 @@ public sealed class RunTracker
             .ToList();
 
         return new RunSnapshot(startedAt is not null, stoppedAt is not null, startedAt ?? end, elapsed, combatTime,
-            total, total / seconds, rows, bosses);
+            total, total / seconds, rows, bosses, dungeon);
     }
 
     /// <param name="summonIds">Zugeschlagene Beschwörungen (siehe SummonMerger) – deren Skills erscheinen mit Präfix.</param>
@@ -354,4 +360,4 @@ public sealed record RunBoss(string Name, TimeSpan StartOffset, TimeSpan Duratio
 }
 
 public sealed record RunSnapshot(bool Started, bool Stopped, DateTime StartedAt, TimeSpan Elapsed, TimeSpan CombatTime,
-    long TotalDamage, double PartyDps, IReadOnlyList<RunPlayer> Players, IReadOnlyList<RunBoss> Bosses);
+    long TotalDamage, double PartyDps, IReadOnlyList<RunPlayer> Players, IReadOnlyList<RunBoss> Bosses, string? Dungeon = null);

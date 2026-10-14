@@ -91,7 +91,7 @@ public sealed class TimerService
         if (mob is null || mob.MobCode <= 0 || !mob.IsBoss || mob.IsDummy) return;
         // Bosse im Dungeon sind keine Feldbosse – die kommen nicht wieder (14.10.: Phantom-Lakshmi u. a. im Overlay)
         if (zones.InInstance) return;
-        var name = GermanGameData.MobName(mob);
+        var name = GameText.MobName(mob);
         lock (gate)
         {
             if (Settings.IgnoredBosses.Contains(name)) return;

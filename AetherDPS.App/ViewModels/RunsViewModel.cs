@@ -113,7 +113,7 @@ public sealed partial class RunsViewModel : ObservableObject
             Players.Add(new PlayerRow(p.PlayerId)
             {
                 Name = p.Name.StartsWith("Player_", StringComparison.Ordinal) ? Loc.T("player.unknown", p.PlayerId) : p.Name,
-                ClassName = GermanGameData.ClassName(p.ClassId, ""),
+                ClassName = GameText.ClassName(p.ClassId, ""),
                 ClassBrush = ClassVisuals.Brush(p.ClassId),
                 ClassIcon = ClassVisuals.Icon(p.ClassId),
                 Dps = Format.Compact(p.Dps) + "/s",
@@ -166,7 +166,7 @@ public sealed partial class RunsViewModel : ObservableObject
     private async Task CopyTextAsync()
     {
         if (current is null) return;
-        var text = RunArchive.ToDiscordText(current, GermanGameData.ClassName);
+        var text = RunArchive.ToDiscordText(current, GameText.ClassName);
         var clipboard = Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime d
             ? d.MainWindow?.Clipboard : null;
         if (clipboard is null) return;

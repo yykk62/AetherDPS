@@ -16,7 +16,7 @@ public sealed class MeterHost : IDisposable
     {
         Directory.CreateDirectory(options.DataDir);
         Environment.CurrentDirectory = options.DataDir;
-        GermanGameData.Apply();
+        GameText.Apply();
         var services = new ServiceCollection();
         services.AddLogging(b =>
         {

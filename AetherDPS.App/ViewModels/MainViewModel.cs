@@ -204,7 +204,7 @@ public sealed partial class MainViewModel : ObservableObject
         HpText = target is { HpTotal: > 0 } ? Format.Compact(Math.Max(0, target.HpCurrent)) + " / " + Format.Compact(target.HpTotal) : "";
         HpPercentText = target is { HpTotal: > 0 } ? Format.Percent(TargetHpPercent) : "";
         TargetName = target is null ? Loc.T(ShowTargetView ? "target.none" : "run.title_short")
-            : target.MobCode == 0 ? Loc.T("target.unknown") : GermanGameData.MobName(target);
+            : target.MobCode == 0 ? Loc.T("target.unknown") : GameText.MobName(target);
         // Stagger-Phase: Leiste auf der Boss-Karte
         if (stagger.Current is { } st)
         {
@@ -283,7 +283,7 @@ public sealed partial class MainViewModel : ObservableObject
         var server = !string.IsNullOrWhiteSpace(meterSettings.ServerName) ? meterSettings.ServerName : meterSettings.CharacterServer;
         if (!string.IsNullOrWhiteSpace(server)) parts.Add(EuServers.Display(server));
         parts.Add(!IsConnected ? StatusText : pingMs >= 0 ? Loc.T("status.ping", pingMs) : Loc.T("status.connected"));
-        if (zones.InInstance) parts.Add(Loc.T("compact.dungeon"));
+        if (zones.InInstance) parts.Add(zones.DungeonName ?? Loc.T("compact.dungeon"));
         parts.Add(Loc.T(mode.AutoMode ? "compact.auto" : "compact.waiting"));
         CompactInfo = string.Join(" · ", parts);
     }
@@ -360,7 +360,7 @@ public sealed partial class MainViewModel : ObservableObject
 
             row.IsUser = p.IsUser;
             row.Name = DisplayName(p);
-            row.ClassName = GermanGameData.ClassName(p.ClassId, p.ClassName);
+            row.ClassName = GameText.ClassName(p.ClassId, p.ClassName);
             row.ClassBrush = ClassVisuals.Brush(p.ClassId);
             row.ClassIcon = ClassVisuals.Icon(p.ClassId);
             row.Dps = Format.Compact(p.DamagePerSecond) + "/s";

@@ -50,7 +50,7 @@ public sealed class UiTests : IDisposable
     private ServiceProvider Start()
     {
         Loc.Load();
-        GermanGameData.Apply();
+        GameText.Apply();
         Directory.CreateDirectory(dataDir);
         Environment.CurrentDirectory = dataDir;
         var settings = MeterSettings.Load(dataDir);

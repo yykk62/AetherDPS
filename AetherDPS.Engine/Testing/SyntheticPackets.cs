@@ -99,6 +99,17 @@ public static class SyntheticPackets
         return Frame(body);
     }
 
+    /// <summary>Karte laden (0x3621): Zähler, Karten-Id, danach Koordinaten u. Ä.</summary>
+    public static byte[] MapLoad(int mapId, uint counter = 1)
+    {
+        var body = new List<byte>();
+        AddU16(body, 0x3621);
+        AddU32(body, counter);
+        AddU32(body, (uint)mapId);
+        body.AddRange(new byte[44]);
+        return Frame(body);
+    }
+
     /// <summary>LZ4-Container (Opcode FF FF) mit mehreren inneren Paketen.</summary>
     public static byte[] Compressed(params byte[][] inner)
     {

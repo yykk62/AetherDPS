@@ -33,7 +33,7 @@ public sealed class FeatureTests : IDisposable
         using var again = NewHost();
         Assert.Equal(50_000, Assert.Single(again.Get<RunArchive>().All()).TotalDamage);
 
-        var text = RunArchive.ToDiscordText(run, (id, fallback) => GermanGameData.ClassName(id, fallback));
+        var text = RunArchive.ToDiscordText(run, (id, fallback) => GameText.ClassName(id, fallback));
         Assert.Contains("Gladiator", text);
         Assert.Contains("```", text);
     }

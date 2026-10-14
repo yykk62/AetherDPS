@@ -213,9 +213,9 @@ public sealed class PipelineTests : IDisposable
     public void Deutsche_Namen_sind_geladen()
     {
         using var host = NewHost();
-        Assert.True(GermanGameData.PatchedSkillCount > 1_000, $"nur {GermanGameData.PatchedSkillCount} Skills übersetzt");
-        Assert.Equal("Sandsack", GermanGameData.MobName(new AionDpsMeter.Core.Models.Mob { MobCode = 2000000 }));
-        Assert.Equal("Waldläufer", GermanGameData.ClassName(14, "Ranger"));
+        Assert.True(GameText.PatchedSkillCount > 1_000, $"nur {GameText.PatchedSkillCount} Skills übersetzt");
+        Assert.Equal("Sandsack", GameText.MobName(new AionDpsMeter.Core.Models.Mob { MobCode = 2000000 }));
+        Assert.Equal("Waldläufer", GameText.ClassName(14, "Ranger"));
     }
 
     [Fact]
@@ -248,7 +248,7 @@ public sealed class PipelineTests : IDisposable
         var boss = host.Get<AionDpsMeter.Services.Services.Entity.EntityTracker>().GetTargetMob(Boss);
         Assert.NotNull(boss);
         Assert.True(boss.IsBoss);
-        Assert.Equal("Ruthilis des Schmerzes", GermanGameData.MobName(boss));
+        Assert.Equal("Ruthilis des Schmerzes", GameText.MobName(boss));
         Assert.Equal(10_000_000, boss.HpTotal);
         Assert.Equal(9_950_000, boss.HpCurrent);
 
@@ -354,6 +354,48 @@ public sealed class PipelineTests : IDisposable
         Assert.True(zones.InInstance);
         Assert.Equal([true, false, true], changes);
         Assert.Equal("87.232.75.228", ZoneTracker.ParseAddress(SyntheticPackets.ServerSwitch("87.232.75.228")));
+    }
+
+    [Fact]
+    public void Dungeon_und_Name_kommen_aus_dem_Kartenwechsel()
+    {
+        using var host = NewHost();
+        var zones = host.Get<ZoneTracker>();
+        var changes = new List<bool>();
+        zones.Changed += changes.Add;
+
+        host.Feed(SyntheticPackets.Heartbeat(), 1_000);
+        host.Feed(SyntheticPackets.MapLoad(1010), 1_050);   // offene Welt
+        Assert.False(zones.InInstance);
+        host.Feed(SyntheticPackets.MapLoad(600032, 2), 1_100);
+        Assert.True(zones.InInstance);
+        Assert.Equal(600032, zones.DungeonId);
+        Assert.Equal("Draupnir", zones.DungeonName);
+        host.Feed(SyntheticPackets.ServerSwitch("87.232.75.228"), 1_150);   // ändert nichts mehr
+        host.Feed(SyntheticPackets.MapLoad(600032, 3), 1_200);   // Teleport im Dungeon
+        host.Feed(SyntheticPackets.MapLoad(1010, 4), 1_300);
+        Assert.False(zones.InInstance);
+        Assert.Null(zones.DungeonName);
+        Assert.Equal([true, false], changes);
+    }
+
+    [Fact]
+    public void Servernamen_folgen_der_Sprache()
+    {
+        try
+        {
+            GameText.Apply("en");
+            Assert.Equal("Tsenka", EuServers.Display("#1317"));
+            Assert.Equal("Gladiator", GameText.ClassName(11, ""));
+            GameText.Apply("fr");
+            Assert.NotEqual("Ranger", GameText.ClassName(14, "Ranger"));
+        }
+        finally
+        {
+            GameText.Apply("de");
+        }
+        Assert.Equal("Hogalum", EuServers.Display("#1317"));
+        Assert.Equal("#9999", EuServers.Display("#9999"));
     }
 
     [Fact]

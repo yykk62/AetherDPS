@@ -243,7 +243,7 @@ public sealed class StaggerTracker
     }
 
     private string BossName(int id) =>
-        entities.GetTargetMob(id) is { MobCode: > 0 } mob ? GermanGameData.MobName(mob) : "Boss";
+        entities.GetTargetMob(id) is { MobCode: > 0 } mob ? GameText.MobName(mob) : "Boss";
 
     private static string SkillName(int code)
     {

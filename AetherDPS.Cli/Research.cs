@@ -75,7 +75,7 @@ static class Research
             var player = entities.GetPlayerEntity(id);
             var mob = entities.GetTargetMob(id);
             if (player is not null) events.Add((now, $"Tod Spieler: {player.Name}{(player.IsUser ? $" (DU, #{id}, SelfId {host.Get<SelfIdentity>().SelfId})" : "")}"));
-            else if (mob is { MobCode: > 0 } && mob.IsBoss) events.Add((now, $"Tod Boss: {GermanGameData.MobName(mob)}"));
+            else if (mob is { MobCode: > 0 } && mob.IsBoss) events.Add((now, $"Tod Boss: {GameText.MobName(mob)}"));
         };
         var bossHits = new Dictionary<int, (string Name, long First, long Last, long Damage, int Hits)>();
         // Alle Treffer (auch Mobs) mit Paketzeit – zum Abgleich mit Stagger-Leiste usw.
@@ -90,12 +90,19 @@ static class Research
         {
             var mob = entities.GetTargetMob(hit.TargetEntity.Id);
             if (mob is not { MobCode: > 0 } || !mob.IsBoss) return;
-            var b = bossHits.GetValueOrDefault(hit.TargetEntity.Id, (GermanGameData.MobName(mob), now, now, 0, 0));
+            var b = bossHits.GetValueOrDefault(hit.TargetEntity.Id, (GameText.MobName(mob), now, now, 0, 0));
             bossHits[hit.TargetEntity.Id] = (b.Item1, b.Item2, now, b.Item4 + hit.Damage, b.Item5 + 1);
         };
 
         var zones = host.Get<ZoneTracker>();
-        zones.Changed += entered => events.Add((now, entered ? $"Dungeon betreten ({zones.InstanceAddress})" : "Dungeon verlassen"));
+        zones.Changed += entered => events.Add((now, entered ? $"Dungeon betreten: {zones.DungeonName ?? "?"} (Karte {zones.MapId}, {zones.InstanceAddress})" : $"Dungeon verlassen (Karte {zones.MapId})"));
+        var dispatch = host.Get<AionDpsMeter.Services.PacketProcessing.Routing.PacketDispatchService>();
+        var previousObserver = dispatch.Observer;
+        dispatch.Observer = (op, data) =>
+        {
+            previousObserver?.Invoke(op, data);
+            if (op == ZoneTracker.OpMapLoad) events.Add((now, $"Karte geladen: {ZoneTracker.ParseMapId(data)}"));
+        };
         var recap = host.Get<DeathRecap>();
         recap.Clock = () => Local(now);
         recap.Died += r => events.Add((now, $"Todes-Rückblick: {r.TotalDamage:N0} Schaden, " +
