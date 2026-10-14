@@ -2,6 +2,10 @@
 
 Newest versions first.
 
+## 0.6.4
+
+- **Character profiles in the Party tab:** click yourself ("My character") or a party member to see level, item level, combat power, full gear with enchantments and skills – straight from NCSOFT (the same public data as on aion2.plaync.com). Only requested when you click
+
 ## 0.6.3
 
 - **Timers as tiles:** every timer in the overlay is a small tile (name on top, time large). Right-click the header: **columns** (1–4, e.g. 2×2 or 3×2), **detach all** or **attach all**. Drag single tiles anywhere – drop them on the group to put them back

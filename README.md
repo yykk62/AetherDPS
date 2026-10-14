@@ -50,6 +50,7 @@
 - die **Update-Prüfung** und das Lesen von Neuigkeiten auf GitHub (es wird nichts gesendet),
 - eine **anonyme Nutzungszahl**, nur wenn du beim ersten Start zustimmst: einmal am Tag `{"v":"0.6.0","lang":"de","new":false}`, also Version, Sprache und ob es die erste Nutzung ist. Keine Namen, kein Server, keine Kennung. Jederzeit abschaltbar unter Einstellungen → Datenschutz,
 - **Fehlerberichte**, nur wenn du selbst auf „Senden“ klickst. Namen von Spielern werden vorher entfernt, und du siehst vorher, was rausgeht.
+- **Charakter-Profile** im Reiter Gruppe: Klickst du auf dich oder ein Gruppenmitglied, fragt der Meter Name und Server bei NCSOFT ab (dieselben öffentlichen Daten wie auf aion2.plaync.com). Ohne Klick passiert das nie.
 
 Der Server dafür ist offen einsehbar im Ordner [`server/`](server/) und speichert keine IP-Adressen.
 

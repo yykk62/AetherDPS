@@ -41,7 +41,14 @@ Windows-Benutzername werden vorher aus dem Log entfernt; du kannst dir vor dem S
 Rechtsgrundlage: Art. 6 Abs. 1 lit. a DSGVO (du sendest selbst). Gespeichert bis der Fehler bearbeitet ist,
 höchstens [12 Monate].
 
-### d) Empfänger
+### d) Charakter-Profile (nur auf Klick)
+Klickst du im Reiter „Gruppe“ auf dich oder ein Gruppenmitglied, fragt die App bei NCSOFT (api-search.plaync.com,
+aion2.plaync.com) den Charakternamen und Server ab und zeigt die öffentlichen Profildaten (Stufe, Ausrüstung, Skills),
+die NCSOFT auch auf seiner Webseite zeigt. Icons kommen von assets.playnccdn.com. Gespeichert wird nur kurz im
+Arbeitsspeicher (15 Minuten). Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (du forderst die Anzeige selbst an; es
+sind öffentlich abrufbare Daten).
+
+### e) Empfänger
 Nutzungszahl und Fehlerberichte verarbeitet ein Server bei Cloudflare, Inc. (Cloudflare Workers und D1) als
 Auftragsverarbeiter. Cloudflare erhält technisch bedingt deine IP-Adresse, um die Anfrage zuzustellen, und begrenzt
 damit Fehlerberichte (höchstens 5 pro Minute, dafür nur kurzzeitig zwischengespeichert); dauerhaft gespeichert wird sie nicht. Datenschutzhinweise von Cloudflare:

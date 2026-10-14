@@ -50,6 +50,13 @@ Aufnahme: Meter offen lassen (Mitschnitte laufen im Ring mit), danach „Problem
 - [ ] **Abyss-Feldbosse**: Liste in der Abyss mit offener Karte (Slots 2001–2008, 2201–2205; Zuordnung Waffle vs. SkeeveAN widersprüchlich)
 - [ ] Riss-Zeiten nach der Zeitumstellung am 25.10. prüfen
 
+## Ideen aus Daeva Codex (daevacodex.de, 15.10.2026)
+- [x] Charakter-Profile über die öffentliche NCSOFT-API (0.6.4, `Armory`): Suche `api-search.plaync.com/aion2global/search/v2/character`, Profil/Ausrüstung `aion2.plaync.com/api/character/{info,equipment}` (region=eu, lang=de-DE)
+- [ ] Bewerber-Scouter + Profil: Bewerber automatisch nachschlagen (Itemstufe/Kampfkraft) – braucht `07 97` aus der Aufnahme
+- [ ] Timer-Kandidaten von Daeva Codex, dort selbst „für EU unbestätigt“: Beritra-Luftangriff, Dimensionale Invasion (:30), Abyss-Riss/Schlachtfeld (täglich 22:00), wöchentliche Wartung (Mi 08:00). Widerspruch: Daeva Codex Belagerung/Nahma 22:00, TheLoop (aus der spieleigenen Liste) 21:00/21:05 → mit Abyss-Liste in der Aufnahme klären
+- [ ] Shugo-Festival: KR :18/:48, Daeva Codex/TheLoop stündlich – EU in der Aufnahme prüfen (Event-Ankündigung im Spiel)
+- [ ] Zusammenarbeit anfragen (nur nach OK des Nutzers): Daeva Codex Companion liest die Position aus der Minimap per Bildschirm und schickt sie an 127.0.0.1; AetherDPS kennt die Position exakt aus den Paketen und könnte sie ihnen liefern. Ihre Marker-Daten (Siegel, Monolith-Fragmente, Hidden Cubes) haben keine offene Lizenz → nur mit Erlaubnis
+
 ## Phase 6: Bot-Radar (Idee vom 13.10.2026)
 Ziel: Bots an Farm-Spots erkennen und mit Beweisen melden. Das Tool liest nur passiv mit, es sendet nie etwas und meldet nie automatisch.
 - [ ] Mitschnitt von 5–10 Minuten an einem Bot-Spot (nach Phase 2)

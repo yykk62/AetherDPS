@@ -11,6 +11,7 @@ AetherDPS ist GPL-3.0 (siehe LICENSE). Daten und Erkenntnisse aus diesen Projekt
 | [aion2-dps-meter](https://github.com/cyberbadger6969/aion2-dps-meter) (cyberbadger6969) | GPL-3.0 | Zeitlimit-Paket im Dungeon |
 | [AionDpsMeter](https://github.com/Accapura/AionDpsMeter) (Accapura) | GPL-3.0 | Idee Discord-Webhook |
 | [Aion-DPS-Meter](https://github.com/SkeeveAN/Aion-DPS-Meter) (SkeeveTV) | MIT | Feldbosse je Karte mit Koordinaten, Kartennamen, Abyss-Zeitpläne (`GameData/field_bosses.json`) |
+| [aion2-api](https://github.com/nuriland/aion2-api) (nuriland) | MIT | Adressen der öffentlichen NCSOFT-Charakter-API (Profil, Ausrüstung) |
 | [waffle_meter](https://github.com/Waffle-ens/waffle_meter) (TK-open-public) | MIT | Zuordnung Slot → Feldboss im Paket 0x9101 (`GameData/field_bosses.json`) |
 
 Spieldaten, Namen und Klassen-Icons: © NCSOFT. AION ist eine Marke von NCSOFT. AetherDPS ist ein inoffizielles Fan-Projekt.

@@ -2,6 +2,10 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
+## 0.6.4
+
+- **Charakter-Profile im Reiter Gruppe:** Klick auf dich („Mein Charakter“) oder ein Gruppenmitglied zeigt Stufe, Itemstufe, Kampfkraft, die komplette Ausrüstung mit Verzauberung und die Skills – direkt von NCSOFT (dieselben öffentlichen Daten wie auf aion2.plaync.com). Abgefragt wird nur auf Klick
+
 ## 0.6.3
 
 - **Timer als Kacheln:** Im Overlay ist jeder Timer eine kleine Kachel (Name oben, Zeit groß). Rechtsklick auf den Kopf: **Spalten** (1–4, z. B. 2×2 oder 3×2), **alle einzeln lösen** oder **alle zurück**. Einzelne Kacheln frei ziehen – zum Zurücklegen einfach wieder auf die Gruppe ziehen

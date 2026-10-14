@@ -162,6 +162,7 @@ public static class AppServices
         services.AddSingleton(sp => new CommunityService(sp.GetRequiredService<MeterSettings>(),
             typeof(Program).Assembly.GetName().Version ?? new Version(0, 0, 0)));
         services.AddSingleton<ReportViewModel>();
+        services.AddSingleton<Armory>();
         services.AddSingleton<CommunityController>();
         return services;
     }
