@@ -84,6 +84,12 @@ Die exe entpackt Sprachdateien und Spieldaten beim ersten Start nach `%TEMP%\.ne
 
 **Umbenennung (0.6.0):** Bis 0.5.0 hieß alles „Aion2Meter“. Alte Versionen suchen im Release nach `Aion2Meter.exe`, deshalb lädt die Pipeline dieselbe Datei zusätzlich unter diesem Namen hoch (`tools/release.ps1`). Kann entfallen, wenn die Nutzungszahlen keine Version ≤ 0.5.0 mehr zeigen. Der alte Datenordner zieht beim ersten Start um (`LegacyMigration`). GitHub leitet `yykk62/Aion2Meter` auf `yykk62/AetherDPS` um.
 
+## Feldbosse
+
+- Daten: `AetherDPS.Engine/GameData/field_bosses.json`, neu bauen mit `python tools/build-field-bosses.py` (SkeeveAN + Waffle, MIT; Respawn-Minuten TheLoop705, GPL-3.0+). Namen kommen per NPC-Code aus `GameData/<sprache>/npcs.json`.
+- `FieldBosses` liest das Paket 0x9101 (siehe PROTOKOLL.md), Zustand pro Server in `%LOCALAPPDATA%\AetherDPSeldbosse.json` (inkl. Sternen und selbst gemessener Respawn-Dauer).
+- Eltnen/Morheim sind in der EU noch nicht live; ihre Karten erscheinen erst, wenn der Server sie schickt.
+
 ## Community-Funktionen
 
 `AetherDPS.Engine/Community/` – alles, was ins Netz geht:

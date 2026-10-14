@@ -40,6 +40,8 @@ public sealed partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private LanguageOption selectedLanguage;
     [ObservableProperty] private bool languageChanged;
     [ObservableProperty] private bool usageStats;
+    [ObservableProperty] private string discordWebhook = "";
+    [ObservableProperty] private string webhookStatus = "";
 
     public IReadOnlyList<LanguageOption> Languages { get; } =
     [
@@ -60,6 +62,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         this.meter = meter;
         selectedLanguage = Languages.FirstOrDefault(l => l.Code == meter.Language) ?? Languages[0];
         usageStats = meter.UsageStats == true;
+        discordWebhook = meter.DiscordWebhook ?? "";
         UsageStatsExample = Loc.T("settings.usage_stats_example", community.PingExample());
         meter.Changed += (_, _) => UsageStats = meter.UsageStats == true;
         this.upstream = upstream;
@@ -89,6 +92,30 @@ public sealed partial class SettingsViewModel : ObservableObject
         meter.Language = value.Code;
         meter.Save();
         LanguageChanged = Loc.Resolve(value.Code) != Loc.Language;
+    }
+
+    partial void OnDiscordWebhookChanged(string value)
+    {
+        var url = value.Trim();
+        bool valid = Engine.Community.DiscordWebhook.IsValid(url);
+        WebhookStatus = url.Length == 0 ? "" : valid ? "" : Loc.T("settings.webhook_invalid");
+        var stored = url.Length == 0 ? null : valid ? url : meter.DiscordWebhook;
+        if (stored == meter.DiscordWebhook) return;
+        meter.DiscordWebhook = stored;
+        meter.Save();
+    }
+
+    [RelayCommand]
+    private async Task TestWebhookAsync()
+    {
+        if (!Engine.Community.DiscordWebhook.IsValid(DiscordWebhook))
+        {
+            WebhookStatus = Loc.T("settings.webhook_invalid");
+            return;
+        }
+        WebhookStatus = Loc.T("settings.webhook_testing");
+        bool ok = await Engine.Community.DiscordWebhook.SendAsync(DiscordWebhook.Trim(), Loc.T("settings.webhook_test_message"));
+        WebhookStatus = Loc.T(ok ? "settings.webhook_ok" : "settings.webhook_failed");
     }
 
     partial void OnUsageStatsChanged(bool value)

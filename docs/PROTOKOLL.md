@@ -30,6 +30,11 @@ Stand: Oktober 2026, ausgelesen aus RATmeter, NOIA2 und a2kit. Die maßgebliche 
 | `0x3847` | Skill-Abklingzeit |
 | `0x3616` | Serverwechsel: neue Spielserver-Adresse als Text (z. B. `87.232.75.228`). Kommt beim Betreten und Verlassen eines Dungeons, nicht bei Teleports. Der Name des Dungeons steht nicht drin |
 | `0xE005` | Stagger-Leiste eines Bosses: `[Boss varint] 03 01 [Max u32] [Aktuell u32] [Zustand]`, Zustand 3 = angekündigt, 2 = läuft, 0/1 = vorbei. `[Boss] 00 03 02 00` = Leiste gebrochen. Jeder Skill senkt sie um einen festen Wert (Tabelle in `StaggerTracker`) |
+| `0x3621` | Karte geladen: `u32 Zähler, u32 Karten-Id`. Instanzen haben Ids ab 600000 = Dungeon-Id mit Schwierigkeit (A2Tools). In der EU-Aufnahme: Draupnir 600032, Verteron 1010 |
+| `0x9101` | Feldboss-Liste der Karte, jede Sekunde solange die Karte im Spiel offen ist: `u16 0, Karte u32, Anzahl u8, n × (lebt u8, Slot varint, [lebt: x y z f32], [u8?], Zeit i64 ms)`. Slot = Karte×100+Platz (Eltnen/Morheim: NPC-Code). Zeit = seit wann er lebt bzw. Respawn. Geprüft an EU-Aufnahme (Verteron, 24 Bosse) |
+| `0x6100` | Zeitlimit im Dungeon: `Karte u32, Art u8, Start i64 ms, Ende i64 ms`. Draupnir: Art 1 = 30 s Start-Countdown, Art 2 = 60 Min. |
+| `0x8D21` | Kampf an/aus eines Mobs: `[Mob varint] 00 {00/01}` (laut Aion2Flow/TK; noch nicht genutzt) |
+| `0x9707` | Beitrittsanfrage an deine Gruppe (Name, Klasse, Kampfkraft, Server; laut TK-open-public/Waffle; in EU noch nicht gesehen, noch nicht genutzt) |
 | `0x3804` mit Skill 0 | normaler Angriff eines Mobs (z. B. auf dich) – RATmeter verwirft ihn, wir nutzen ihn für den Todes-Rückblick |
 
 **Schadenspaket:**

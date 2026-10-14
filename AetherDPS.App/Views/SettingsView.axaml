@@ -144,6 +144,20 @@
       </StackPanel>
     </Border>
 
+    <!-- ===== Discord ===== -->
+    <Border Classes="card">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="section" Text="{l:T settings.section.discord}" />
+        <TextBlock Classes="label" Text="{l:T settings.webhook}" />
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBox Text="{Binding DiscordWebhook}" Watermark="https://discord.com/api/webhooks/…" />
+          <Button Grid.Column="1" Content="{l:T settings.webhook_test}" Command="{Binding TestWebhookCommand}" Margin="8,0,0,0" />
+        </Grid>
+        <TextBlock Classes="dim" Text="{Binding WebhookStatus}" IsVisible="{Binding WebhookStatus, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        <TextBlock Classes="dim" Text="{l:T settings.webhook_hint}" />
+      </StackPanel>
+    </Border>
+
     <!-- ===== Start ===== -->
     <Border Classes="card">
       <StackPanel Spacing="14">

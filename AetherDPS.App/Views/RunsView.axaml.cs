@@ -13,9 +13,17 @@ public partial class RunsView : UserControl
         InitializeComponent();
         DataContextChanged += (_, _) =>
         {
-            if (subscribed is not null) subscribed.CopyImageRequested -= OnCopyImage;
+            if (subscribed is not null)
+            {
+                subscribed.CopyImageRequested -= OnCopyImage;
+                subscribed.RenderImage = null;
+            }
             subscribed = DataContext as RunsViewModel;
-            if (subscribed is not null) subscribed.CopyImageRequested += OnCopyImage;
+            if (subscribed is not null)
+            {
+                subscribed.CopyImageRequested += OnCopyImage;
+                subscribed.RenderImage = () => ClipboardImage.RenderPng(DetailsCard);
+            }
         };
     }
 

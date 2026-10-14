@@ -57,6 +57,37 @@
         </StackPanel>
       </Border>
 
+      <!-- Feldbosse -->
+      <Border Classes="card">
+        <StackPanel Spacing="8">
+          <TextBlock Classes="h2" Text="{l:T fb.title}" />
+          <TextBlock Classes="dim" FontSize="12" TextWrapping="Wrap" Text="{l:T fb.hint}" />
+          <TextBlock Foreground="#E0A84A" FontSize="12" TextWrapping="Wrap" Text="{l:T fb.open_map}" IsVisible="{Binding !FieldBossesKnown}" />
+          <ItemsControl ItemsSource="{Binding FieldBossGroups}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:FieldBossGroup">
+                <Expander Header="{Binding Name}" IsExpanded="{Binding Expanded}" HorizontalAlignment="Stretch" Margin="0,0,0,6">
+                  <ItemsControl ItemsSource="{Binding Rows}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:FieldBossRow">
+                        <Grid ColumnDefinitions="30,*,Auto,Auto" Margin="0,1">
+                          <Button Content="{Binding IsFavorite, Converter={x:Static l:BoolText.StarFilledElseEmpty}}" Command="{Binding ToggleFavoriteCommand}"
+                                  Background="Transparent" Foreground="#E0A84A" Padding="2,0" FontSize="15" ToolTip.Tip="{l:T fb.star_tip}" />
+                          <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                          <TextBlock Grid.Column="2" Text="{Binding At}" Classes="dim" FontSize="12" VerticalAlignment="Center" Margin="12,0,0,0" />
+                          <TextBlock Grid.Column="3" Text="{Binding State}" MinWidth="110" TextAlignment="Right" FontWeight="SemiBold" VerticalAlignment="Center" Margin="12,0,0,0"
+                                     Foreground="{Binding IsUp, Converter={x:Static l:BoolBrush.DueGreenElseText}}" />
+                        </Grid>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </Expander>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+
       <!-- Zeitpläne -->
       <Border Classes="card">
         <StackPanel Spacing="8">

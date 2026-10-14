@@ -14,6 +14,12 @@ Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des G
 - **Nachrichten vom Entwickler** (z. B. „Update kommt heute Abend“) erscheinen im Hauptfenster
 - **Anonyme Nutzungszahl** (freiwillig, fragt beim Start): einmal am Tag ein Signal mit Version und Sprache, ohne Namen oder Kennung
 - „Was ist neu“ nach jedem Update
+- **Feldbosse mit den echten Zeiten des Servers:** Öffnest du im Spiel die Karte, kennt der Meter alle Feldbosse dieser Karte: wer lebt, wer wann wiederkommt (Verteron, Altgard, Abyss). Mit ★ landen Bosse im Timer-Overlay und erinnern dich vor dem Respawn. Die Respawn-Dauer lernt der Meter mit
+- **Zeitlimit im Dungeon** als Countdown auf der Boss-Karte und in der Mini-Leiste (vom Server, rot in der letzten Minute)
+- **Erfassungsquote:** Bei besiegten Bossen steht im Läufe-Archiv, wie viel ihres Lebens der Meter erfasst hat – so siehst du, dass nichts fehlt
+- **Erlittener Schaden** pro Spieler in der Kampfanalyse
+- **An Discord senden:** Webhook in den Einstellungen eintragen, dann postet ein Klick den Lauf als Bild und Text in deinen Kanal
+- **EU-Termine:** Artefakt-Belagerung (Mo, Do, Sa 21:00) statt der bisherigen geschätzten Vorlagen; Abyss-Bosse stehen jetzt bei den Feldbossen
 
 ## 0.5.0
 

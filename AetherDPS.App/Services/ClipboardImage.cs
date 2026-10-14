@@ -15,14 +15,17 @@ public static partial class ClipboardImage
     private const uint CfDib = 8, GmemMoveable = 0x0002;
 
     /// <summary>Control (z. B. die Lauf-Details) als Bild rendern und kopieren.</summary>
-    public static bool CopyControl(Control control, double scale = 1.5)
+    public static bool CopyControl(Control control, double scale = 1.5) => SetPng(RenderPng(control, scale));
+
+    /// <summary>Control als PNG (z. B. für Discord).</summary>
+    public static byte[] RenderPng(Control control, double scale = 1.5)
     {
         var size = new PixelSize(Math.Max(1, (int)(control.Bounds.Width * scale)), Math.Max(1, (int)(control.Bounds.Height * scale)));
         using var rtb = new RenderTargetBitmap(size, new Vector(96 * scale, 96 * scale));
         rtb.Render(control);
         using var png = new MemoryStream();
         rtb.Save(png);
-        return SetPng(png.ToArray());
+        return png.ToArray();
     }
 
     public static bool SetPng(byte[] png)

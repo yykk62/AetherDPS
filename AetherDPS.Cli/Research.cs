@@ -98,12 +98,18 @@ static class Research
         zones.Changed += entered => events.Add((now, entered ? $"Dungeon betreten: {zones.DungeonName ?? "?"} (Karte {zones.MapId}, {zones.InstanceAddress})" : $"Dungeon verlassen (Karte {zones.MapId})"));
         host.Get<AetherDPS.Engine.Community.PatchDetector>().Changed += broken =>
             events.Add((now, broken ? "Patch-Erkennung: versteht die Pakete nicht mehr" : "Patch-Erkennung: wieder in Ordnung"));
+        var runTracker = host.Get<RunTracker>();
+        runTracker.Start();
         var dispatch = host.Get<AionDpsMeter.Services.PacketProcessing.Routing.PacketDispatchService>();
         var previousObserver = dispatch.Observer;
         dispatch.Observer = (op, data) =>
         {
             previousObserver?.Invoke(op, data);
             if (op == ZoneTracker.OpMapLoad) events.Add((now, $"Karte geladen: {ZoneTracker.ParseMapId(data)}"));
+            if (op == FieldBosses.OpList && FieldBosses.Parse(data) is { } list)
+                events.Add((now, $"Feldboss-Liste Karte {list.Map}: {list.Entries.Count} Bosse, {list.Entries.Count(e => e.Alive)} leben"));
+            if (op == InstanceTimer.Op && InstanceTimer.Parse(data) is { } t)
+                events.Add((now, $"Zeitlimit Karte {t.Map} Art {t.Kind}: {(t.End - t.Start).TotalMinutes:0.#} Min. bis {t.End:HH:mm:ss}"));
         };
         var recap = host.Get<DeathRecap>();
         recap.Clock = () => Local(now);
@@ -139,6 +145,10 @@ static class Research
         Line("\n== Erkannt ==");
         foreach (var (ms, text) in events) Line($"{Local(ms):HH:mm:ss} [{SegmentOf(ms)}] {text}");
         Line($"Schaden auf dich (Treffer): {recap.IncomingHits}");
+        var snap = runTracker.Snapshot();
+        foreach (var b in snap.Bosses)
+            Line($"Lauf-Boss {b.Name}: {(b.Killed ? "besiegt" : "offen")}, Schaden {b.Damage:N0} / Leben {b.HpMax:N0}, erfasst {(b.Coverage is double c ? $"{c:0.0} %" : "–")}");
+        Line($"Erlittener Schaden (Lauf): {string.Join(", ", snap.Players.Select(p => $"{(p.IsUser ? "DU" : "Spieler")} {p.DamageTaken:N0}"))}");
         foreach (var (id, b) in bossHits)
             Line($"Boss {b.Name} (#{id}): {Local(b.First):HH:mm:ss}–{Local(b.Last):HH:mm:ss}, {b.Hits} Treffer, {b.Damage:N0} Schaden");
 

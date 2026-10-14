@@ -62,15 +62,25 @@ public sealed class ScheduleEntry
             Name = Loc.T("schedule.default.rift"), Category = "Riss", Times = [riftAnchor], IntervalHours = riftInterval,
             Reminder = riftReminder, Unconfirmed = true,
         },
+        .. EuEvents(),
+    ];
+
+    /// <summary>
+    /// EU-Termine (Europe/Berlin) nach TheLoop705/aion2dps (GPL-3.0-or-later, data/timers.json): die
+    /// Artefakt-Belagerung hat die spieleigene Bossliste bestätigt, die Dimensions-Invasion ist eine
+    /// Schätzung der Community. Die Abyss-Bosse (Nahma, Vollstrecker, Kaira) stehen bei den Feldbossen.
+    /// </summary>
+    public static List<ScheduleEntry> EuEvents() =>
+    [
         new()
         {
-            Name = Loc.T("schedule.default.rift_conquest"), Category = "Riss", Enabled = false, Unconfirmed = true,
-            Days = [DayOfWeek.Monday, DayOfWeek.Thursday, DayOfWeek.Saturday], Times = ["20:00", "23:00"],
+            Name = Loc.T("schedule.default.artifact_siege"), Category = "Event", Reminder = false,
+            Days = [DayOfWeek.Monday, DayOfWeek.Thursday, DayOfWeek.Saturday], Times = ["21:00"],
         },
         new()
         {
-            Name = Loc.T("schedule.default.abyss_boss"), Category = "Weltboss", Enabled = false, Unconfirmed = true,
-            Days = [DayOfWeek.Wednesday, DayOfWeek.Saturday], Times = ["21:45", "22:15", "22:45"],
+            Name = Loc.T("schedule.default.invasion"), Category = "Event", Enabled = false, Unconfirmed = true, Reminder = false,
+            Times = ["00:30"], IntervalHours = 1,
         },
     ];
 }

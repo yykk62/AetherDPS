@@ -31,8 +31,8 @@
 | ⚔ **DPS-Meter** | Boss mit Lebensbalken, darunter Schaden, DPS, Anteil und Kampfkraft jedes Gruppenmitglieds. Skill-Details per Klick. Start mit STRG+W oder automatisch bei jedem Boss |
 | 🗺 **Dungeons** | Der Meter erkennt, in welchem Dungeon du bist (mit Schwierigkeit), und benennt Läufe danach |
 | 👥 **Nur deine Gruppe** | Fremde in der Nähe erscheinen nie. Beschwörungen zählen zu ihrem Besitzer |
-| 🏆 **Läufe-Archiv** | Jeder Dungeon mit Boss-Zeiten, Bestzeit und Kampfanalyse, als Bild oder Text für Discord kopierbar |
-| ⏱ **Timer-Overlay** | Risse, Weltbosse, Events und Feldbosse mit Erinnerung, frei anpassbar |
+| 🏆 **Läufe-Archiv** | Jeder Dungeon mit Boss-Zeiten, Bestzeit, Erfassungsquote und Kampfanalyse (inkl. erlittenem Schaden), als Bild oder Text kopierbar oder per Klick in deinen Discord-Kanal |
+| ⏱ **Timer & Feldbosse** | Alle Feldbosse mit den echten Respawn-Zeiten des Servers (Karte im Spiel öffnen genügt), Risse, Artefakt-Belagerung, eigene Timer, mit Erinnerung und eigenem Overlay. Im Dungeon läuft das Zeitlimit mit |
 | 💥 **Stagger & Tode** | Stagger-Leiste des Bosses mit Auswertung danach (wer hat wie viel beigetragen?). Nach deinem Tod: woran du gestorben bist |
 | ✅ **Checkliste** | Tägliches und Wöchentliches mit automatischem Reset |
 | 📶 **Verbindung** | Ping-Verlauf, Lag-Spitzen und eine Prüfung, ob das Problem bei dir, beim Anbieter oder beim Spielserver liegt |
@@ -127,9 +127,13 @@ Aufbau und Wartung stehen in [docs/WARTUNG.md](docs/WARTUNG.md), das Protokoll i
 
 ## Danke an
 
+Alle Quellen mit Lizenz stehen in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). Besonders:
+
+
 - **[RATmeter](https://github.com/Kuroukihime/AIon2-Dps-Meter)** von Kuroukihime (GPL-3.0): Netzwerkmitschnitt, Paketverarbeitung, Kampf-Sessions und die Mob-/Skill-Datenbank. Dieses Projekt ist ein Fork davon.
 - **[A2Tools](https://github.com/taengu/A2Tools-DPS-Meter)** von taengu (GPL-3.0): Skill-, NPC-, Buff-, Dungeon- und Servernamen in 10 Sprachen sowie die Erkenntnis, wie man den Kartenwechsel (und damit den Dungeon) im Netzwerkverkehr erkennt
 - **[Daevalog](https://github.com/Seralth/Daevalog)** von Seralth (GPL-3.0): Buff-Daten, über A2Tools übernommen
+- **[aion2dps](https://github.com/TheLoop705/aion2dps)** (GPL-3.0+), **[Aion-DPS-Meter](https://github.com/SkeeveAN/Aion-DPS-Meter)** (MIT), **[waffle_meter](https://github.com/Waffle-ens/waffle_meter)** (MIT) und **[aion2-dps-meter](https://github.com/cyberbadger6969/aion2-dps-meter)** (GPL-3.0): Feldboss-Liste, EU-Respawn-Zeiten und Zeitlimit-Paket
 - Klassen-Icons: © NCSOFT. Es sind die Icons aus AION 2, übernommen aus RATmeter und als Fan-Inhalt verwendet. Sie fallen nicht unter die GPL.
 
 ## In English
@@ -138,7 +142,7 @@ Aufbau und Wartung stehen in [docs/WARTUNG.md](docs/WARTUNG.md), das Protokoll i
 
 - **DPS meter** with boss card, damage, DPS, share and combat power for your party only, skill details, stagger analysis and death recap
 - **Run archive** named after the dungeon, with boss times, best time and combat analysis, copyable for Discord
-- **Timers** for rifts, world bosses, events and field bosses, **checklist**, **connection monitor**, **second-screen screenshot**
+- **Field bosses with the server's real respawn times** (just open the map in game), rifts, Artifact Siege, dungeon time limit, **checklist**, **connection monitor**, **second-screen screenshot**, **post runs to Discord**
 - **Automatic updates**, a warning after game patches, and **Report a problem** straight from the app
 
 **Download:** [AetherDPS.exe](https://github.com/yykk62/AetherDPS/releases/latest), a single file with no installation needed (Windows 10/11, 64-bit). On first start it sets up Npcap with one click.

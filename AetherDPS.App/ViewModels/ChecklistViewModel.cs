@@ -70,7 +70,7 @@ public sealed partial class ChecklistViewModel : ObservableObject
     {
         var next = service.NextReset(period, now);
         var left = next - now;
-        var leftText = left.TotalHours >= 24 ? $"{(int)left.TotalDays} T {left.Hours} Std." : $"{(int)left.TotalHours} Std. {left.Minutes} Min.";
+        var leftText = left.TotalHours >= 24 ? Loc.T("time.days_hours", (int)left.TotalDays, left.Hours) : Loc.T("time.hours_minutes", (int)left.TotalHours, left.Minutes);
         return $"{rows.Count(r => r.IsDone)}/{rows.Count} erledigt · Reset {next:ddd HH:mm} (in {leftText})";
     }
 

@@ -31,6 +31,8 @@ public sealed class RunTracker
     private DateTime? lastHit;
     private string? dungeon;
     private TimeSpan combatTime;
+    // Schaden, den Spieler von Mobs bekommen (RATmeter verwirft diese Treffer, wir sehen sie über RawDamage)
+    private readonly Dictionary<int, long> taken = [];
 
     /// <summary>Nach dem Stopp eines Laufs mit Schaden (für das Archiv).</summary>
     public event Action<RunSnapshot>? Completed;
@@ -41,7 +43,19 @@ public sealed class RunTracker
         sessions.DamageRecorded += Add;
         sessions.PlayerDied += OnPlayerDied;
         sessions.BuffRecorded += OnBuff;
+        sessions.RawDamage += OnRawDamage;
         entities.EntityDied += OnEntityDied;
+    }
+
+    private void OnRawDamage(int targetId, int actorId, int skillCode, long damage)
+    {
+        if (damage <= 0 || targetId == actorId) return;
+        if (entities.GetPlayerEntity(targetId) is null || entities.GetPlayerEntity(actorId) is not null) return;
+        lock (gate)
+        {
+            if (!Recording) return;
+            taken[targetId] = taken.GetValueOrDefault(targetId) + damage;
+        }
     }
 
     public bool IsRunning { get { lock (gate) return startedAt is not null && stoppedAt is null; } }
@@ -72,6 +86,7 @@ public sealed class RunTracker
         stoppedAt = null;
         lastHit = null;
         dungeon = null;
+        taken.Clear();
         combatTime = TimeSpan.Zero;
     }
 
@@ -188,7 +203,8 @@ public sealed class RunTracker
                 p.Hits,
                 p.Crits,
                 p.Deaths.Count,
-                Math.Min(100, p.ActiveTime.TotalSeconds * 100 / seconds));
+                Math.Min(100, p.ActiveTime.TotalSeconds * 100 / seconds),
+                taken.GetValueOrDefault(p.Id));
         }).OrderByDescending(r => r.Damage).ToList();
 
         var bosses = targets.Values
@@ -200,7 +216,8 @@ public sealed class RunTracker
                 (x.Target.DiedAt ?? x.Target.LastHit) - x.Target.FirstHit,
                 x.Target.DiedAt is not null,
                 x.Target.Damage,
-                x.Target.Attempts))
+                x.Target.Attempts,
+                x.Mob!.HpTotal))
             .Where(b => b.IsSignificant(total))
             .OrderBy(b => b.StartOffset)
             .ToList();
@@ -344,14 +361,21 @@ public sealed class RunTracker
 }
 
 public sealed record RunPlayer(int PlayerId, string Name, bool IsUser, bool IsIdentified, int ClassId, string ClassName,
-    long Damage, double Dps, double Share, int Hits, int Crits, int Deaths = 0, double ActivityPercent = 0);
+    long Damage, double Dps, double Share, int Hits, int Crits, int Deaths = 0, double ActivityPercent = 0, long DamageTaken = 0);
 
 public sealed record RunSkill(string Name, long Damage, double Share, int Hits, double CritRate);
 
 public sealed record RunBuff(string Name, double UptimePercent, int Applications);
 
-public sealed record RunBoss(string Name, TimeSpan StartOffset, TimeSpan Duration, bool Killed, long Damage, int Attempts = 1)
+public sealed record RunBoss(string Name, TimeSpan StartOffset, TimeSpan Duration, bool Killed, long Damage, int Attempts = 1, long HpMax = 0)
 {
+    /// <summary>
+    /// Erfasster Anteil: Schaden der Gruppe im Verhältnis zum Leben des besiegten Bosses (Idee aus
+    /// Helveticxa/Aether und TheLoop705). Deutlich unter 100 % = Pakete verpasst oder Fremde haben mitgehauen.
+    /// </summary>
+    /// Unplausible Werte (Phantome melden z. B. 66 Leben) bleiben leer.
+    public double? Coverage => Killed && HpMax > 0 && Damage * 100.0 / HpMax is var c && c is >= 20 and <= 130 ? c : null;
+
     /// <summary>
     /// Ein echter Bosskampf: besiegt oder mindestens 5 % des Laufschadens. Ein paar Streiftreffer
     /// (13.10.: „Verfaulter Kutar“ mit 2.690 von 728.660 Schaden) zählen nicht.

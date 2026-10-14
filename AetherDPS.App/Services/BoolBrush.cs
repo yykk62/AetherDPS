@@ -53,3 +53,9 @@ public sealed class StepBrush : IValueConverter
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
         throw new NotSupportedException();
 }
+
+public static class BoolText
+{
+    public static readonly Avalonia.Data.Converters.IValueConverter StarFilledElseEmpty =
+        new Avalonia.Data.Converters.FuncValueConverter<bool, string>(star => star ? "★" : "☆");
+}

@@ -43,8 +43,12 @@ public sealed partial class RunsViewModel : ObservableObject
     /// <summary>Die View rendert die Details als Bild (Control nötig) – Anfrage per Event.</summary>
     public event EventHandler? CopyImageRequested;
 
-    public RunsViewModel(RunArchive archive, RunTracker tracker, TrackingMode mode)
+    private readonly MeterSettings meterSettings;
+
+    public RunsViewModel(RunArchive archive, RunTracker tracker, TrackingMode mode, MeterSettings meterSettings)
     {
+        this.meterSettings = meterSettings;
+        meterSettings.Changed += (_, _) => Dispatcher.UIThread.Post(RefreshWebhook);
         this.archive = archive;
         this.tracker = tracker;
         this.mode = mode;
@@ -127,7 +131,8 @@ public sealed partial class RunsViewModel : ObservableObject
         foreach (var b in current.Bosses.Where(b => b.IsSignificant(current.TotalDamage)))
             Bosses.Add(new BossRow(b.Name,
                 Loc.T("runs.boss_detail", RunArchive.Fmt(b.StartOffset), RunArchive.Fmt(b.Duration), Format.Compact(b.Damage))
-                    + (b.Attempts > 1 ? " · " + Loc.T("runs.attempts", b.Attempts) : ""),
+                    + (b.Attempts > 1 ? " · " + Loc.T("runs.attempts", b.Attempts) : "")
+                    + (b.Coverage is double c ? " · " + Loc.T("runs.coverage", Math.Min(100, c).ToString("0", Loc.Culture)) : ""),
                 b.Killed));
 
         SelectedPlayer = Players.FirstOrDefault(p => p.PlayerId == selectedId)
@@ -149,8 +154,9 @@ public sealed partial class RunsViewModel : ObservableObject
             Loc.T("runs.active", p.ActivityPercent.ToString("0", Loc.Culture)),
             p.Deaths == 0 ? Loc.T("runs.no_deaths") : Loc.T("runs.deaths", p.Deaths),
             Loc.T("runs.hits", p.Skills.Sum(s => s.Hits)),
+            p.DamageTaken > 0 ? Loc.T("runs.taken", Format.Compact(p.DamageTaken)) : "",
         };
-        PlayerFacts = string.Join(" · ", facts);
+        PlayerFacts = string.Join(" · ", facts.Where(f => f.Length > 0));
 
         long top = p.Skills.Count > 0 ? p.Skills.Max(s => s.Damage) : 0;
         foreach (var s in p.Skills)
@@ -175,6 +181,29 @@ public sealed partial class RunsViewModel : ObservableObject
 
     [RelayCommand]
     private void CopyImage() => CopyImageRequested?.Invoke(this, EventArgs.Empty);
+
+    /// <summary>Vom View gesetzt: rendert die Lauf-Karte als PNG.</summary>
+    public Func<byte[]>? RenderImage { get; set; }
+
+    public bool HasWebhook => AetherDPS.Engine.Community.DiscordWebhook.IsValid(meterSettings.DiscordWebhook);
+
+    [ObservableProperty] private bool isPosting;
+
+    /// <summary>Lauf als Bild + Text in den eingetragenen Discord-Kanal.</summary>
+    [RelayCommand]
+    private async Task SendToDiscordAsync()
+    {
+        if (current is null || IsPosting || !HasWebhook) return;
+        IsPosting = true;
+        byte[]? png = null;
+        try { png = RenderImage?.Invoke(); } catch (Exception) { /* dann nur Text */ }
+        var ok = await AetherDPS.Engine.Community.DiscordWebhook.SendAsync(meterSettings.DiscordWebhook!,
+            RunArchive.ToDiscordText(current, GameText.ClassName), png);
+        IsPosting = false;
+        Notice = Loc.T(ok ? "runs.discord_sent" : "runs.discord_failed");
+    }
+
+    public void RefreshWebhook() => OnPropertyChanged(nameof(HasWebhook));
 
     public void ReportImageCopied(bool ok) =>
         Notice = ok ? Loc.T("runs.copied_image") : Loc.T("runs.copy_failed");

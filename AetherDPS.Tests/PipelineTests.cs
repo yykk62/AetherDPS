@@ -407,6 +407,57 @@ public sealed class PipelineTests : IDisposable
     }
 
     [Fact]
+    public void Feldboss_Liste_aus_einer_EU_Aufnahme()
+    {
+        // Verteron (Karte 1010), 14.10.2026 – nur die ersten 200 Bytes, die Liste ist dort abgeschnitten
+        var data = Convert.FromHexString("970401910000F203000018008E9506F6F3FAEE37A10100000189950600AD60C7805AA6C700981E4600DCFA2DA1010000018F9506003E07C7006D0EC70058B845E247532CA1010000009D95063FBAAB39A1010000018C950600768DC6004C23C6001CA84697BF812CA1010000018A95060034D5C600C79DC7008087436B2CFF35A101000001909506000762C78062A14700C84F4683FA092EA1010000019A9506A3ECC8C60D0F014800BA9B46336BE92DA1010000018B950600FEB7C7000F2AC700383C467F77248B");
+        var list = FieldBosses.Parse(data);
+        Assert.NotNull(list);
+        Assert.Equal(1010, list!.Map);
+        Assert.True(list.Entries.Count >= 4);
+        var first = list.Entries[0];
+        Assert.Equal(101006, first.Slot);
+        Assert.False(first.Alive);
+        Assert.InRange(DateTimeOffset.FromUnixTimeMilliseconds(first.TimeMs).Year, 2026, 2027);
+        Assert.Contains(list.Entries, e => e.Alive);
+        Assert.All(list.Entries, e => Assert.InRange(e.Slot, 101001, 101024));
+    }
+
+    [Fact]
+    public void Feldbosse_merken_sich_die_Zeiten_des_Servers()
+    {
+        using var host = NewHost();
+        var bosses = host.Get<FieldBosses>();
+        Assert.Equal(84, bosses.Maps.Sum(m => m.Bosses.Count));
+        var respawn = DateTimeOffset.UtcNow.AddMinutes(42).ToUnixTimeMilliseconds();
+        var since = DateTimeOffset.UtcNow.AddMinutes(-5).ToUnixTimeMilliseconds();
+        host.Feed(SyntheticPackets.Heartbeat(), 1_000);
+        host.Feed(SyntheticPackets.FieldBossList(1110, (111001, false, respawn), (111002, true, since)), 1_100);
+        var views = bosses.Views().ToDictionary(v => v.Boss.Slot);
+        Assert.Equal(FieldBossStatus.Respawning, views[111001].Status);
+        Assert.InRange((views[111001].Time!.Value - DateTime.Now).TotalMinutes, 41, 43);
+        Assert.Equal(FieldBossStatus.Alive, views[111002].Status);
+        Assert.Equal(FieldBossStatus.Unknown, views[111003].Status);
+        Assert.Equal(FieldBossStatus.Scheduled, views.Values.First(v => v.Boss.Fixed is not null).Status);
+        Assert.True(bosses.HasData);
+
+        bosses.SetFavorite(views[111001].Boss.Npc, true);
+        var timers = host.Get<TimerService>();
+        Assert.Contains(timers.Items(), i => i.Kind == TimerKind.FieldBoss && i.DueAt is not null);
+    }
+
+    [Fact]
+    public void Zeitlimit_im_Dungeon()
+    {
+        // Draupnir, 14.10.2026: 60 Minuten Zeitlimit (Art 2)
+        var t = InstanceTimer.Parse(Convert.FromHexString("1B0061E027090002FDB0E037A10100007D9F1738A1010000"));
+        Assert.NotNull(t);
+        Assert.Equal(600032, t!.Value.Map);
+        Assert.Equal(2, t.Value.Kind);
+        Assert.Equal(TimeSpan.FromMinutes(60), t.Value.End - t.Value.Start);
+    }
+
+    [Fact]
     public void Servernamen_folgen_der_Sprache()
     {
         try

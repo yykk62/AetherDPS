@@ -6,7 +6,7 @@ using System.Text.Json;
 namespace AetherDPS.Engine;
 
 public sealed record ArchivedPlayer(long PlayerId, string Name, bool IsUser, int ClassId, long Damage, double Dps,
-    double Share, int Deaths, double ActivityPercent, List<RunSkill> Skills, List<RunBuff> Buffs);
+    double Share, int Deaths, double ActivityPercent, List<RunSkill> Skills, List<RunBuff> Buffs, long DamageTaken = 0);
 
 public sealed record ArchivedRun(
     string Id, DateTime StartedAt, double DurationSeconds, double CombatSeconds, string Name,
@@ -68,7 +68,8 @@ public sealed class RunArchive
                 return new ArchivedPlayer(l.PlayerId, l.PlayerName, l.IsUser, l.ClassId, l.TotalDamage, l.DamagePerSecond,
                     l.DamagePercentage, raw?.Deaths ?? 0, raw?.ActivityPercent ?? 0,
                     tracker.Skills((int)l.PlayerId, merge.MergedInto.GetValueOrDefault(l.PlayerId)).Take(12).ToList(),
-                    tracker.Buffs((int)l.PlayerId).Take(10).ToList());
+                    tracker.Buffs((int)l.PlayerId).Take(10).ToList(),
+                    raw?.DamageTaken ?? 0);
             })
             .ToList();
 

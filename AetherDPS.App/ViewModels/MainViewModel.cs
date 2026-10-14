@@ -78,6 +78,8 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty] private string hpPercentText = "";
     [ObservableProperty] private bool isBoss;
     [ObservableProperty] private string deathsText = "";
+    [ObservableProperty] private string limitText = "";
+    [ObservableProperty] private bool limitUrgent;
     [ObservableProperty] private bool hasDeaths;
     [ObservableProperty] private bool staggerVisible;
     [ObservableProperty] private bool showHpBar;
@@ -93,11 +95,28 @@ public sealed partial class MainViewModel : ObservableObject
     private static readonly TimeSpan BossLinger = TimeSpan.FromSeconds(45);
 
     private long? selectedPlayerId;
+    private readonly InstanceTimer limit;
+
+    /// <summary>Zeitlimit des Dungeons („⏱ 42:13“), rot in der letzten Minute.</summary>
+    private void UpdateLimit()
+    {
+        if (limit.Current() is not { } t)
+        {
+            LimitText = "";
+            LimitUrgent = false;
+            return;
+        }
+        var left = t.End - DateTime.Now;
+        LimitText = "⏱ " + (left.TotalHours >= 1 ? left.ToString(@"h\:mm\:ss") : left.ToString(@"mm\:ss"));
+        LimitUrgent = left <= TimeSpan.FromMinutes(1);
+    }
 
     public MainViewModel(CombatSessionManager sessions, IPacketService pipeline, IPacketCaptureDevice capture,
         RingRecorder recorder, TrackingMode mode, RunTracker run, PartyRoster roster, MeterSettings meterSettings, TimerService timers, SelfIdentity self,
-        EntityTracker entities, OwnSide own, StaggerTracker stagger, ZoneTracker zones, IAppSettingsService settings, MeterOptions options, ILogger<MainViewModel> logger)
+        EntityTracker entities, OwnSide own, StaggerTracker stagger, ZoneTracker zones, IAppSettingsService settings, MeterOptions options, ILogger<MainViewModel> logger,
+        InstanceTimer limit)
     {
+        this.limit = limit;
         this.entities = entities;
         this.own = own;
         this.stagger = stagger;
@@ -217,6 +236,7 @@ public sealed partial class MainViewModel : ObservableObject
         int deaths = snapshot.Players.Sum(p => p.Deaths);
         HasDeaths = deaths > 0;
         DeathsText = Loc.T("card.deaths", deaths);
+        UpdateLimit();
 
         // Fremde ausblenden (Gruppenmodus) und namenlose Beschwörungen ihrem Besitzer zuschlagen.
         bool userKnown = self.SelfId is not null || entries.Any(e => e.IsUser);
@@ -284,6 +304,8 @@ public sealed partial class MainViewModel : ObservableObject
         if (!string.IsNullOrWhiteSpace(server)) parts.Add(EuServers.Display(server));
         parts.Add(!IsConnected ? StatusText : pingMs >= 0 ? Loc.T("status.ping", pingMs) : Loc.T("status.connected"));
         if (zones.InInstance) parts.Add(zones.DungeonName ?? Loc.T("compact.dungeon"));
+        UpdateLimit();
+        if (LimitText.Length > 0) parts.Add(LimitText);
         parts.Add(Loc.T(mode.AutoMode ? "compact.auto" : "compact.waiting"));
         CompactInfo = string.Join(" · ", parts);
     }

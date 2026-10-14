@@ -10,7 +10,7 @@ public static class TimerIcons
 {
     public static string For(TimerItem item) => item.Kind switch
     {
-        TimerKind.Boss => "☠",
+        TimerKind.Boss or TimerKind.FieldBoss => "☠",
         TimerKind.Custom => "⏱",
         _ => item.Category switch { "Riss" => "◈", "Weltboss" => "♛", _ => "★" },
     };
@@ -37,15 +37,15 @@ public sealed partial class TimerRow(TimersViewModel owner, TimerItem item) : Ob
     {
         if (Item.DueAt is not DateTime due)
         {
-            Remaining = "–";
+            Remaining = Item.State ?? "–";
             At = "";
             return;
         }
         var left = due - now;
         IsDue = left <= TimeSpan.Zero;
         IsSoon = !IsDue && left <= TimeSpan.FromMinutes(10);
-        At = due.Date == now.Date ? $"um {due:HH:mm}" : $"{due:ddd HH:mm}";
-        Remaining = IsDue ? "jetzt" : left.TotalHours >= 24 ? $"{(int)left.TotalDays} T {left.Hours} Std."
+        At = due.Date == now.Date ? Loc.T("timer.at", due) : due.ToString("ddd HH:mm", Loc.Culture);
+        Remaining = IsDue ? Loc.T("timer.now") : left.TotalHours >= 24 ? Loc.T("time.days_hours", (int)left.TotalDays, left.Hours)
             : left.TotalHours >= 1 ? left.ToString(@"h\:mm\:ss") : left.ToString(@"mm\:ss");
     }
 
@@ -196,9 +196,57 @@ public sealed partial class ScheduleEditor : ObservableObject
 }
 
 /// <summary>Reiter „Timer“: alle Timer, Zeitplan-Editor, Feldbosse, eigene Timer.</summary>
+/// <summary>Ein Feldboss im Reiter „Timer“: Stern = im Overlay und mit Erinnerung.</summary>
+public sealed partial class FieldBossRow(FieldBosses service, FieldBossInfo boss) : ObservableObject
+{
+    public FieldBossInfo Boss { get; } = boss;
+    public string Name => Boss.Name;
+
+    [ObservableProperty] private bool isFavorite;
+    [ObservableProperty] private string state = "";
+    [ObservableProperty] private string at = "";
+    [ObservableProperty] private bool isUp;
+
+    public void Update(FieldBossView view, DateTime now)
+    {
+        IsFavorite = view.Favorite;
+        IsUp = view.Status is FieldBossStatus.Alive or FieldBossStatus.ProbablyUp;
+        At = view.Time is DateTime t && view.Status != FieldBossStatus.Unknown
+            ? (t.Date == now.Date ? t.ToString("HH:mm", Loc.Culture) : t.ToString("ddd HH:mm", Loc.Culture)) : "";
+        State = view.Status switch
+        {
+            FieldBossStatus.Alive => view.Time is DateTime since ? Loc.T("fb.alive_since", since) : Loc.T("fb.alive"),
+            FieldBossStatus.Respawning or FieldBossStatus.Scheduled when view.Time is DateTime due =>
+                Left(due - now) + (view.Estimated ? " ~" : ""),
+            FieldBossStatus.ProbablyUp => Loc.T("fb.probably_up"),
+            _ => Loc.T("fb.unknown"),
+        };
+    }
+
+    private static string Left(TimeSpan left) =>
+        left.TotalHours >= 24 ? Loc.T("time.days_hours", (int)left.TotalDays, left.Hours)
+        : left.TotalHours >= 1 ? left.ToString(@"h\:mm\:ss") : left.ToString(@"mm\:ss");
+
+    [RelayCommand]
+    private void ToggleFavorite() => service.SetFavorite(Boss.Npc, !IsFavorite);
+}
+
+public sealed class FieldBossGroup(string name, bool expanded)
+{
+    public string Name { get; } = name;
+    public bool Expanded { get; set; } = expanded;
+    public ObservableCollection<FieldBossRow> Rows { get; } = [];
+}
+
 public sealed partial class TimersViewModel : ObservableObject
 {
     private readonly TimerService timers;
+    private readonly FieldBosses fieldBosses;
+
+    /// <summary>Feldbosse je Karte (nur Karten, die es in der EU gibt oder für die schon Daten kamen).</summary>
+    public ObservableCollection<FieldBossGroup> FieldBossGroups { get; } = [];
+
+    [ObservableProperty] private bool fieldBossesKnown;
 
     public ObservableCollection<TimerRow> Rows { get; } = [];
     public ObservableCollection<ScheduleEditor> Schedules { get; } = [];
@@ -211,9 +259,11 @@ public sealed partial class TimersViewModel : ObservableObject
     /// <summary>Timer-Overlay ein/aus (die App reagiert darauf).</summary>
     public event EventHandler? OverlayVisibilityChanged;
 
-    public TimersViewModel(TimerService timers)
+    public TimersViewModel(TimerService timers, FieldBosses fieldBosses)
     {
         this.timers = timers;
+        this.fieldBosses = fieldBosses;
+        BuildFieldBosses();
         reminderMinutes = timers.Settings.ReminderMinutes.ToString(CultureInfo.InvariantCulture);
         overlayVisible = timers.Settings.OverlayVisible;
         timers.Changed += (_, _) => Avalonia.Threading.Dispatcher.UIThread.Post(Rebuild);
@@ -227,6 +277,7 @@ public sealed partial class TimersViewModel : ObservableObject
     {
         Rows.Clear();
         foreach (var item in timers.Items().OrderBy(i => i.DueAt ?? DateTime.MaxValue)) Rows.Add(new TimerRow(this, item));
+        BuildFieldBosses();
         Tick();
     }
 
@@ -246,6 +297,43 @@ public sealed partial class TimersViewModel : ObservableObject
             return;
         }
         foreach (var row in Rows) row.Update(now);
+        UpdateFieldBosses(now);
+    }
+
+    // Eltnen und Morheim gibt es in der EU noch nicht – erscheinen erst, wenn der Server sie schickt
+    private static readonly HashSet<int> EuMaps = [1010, 1110, 20, 22];
+
+    private List<int> shownMaps = [];
+
+    private List<int> VisibleMaps(Dictionary<int, FieldBossView> views) => fieldBosses.Maps
+        .Where(map => EuMaps.Contains(map.Id) || HasData(map, views)).Select(m => m.Id).ToList();
+
+    private static bool HasData(FieldBossMap map, Dictionary<int, FieldBossView> views) =>
+        map.Bosses.Any(b => views.TryGetValue(b.Slot, out var v) && v.Status is not (FieldBossStatus.Unknown or FieldBossStatus.Scheduled));
+
+    private void BuildFieldBosses()
+    {
+        var views = fieldBosses.Views().ToDictionary(v => v.Boss.Slot);
+        var visible = VisibleMaps(views);
+        if (visible.SequenceEqual(shownMaps) && FieldBossGroups.Count > 0) return;
+        shownMaps = visible;
+        FieldBossGroups.Clear();
+        foreach (var map in fieldBosses.Maps.Where(m => visible.Contains(m.Id)))
+        {
+            bool hasData = HasData(map, views);
+            var group = new FieldBossGroup(map.Name, hasData || map.Bosses.Any(b => views.TryGetValue(b.Slot, out var v) && v.Favorite));
+            foreach (var boss in map.Bosses) group.Rows.Add(new FieldBossRow(fieldBosses, boss));
+            FieldBossGroups.Add(group);
+        }
+        UpdateFieldBosses(DateTime.Now);
+    }
+
+    private void UpdateFieldBosses(DateTime now)
+    {
+        var views = fieldBosses.Views(now).ToDictionary(v => v.Boss.Slot);
+        foreach (var row in FieldBossGroups.SelectMany(g => g.Rows))
+            if (views.TryGetValue(row.Boss.Slot, out var view)) row.Update(view, now);
+        FieldBossesKnown = fieldBosses.HasData;
     }
 
     partial void OnOverlayVisibleChanged(bool value)

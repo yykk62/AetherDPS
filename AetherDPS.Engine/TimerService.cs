@@ -22,6 +22,9 @@ public sealed class TimerSettings
 
     public int ReminderMinutes { get; set; } = 5;
     public List<ScheduleEntry>? Schedules { get; set; }
+
+    /// <summary>Stand der mitgelieferten Vorlagen (1 = EU-Termine aus 0.6.0).</summary>
+    public int DefaultsVersion { get; set; }
     public Dictionary<string, int> BossRespawnMinutes { get; set; } = [];
     public HashSet<string> IgnoredBosses { get; set; } = [];
     public List<CustomTimer> Custom { get; set; } = [];
@@ -38,10 +41,11 @@ public sealed class TimerSettings
     public Dictionary<string, double[]> Detached { get; set; } = [];
 }
 
-public enum TimerKind { Schedule, Boss, Custom }
+public enum TimerKind { Schedule, Boss, Custom, FieldBoss }
 
+/// <param name="State">Statt eines Countdowns anzeigen (z. B. Feldboss „lebt“).</param>
 public sealed record TimerItem(TimerKind Kind, string Name, string Category, DateTime? DueAt, TimeSpan? Remaining,
-    string? Detail, bool ShowInOverlay, bool Unconfirmed);
+    string? Detail, bool ShowInOverlay, bool Unconfirmed, string? State = null);
 
 /// <summary>
 /// Timer: feste Zeitpläne (Risse, Weltbosse, Events – selbst anlegbar), Feldbosse (Tod wird
@@ -71,16 +75,30 @@ public sealed class TimerService
 
     private readonly ZoneTracker zones;
 
-    public TimerService(MeterOptions options, EntityTracker entities, ZoneTracker zones)
+    private readonly FieldBosses fieldBosses;
+
+    public TimerService(MeterOptions options, EntityTracker entities, ZoneTracker zones, FieldBosses fieldBosses)
     {
         this.zones = zones;
+        this.fieldBosses = fieldBosses;
+        fieldBosses.Changed += (_, _) => Changed?.Invoke(this, EventArgs.Empty);
         file = Path.Combine(options.DataDir, "timer.json");
         this.entities = entities;
         Settings = Load(file);
         if (Settings.Schedules is null)
         {
             Settings.Schedules = ScheduleEntry.Defaults(Settings.RiftAnchor, Settings.RiftIntervalHours, Settings.RiftReminder);
+            Settings.DefaultsVersion = 1;
             if (File.Exists(file)) Save();
+        }
+        else if (Settings.DefaultsVersion < 1)
+        {
+            // Bis 0.5.0 gab es zwei geschätzte Vorlagen; unverändert (aus, unbestätigt) → durch die EU-Termine ersetzen
+            Settings.Schedules.RemoveAll(s => s.Unconfirmed && !s.Enabled && s.Category is "Riss" or "Weltboss" && s.IntervalHours == 0);
+            foreach (var e in ScheduleEntry.EuEvents())
+                if (Settings.Schedules.All(s => s.Name != e.Name)) Settings.Schedules.Add(e);
+            Settings.DefaultsVersion = 1;
+            Save();
         }
         entities.EntityDied += OnEntityDied;
     }
@@ -89,6 +107,8 @@ public sealed class TimerService
     {
         var mob = entities.GetTargetMob(entityId);
         if (mob is null || mob.MobCode <= 0 || !mob.IsBoss || mob.IsDummy) return;
+        // Bekannte Feldbosse führt FieldBosses (mit den echten Zeiten des Servers)
+        if (fieldBosses.IsFieldBoss(mob.MobCode)) return;
         // Bosse im Dungeon sind keine Feldbosse – die kommen nicht wieder (14.10.: Phantom-Lakshmi u. a. im Overlay)
         if (zones.InInstance) return;
         var name = GameText.MobName(mob);
@@ -144,8 +164,22 @@ public sealed class TimerService
             }
 
             foreach (var custom in Settings.Custom)
-                list.Add(new TimerItem(TimerKind.Custom, custom.Name, "Eigener Timer", custom.EndsAt,
-                    custom.EndsAt is DateTime e ? (e > now ? e - now : TimeSpan.Zero) : null, $"{custom.Minutes} Min.", true, false));
+                list.Add(new TimerItem(TimerKind.Custom, custom.Name, "Custom", custom.EndsAt,
+                    custom.EndsAt is DateTime e ? (e > now ? e - now : TimeSpan.Zero) : null, Loc.T("timer.minutes", custom.Minutes), true, false));
+        }
+
+        // Feldbosse mit Stern: echte Zeiten vom Server (Karte im Spiel geöffnet)
+        foreach (var fb in fieldBosses.Views(now).Where(v => v.Favorite))
+        {
+            var (due, state) = fb.Status switch
+            {
+                FieldBossStatus.Respawning or FieldBossStatus.Scheduled => (fb.Time, (string?)null),
+                FieldBossStatus.Alive => ((DateTime?)null, Loc.T("fb.alive")),
+                FieldBossStatus.ProbablyUp => (null, Loc.T("fb.probably_up")),
+                _ => (null, Loc.T("fb.unknown_short")),
+            };
+            list.Add(new TimerItem(TimerKind.FieldBoss, fb.Boss.Name, "Feldboss", due, due is DateTime d ? d - now : null,
+                fb.Boss.Map.Name + (fb.Estimated ? " · " + Loc.T("fb.estimated") : ""), true, false, state));
         }
         return list;
     }
@@ -161,7 +195,7 @@ public sealed class TimerService
             foreach (var s in Settings.Schedules!.Where(s => s.Enabled && s.Reminder))
             {
                 if (s.Next(now) is DateTime next && next - now <= lead && remindedKeys.Add($"plan:{s.Name}:{next:O}"))
-                    reminders.Add((s.Name, $"um {next:HH:mm} (in {Math.Ceiling((next - now).TotalMinutes)} Min.)"));
+                    reminders.Add((s.Name, Loc.T("timer.reminder", next, Math.Ceiling((next - now).TotalMinutes))));
             }
 
             foreach (var kill in Settings.Kills)
@@ -170,6 +204,14 @@ public sealed class TimerService
                 var due = kill.KilledAt.AddMinutes(minutes);
                 if (due - now <= lead && due > now.AddMinutes(-1) && remindedKeys.Add($"boss:{kill.Name}:{due:O}"))
                     reminders.Add((kill.Name, Loc.T("timer.appears_at", due)));
+            }
+
+            foreach (var fb in fieldBosses.Views(now).Where(v => v.Favorite && v.Time is not null
+                         && v.Status is FieldBossStatus.Respawning or FieldBossStatus.Scheduled))
+            {
+                var due = fb.Time!.Value;
+                if (due - now <= lead && due > now.AddMinutes(-1) && remindedKeys.Add($"fb:{fb.Boss.Npc}:{due:O}"))
+                    reminders.Add((fb.Boss.Name, Loc.T("timer.appears_at", due)));
             }
 
             foreach (var custom in Settings.Custom)

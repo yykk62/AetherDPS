@@ -14,3 +14,9 @@ Newest versions first.
 - **Messages from the developer** (e.g. "update coming tonight") show up in the main window
 - **Anonymous usage count** (opt-in, asked on start): one signal per day with version and language, no names, no ID
 - "What's new" after every update
+- **Field bosses with the server's real times:** open the map in game and the meter knows every field boss on it – who is alive and when the others respawn (Verteron, Altgard, Abyss). Star a boss to see it in the timer overlay and get a reminder before it spawns. The meter learns respawn durations as it goes
+- **Dungeon time limit** as a countdown on the boss card and mini bar (from the server, red in the last minute)
+- **Capture rate:** for defeated bosses the run archive shows how much of their HP the meter captured – so you know nothing is missing
+- **Damage taken** per player in the combat analysis
+- **Post to Discord:** add a webhook in the settings, and one click posts the run as image and text to your channel
+- **EU schedule:** Artifact Siege (Mon, Thu, Sat 21:00) instead of the old estimated templates; Abyss bosses are now listed with the field bosses

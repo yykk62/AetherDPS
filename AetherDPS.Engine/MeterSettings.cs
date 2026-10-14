@@ -69,6 +69,9 @@ public sealed class MeterSettings
     /// <summary>Version beim letzten Start – ist sie neuer, zeigt der Meter „Was ist neu“.</summary>
     public string? LastSeenVersion { get; set; }
 
+    /// <summary>Discord-Webhook für „An Discord senden“ bei Läufen (leer = aus).</summary>
+    public string? DiscordWebhook { get; set; }
+
     /// <summary>Schon angezeigte Nachrichten an alle (Ids aus status.json).</summary>
     public List<string> SeenMessages { get; set; } = [];
 

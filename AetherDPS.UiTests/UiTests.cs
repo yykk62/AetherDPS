@@ -141,6 +141,11 @@ public sealed class UiTests : IDisposable
     {
         Start();
         BossFight();
+        var now = DateTimeOffset.UtcNow;
+        Feed(SyntheticPackets.FieldBossList(1110, (111001, false, now.AddMinutes(42).ToUnixTimeMilliseconds()),
+            (111002, true, now.AddMinutes(-5).ToUnixTimeMilliseconds()), (111003, false, now.AddMinutes(-3).ToUnixTimeMilliseconds())));
+        var fieldBosses = provider!.GetRequiredService<FieldBosses>();
+        fieldBosses.SetFavorite(fieldBosses.Maps.First(m => m.Id == 1110).Bosses[0].Npc, true);
         var hub = provider!.GetRequiredService<HubViewModel>();
         string[] names = ["dps", "laeufe", "gruppe", "timer", "checkliste", "verbindung", "einstellungen"];
         for (int tab = 0; tab < names.Length; tab++)

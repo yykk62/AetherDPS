@@ -110,6 +110,25 @@ public static class SyntheticPackets
         return Frame(body);
     }
 
+    /// <summary>Feldboss-Liste (0x9101): lebende Bosse mit Position, Zeit = seit wann bzw. Respawn (Unix ms).</summary>
+    public static byte[] FieldBossList(int map, params (int Slot, bool Alive, long TimeMs)[] entries)
+    {
+        var body = new List<byte>();
+        AddU16(body, 0x9101);
+        AddU16(body, 0);
+        AddU32(body, (uint)map);
+        body.Add((byte)entries.Length);
+        foreach (var (slot, alive, time) in entries)
+        {
+            body.Add(alive ? (byte)1 : (byte)0);
+            AddVarInt(body, (uint)slot);
+            if (alive) body.AddRange(new byte[12]);
+            body.AddRange(BitConverter.GetBytes(time));
+        }
+        body.AddRange(new byte[3]);
+        return Frame(body);
+    }
+
     /// <summary>LZ4-Container (Opcode FF FF) mit mehreren inneren Paketen.</summary>
     public static byte[] Compressed(params byte[][] inner)
     {

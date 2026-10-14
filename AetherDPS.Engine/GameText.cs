@@ -133,6 +133,9 @@ public static class GameText
     public static string MobName(Mob mob) =>
         mobs is not null && mobs.IsKnownMob(mob.MobCode) ? mobs.GetName(mob.MobCode) : mob.Name;
 
+    /// <summary>NPC-Name nach Code in der gewählten Sprache, null wenn unbekannt.</summary>
+    public static string? NpcName(int code) => mobs is not null && mobs.IsKnownMob(code) ? mobs.GetName(code) : null;
+
     public static string ClassName(int classId, string fallback) =>
         classNames.TryGetValue(classId, out var name) ? name : fallback;
 
