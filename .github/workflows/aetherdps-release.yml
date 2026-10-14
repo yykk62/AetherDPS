@@ -1,0 +1,63 @@
+# Veröffentlichen: Version in AetherDPS.App.csproj + CHANGELOG.md eintragen, dann
+#   git tag v0.2.0 && git push origin v0.2.0
+# Baut, testet und lädt AetherDPS.exe + AetherDPS.exe.sha256 als GitHub-Release hoch.
+# Das Auto-Update im Meter liest genau diese beiden Dateien.
+name: AetherDPS Release
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: 1
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Version aus dem Tag
+        id: version
+        shell: pwsh
+        run: |
+          $v = '${{ github.ref_name }}'.TrimStart('v')
+          if ($v -notmatch '^\d+\.\d+\.\d+$') { throw "Tag ${{ github.ref_name }} ist keine Version wie v1.2.3" }
+          "version=$v" >> $env:GITHUB_OUTPUT
+
+      - name: Bauen, testen, exe + Prüfsumme
+        shell: pwsh
+        run: ./tools/release.ps1 -Version ${{ steps.version.outputs.version }}
+
+      - name: Release-Text aus CHANGELOG.md
+        shell: pwsh
+        run: |
+          $v = '${{ steps.version.outputs.version }}'
+          $lines = Get-Content CHANGELOG.md -Encoding utf8
+          $start = [array]::IndexOf(($lines | ForEach-Object { $_ -match "^## \[?$([regex]::Escape($v))\]?" }), $true)
+          $notes = if ($start -ge 0) {
+            $rest = $lines[($start + 1)..($lines.Count - 1)]
+            $end = [array]::IndexOf(($rest | ForEach-Object { $_ -match '^## ' }), $true)
+            ($(if ($end -ge 0) { $rest[0..($end - 1)] } else { $rest }) -join "`n").Trim()
+          } else { "Version $v" }
+          $hash = (Get-Content artifacts/release/AetherDPS.exe.sha256).Split(' ')[0]
+          $notes += "`n`n---`n**Download:** ``AetherDPS.exe`` herunterladen und starten – keine Installation nötig.`n`nSHA-256: ``$hash``"
+          Set-Content release-notes.md $notes -Encoding utf8
+
+      - name: GitHub-Release anlegen
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create '${{ github.ref_name }}' `
+            artifacts/release/AetherDPS.exe artifacts/release/AetherDPS.exe.sha256 `
+            artifacts/release/Aion2Meter.exe artifacts/release/Aion2Meter.exe.sha256 `
+            --title 'AetherDPS ${{ steps.version.outputs.version }}' `
+            --notes-file release-notes.md

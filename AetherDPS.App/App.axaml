@@ -1,0 +1,31 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="using:AetherDPS.App.Services"
+             x:Class="AetherDPS.App.App"
+             RequestedThemeVariant="Dark">
+  <Application.Styles>
+    <FluentTheme />
+  </Application.Styles>
+
+  <TrayIcon.Icons>
+    <TrayIcons>
+      <TrayIcon Icon="/Assets/icon.ico" ToolTipText="{l:T app.title}" Clicked="OnTrayClicked">
+        <TrayIcon.Menu>
+          <NativeMenu>
+            <NativeMenuItem Header="{l:T tray.hub}" Click="OnHub" />
+            <NativeMenuItem Header="{l:T tray.show}" Click="OnToggleOverlay" />
+            <NativeMenuItem Header="{l:T tray.timer_overlay}" Click="OnToggleTimerOverlay" />
+            <NativeMenuItem Header="{l:T tray.clickthrough}" Click="OnToggleClickThrough" />
+            <NativeMenuItemSeparator />
+            <NativeMenuItem Header="{l:T tray.report}" Click="OnReport" />
+            <NativeMenuItem Header="{l:T tray.settings}" Click="OnSettings" />
+            <NativeMenuItem Header="{l:T tray.setup}" Click="OnSetup" />
+            <NativeMenuItem Header="{l:T tray.folder}" Click="OnOpenFolder" />
+            <NativeMenuItemSeparator />
+            <NativeMenuItem Header="{l:T tray.quit}" Click="OnQuit" />
+          </NativeMenu>
+        </TrayIcon.Menu>
+      </TrayIcon>
+    </TrayIcons>
+  </TrayIcon.Icons>
+</Application>

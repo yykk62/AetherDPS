@@ -1,9 +1,9 @@
 # AION-2-Protokoll (Server → Client)
 
 Neue Pakete findet die geführte Aufnahme (Tray → „Geführte Aufnahme starten“) zusammen mit
-`aion2meter-cli research <aufnahme.txt> [ausgabeordner]`: Opcodes je Abschnitt zwischen zwei F8-Marken,
-seltene Opcodes, erkannte Ereignisse. `AION2METER_FULL=E005,3616` schreibt komplette Pakete,
-`AION2METER_WINDOW=02:46:40-02:46:56` alle Pakete eines Zeitfensters. Ausgabe nie ins Repo (Spielernamen).
+`aetherdps-cli research <aufnahme.txt> [ausgabeordner]`: Opcodes je Abschnitt zwischen zwei F8-Marken,
+seltene Opcodes, erkannte Ereignisse. `AETHERDPS_FULL=E005,3616` schreibt komplette Pakete,
+`AETHERDPS_WINDOW=02:46:40-02:46:56` alle Pakete eines Zeitfensters. Ausgabe nie ins Repo (Spielernamen).
 
 Stand: Oktober 2026, ausgelesen aus RATmeter, NOIA2 und a2kit. Die maßgebliche Wahrheit ist der Code in
 `AionDpsMeter.Services/PacketProcessing`.

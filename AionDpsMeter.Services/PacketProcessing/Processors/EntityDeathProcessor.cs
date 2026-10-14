@@ -17,7 +17,7 @@ namespace AionDpsMeter.Services.PacketProcessing.Processors
             reader.ReadVarInt();      // packet length
             reader.ReadU16();         // opcode
             var entityId = (int)reader.ReadVarInt();
-            entityTracker.RaiseEntityDied(entityId); // Aion2Meter: Boss-Timer
+            entityTracker.RaiseEntityDied(entityId); // AetherDPS: Boss-Timer
 
             if (entityTracker.IsIdentifiedPlayer(entityId)) sessionManager.RegisterPlayerDeath(entityId);
         }

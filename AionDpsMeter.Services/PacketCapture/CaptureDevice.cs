@@ -47,7 +47,7 @@ namespace AionDpsMeter.Services.PacketCapture
         private AdapterContext? lockedAdapter;
         private volatile int lockedPort;
 
-        // Aion2Meter: Verbindungs-Monitor (Server-Adresse, Segmente, Lücken, erneut gesendete Segmente)
+        // AetherDPS: Verbindungs-Monitor (Server-Adresse, Segmente, Lücken, erneut gesendete Segmente)
         public System.Net.IPAddress? ServerAddress { get; private set; }
         private long tcpSegments, tcpGaps, tcpRetransmits;
         public long TcpSegments => Interlocked.Read(ref tcpSegments);

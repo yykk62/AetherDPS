@@ -8,7 +8,7 @@ namespace AionDpsMeter.Services.PacketCapture
     {
         private readonly ConcurrentDictionary<string, PacketAccumulator> _streamAccumulators = new();
         public event EventHandler<TcpPacketEventArgs>? PacketExtracted;
-        // Aion2Meter: Rohdaten für den Ringpuffer ("Problem melden").
+        // AetherDPS: Rohdaten für den Ringpuffer ("Problem melden").
         public event Action<string, byte[], long>? RawDataAdded;
         private readonly ILogger<TcpStreamBuffer> logger;
         private readonly FilePacketWriter? filePacketWriter;

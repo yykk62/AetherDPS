@@ -1,0 +1,215 @@
+using System.Collections.ObjectModel;
+using AetherDPS.App.Services;
+using AetherDPS.Engine;
+using AetherDPS.Engine.Updates;
+using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+
+namespace AetherDPS.App.ViewModels;
+
+/// <summary>Hauptfenster: Reiter DPS-Meter, Verbindung, Einstellungen.</summary>
+public sealed partial class HubViewModel : ObservableObject
+{
+    private readonly TrackingMode mode;
+    private readonly RunTracker run;
+    private readonly ConnectionMonitor monitor;
+    private readonly MeterSettings meterSettings;
+    private readonly PartyRoster roster;
+    private readonly LiveTimers live;
+    private readonly TimerService timerService;
+    private readonly UpdateService updates;
+    private readonly DispatcherTimer timer;
+
+    public MainViewModel Overlay { get; }
+    public SettingsViewModel Settings { get; }
+    public RunsViewModel Runs { get; }
+    public PartyViewModel Party { get; }
+    public TimersViewModel Timers { get; }
+    public ChecklistViewModel Checklist { get; }
+
+    public const int TabDps = 0, TabRuns = 1, TabParty = 2, TabTimers = 3, TabChecklist = 4, TabConnection = 5, TabSettings = 6;
+    public ObservableCollection<PlayerRow> RunPlayers { get; } = [];
+    public ObservableCollection<DiagnosisRow> DiagnosisRows { get; } = [];
+
+    [ObservableProperty] private int selectedTab;
+    [ObservableProperty] private bool isActive;
+    [ObservableProperty] private bool isAuto;
+    [ObservableProperty] private string modeTitle = "";
+    [ObservableProperty] private string modeText = "";
+    [ObservableProperty] private string toggleText = "";
+    [ObservableProperty] private string runSummary = "";
+    [ObservableProperty] private bool hasRun;
+    [ObservableProperty] private string characterLine = "";
+    [ObservableProperty] private string riftInfo = "";
+    [ObservableProperty] private bool gameRunning = true;
+    [ObservableProperty] private string launchText = "";
+    [ObservableProperty] private string updateBanner = "";
+
+    [ObservableProperty] private string pingNow = "–";
+    [ObservableProperty] private string pingAvg = "–";
+    [ObservableProperty] private string pingJitter = "–";
+    [ObservableProperty] private string spikeCount = "–";
+    [ObservableProperty] private string retransmits = "–";
+    [ObservableProperty] private IReadOnlyList<PingSample>? pingSamples;
+    [ObservableProperty] private double spikeThreshold = double.MaxValue;
+    [ObservableProperty] private bool hasPingData;
+    [ObservableProperty] private string serverText = "";
+    [ObservableProperty] private bool isDiagnosing;
+    [ObservableProperty] private string diagnosisText = "";
+
+    public HubViewModel(TrackingMode mode, RunTracker run, ConnectionMonitor monitor, MeterSettings meterSettings,
+        PartyRoster roster, MainViewModel overlay, SettingsViewModel settings,
+        RunsViewModel runs, PartyViewModel party, TimersViewModel timers, ChecklistViewModel checklist, LiveTimers live, TimerService timerService, UpdateService updates)
+    {
+        this.updates = updates;
+        this.mode = mode;
+        this.run = run;
+        this.monitor = monitor;
+        this.meterSettings = meterSettings;
+        this.roster = roster;
+        this.live = live;
+        this.timerService = timerService;
+        Overlay = overlay;
+        Settings = settings;
+        Runs = runs;
+        Party = party;
+        Timers = timers;
+        Checklist = checklist;
+        mode.Changed += (_, _) => Dispatcher.UIThread.Post(Refresh);
+        timer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, (_, _) => Refresh());
+    }
+
+    public void StartRefreshing()
+    {
+        Refresh();
+        timer.Start();
+    }
+
+    public void StopRefreshing() => timer.Stop();
+
+    internal void Refresh()
+    {
+        IsActive = mode.IsCapturing;
+        IsAuto = mode.AutoMode;
+        ModeTitle = Loc.T(IsAuto ? "hub.mode.auto" : IsActive ? "hub.mode.active" : "hub.mode.standby");
+        ModeText = Loc.T(IsAuto ? "hub.mode.auto_text" : IsActive ? "hub.mode.active_text" : "hub.mode.standby_text", meterSettings.HotkeyText);
+        ToggleText = Loc.T(IsActive ? "hub.stop" : "hub.start");
+        GameRunning = AetherDPS.App.Services.GameLauncher.IsRunning;
+        LaunchText = Loc.T(GameRunning ? "hub.launch_running" : "hub.launch");
+        UpdateBanner = AppUpdate.CanSelfUpdate && updates.Pending is { } pending ? Loc.T("update.banner", pending.Version) : "";
+        var next = timerService.Items().Where(i => i.DueAt > DateTime.Now).MinBy(i => i.DueAt);
+        RiftInfo = next is { DueAt: DateTime due }
+            ? Loc.T("rift.hub", next.Name, FormatLeft(due - DateTime.Now), due.ToString("HH:mm"))
+            : "";
+        switch (SelectedTab)
+        {
+            case TabDps: RefreshRun(); break;
+            case TabRuns: Runs.Tick(); break;
+            case TabParty: Party.Refresh(); break;
+            case TabTimers: Timers.Tick(); break;
+            case TabChecklist: Checklist.Refresh(); break;
+            case TabConnection: RefreshConnection(); break;
+        }
+    }
+
+    private void RefreshRun()
+    {
+        var self = live.Diagnostics().Self ?? meterSettings.CharacterName;
+        var server = EuServers.Display(!string.IsNullOrWhiteSpace(meterSettings.ServerName) ? meterSettings.ServerName : meterSettings.CharacterServer);
+        CharacterLine = string.IsNullOrWhiteSpace(self) ? Loc.T("hub.character_unknown")
+            : Loc.T("hub.character", string.IsNullOrEmpty(server) ? self : $"{self} · {server}");
+        var snapshot = run.Snapshot();
+        var lines = snapshot.Players
+            .Select(p => new MeterLine(p.PlayerId, p.Name, p.IsUser, p.IsIdentified, p.ClassId, p.ClassName, p.Damage, p.Dps, p.Share))
+            .ToList();
+        var players = MeterFilter.Apply(lines, roster, meterSettings).Lines
+            .Where(p => p.IsIdentified || p.DamagePercentage > 1).Take(8).ToList();
+        HasRun = players.Count > 0;
+        var duration = snapshot.Elapsed.TotalHours >= 1 ? snapshot.Elapsed.ToString(@"h\:mm\:ss") : snapshot.Elapsed.ToString(@"mm\:ss");
+        RunSummary = Loc.T("hub.run.summary", duration, Format.Compact(snapshot.TotalDamage), Format.Compact(snapshot.PartyDps));
+
+        long top = players.Count > 0 ? players[0].TotalDamage : 0;
+        RunPlayers.Clear();
+        foreach (var p in players)
+        {
+            RunPlayers.Add(new PlayerRow(p.PlayerId)
+            {
+                Name = p.PlayerName.StartsWith("Player_", StringComparison.Ordinal) ? Loc.T("player.unknown", p.PlayerId) : p.PlayerName,
+                ClassName = GermanGameData.ClassName(p.ClassId, p.ClassName),
+                ClassBrush = ClassVisuals.Brush(p.ClassId),
+                ClassIcon = ClassVisuals.Icon(p.ClassId),
+                Dps = Format.Compact(p.DamagePerSecond) + "/s",
+                Total = Format.Compact(p.TotalDamage),
+                Share = Format.Percent(p.DamagePercentage),
+                BarPercent = top > 0 ? p.TotalDamage * 100.0 / top : 0,
+                IsUser = p.IsUser,
+            });
+        }
+    }
+
+    private void RefreshConnection()
+    {
+        var stats = monitor.Stats();
+        HasPingData = stats.Current is not null;
+        PingNow = stats.Current is int c ? $"{c} ms" : "–";
+        PingAvg = stats.Average is double a ? $"{a:0} ms" : "–";
+        PingJitter = stats.Jitter is double j ? $"± {j:0} ms" : "–";
+        SpikeCount = HasPingData ? stats.Spikes.Count.ToString() : "–";
+        Retransmits = stats.Segments > 0 ? Format.Percent(stats.RetransmitPercent) : "–";
+        PingSamples = monitor.Samples();
+        SpikeThreshold = stats.SpikeThreshold;
+        ServerText = monitor.ServerAddress is { } ip ? Loc.T("conn.server", ip) : "";
+    }
+
+    partial void OnSelectedTabChanged(int value) => Refresh();
+
+    private static string FormatLeft(TimeSpan left) =>
+        left.TotalHours >= 24 ? $"{(int)left.TotalDays} T {left.Hours} Std." : left.TotalHours >= 1 ? left.ToString(@"h\:mm\:ss") : left.ToString(@"mm\:ss");
+
+    [RelayCommand]
+    private void LaunchGame() => AetherDPS.App.Services.GameLauncher.Launch();
+
+    [RelayCommand]
+    private void ToggleMeter() => mode.Toggle();
+
+    [RelayCommand]
+    private void RestartForUpdate() => AppUpdate.RequestRestart();
+
+    [RelayCommand]
+    private void ReportProblem() => Overlay.ReportProblem();
+
+    [RelayCommand]
+    private void OpenDataFolder() => Overlay.OpenDataFolder();
+
+    [RelayCommand]
+    private async Task DiagnoseAsync()
+    {
+        if (IsDiagnosing) return;
+        IsDiagnosing = true;
+        DiagnosisRows.Clear();
+        DiagnosisText = Loc.T("conn.checking");
+        try
+        {
+            var d = await monitor.DiagnoseAsync();
+            DiagnosisRows.Add(Row(Loc.T(d.IsWifi ? "conn.row.router_wifi" : "conn.row.router"), d.Router, isServer: false));
+            DiagnosisRows.Add(Row(Loc.T("conn.row.internet"), d.Internet, isServer: false));
+            DiagnosisRows.Add(Row(Loc.T("conn.row.server"), d.GameServer, isServer: true));
+            DiagnosisText = Loc.T($"conn.verdict.{d.Verdict}");
+        }
+        finally
+        {
+            IsDiagnosing = false;
+        }
+    }
+
+    private static DiagnosisRow Row(string label, ProbeResult r, bool isServer)
+    {
+        if (r.Reachable)
+            return new DiagnosisRow(label, Loc.T("conn.row.result", $"{r.AverageMs:0}", Format.Percent(r.LossPercent)),
+                r.LossPercent == 0);
+        return new DiagnosisRow(label, Loc.T(isServer ? "conn.row.server_blocked" : "conn.row.unreachable"), isServer);
+    }
+}
+
+public sealed record DiagnosisRow(string Label, string Result, bool Ok);

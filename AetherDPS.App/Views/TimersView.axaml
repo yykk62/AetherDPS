@@ -1,0 +1,130 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AetherDPS.App.ViewModels"
+             xmlns:l="using:AetherDPS.App.Services"
+             x:Class="AetherDPS.App.Views.TimersView"
+             x:DataType="vm:TimersViewModel">
+  <UserControl.Styles>
+    <Style Selector="CheckBox.day">
+      <Setter Property="MinWidth" Value="0" />
+      <Setter Property="Margin" Value="0,0,6,0" />
+    </Style>
+  </UserControl.Styles>
+
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="12" Margin="12,4,22,22">
+
+      <!-- Alle Timer -->
+      <Border Classes="card">
+        <StackPanel Spacing="8">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Classes="h2" Text="{l:T timers.title}" />
+            <CheckBox Grid.Column="1" IsChecked="{Binding OverlayVisible}" Content="{l:T timers.overlay_visible}" />
+          </Grid>
+          <ItemsControl ItemsSource="{Binding Rows}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:TimerRow">
+                <Border CornerRadius="4" Background="#14FFFFFF" Padding="10,6" Margin="0,0,0,4">
+                  <StackPanel Spacing="6">
+                    <Grid ColumnDefinitions="26,*,Auto,Auto,Auto">
+                      <TextBlock Text="{Binding Icon}" FontSize="15" Foreground="#E0A84A" VerticalAlignment="Center" />
+                      <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding Detail}" Classes="dim" FontSize="11" />
+                      </StackPanel>
+                      <TextBlock Grid.Column="2" Text="{Binding At}" Classes="dim" VerticalAlignment="Center" Margin="12,0,0,0" />
+                      <TextBlock Grid.Column="3" Text="{Binding Remaining}" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" Margin="12,0"
+                                 Foreground="{Binding IsDue, Converter={x:Static l:BoolBrush.DueGreenElseText}}" />
+                      <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                        <Button Classes="secondary" Content="{l:T timers.start}" Command="{Binding StartCommand}" IsVisible="{Binding IsCustom}" />
+                        <Button Classes="secondary" Content="✕" Command="{Binding RemoveCommand}" IsVisible="{Binding IsCustom}" ToolTip.Tip="{l:T timers.remove}" />
+                        <Button Classes="secondary" Content="✕" Command="{Binding RemoveCommand}" IsVisible="{Binding IsBoss}" ToolTip.Tip="{l:T timers.remove}" />
+                      </StackPanel>
+                    </Grid>
+                    <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding NeedsRespawn}" Margin="26,0,0,0">
+                      <TextBlock Text="{l:T timers.respawn}" Classes="dim" VerticalAlignment="Center" FontSize="12" />
+                      <TextBox Text="{Binding RespawnMinutes}" Width="70" Watermark="Min." />
+                      <Button Classes="secondary" Content="{l:T timers.save}" Command="{Binding SaveRespawnCommand}" />
+                      <Button Classes="secondary" Content="{l:T timers.ignore}" Command="{Binding IgnoreCommand}" ToolTip.Tip="{l:T timers.ignore_hint}" />
+                    </StackPanel>
+                  </StackPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <TextBlock Text="{l:T timers.unconfirmed_note}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
+          <TextBlock Text="{l:T timers.boss_note}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
+        </StackPanel>
+      </Border>
+
+      <!-- Zeitpläne -->
+      <Border Classes="card">
+        <StackPanel Spacing="8">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Classes="h2" Text="{l:T timers.schedules}" VerticalAlignment="Center" />
+            <Button Grid.Column="1" Classes="primary" Content="{l:T timers.add_schedule}" Command="{Binding AddScheduleCommand}" />
+          </Grid>
+          <TextBlock Text="{l:T timers.schedules_hint}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
+          <TextBlock Text="{l:T timers.inactive_hint}" Foreground="#E0A84A" FontSize="11" TextWrapping="Wrap" />
+          <ItemsControl ItemsSource="{Binding Schedules}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:ScheduleEditor">
+                <Border CornerRadius="6" Background="#14FFFFFF" Padding="10,8" Margin="0,0,0,6">
+                  <StackPanel Spacing="6">
+                    <Grid ColumnDefinitions="Auto,*,130">
+                      <CheckBox IsChecked="{Binding Enabled}" Content="{l:T timers.enabled}" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="SemiBold" />
+                      <TextBox Grid.Column="1" Text="{Binding Name}" FontWeight="SemiBold" Margin="0,0,8,0" />
+                      <ComboBox Grid.Column="2" ItemsSource="{Binding Categories}" SelectedItem="{Binding Category}" HorizontalAlignment="Stretch" />
+                    </Grid>
+                    <WrapPanel>
+                      <CheckBox Classes="day" IsChecked="{Binding Mo}" Content="Mo" />
+                      <CheckBox Classes="day" IsChecked="{Binding Di}" Content="Di" />
+                      <CheckBox Classes="day" IsChecked="{Binding Mi}" Content="Mi" />
+                      <CheckBox Classes="day" IsChecked="{Binding Don}" Content="Do" />
+                      <CheckBox Classes="day" IsChecked="{Binding Fr}" Content="Fr" />
+                      <CheckBox Classes="day" IsChecked="{Binding Sa}" Content="Sa" />
+                      <CheckBox Classes="day" IsChecked="{Binding So}" Content="So" />
+                      <TextBlock Text="{l:T timers.days_hint}" Classes="dim" FontSize="11" VerticalAlignment="Center" />
+                    </WrapPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                      <TextBlock Text="{l:T timers.times}" VerticalAlignment="Center" />
+                      <TextBox Text="{Binding TimesText}" Width="170" Watermark="20:00, 23:00" />
+                      <TextBlock Text="{l:T timers.interval}" VerticalAlignment="Center" Margin="8,0,0,0" />
+                      <TextBox Text="{Binding IntervalText}" Width="55" Watermark="–" />
+                    </StackPanel>
+                    <WrapPanel>
+                      <CheckBox IsChecked="{Binding ShowInOverlay}" Content="{l:T timers.in_overlay}" Margin="0,0,14,0" />
+                      <CheckBox IsChecked="{Binding Reminder}" Content="{l:T timers.remind}" Margin="0,0,14,0" />
+                      <Button Classes="secondary" Content="{l:T timers.delete}" Command="{Binding DeleteCommand}" />
+                      <TextBlock Text="{l:T timers.unconfirmed_badge}" Foreground="#E0A84A" FontSize="11" VerticalAlignment="Center" Margin="10,0,0,0"
+                                 IsVisible="{Binding Unconfirmed}" />
+                    </WrapPanel>
+                    <TextBlock Text="{Binding Error}" Foreground="#E86A6A" FontSize="12"
+                               IsVisible="{Binding Error, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                  </StackPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+
+      <!-- Eigener Countdown -->
+      <Border Classes="card">
+        <StackPanel Spacing="8">
+          <TextBlock Classes="h2" Text="{l:T timers.custom}" />
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <TextBox Text="{Binding NewName}" Width="220" Watermark="{l:T timers.custom_name}" />
+            <TextBox Text="{Binding NewMinutes}" Width="80" Watermark="Min." />
+            <Button Classes="primary" Content="{l:T timers.add}" Command="{Binding AddCustomCommand}" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,6,0,0">
+            <TextBlock Text="{l:T timers.reminder_minutes}" VerticalAlignment="Center" />
+            <TextBox Text="{Binding ReminderMinutes}" Width="50" />
+            <Button Classes="secondary" Content="{l:T timers.save}" Command="{Binding SaveReminderCommand}" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

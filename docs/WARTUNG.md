@@ -6,10 +6,10 @@
 |---|---|---|
 | `AionDpsMeter.Core`, `AionDpsMeter.Services` | **Upstream** (RATmeter) | Modelle, Spieldaten, Capture, Paketverarbeitung, Sessions |
 | `AionDpsMeter.UI`, `AionDpsMeter.Updater` | Upstream | WPF-Oberfläche von RATmeter. Bleibt **unangetastet** im Repo, damit Merges sauber bleiben, und wird von uns nicht gebaut |
-| `Aion2Meter.Engine` | unser Code | Verdrahtung, Ringpuffer, Wiedergabe, deutsche Namen, synthetische Pakete |
-| `Aion2Meter.App` | unser Code | Avalonia-Overlay, Texte in `Lang/*.json` |
-| `Aion2Meter.Cli` | unser Code | `replay` (Mitschnitt auswerten), `demo` (künstlicher Kampf) |
-| `Aion2Meter.Tests` | unser Code | Tests der gesamten Pipeline |
+| `AetherDPS.Engine` | unser Code | Verdrahtung, Ringpuffer, Wiedergabe, deutsche Namen, synthetische Pakete |
+| `AetherDPS.App` | unser Code | Avalonia-Overlay, Texte in `Lang/*.json` |
+| `AetherDPS.Cli` | unser Code | `replay` (Mitschnitt auswerten), `demo` (künstlicher Kampf) |
+| `AetherDPS.Tests` | unser Code | Tests der gesamten Pipeline |
 
 ## Upstream-Fixes übernehmen (nach jedem AION-2-Patch)
 
@@ -17,7 +17,7 @@
 git fetch upstream
 git log --oneline main..upstream/master        # was ist neu?
 git merge upstream/master
-dotnet build Aion2Meter.slnx && dotnet test Aion2Meter.Tests
+dotnet build AetherDPS.slnx && dotnet test AetherDPS.Tests
 ```
 
 Für `README.md` gilt `merge=ours` (siehe `.gitattributes`). Einmal pro Klon muss dafür dieser Befehl laufen:
@@ -53,26 +53,26 @@ So wenig wie möglich in Upstream-Dateien ändern. Lieber in der Engine erweiter
 
 ## Fehler aus „Problem melden“ bearbeiten
 
-1. Der Nutzer schickt `%LOCALAPPDATA%\Aion2Meter\Mitschnitte\problem_*.txt` und die Logs aus `...\logs`.
-2. Zum Reproduzieren: `aion2meter-cli replay problem_….txt` oder die App mit `--replay`.
-3. Den Mitschnitt nach `Aion2Meter.Tests/Captures/` legen. Der Test `Echte_Mitschnitte_laufen_fehlerfrei_durch` spielt alle Mitschnitte dort ab.
+1. Der Nutzer schickt `%LOCALAPPDATA%\AetherDPS\Mitschnitte\problem_*.txt` und die Logs aus `...\logs`.
+2. Zum Reproduzieren: `aetherdps-cli replay problem_….txt` oder die App mit `--replay`.
+3. Den Mitschnitt nach `AetherDPS.Tests/Captures/` legen. Der Test `Echte_Mitschnitte_laufen_fehlerfrei_durch` spielt alle Mitschnitte dort ab.
    **Der Ordner ist per .gitignore ausgeschlossen**, weil Mitschnitte Spielernamen enthalten. Er wird nie committet.
 
 ## Release
 
-1. Version in `Aion2Meter.App/Aion2Meter.App.csproj` (`<Version>`) erhöhen und einen Abschnitt `## x.y.z` oben in `CHANGELOG.md` schreiben.
+1. Version in `AetherDPS.App/AetherDPS.App.csproj` (`<Version>`) erhöhen und einen Abschnitt `## x.y.z` oben in `CHANGELOG.md` schreiben.
 2. Committen, dann `git tag vx.y.z` und `git push origin main vx.y.z`.
-3. `.github/workflows/aion2meter-release.yml` baut mit `tools/release.ps1` (Tests, `dotnet publish`, eine einzige exe), schreibt `Aion2Meter.exe.sha256` und legt das GitHub-Release mit dem Text aus dem CHANGELOG an.
+3. `.github/workflows/aetherdps-release.yml` baut mit `tools/release.ps1` (Tests, `dotnet publish`, eine einzige exe), schreibt `AetherDPS.exe.sha256` und legt das GitHub-Release mit dem Text aus dem CHANGELOG an.
 
-**Auto-Update** (`Aion2Meter.Engine/Updates/UpdateService.cs`, `Aion2Meter.App/Services/AppUpdate.cs`):
-- Fragt `api.github.com/repos/yykk62/Aion2Meter/releases/latest` ab (3 s nach dem Start, dann stündlich). Wird beim Start (erste 3 Min.) eine neue Version fertig geladen und läuft kein Lauf, installiert der Meter sie sofort und startet neu. Drafts und Pre-Releases werden ignoriert.
-- Lädt `Aion2Meter.exe` nach `%LOCALAPPDATA%\Aion2Meter\Update` und übernimmt sie nur, wenn der SHA-256 zu `Aion2Meter.exe.sha256` **und** zum `digest`, den GitHub für das Asset meldet, passt.
+**Auto-Update** (`AetherDPS.Engine/Updates/UpdateService.cs`, `AetherDPS.App/Services/AppUpdate.cs`):
+- Fragt `api.github.com/repos/yykk62/AetherDPS/releases/latest` ab (3 s nach dem Start, dann stündlich). Wird beim Start (erste 3 Min.) eine neue Version fertig geladen und läuft kein Lauf, installiert der Meter sie sofort und startet neu. Drafts und Pre-Releases werden ignoriert.
+- Lädt `AetherDPS.exe` nach `%LOCALAPPDATA%\AetherDPS\Update` und übernimmt sie nur, wenn der SHA-256 zu `AetherDPS.exe.sha256` **und** zum `digest`, den GitHub für das Asset meldet, passt.
 - Installiert wird beim Beenden über das Tray, beim nächsten Start oder per Knopf „Neu starten“: Die laufende exe wird in `.old` umbenannt, die neue an ihre Stelle kopiert. Bei einem Fehler wird zurückgerollt.
 - Nur Builds aus `dotnet publish` aktualisieren sich selbst (Konstante `SELF_UPDATE`). Debug-Builds aus dem Repo tun es nie.
-- Testen ohne GitHub: Umgebungsvariable `AION2METER_UPDATE_API` auf eine lokale `latest.json` zeigen lassen. Am 13.10.2026 so geprüft: 0.1.0 → 0.1.1 per Knopf und 0.1.1 → 0.1.2 beim nächsten Start.
+- Testen ohne GitHub: Umgebungsvariable `AETHERDPS_UPDATE_API` auf eine lokale `latest.json` zeigen lassen. Am 13.10.2026 so geprüft: 0.1.0 → 0.1.1 per Knopf und 0.1.1 → 0.1.2 beim nächsten Start.
 
-Die exe entpackt Sprachdateien und Spieldaten beim ersten Start nach `%TEMP%\.net\Aion2Meter\<hash>`. Ordner älterer Versionen räumt der Meter beim Start weg.
+Die exe entpackt Sprachdateien und Spieldaten beim ersten Start nach `%TEMP%\.net\AetherDPS\<hash>`. Ordner älterer Versionen räumt der Meter beim Start weg.
 
-**Nur ein Meter gleichzeitig:** Ein zweiter Start holt das Hauptfenster der laufenden Instanz nach vorn (Mutex `Local\Aion2Meter`). Wiedergaben mit `--replay` sind davon ausgenommen.
+**Nur ein Meter gleichzeitig:** Ein zweiter Start holt das Hauptfenster der laufenden Instanz nach vorn (Mutex `Local\AetherDPS`). Wiedergaben mit `--replay` sind davon ausgenommen.
 
 **Signatur:** Die exe ist noch nicht signiert, deshalb warnt SmartScreen. Kostenlos für Open-Source-Projekte geht das über die SignPath Foundation (Antrag mit öffentlichem Repo nötig). Wäre ein Schritt in der Release-Pipeline.

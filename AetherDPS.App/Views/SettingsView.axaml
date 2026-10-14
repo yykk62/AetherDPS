@@ -1,0 +1,171 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AetherDPS.App.ViewModels"
+        xmlns:l="using:AetherDPS.App.Services"
+        x:Class="AetherDPS.App.Views.SettingsView"
+        x:DataType="vm:SettingsViewModel">
+
+  <UserControl.Styles>
+    <Style Selector="TextBlock">
+      <Setter Property="Foreground" Value="#E6E8EC" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+    <Style Selector="TextBlock.dim">
+      <Setter Property="Foreground" Value="#8E96A3" />
+      <Setter Property="FontSize" Value="11" />
+    </Style>
+    <Style Selector="TextBlock.label">
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="FontSize" Value="13" />
+    </Style>
+    <Style Selector="TextBlock.section">
+      <Setter Property="FontSize" Value="15" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="#E0A84A" />
+    </Style>
+    <!-- Erklärung unter einer Checkbox, eingerückt auf Höhe des Texts -->
+    <Style Selector="TextBlock.hint">
+      <Setter Property="Foreground" Value="#8E96A3" />
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="Margin" Value="28,0,0,0" />
+    </Style>
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="#191E28" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Padding" Value="18,16" />
+      <Setter Property="BorderBrush" Value="#232A36" />
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <Style Selector="Button.primary">
+      <Setter Property="Background" Value="#E0A84A" />
+      <Setter Property="Foreground" Value="#141820" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="CornerRadius" Value="6" />
+    </Style>
+  </UserControl.Styles>
+
+  <StackPanel Spacing="14" MaxWidth="620" HorizontalAlignment="Left">
+
+    <!-- ===== Bedienung ===== -->
+    <Border Classes="card">
+      <StackPanel Spacing="16">
+        <TextBlock Classes="section" Text="{l:T settings.section.controls}" />
+
+        <StackPanel Spacing="6">
+          <TextBlock Classes="label" Text="{l:T settings.hotkey}" />
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBox Name="HotkeyBox" Text="{Binding HotkeyText}" IsReadOnly="True" FontSize="14" FontWeight="SemiBold"
+                     HorizontalContentAlignment="Center" Cursor="Hand" />
+            <Button Grid.Column="1" Content="{l:T settings.hotkey_reset}" Command="{Binding ResetHotkeyCommand}" Margin="8,0,0,0" MinWidth="160" HorizontalContentAlignment="Center" />
+          </Grid>
+          <TextBlock Classes="dim" Text="{Binding HotkeyError}" Foreground="#E86A6A"
+                     IsVisible="{Binding HotkeyError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+          <TextBlock Classes="dim" Text="{l:T settings.hotkey_hint}" />
+        </StackPanel>
+
+        <StackPanel Spacing="6">
+          <CheckBox IsChecked="{Binding ScreenshotEnabled}">
+            <TextBlock Classes="label" Text="{l:T settings.screenshot}" />
+          </CheckBox>
+          <Grid ColumnDefinitions="*,Auto" IsEnabled="{Binding ScreenshotEnabled}">
+            <TextBox Name="ScreenshotBox" Text="{Binding ScreenshotText}" IsReadOnly="True" FontSize="14" FontWeight="SemiBold"
+                     HorizontalContentAlignment="Center" Cursor="Hand" />
+            <Button Grid.Column="1" Content="{l:T settings.screenshot_reset}" Command="{Binding ResetScreenshotHotkeyCommand}" Margin="8,0,0,0" MinWidth="160" HorizontalContentAlignment="Center" />
+          </Grid>
+          <TextBlock Classes="dim" Text="{l:T settings.screenshot_hint}" />
+        </StackPanel>
+      </StackPanel>
+    </Border>
+
+    <!-- ===== Erfassung ===== -->
+    <Border Classes="card">
+      <StackPanel Spacing="14">
+        <TextBlock Classes="section" Text="{l:T settings.section.tracking}" />
+        <StackPanel Spacing="4">
+          <CheckBox IsChecked="{Binding AutoTrack}">
+            <TextBlock Classes="label" Text="{l:T settings.auto_track}" />
+          </CheckBox>
+          <TextBlock Classes="hint" Text="{l:T settings.auto_track_hint}" />
+        </StackPanel>
+        <StackPanel Spacing="4">
+          <CheckBox IsChecked="{Binding PartyOnly}">
+            <TextBlock Classes="label" Text="{l:T settings.party_only}" />
+          </CheckBox>
+          <TextBlock Classes="hint" Text="{l:T settings.party_only_hint}" />
+        </StackPanel>
+        <CheckBox IsChecked="{Binding HideName}">
+          <TextBlock Classes="label" Text="{l:T settings.hide_name}" />
+        </CheckBox>
+      </StackPanel>
+    </Border>
+
+    <!-- ===== Anzeige ===== -->
+    <Border Classes="card">
+      <StackPanel Spacing="14">
+        <TextBlock Classes="section" Text="{l:T settings.section.display}" />
+        <StackPanel Spacing="4">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Classes="label" Text="{l:T settings.opacity}" />
+            <TextBlock Grid.Column="1" Text="{Binding OpacityPercent, StringFormat='{}{0:0} %'}" />
+          </Grid>
+          <Slider Minimum="20" Maximum="100" Value="{Binding OpacityPercent}" TickFrequency="5" IsSnapToTickEnabled="True" />
+        </StackPanel>
+        <StackPanel Spacing="4">
+          <CheckBox IsChecked="{Binding CombatHints}">
+            <TextBlock Classes="label" Text="{l:T settings.combat_hints}" />
+          </CheckBox>
+          <TextBlock Classes="hint" Text="{l:T settings.combat_hints_hint}" />
+        </StackPanel>
+        <StackPanel Spacing="4">
+          <CheckBox IsChecked="{Binding StaggerWarning}">
+            <TextBlock Classes="label" Text="{l:T settings.stagger_warning}" />
+          </CheckBox>
+          <TextBlock Classes="hint" Text="{l:T settings.stagger_warning_hint}" />
+        </StackPanel>
+        <StackPanel Spacing="4">
+          <CheckBox IsChecked="{Binding BuffBarEnabled}">
+            <TextBlock Classes="label" Text="{l:T settings.buffbar}" />
+          </CheckBox>
+          <TextBlock Classes="hint" Text="{l:T settings.buffbar_hint}" />
+        </StackPanel>
+      </StackPanel>
+    </Border>
+
+    <!-- ===== Start ===== -->
+    <Border Classes="card">
+      <StackPanel Spacing="14">
+        <TextBlock Classes="section" Text="{l:T settings.section.start}" />
+        <StackPanel Spacing="4">
+          <CheckBox IsChecked="{Binding LaunchGameWithMeter}">
+            <TextBlock Classes="label" Text="{l:T settings.launch_game}" />
+          </CheckBox>
+          <TextBlock Classes="hint" Text="{l:T settings.launch_game_hint}" />
+        </StackPanel>
+      </StackPanel>
+    </Border>
+
+    <!-- ===== Updates ===== -->
+    <Border Classes="card">
+      <StackPanel Spacing="10">
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Classes="section" Text="{l:T update.heading}" />
+          <TextBlock Grid.Column="1" Classes="dim" Text="{Binding VersionText}" VerticalAlignment="Center" />
+        </Grid>
+        <StackPanel Spacing="4">
+          <CheckBox IsChecked="{Binding AutoUpdate}" IsEnabled="{Binding CanSelfUpdate}">
+            <TextBlock Classes="label" Text="{l:T update.auto}" />
+          </CheckBox>
+          <TextBlock Classes="hint" Text="{l:T update.auto_hint}" />
+        </StackPanel>
+        <WrapPanel>
+          <Button Content="{l:T update.check}" Command="{Binding CheckUpdatesCommand}" IsEnabled="{Binding CanSelfUpdate}" Margin="0,0,8,6" />
+          <Button Classes="primary" Content="{l:T update.restart}" Command="{Binding RestartForUpdateCommand}" IsVisible="{Binding UpdateReady}" Margin="0,0,8,6" />
+          <Button Content="{l:T update.releases}" Command="{Binding OpenReleasesCommand}" Margin="0,0,8,6" />
+        </WrapPanel>
+        <TextBlock Classes="dim" Text="{Binding UpdateStatus}"
+                   IsVisible="{Binding UpdateStatus, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+      </StackPanel>
+    </Border>
+
+  </StackPanel>
+</UserControl>

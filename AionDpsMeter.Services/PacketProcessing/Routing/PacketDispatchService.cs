@@ -5,10 +5,10 @@ namespace AionDpsMeter.Services.PacketProcessing.Routing
 {
     public sealed class PacketDispatchService(OpcodeProcessorRegistry registry, ILogger<PacketDispatchService> logger)
     {
-        // Aion2Meter: Filter pro Opcode (null = alles durchlassen).
+        // AetherDPS: Filter pro Opcode (null = alles durchlassen).
         public Func<ushort, bool>? Gate { get; set; }
 
-        // Aion2Meter: sieht jedes Paket (auch in Bereitschaft), z. B. Serverwechsel = Dungeon.
+        // AetherDPS: sieht jedes Paket (auch in Bereitschaft), z. B. Serverwechsel = Dungeon.
         public Action<ushort, byte[]>? Observer { get; set; }
 
         public void Dispatch(Packet packet)
@@ -22,7 +22,7 @@ namespace AionDpsMeter.Services.PacketProcessing.Routing
             try { Observer?.Invoke(opcode, packet.Data); }
             catch (Exception ex) { logger.LogError(ex, "Observer failed for opcode 0x{Opcode:X4}.", opcode); }
 
-            // Aion2Meter: Bereitschaftsmodus lässt nur bestimmte Opcodes durch.
+            // AetherDPS: Bereitschaftsmodus lässt nur bestimmte Opcodes durch.
             if (Gate is not null && !Gate(opcode)) return;
 
             if (!registry.TryGet(opcode, out var processor))

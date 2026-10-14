@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/upstream/">
+    <Project Path="AionDpsMeter.Core/AionDpsMeter.Core.csproj" />
+    <Project Path="AionDpsMeter.Services/AionDpsMeter.Services.csproj" />
+  </Folder>
+  <Project Path="AetherDPS.Engine/AetherDPS.Engine.csproj" />
+  <Project Path="AetherDPS.App/AetherDPS.App.csproj" />
+  <Project Path="AetherDPS.Cli/AetherDPS.Cli.csproj" />
+  <Project Path="AetherDPS.Tests/AetherDPS.Tests.csproj" />
+  <Project Path="AetherDPS.UiTests/AetherDPS.UiTests.csproj" />
+</Solution>

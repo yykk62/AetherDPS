@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="Aion2Meter.App/Assets/icon.png" width="72" alt="" />
+  <img src="AetherDPS.App/Assets/icon.png" width="72" alt="" />
 </p>
 
-<h1 align="center">AION 2 Meter</h1>
+<h1 align="center">AetherDPS</h1>
 
 <p align="center">
   <b>Der kostenlose DPS-Meter und Begleiter für AION 2, auf Deutsch und für die EU-Server gebaut.</b><br />
@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/yykk62/Aion2Meter/releases/latest"><b>⬇ Aion2Meter.exe herunterladen</b></a>
+  <a href="https://github.com/yykk62/AetherDPS/releases/latest"><b>⬇ AetherDPS.exe herunterladen</b></a>
   ·
   <a href="#bedienung">Bedienung</a>
   ·
@@ -47,24 +47,24 @@
 
 **Was ist Npcap?** Ein kostenloser Treiber, mit dem Programme den Netzwerkverkehr mitlesen können (auch Wireshark nutzt ihn). Der Meter richtet ihn beim ersten Start mit einem Klick ein.
 
-**Etwas stimmt nicht?** Tray-Symbol → „Problem melden“ speichert die letzten 5 Minuten. Dann ein [Issue öffnen](https://github.com/yykk62/Aion2Meter/issues) und die Datei anhängen. Achtung: Darin stehen die Namen der Spieler um dich herum.
+**Etwas stimmt nicht?** Tray-Symbol → „Problem melden“ speichert die letzten 5 Minuten. Dann ein [Issue öffnen](https://github.com/yykk62/AetherDPS/issues) und die Datei anhängen. Achtung: Darin stehen die Namen der Spieler um dich herum.
 
 ## Download
 
-**[Aion2Meter.exe von der Release-Seite laden](https://github.com/yykk62/Aion2Meter/releases/latest)**: eine einzige Datei, keine Installation und kein .NET nötig.
+**[AetherDPS.exe von der Release-Seite laden](https://github.com/yykk62/AetherDPS/releases/latest)**: eine einzige Datei, keine Installation und kein .NET nötig.
 
 - **Voraussetzung:** Windows 10 oder 11 (64 Bit) und Npcap (richtet der Meter beim ersten Start selbst ein)
-- **Wohin damit?** In einen eigenen Ordner, zum Beispiel `Dokumente\Aion2Meter`, nicht in den Download-Ordner und nicht nach `C:\Programme` (dort darf sich die Datei nicht selbst aktualisieren)
-- **Windows-Warnung „Der Computer wurde durch Windows geschützt“:** Die Datei ist noch nicht digital signiert. Auf „Weitere Informationen“ → „Trotzdem ausführen“ klicken. Wer sichergehen will, vergleicht die SHA-256-Prüfsumme mit der Angabe auf der Release-Seite: `Get-FileHash Aion2Meter.exe`
+- **Wohin damit?** In einen eigenen Ordner, zum Beispiel `Dokumente\AetherDPS`, nicht in den Download-Ordner und nicht nach `C:\Programme` (dort darf sich die Datei nicht selbst aktualisieren)
+- **Windows-Warnung „Der Computer wurde durch Windows geschützt“:** Die Datei ist noch nicht digital signiert. Auf „Weitere Informationen“ → „Trotzdem ausführen“ klicken. Wer sichergehen will, vergleicht die SHA-256-Prüfsumme mit der Angabe auf der Release-Seite: `Get-FileHash AetherDPS.exe`
 - **Updates kommen automatisch:** Der Meter sieht bei jedem Start auf GitHub nach und installiert eine neue Version gleich dort (er startet kurz neu). Läuft er länger, schaut er stündlich nach und installiert beim nächsten Start. Abschaltbar unter Einstellungen → Updates. Dabei wird nur die öffentliche Release-Seite abgefragt, von dir wird nichts gesendet
 
 ## Installation
 
-1. Aion2Meter starten.
+1. AetherDPS starten.
 2. Fehlt **Npcap**, öffnet sich die Einrichtung. Dort einmal auf „Npcap jetzt installieren“ klicken. Der Meter lädt Npcap von der offiziellen Seite, prüft die Signatur und startet den Installer mit den richtigen Einstellungen. Du bestätigst nur noch (Admin-Abfrage → „Ja“, dann „I Agree“ → „Install“ → „Finish“).
 3. AION 2 starten und einloggen. Das Overlay findet die Verbindung von selbst.
 
-Die Einstellungen, die Kampf-Historie, die Logs und die Mitschnitte liegen unter `%LOCALAPPDATA%\Aion2Meter`.
+Die Einstellungen, die Kampf-Historie, die Logs und die Mitschnitte liegen unter `%LOCALAPPDATA%\AetherDPS`.
 
 ## Bedienung
 
@@ -100,17 +100,17 @@ Beim Start öffnet sich das **Hauptfenster** mit den Reitern DPS-Meter, Verbindu
 ## Für Entwickler
 
 ```
-dotnet build Aion2Meter.slnx
-dotnet test Aion2Meter.Tests
-dotnet test Aion2Meter.UiTests      # rendert alle Fenster unsichtbar; AION2METER_SHOTS=<ordner> speichert Bilder
-Aion2Meter.App\bin\Debug\net10.0\Aion2Meter.exe --replay <mitschnitt.txt> [--speed 1]
-Aion2Meter.Cli\bin\Debug\net10.0\aion2meter-cli.exe replay|demo <datei>
+dotnet build AetherDPS.slnx
+dotnet test AetherDPS.Tests
+dotnet test AetherDPS.UiTests      # rendert alle Fenster unsichtbar; AETHERDPS_SHOTS=<ordner> speichert Bilder
+AetherDPS.App\bin\Debug\net10.0\AetherDPS.exe --replay <mitschnitt.txt> [--speed 1]
+AetherDPS.Cli\bin\Debug\net10.0\aetherdps-cli.exe replay|demo <datei>
 ```
 
 Aufbau und Wartung stehen in [docs/WARTUNG.md](docs/WARTUNG.md), das Protokoll in [docs/PROTOKOLL.md](docs/PROTOKOLL.md).
 
-**Release bauen:** `powershell -ExecutionPolicy Bypass -File tools\release.ps1` → `artifacts\release\Aion2Meter.exe` + `.sha256`.
-**Veröffentlichen:** Version in `Aion2Meter.App.csproj` und `CHANGELOG.md` eintragen, dann `git tag v0.2.0` und `git push origin v0.2.0`. GitHub Actions baut, testet und legt das Release an.
+**Release bauen:** `powershell -ExecutionPolicy Bypass -File tools\release.ps1` → `artifacts\release\AetherDPS.exe` + `.sha256`.
+**Veröffentlichen:** Version in `AetherDPS.App.csproj` und `CHANGELOG.md` eintragen, dann `git tag v0.2.0` und `git push origin v0.2.0`. GitHub Actions baut, testet und legt das Release an.
 
 ## Danke an
 

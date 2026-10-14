@@ -1,4 +1,4 @@
-name: Aion2Meter CI
+name: AetherDPS CI
 
 on:
   push:
@@ -17,6 +17,6 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-      - run: dotnet build Aion2Meter.slnx -c Release
-      - run: dotnet test Aion2Meter.Tests -c Release --no-build
-      - run: dotnet test Aion2Meter.UiTests -c Release --no-build
+      - run: dotnet build AetherDPS.slnx -c Release
+      - run: dotnet test AetherDPS.Tests -c Release --no-build
+      - run: dotnet test AetherDPS.UiTests -c Release --no-build

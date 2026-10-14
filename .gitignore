@@ -361,6 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-# Aion2Meter: echte Mitschnitte enthalten Spielernamen – nie committen
-Aion2Meter.Tests/Captures/
+# AetherDPS: echte Mitschnitte enthalten Spielernamen – nie committen
+AetherDPS.Tests/Captures/
 PacketLogs/

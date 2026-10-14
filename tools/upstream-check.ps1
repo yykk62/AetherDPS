@@ -39,8 +39,8 @@ if ($neu) {
 
 # Deutsche Skill-/Mob-Namen (A2Tools)
 & powershell -NoProfile -ExecutionPolicy Bypass -File tools\update-german-data.ps1
-if (git status --porcelain Aion2Meter.Engine/GameData) {
-    git add Aion2Meter.Engine/GameData
+if (git status --porcelain AetherDPS.Engine/GameData) {
+    git add AetherDPS.Engine/GameData
     git commit -q -m 'Wartung: deutsche Spieldaten aktualisiert (A2Tools)'
     Write-Host 'Deutsche Spieldaten aktualisiert.'
     $neu = $true
@@ -53,9 +53,9 @@ if (-not $neu) {
 }
 
 # Release-Konfiguration, damit eine laufende Debug-App die Dateien nicht sperrt
-& $dotnet build Aion2Meter.slnx -c Release 2>&1 | Select-String -Pattern ' error |Fehler' | ForEach-Object { Write-Host $_ }
+& $dotnet build AetherDPS.slnx -c Release 2>&1 | Select-String -Pattern ' error |Fehler' | ForEach-Object { Write-Host $_ }
 if ($LASTEXITCODE -ne 0) { Ende 'ROT' }
-& $dotnet test Aion2Meter.Tests -c Release --no-build 2>&1 | Select-String -Pattern 'Fehler |Bestanden|Assert|Expected|Actual' | ForEach-Object { Write-Host $_ }
+& $dotnet test AetherDPS.Tests -c Release --no-build 2>&1 | Select-String -Pattern 'Fehler |Bestanden|Assert|Expected|Actual' | ForEach-Object { Write-Host $_ }
 if ($LASTEXITCODE -ne 0) { Ende 'ROT' }
 
 Ende "GRUEN (Branch $branch bereit zum Übernehmen)"

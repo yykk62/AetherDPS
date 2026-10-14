@@ -14,13 +14,13 @@
 
 ## Phase 3: Veröffentlichen
 - [ ] GitHub-Repo (öffentlich, GPL), erst nach Rücksprache
-- [x] Release als eigenständige Einzeldatei: `tools/release.ps1`, Pipeline `aion2meter-release.yml` (13.10.)
+- [x] Release als eigenständige Einzeldatei: `tools/release.ps1`, Pipeline `aetherdps-release.yml` (13.10.)
 - [x] Auto-Update über unsere GitHub-Releases mit SHA-256-Prüfung, nur eine Instanz gleichzeitig (13.10.)
 - [ ] Signatur über die SignPath Foundation beantragen (braucht das öffentliche Repo)
 - [ ] Sync-Bug als Issue oder PR an RATmeter melden
 
 ## Phase 4: Autonome Wartung
-- [x] Geplante Aufgabe „aion2meter-wartung“ (täglich 11 Uhr): Upstream-Merge + deutsche Daten auf Wartungs-Branch, Build+Test, nur bei Grün nach main. Kein Push. Log: docs/WARTUNGSLOG.md
+- [x] Geplante Aufgabe „aetherdps-wartung“ (täglich 11 Uhr): Upstream-Merge + deutsche Daten auf Wartungs-Branch, Build+Test, nur bei Grün nach main. Kein Push. Log: docs/WARTUNGSLOG.md
 
 ## Phase 5: Ausbau
 - [x] Hauptfenster mit Reitern (DPS-Meter, Verbindung, Einstellungen), Verbindungs-Monitor mit Ping-Verlauf und Diagnose (13.10.)

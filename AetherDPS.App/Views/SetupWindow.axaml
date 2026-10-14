@@ -1,0 +1,101 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AetherDPS.App.ViewModels"
+        xmlns:l="using:AetherDPS.App.Services"
+        x:Class="AetherDPS.App.Views.SetupWindow"
+        x:DataType="vm:SetupViewModel"
+        Title="{l:T setup.window_title}"
+        Width="560" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterScreen"
+        Background="#141820" Icon="/Assets/icon.ico">
+
+  <Window.Styles>
+    <Style Selector="TextBlock">
+      <Setter Property="Foreground" Value="#E6E8EC" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+    <Style Selector="TextBlock.dim">
+      <Setter Property="Foreground" Value="#8E96A3" />
+    </Style>
+    <Style Selector="Border.num">
+      <Setter Property="Width" Value="26" />
+      <Setter Property="Height" Value="26" />
+      <Setter Property="CornerRadius" Value="13" />
+      <Setter Property="VerticalAlignment" Value="Top" />
+    </Style>
+    <Style Selector="Border.num TextBlock">
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="Foreground" Value="#141820" />
+    </Style>
+    <Style Selector="Button.primary">
+      <Setter Property="Background" Value="#E0A84A" />
+      <Setter Property="Foreground" Value="#141820" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="FontSize" Value="15" />
+      <Setter Property="Padding" Value="22,10" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.primary:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#F0BC62" />
+      <Setter Property="Foreground" Value="#141820" />
+    </Style>
+    <Style Selector="Button.link">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="#7FA8F5" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
+  </Window.Styles>
+
+  <StackPanel Margin="32,28" Spacing="18">
+    <StackPanel Orientation="Horizontal" Spacing="14">
+      <Image Source="/Assets/icon.png" Width="44" Height="44" />
+      <StackPanel VerticalAlignment="Center">
+        <TextBlock Text="{l:T setup.title}" FontSize="22" FontWeight="SemiBold" />
+        <TextBlock Text="{l:T app.title}" Classes="dim" FontSize="12" />
+      </StackPanel>
+    </StackPanel>
+
+    <TextBlock Text="{l:T setup.intro}" FontSize="14" LineHeight="21" />
+
+    <StackPanel Spacing="12">
+      <Grid ColumnDefinitions="Auto,*">
+        <Border Classes="num" Background="{Binding ActiveStep, Converter={x:Static l:StepBrush.Instance}, ConverterParameter=1}">
+          <TextBlock Text="1" />
+        </Border>
+        <TextBlock Grid.Column="1" Text="{l:T setup.step1}" Margin="12,3,0,0" FontSize="13" />
+      </Grid>
+      <Grid ColumnDefinitions="Auto,*">
+        <Border Classes="num" Background="{Binding ActiveStep, Converter={x:Static l:StepBrush.Instance}, ConverterParameter=2}">
+          <TextBlock Text="2" />
+        </Border>
+        <TextBlock Grid.Column="1" Text="{l:T setup.step2}" Margin="12,3,0,0" FontSize="13" />
+      </Grid>
+      <Grid ColumnDefinitions="Auto,*">
+        <Border Classes="num" Background="{Binding ActiveStep, Converter={x:Static l:StepBrush.Instance}, ConverterParameter=3}">
+          <TextBlock Text="3" />
+        </Border>
+        <TextBlock Grid.Column="1" Text="{l:T setup.step3}" Margin="12,3,0,0" FontSize="13" />
+      </Grid>
+    </StackPanel>
+
+    <StackPanel Spacing="8">
+      <Button Classes="primary" Content="{Binding ButtonText}" Command="{Binding InstallCommand}"
+              IsVisible="{Binding !IsDone}" IsEnabled="{Binding !IsBusy}" />
+      <Button Classes="primary" Content="{l:T setup.start_meter}" Command="{Binding StartMeterCommand}"
+              IsVisible="{Binding IsDone}" />
+      <ProgressBar Value="{Binding Progress}" Maximum="100" Height="6" Foreground="#E0A84A" IsVisible="{Binding IsBusy}" />
+      <TextBlock Text="{Binding StateText}" FontSize="13" TextAlignment="Center"
+                 Foreground="{Binding HasError, Converter={x:Static l:BoolBrush.ErrorRedElseText}}" />
+    </StackPanel>
+
+    <StackPanel Spacing="4">
+      <Button Classes="link" Content="{l:T setup.manual}" Command="{Binding OpenOfficialPageCommand}" FontSize="12" />
+      <TextBlock Text="{l:T setup.about}" Classes="dim" FontSize="11" TextAlignment="Center" />
+    </StackPanel>
+  </StackPanel>
+</Window>

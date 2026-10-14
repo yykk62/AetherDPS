@@ -2,7 +2,7 @@
 # Aufruf aus dem Repo-Root:  powershell -File tools\update-german-data.ps1
 $ErrorActionPreference = 'Stop'
 $base = 'https://raw.githubusercontent.com/taengu/A2Tools-DPS-Meter/main/src/data/i18n'
-$ziel = Join-Path $PSScriptRoot '..\Aion2Meter.Engine\GameData\de'
+$ziel = Join-Path $PSScriptRoot '..\AetherDPS.Engine\GameData\de'
 New-Item -ItemType Directory -Force $ziel | Out-Null
 
 $dateien = @{ 'skills/de.json' = 'skills.json'; 'npcs/de.json' = 'mobs.json' }

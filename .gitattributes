@@ -62,5 +62,5 @@
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
 
-# Aion2Meter: eigene README bei Upstream-Merges behalten
+# AetherDPS: eigene README bei Upstream-Merges behalten
 README.md merge=ours

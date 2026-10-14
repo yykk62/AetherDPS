@@ -52,7 +52,7 @@ public static class ServerMap
 	{
 		if (!Servers.TryGetValue(id, out string value))
 		{
-			// Aion2Meter: EU-Server fehlen in der Liste – Nummer zeigen statt nichts
+			// AetherDPS: EU-Server fehlen in der Liste – Nummer zeigen statt nichts
 			return id > 0 ? "#" + id : "";
 		}
 		return value;
