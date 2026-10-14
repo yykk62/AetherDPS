@@ -306,14 +306,7 @@ public partial class App : Application
     private void StartCombatHints(MeterSettings settings)
     {
         var stagger = Services.GetRequiredService<StaggerTracker>();
-        stagger.Announced += boss => Dispatcher.UIThread.Post(() =>
-        {
-            if (!settings.CombatHints) return;
-            var best = stagger.BestOwnSkills();
-            ShowToast(Loc.T("hint.stagger_soon", boss), best.Count > 0
-                ? Loc.T("hint.stagger_skills", string.Join(", ", best.Select(b => $"{b.Skill} ({b.Points})")))
-                : Loc.T("hint.stagger_generic"));
-        });
+        // Keine Vorab-Ankündigung mit Skill-Tipps – die wären nur für eine Klasse richtig (Rückmeldung 14.10.).
         stagger.Finished += phase => Dispatcher.UIThread.Post(() =>
         {
             lastStagger = phase;

@@ -4,7 +4,7 @@ Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des G
 
 ## 0.4.0
 
-- **Stagger-Anzeige:** Die Stagger-Leiste des Bosses erscheint auf der Boss-Karte. Vor der Phase kommt ein Hinweis mit deinen stärksten Stagger-Skills, danach siehst du, ob es geklappt hat und wer wie viel beigetragen hat
+- **Stagger-Anzeige:** Die Stagger-Leiste des Bosses erscheint auf der Boss-Karte. Danach siehst du, ob es geklappt hat und wer wie viel beigetragen hat
 - **Todes-Rückblick:** Nach deinem Tod zeigt der Meter, wer dir in den letzten Sekunden wie viel Schaden gemacht hat, oder dass es ein Sofort-Tod durch eine Boss-Mechanik war (z. B. nach einer verfehlten Stagger-Phase)
 - **Dungeon-Erkennung:** Im Auto-Modus beginnt der Lauf beim Betreten eines Dungeons und endet beim Verlassen
 - **Versuche:** Neue Anläufe am Boss werden gezählt, auf der Boss-Karte und im Läufe-Archiv
