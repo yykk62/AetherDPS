@@ -2,6 +2,10 @@
 
 Newest versions first.
 
+## 0.6.2
+
+- **Fixed:** if the meter started before the game, or while Steam was downloading an update, it could lock onto the wrong network traffic and then showed nothing at all (no field bosses either). It now finds the game server reliably and searches again by itself if nothing comes from the game
+
 ## 0.6.1
 
 - **Fixed:** after updating from 0.5.0 the meter no longer started (it cleaned up its own unpacked files on start). If this hit you: [download AetherDPS.exe again](https://github.com/yykk62/AetherDPS/releases/latest) – your settings and runs are kept

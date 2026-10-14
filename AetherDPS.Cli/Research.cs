@@ -98,6 +98,7 @@ static class Research
         zones.Changed += entered => events.Add((now, entered ? $"Dungeon betreten: {zones.DungeonName ?? "?"} (Karte {zones.MapId}, {zones.InstanceAddress})" : $"Dungeon verlassen (Karte {zones.MapId})"));
         host.Get<AetherDPS.Engine.Community.PatchDetector>().Changed += broken =>
             events.Add((now, broken ? "Patch-Erkennung: versteht die Pakete nicht mehr" : "Patch-Erkennung: wieder in Ordnung"));
+        var fieldBosses = host.Get<FieldBosses>();
         var runTracker = host.Get<RunTracker>();
         runTracker.Start();
         var dispatch = host.Get<AionDpsMeter.Services.PacketProcessing.Routing.PacketDispatchService>();
@@ -145,6 +146,7 @@ static class Research
         Line("\n== Erkannt ==");
         foreach (var (ms, text) in events) Line($"{Local(ms):HH:mm:ss} [{SegmentOf(ms)}] {text}");
         Line($"Schaden auf dich (Treffer): {recap.IncomingHits}");
+        Line($"Feldbosse: Daten {fieldBosses.HasData}, " + string.Join(", ", fieldBosses.Views().GroupBy(v => v.Status).Select(g => $"{g.Key} {g.Count()}")));
         var snap = runTracker.Snapshot();
         foreach (var b in snap.Bosses)
             Line($"Lauf-Boss {b.Name}: {(b.Killed ? "besiegt" : "offen")}, Schaden {b.Damage:N0} / Leben {b.HpMax:N0}, erfasst {(b.Coverage is double c ? $"{c:0.0} %" : "–")}");

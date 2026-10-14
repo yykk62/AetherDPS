@@ -26,6 +26,8 @@ switch (args[0])
         return Research.Run(file, args.Length > 2 ? args[2] : Path.Combine(Path.GetTempPath(), "aetherdps-research"));
     case "dump":
         return Dump(file, args.Length > 2 ? args[2] : null);
+    case "live":
+        return Live(file, args.Length > 2 ? int.Parse(args[2]) : 120);
     case "demo":
         WriteDemo(file);
         Console.WriteLine($"Demo-Mitschnitt geschrieben: {file}");
@@ -186,5 +188,40 @@ static int Dump(string path, string? needle)
     ((ReplayCaptureDevice)host.Capture).PlayToEnd();
     Console.WriteLine($"Treffer: {hits}");
     foreach (var (op, n) in counts.OrderByDescending(x => x.Value).Take(30)) Console.WriteLine($"  0x{op:X4} {n,6}");
+    return 0;
+}
+
+// Live mitlesen (ohne Fenster, parallel zum Meter): Feldboss-Liste, Karte, Zeitlimit melden, danach Mitschnitt speichern.
+// Der Mitschnitt enthält Spielernamen – nur lokal auswerten, nie committen.
+static int Live(string path, int seconds)
+{
+    var dataDir = Path.Combine(Path.GetTempPath(), "aetherdps-cli-live");
+    using var host = new MeterHost(new MeterOptions { DataDir = dataDir });
+    var dispatch = host.Get<AionDpsMeter.Services.PacketProcessing.Routing.PacketDispatchService>();
+    var counts = new Dictionary<ushort, int>();
+    var previous = dispatch.Observer;
+    dispatch.Observer = (op, data) =>
+    {
+        previous?.Invoke(op, data);
+        lock (counts) counts[op] = counts.GetValueOrDefault(op) + 1;
+        if (op == FieldBosses.OpList)
+        {
+            var list = FieldBosses.Parse(data);
+            Console.WriteLine($"{DateTime.Now:HH:mm:ss} 0x9101 len={data.Length} → {(list is null ? "NICHT LESBAR " + Convert.ToHexString(data.AsSpan(0, Math.Min(64, data.Length))) : $"Karte {list.Map}, {list.Entries.Count} Bosse")}");
+        }
+        if (op == ZoneTracker.OpMapLoad) Console.WriteLine($"{DateTime.Now:HH:mm:ss} Karte {ZoneTracker.ParseMapId(data)}");
+    };
+    host.Pipeline.Start();
+    Console.WriteLine($"Lese {seconds} s mit …");
+    for (int s = 0; s < seconds; s += 5)
+    {
+        Thread.Sleep(TimeSpan.FromSeconds(5));
+        Console.WriteLine($"{DateTime.Now:HH:mm:ss} Server: {(host.Capture as AionDpsMeter.Services.PacketCapture.CaptureDevice)?.ServerAddress?.ToString() ?? "–"}");
+    }
+    host.Pipeline.Stop();
+    var saved = host.Recorder.SaveSnapshot(Path.GetDirectoryName(path)!, "live", "cli");
+    Console.WriteLine($"Pakete: {counts.Values.Sum()}, Opcodes: {counts.Count}, 0x9101: {counts.GetValueOrDefault(FieldBosses.OpList)}");
+    Console.WriteLine("Häufigste: " + string.Join(", ", counts.OrderByDescending(c => c.Value).Take(12).Select(c => $"{c.Key:X4}×{c.Value}")));
+    Console.WriteLine($"Mitschnitt: {saved ?? "–"}");
     return 0;
 }

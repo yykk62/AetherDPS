@@ -2,6 +2,10 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
+## 0.6.2
+
+- **Behoben:** Startete der Meter vor dem Spiel oder lud Steam gerade ein Update, konnte er sich auf den falschen Netzwerkverkehr festlegen und zeigte dann gar nichts mehr an (auch keine Feldbosse). Jetzt erkennt er den Spielserver zuverlässig und sucht von selbst neu, wenn vom Spiel nichts kommt
+
 ## 0.6.1
 
 - **Behoben:** Nach dem Update von 0.5.0 startete der Meter nicht mehr (er räumte beim Start seine eigenen entpackten Dateien weg). Wer davon betroffen ist: [AetherDPS.exe neu herunterladen](https://github.com/yykk62/AetherDPS/releases/latest) – Einstellungen und Läufe bleiben erhalten

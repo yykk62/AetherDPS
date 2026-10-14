@@ -23,7 +23,13 @@ namespace AionDpsMeter.Services.PacketCapture
     {
         private const int KernelBufferSize = 64 * 1024 * 1024;
         private const int ReadTimeoutMs = 100;
-        private const int DetectionThreshold = 5;
+        // AetherDPS: Treffer pro Zeitfenster statt insgesamt. Das Spiel schickt ~20 Heartbeats/s
+        // (EU: ~45 Treffer im Grace-Fenster). Zufällige Treffer in HTTPS-/Download-Verkehr (Steam-Patch,
+        // Browser) kamen auf 5–9 insgesamt und ließen den Meter auf Port 443/80 einrasten (14.10.2026).
+        private const int DetectionThreshold = 15;
+        private const int DetectionWindowMs = 3000;
+        private const int WatchdogMinHeartbeats = 30;
+        private readonly Dictionary<(string Adapter, int Port), Queue<long>> detectionTimes = new();
         private const int GraceWindowMs = 2000;
         private const int WatchdogTimeoutMs = 60_000;
 
@@ -275,7 +281,9 @@ namespace AionDpsMeter.Services.PacketCapture
             if (raw.SourceAdapter != lockedAdapter) return;
             if (tcp.SourcePort != lockedPort) return;
 
-            Interlocked.Increment(ref watchdogHeartbeatsSinceCheck);
+            // AetherDPS: nur echte Heartbeats zählen – sonst hält beliebiger Verkehr auf dem Port den Watchdog wach
+            if (((ReadOnlySpan<byte>)tcp.PayloadData).IndexOf(HeartbeatPattern) >= 0)
+                Interlocked.Increment(ref watchdogHeartbeatsSinceCheck);
             Interlocked.Increment(ref tcpSegments);
             ServerAddress = packet.Extract<IPPacket>()?.SourceAddress ?? ServerAddress;
 
@@ -353,8 +361,14 @@ namespace AionDpsMeter.Services.PacketCapture
                     detectionHits[ctx.Device.Name] = portMap;
                 }
 
-                portMap.TryGetValue(port, out int hits);
-                portMap[port] = ++hits;
+                // AetherDPS: nur Treffer der letzten DetectionWindowMs zählen
+                long now = Environment.TickCount64;
+                if (!detectionTimes.TryGetValue((ctx.Device.Name, port), out var times))
+                    detectionTimes[(ctx.Device.Name, port)] = times = new Queue<long>();
+                times.Enqueue(now);
+                while (times.Count > 0 && now - times.Peek() > DetectionWindowMs) times.Dequeue();
+                int hits = times.Count;
+                portMap[port] = hits;
 
                 logger.LogDebug(
                     $"[DETECT] Pattern on {ctx.Kind} adapter '{ctx.Device.Name}' " +
@@ -394,6 +408,7 @@ namespace AionDpsMeter.Services.PacketCapture
                     logger.LogWarning("[DETECT] Grace window expired but no winner found. Resetting.");
                     graceWindowActive = false;
                     detectionHits.Clear();
+                    detectionTimes.Clear();
                     return;
                 }
 
@@ -487,6 +502,7 @@ namespace AionDpsMeter.Services.PacketCapture
             CloseAllExcept(winner);
 
             detectionHits.Clear();
+            detectionTimes.Clear();
 
             watchdogHeartbeatsSinceCheck = 0;
             watchdogTimer = new Timer(
@@ -501,7 +517,7 @@ namespace AionDpsMeter.Services.PacketCapture
             if (!isCapturing || !isLocked) return;
 
             int beats = Interlocked.Exchange(ref watchdogHeartbeatsSinceCheck, 0);
-            if (beats > 0)
+            if (beats >= WatchdogMinHeartbeats)
             {
                 logger.LogDebug($"[WATCHDOG] OK — {beats} heartbeat packet(s) in last window.");
                 return;
@@ -528,6 +544,7 @@ namespace AionDpsMeter.Services.PacketCapture
                 lockedAdapter = null;
                 lockedPort = 0;
                 detectionHits.Clear();
+                detectionTimes.Clear();
             }
 
             lock (expectedSeqNumbers)
@@ -562,6 +579,7 @@ namespace AionDpsMeter.Services.PacketCapture
                 lockedAdapter = null;
                 lockedPort = 0;
                 detectionHits.Clear();
+                detectionTimes.Clear();
             }
 
             lock (expectedSeqNumbers)
