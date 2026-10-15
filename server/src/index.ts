@@ -1,4 +1,4 @@
-// AetherDPS API – anonyme Tageszähler und Fehlerberichte.
+// AetherDPS API – anonyme Tageszähler, Fehlerberichte und Charakterprofile für aetherdps.com (src/character.ts).
 // Datenschutz: Dieser Worker speichert und protokolliert keine IP-Adressen, User-Agents,
 // Cookies oder sonstigen Kennungen. Es gibt bewusst keine console.*-Ausgaben.
 // Harte Grenzen gegen Spam: je Absender zählt höchstens ein Ping pro Tag und es gehen höchstens
@@ -7,12 +7,13 @@
 // gelöscht, danach lässt sich nichts mehr einer IP zuordnen (wie bei Plausible Analytics).
 
 import { ADMIN_HTML } from "./admin-page";
+import { character, type CharacterEnv } from "./character";
 
 interface RateLimiter {
   limit(options: { key: string }): Promise<{ success: boolean }>;
 }
 
-export interface Env {
+export interface Env extends CharacterEnv {
   DB: D1Database;
   REPORT_LIMIT: RateLimiter;
   PING_LIMIT: RateLimiter;
@@ -291,12 +292,13 @@ async function admin(req: Request, env: Env, url: URL): Promise<Response> {
 // ---------- Einstieg ----------
 
 export default {
-  async fetch(req: Request, env: Env): Promise<Response> {
+  async fetch(req: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     try {
       const url = new URL(req.url);
       const p = url.pathname;
       if (req.method === "POST" && p === "/v1/ping") return await ping(req, env);
       if (req.method === "POST" && p === "/v1/report") return await report(req, env);
+      if (p === "/api/character") return await character(req, env, ctx, url);
       if (p === "/admin" || p.startsWith("/admin/")) return await admin(req, env, url);
       return empty(404);
     } catch {

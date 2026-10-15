@@ -1,9 +1,10 @@
 # AetherDPS API (Cloudflare Worker)
 
-Kleiner Server für zwei Dinge:
+Kleiner Server für drei Dinge:
 
 1. **Anonyme Nutzungszahlen:** Die App meldet einmal am Tag Version, Sprache und ob es eine Neuinstallation ist (`POST /v1/ping`). Gespeichert werden nur Tagessummen.
 2. **Fehlerberichte:** Freiwillig gesendete Meldungen oder Absturzberichte (`POST /v1/report`).
+3. **Charakterprofile für aetherdps.com:** Die Seite „Mein Charakter“ fragt hier das öffentliche Profil bei NCSOFT ab (`GET /api/character`), weil der Browser die NCSOFT-API wegen CORS nicht selbst abfragen darf.
 
 Dazu gibt es eine passwortgeschützte Admin-Seite (`/admin?key=…`) mit Statistik und Berichtsliste.
 
@@ -29,12 +30,25 @@ Hinweise:
 - Was in `message` und `log` steht, bestimmt die App. Sie muss vor dem Senden Spielernamen, Benutzernamen und Pfade mit Benutzernamen entfernen.
 - „Nutzer“ heißt: Anzahl Pings an diesem Tag. Ohne Kennung kann der Server nicht entduplizieren. Die App darf darum höchstens einmal pro UTC-Tag pingen.
 
+## Charakterprofile (`src/character.ts`)
+
+Reicht genau das weiter, was die App in `AetherDPS.Engine/Community/Armory.cs` abfragt: Suche über `api-search.plaync.com` (Name → characterId), dann Profil und Ausrüstung über `aion2.plaync.com`, immer `region=eu` und `lang=de-DE`. Die Antwort enthält nur die Felder, die auch `Armory.Parse` liest; Bild-Adressen nur von `assets.playnccdn.com` und `profileimg.plaync.com`.
+
+Regeln nach NCSOFT-ToS §6 (kein Scraping, nur auf Nutzer-Aktion, cachen, höchstens 1 Anfrage pro Sekunde):
+
+- **Nur auf Nutzer-Aktion:** Eine Abfrage entsteht nur, wenn jemand „Mein Charakter“ mit verbundenem Charakter öffnet oder verbindet.
+- **Cache:** Profil 1 Stunde, Name → characterId 1 Tag, „nicht gefunden“ 10 Minuten. Über die Cache API, die nur unter einer eigenen Domain wirkt; auf `*.workers.dev` hilft nur ein kleiner Speicher je Isolat (höchstens 300 Einträge). Darüber hinaus wird nichts gespeichert.
+- **Höchstens 1 Anfrage pro Sekunde an NCSOFT:** Innerhalb eines Abrufs starten die Anfragen mindestens 1 s nacheinander; über alle Abrufe begrenzt `NCSOFT_LIMIT` auf 10 Anfragen je 10 s (sonst 503 `busy`). Ein neuer Abruf dauert dadurch etwa 4–5 s, weil NCSOFT selbst ~3 s braucht.
+- **Je IP 10 Abrufe pro Minute** (`CHARACTER_LIMIT`, sonst 429). Die IP ist nur der flüchtige Schlüssel dafür.
+- **CORS:** nur `https://aetherdps.com`, `https://www.aetherdps.com` und lokal `http://localhost:<port>` / `http://127.0.0.1:<port>`.
+
 ## Endpunkte
 
 | Methode und Pfad | Zweck |
 |---|---|
 | `POST /v1/ping` | `{ "v": "0.6.0", "lang": "de", "new": false }`, max. 1 KB. Antwort 204, ungültig 400. |
 | `POST /v1/report` | `{ "kind": "manual"\|"crash", "v", "lang", "os", "message", "log"? }`, max. 256 KB. Antwort 201 `{ "id": n }`, 400 ungültig, 413 zu groß, 429 zu viele. |
+| `GET /api/character?name=&server=` | Öffentliches Profil eines Charakters auf einem EU-Server (`server` 1301–1399 Elyos, 2301–2399 Asmodier; Name 2–24 Buchstaben/Ziffern). Antwort 200 mit Profil, sonst `{ "error": "input" \| "notfound" \| "rate" \| "busy" \| "upstream" }` mit 400/404/429/503/502. |
 | `GET /admin?key=` | Admin-Seite |
 | `GET /admin/api/stats?key=&days=60` | Tageswerte und Verteilung nach Version und Sprache |
 | `GET /admin/api/reports?key=&status=open\|closed\|all&limit=100` | Berichtsliste ohne Log (mit `has_log`, `log_size`) |
@@ -62,7 +76,7 @@ npx wrangler secret put ADMIN_KEY
 npx wrangler deploy
 ```
 
-Die `database_id` ist kein Geheimnis (Zugriff nur mit Cloudflare-Konto) und darf im öffentlichen Repo stehen. Der `ADMIN_KEY` gehört **nie** in eine Datei im Repo. Die `namespace_id` des Rate-Limiters (`1001`) ist eine frei gewählte Zahl, die im Cloudflare-Konto eindeutig sein muss.
+Die `database_id` ist kein Geheimnis (Zugriff nur mit Cloudflare-Konto) und darf im öffentlichen Repo stehen. Der `ADMIN_KEY` gehört **nie** in eine Datei im Repo. Die `namespace_id` der Rate-Limiter (`1001` bis `1004`) sind frei gewählte Zahlen, die im Cloudflare-Konto eindeutig sein müssen.
 
 Prüfen ohne Veröffentlichen: `npm run check` (TypeScript) und `npx wrangler deploy --dry-run`.
 

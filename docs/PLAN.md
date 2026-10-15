@@ -100,7 +100,8 @@ Astro-Seite in `web/`, statisch, über Cloudflare (Konto des Nutzers, Domain aet
 - [x] E-Mail: Cloudflare Email Routing, kontakt@ und alle anderen Adressen an die Gmail des Nutzers (15.10.)
 - [ ] **Resetzeit klären:** App nimmt 06:00 an (`ChecklistService`), Wakayashi 09:00 täglich und Mi 09:00. Webseite nutzt 09:00 (`web/src/lib/schedule.ts`). Im Spiel prüfen, dann beide angleichen
 - [ ] Unbestätigte Zeiten prüfen: Beritra, Shugofesta, Dimensions-Invasion, Reshanta-Weltbosse (`web/src/data/events.ts`)
-- [ ] Mein Charakter: Abfrage über den Worker (CORS), nur der eigene Charakter, mit Cache und Begrenzung; Charakter im localStorage. Neue Verbindung nach außen → README, Datenschutz, CLAUDE.md
+- [x] Mein Charakter: Abfrage über den Worker (`GET /api/character`, CORS), 1 Std. Cache, NCSOFT höchstens 1×/s, je IP 10/Min.; Name + Server im localStorage; README, Datenschutz, CLAUDE.md nachgezogen (15.10.)
+- [ ] Worker `aetherdps-api` unter eigener Domain (z. B. api.aetherdps.com): erst dann wirkt die Cache API (auf workers.dev nur der kleine Speicher je Isolat); danach `PUBLIC_API_BASE` bzw. die Vorgabe in `web/src/lib/character.ts` umstellen
 - [ ] Guide-Check gegen das Profil (Skill-Stufen, Stigmas)
 - [ ] Datenbank: Dungeons, Begriffe in 10 Sprachen
 - [ ] Eigene Karte (Pet-Spawns, Feldbosse; Kacheln liegen schon in `AetherDPS.App/Assets/maps`)

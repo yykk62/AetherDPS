@@ -67,6 +67,20 @@ Auskunft, Berichtigung, Löschung, Einschränkung, Widerspruch, Datenübertragba
 keine Kennung enthält, lassen sich einzelne Signale keiner Person zuordnen.
 
 ## 5. Webseite
-[Abschnitt für die Webseite selbst ergänzen: Hosting, Server-Logs, ggf. Schriftarten. Möglichst ohne Cookies und ohne Tracking.]
+[Abschnitt für die Webseite selbst ergänzen: Hosting, Server-Logs, ggf. Schriftarten. Möglichst ohne Cookies und ohne Tracking.
+Der aktuelle Stand für die Webseite steht in `web/src/pages/datenschutz.md`.]
+
+### Mein Charakter
+Auf der Seite „Mein Charakter“ wählst du einmal Charaktername und EU-Server. Beides speichert dein Browser im
+localStorage (kein Cookie); löschen kannst du es mit „Trennen“ oder über die Browser-Einstellungen. Bei jedem Besuch
+der Seite fragt dein Browser damit unseren Server (Cloudflare Worker, siehe 3e) ab, und der fragt bei NCSOFT
+(api-search.plaync.com, aion2.plaync.com) dieselben öffentlichen Profildaten ab wie die App (Stufe, Ausrüstung, Werte,
+Daevanion, Titel, Skills). Übertragen werden nur Name und Server. Das Ergebnis hält der Server höchstens eine Stunde im
+Cache (danach gelöscht), damit NCSOFT nicht bei jedem Aufruf gefragt wird; an NCSOFT geht höchstens eine Anfrage pro
+Sekunde. Gegen Missbrauch sind je IP-Adresse höchstens 10 Abrufe pro Minute möglich; die IP-Adresse dient dafür nur
+kurzzeitig im Arbeitsspeicher als Schlüssel und wird nicht gespeichert, protokolliert wird nichts. Bilder und Icons
+lädt dein Browser direkt von NCSOFT (assets.playnccdn.com, profileimg.plaync.com, ohne Referrer); NCSOFT erhält dabei
+technisch bedingt deine IP-Adresse. Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (von dir gewünschte Anzeige öffentlich
+abrufbarer Spieldaten), für den Speicher im Browser § 25 Abs. 2 Nr. 2 TDDDG.
 
 Stand: [Datum]

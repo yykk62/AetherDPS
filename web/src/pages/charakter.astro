@@ -2,28 +2,314 @@
 import Base from '../layouts/Base.astro';
 import PageHead from '../components/PageHead.astro';
 import { t } from '../i18n';
----
-<Base title={t('char.title')}>
-  <div class="wrap">
-    <PageHead image="/img/charakter.webp" eyebrow={t('common.soon')} title={t('char.title')} lead={t('char.lead')} />
+import { euServers } from '../lib/gamedata';
 
-    <form class="card connect" onsubmit="return false">
-      <input placeholder="Charaktername" disabled aria-label="Charaktername" />
-      <select disabled aria-label="Server"><option>Server</option></select>
-      <button class="btn" disabled>Verbinden</button>
+const servers = euServers();
+---
+<Base title={t('char.title')} description="Dein AION-2-Charakter auf einen Blick: Ausrüstung, Werte, Daevanion und Skills, bei jedem Besuch aktuell.">
+  <div class="wrap">
+    <PageHead image="/img/charakter.webp" eyebrow={t('char.eyebrow')} title={t('char.title')} lead={t('char.lead')} />
+
+    <form class="card connect" id="connect" hidden>
+      <input name="name" required minlength="2" maxlength="24" autocomplete="off" spellcheck="false"
+        placeholder={t('char.name')} aria-label={t('char.name')} />
+      <select name="server" required aria-label={t('char.server')}>
+        <option value="">{t('char.server')}</option>
+        <optgroup label={t('char.elyos')}>{servers.elyos.map((s) => <option value={s.id}>{s.name}</option>)}</optgroup>
+        <optgroup label={t('char.asmodian')}>{servers.asmodian.map((s) => <option value={s.id}>{s.name}</option>)}</optgroup>
+      </select>
+      <button class="btn" type="submit">{t('char.connect')}</button>
     </form>
 
-    <div class="grid section">
-      <div class="card"><div class="icon">🧙</div><h3>Einmal verbinden</h3><p>Name und Server wählen. Gespeichert wird das nur in deinem Browser, ohne Konto.</p></div>
-      <div class="card"><div class="icon">🔄</div><h3>Immer aktuell</h3><p>Bei jedem Besuch werden Ausrüstung, Werte, Daevanion und Skills neu abgefragt, dieselben öffentlichen Daten wie bei NCSOFT.</p></div>
-      <div class="card"><div class="icon">✅</div><h3>Guide-Check</h3><p>Guides prüfen deinen Build: Welche Skills haben schon die Ziel-Stufe, welches Stigma fehlt noch?</p></div>
+    <div class="card bar" id="bar" hidden>
+      <span id="bar-text"></span>
+      <span class="bar-actions">
+        <button class="btn ghost small" type="button" id="change">{t('char.change')}</button>
+        <button class="btn ghost small" type="button" id="disconnect">{t('char.disconnect')}</button>
+      </span>
     </div>
 
-    <p class="muted small">Bis dahin gibt es das Profil schon in der App (Reiter Profil), dort auch für jeden anderen Charakter auf einem EU-Server.</p>
+    <p class="status" id="status" role="status" aria-live="polite" hidden></p>
+    <div id="profile"></div>
+
+    <div class="grid section" id="intro">
+      <div class="card"><div class="icon">🧙</div><h3>{t('char.step1')}</h3><p>{t('char.step1Text')}</p></div>
+      <div class="card"><div class="icon">🔄</div><h3>{t('char.step2')}</h3><p>{t('char.step2Text')}</p></div>
+      <div class="card"><div class="icon">✅</div><h3>{t('char.step3')}</h3><p>{t('char.step3Text')}</p></div>
+    </div>
+
+    <p class="muted small">{t('char.privacy')} <a href="/datenschutz">{t('footer.privacy')}</a></p>
+    <p class="muted small">{t('char.appHint')}</p>
   </div>
 </Base>
 
+<script>
+  import { t, type Key } from '../i18n';
+  import {
+    ARMOR_SLOTS, averageEnchant, daevanionPercent, link, linked, loadProfile,
+    type Item, type Linked, type Profile,
+  } from '../lib/character';
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const form = $<HTMLFormElement>('connect');
+  const nameInput = form.elements.namedItem('name') as HTMLInputElement;
+  const serverSelect = form.elements.namedItem('server') as HTMLSelectElement;
+  const bar = $('bar');
+  const status = $('status');
+  const out = $('profile');
+  const intro = $('intro');
+
+  const nf = new Intl.NumberFormat('de-DE');
+  const serverName = (id: number) => serverSelect.querySelector<HTMLOptionElement>(`option[value="${id}"]`)?.textContent ?? `#${id}`;
+  /** Text mit Fallback auf den Rohwert, falls NCSOFT einen neuen Wert liefert. */
+  const label = (key: string, raw: string) => {
+    const text = t(key as Key);
+    return text === key ? raw : text;
+  };
+
+  const el = <K extends keyof HTMLElementTagNameMap>(tag: K, props: Partial<HTMLElementTagNameMap[K]> = {}, ...kids: (Node | string | null)[]) => {
+    const e = Object.assign(document.createElement(tag), props);
+    e.append(...kids.filter((k): k is Node | string => k !== null));
+    return e;
+  };
+  /** Bilder nur von NCSOFT (prüft schon der Server), ohne Referrer. */
+  const img = (src: string | null, alt = '', className = 'ico') => {
+    if (!src) return el('span', { className: `${className} blank` });
+    const i = el('img', { src, alt, className, loading: 'lazy', decoding: 'async', width: 40, height: 40 });
+    i.referrerPolicy = 'no-referrer';
+    return i;
+  };
+  const grade = (g: string) => `g-${/^[A-Za-z]+$/.test(g) ? g : 'none'}`;
+  const section = (title: string, ...kids: (Node | null)[]) => el('section', { className: 'section' }, el('h2', {}, title), ...kids);
+
+  function showStatus(text: string, error = false, retry = false) {
+    status.hidden = !text;
+    status.className = error ? 'status note err' : 'status muted';
+    status.replaceChildren(text);
+    if (retry) {
+      const b = el('button', { className: 'btn ghost small', type: 'button' }, t('char.retry'));
+      b.addEventListener('click', () => { const c = linked(); if (c) void show(c); });
+      status.append(' ', b);
+    }
+  }
+
+  function showForm(prefill?: Linked | null) {
+    form.hidden = false;
+    bar.hidden = true;
+    intro.hidden = false;
+    if (prefill) {
+      nameInput.value = prefill.name;
+      serverSelect.value = String(prefill.server);
+    }
+    nameInput.focus();
+  }
+
+  async function show(c: Linked) {
+    form.hidden = true;
+    bar.hidden = false;
+    intro.hidden = true;
+    $('bar-text').textContent = t('char.connected', c.name, serverName(c.server));
+    out.replaceChildren();
+    showStatus(t('char.loading', c.name));
+    const result = await loadProfile(c);
+    if (typeof result === 'string') {
+      showStatus(t(`char.err.${result}` as Key), true, result !== 'notfound' && result !== 'input');
+      return;
+    }
+    showStatus('');
+    out.replaceChildren(render(result));
+  }
+
+  // ---------- Darstellung ----------
+
+  function render(p: Profile): DocumentFragment {
+    const f = document.createDocumentFragment();
+    f.append(head(p), gear(p), stats(p), daevanion(p), skills(p), extras(p));
+    const at = new Date(p.loadedAt);
+    f.append(el('p', { className: 'muted small' }, t('char.updated', at.toLocaleString('de-DE', { dateStyle: 'short', timeStyle: 'short' }))));
+    return f;
+  }
+
+  function head(p: Profile) {
+    const kpi = (name: string, value: string, title = '') => el('div', { className: 'kpi', title }, el('span', { className: 'kpi-v' }, value), el('span', { className: 'kpi-l' }, name));
+    return el('div', { className: 'card hero' },
+      img(p.portrait, '', 'portrait'),
+      el('div', { className: 'who' },
+        el('h2', {}, p.name),
+        el('p', { className: 'muted' }, [t('char.level', p.level), p.className, p.race, p.server].filter(Boolean).join(' · ')),
+        p.title ? el('p', { className: `title ${grade(p.title.grade)}` }, `„${p.title.name}“`) : null),
+      el('div', { className: 'kpis' },
+        kpi(t('char.combatPower'), nf.format(p.combatPower)),
+        kpi(t('char.itemLevel'), nf.format(p.itemLevel)),
+        kpi(t('char.enchant'), `+${averageEnchant(p).toLocaleString('de-DE', { maximumFractionDigits: 1 })}`, t('char.enchantHint')),
+        kpi(t('char.daevanion'), `${daevanionPercent(p)} %`)));
+  }
+
+  function slotName(slot: string) {
+    const arcana = /^Arcana(\d+)$/.exec(slot);
+    return arcana ? t('char.slot.Arcana', arcana[1]) : label(`char.slot.${slot}`, slot);
+  }
+
+  function itemRow(i: Item) {
+    const plus = i.enchant || i.exceed ? `+${i.enchant}${i.exceed ? ` (+${i.exceed})` : ''}` : '';
+    return el('li', { className: 'item' },
+      img(i.icon, ''),
+      el('span', { className: 'item-text' },
+        el('span', { className: 'muted small' }, slotName(i.slot)),
+        el('span', { className: grade(i.grade) }, i.name)),
+      el('span', { className: 'plus' }, plus));
+  }
+
+  function gear(p: Profile) {
+    const order = (i: Item) => ARMOR_SLOTS.indexOf(i.slot);
+    const armor = p.equipment.filter((i) => order(i) >= 0).sort((a, b) => order(a) - order(b));
+    const rest = p.equipment.filter((i) => order(i) < 0);
+    return section(t('char.gear'),
+      el('div', { className: 'two' },
+        el('div', { className: 'card' }, el('h3', {}, t('char.armor')), el('ul', { className: 'items' }, ...armor.map(itemRow))),
+        el('div', { className: 'card' }, el('h3', {}, t('char.accessories')), el('ul', { className: 'items' }, ...rest.map(itemRow)))));
+  }
+
+  function stats(p: Profile) {
+    const table = (rows: Profile['stats']) => el('div', { className: 'table-wrap' }, el('table', {}, el('tbody', {},
+      ...rows.map((s) => el('tr', {}, el('td', {}, s.name), el('td', { className: 'num' }, nf.format(s.value)), el('td', { className: 'muted small' }, s.effects.join(' · ')))))));
+    // Gottheiten-Werte heißen z. B. „Gerechtigkeit [Nezekan]“ (wie im Reiter Profil der App).
+    const gods = p.stats.filter((s) => s.name.includes('['));
+    const base = p.stats.filter((s) => !s.name.includes('['));
+    return section(t('char.stats'),
+      el('div', { className: 'two' },
+        el('div', {}, el('h3', {}, t('char.baseStats')), table(base)),
+        gods.length ? el('div', {}, el('h3', {}, t('char.godStats')), table(gods)) : null));
+  }
+
+  function fill(percent: number) {
+    const d = el('div', { className: 'bar-fill' });
+    d.style.width = `${Math.min(100, Math.max(0, percent))}%`;
+    return d;
+  }
+
+  function daevanion(p: Profile) {
+    if (!p.boards.length) return document.createDocumentFragment();
+    return section(t('char.daevanion'),
+      el('div', { className: 'boards' }, ...p.boards.map((b) =>
+        el('div', { className: 'card board' },
+          img(b.icon, ''),
+          el('div', { className: 'board-text' },
+            el('strong', {}, b.name),
+            el('div', { className: 'bar-track', role: 'progressbar', ariaValueNow: String(b.percent), ariaValueMin: '0', ariaValueMax: '100' },
+              fill(b.percent)),
+            el('span', { className: 'muted small' }, `${b.percent} % · ${t('char.nodes', b.open, b.total)}`))))));
+  }
+
+  function skills(p: Profile) {
+    const rank = (c: string) => ({ Active: 0, Passive: 1, Dp: 2 })[c] ?? 3;
+    const groups = [...new Set(p.skills.map((s) => s.category))].sort((a, b) => rank(a) - rank(b));
+    return section(t('char.skills'), ...groups.map((g) =>
+      el('div', { className: 'skill-group' },
+        el('h3', {}, label(`char.skillcat.${g}`, g)),
+        el('ul', { className: 'skills' }, ...p.skills.filter((s) => s.category === g).map((s) =>
+          el('li', { className: `skill${g === 'Dp' && s.equipped ? ' on' : ''}`, title: g === 'Dp' && s.equipped ? t('char.equipped') : '' },
+            img(s.icon, ''),
+            el('span', { className: 'skill-name' }, s.name),
+            el('span', { className: 'lvl' }, String(s.level))))))));
+  }
+
+  function extras(p: Profile) {
+    const cards: Node[] = [];
+    if (p.pet) cards.push(el('div', { className: 'card extra' }, img(p.pet.icon, ''), el('div', {}, el('span', { className: 'muted small' }, t('char.pet')), el('div', {}, p.pet.name), el('span', { className: 'muted small' }, t('char.petLevel', p.pet.level)))));
+    if (p.wing) cards.push(el('div', { className: 'card extra' }, img(p.wing.icon, ''), el('div', {}, el('span', { className: 'muted small' }, t('char.wing')), el('div', { className: grade(p.wing.grade) }, p.wing.name + (p.wing.enchant ? ` +${p.wing.enchant}` : '')))));
+    for (const x of p.titles.list) {
+      cards.push(el('div', { className: 'card extra' }, el('div', { className: 'grow' },
+        el('span', { className: 'muted small' }, `${t('char.titles')} · ${label(`char.titlecat.${x.category}`, x.category)}`),
+        el('div', { className: grade(x.grade) }, x.name),
+        el('span', { className: 'muted small' }, `${x.owned} / ${x.total}`))));
+    }
+    if (!cards.length) return document.createDocumentFragment();
+    return section(`${t('char.pet')}, ${t('char.wing')}, ${t('char.titles')}`, el('div', { className: 'extras' }, ...cards),
+      p.titles.owned ? el('p', { className: 'muted small' }, t('char.titlesOwned', p.titles.owned)) : null);
+  }
+
+  // ---------- Ablauf ----------
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const c = { name: nameInput.value.trim(), server: Number(serverSelect.value) };
+    if (!/^[\p{L}\p{N}]{2,24}$/u.test(c.name) || !c.server) {
+      showStatus(t('char.err.input'), true);
+      return;
+    }
+    link(c);
+    void show(c);
+  });
+  $('change').addEventListener('click', () => { out.replaceChildren(); showStatus(''); showForm(linked()); });
+  $('disconnect').addEventListener('click', () => {
+    const c = linked();
+    if (c && !confirm(t('char.disconnectConfirm', c.name))) return;
+    link(null);
+    out.replaceChildren();
+    showStatus('');
+    nameInput.value = '';
+    serverSelect.value = '';
+    showForm();
+  });
+
+  const current = linked();
+  if (current) void show(current);
+  else showForm();
+</script>
+
 <style>
-  .connect { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; opacity: 0.6; }
-  .connect input { flex: 1 1 220px; }
+  .connect { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .connect input { flex: 1 1 220px; min-width: 0; }
+  .connect select { flex: 0 1 220px; min-width: 0; }
+  .bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between; padding: 12px 18px; }
+  .bar-actions { display: flex; gap: 8px; }
+  .status { margin: 16px 0; }
+  .status.err { border-left-color: var(--live); }
+  [hidden] { display: none !important; }
+
+  #profile :global(.hero) { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; margin-top: 16px; }
+  #profile :global(.portrait) { width: 96px; height: 96px; border-radius: 12px; object-fit: cover; background: var(--panel-2); flex: none; }
+  #profile :global(.who) { flex: 1 1 220px; min-width: 0; }
+  #profile :global(.who h2) { margin: 0 0 4px; font-size: 1.6rem; }
+  #profile :global(.who p) { margin: 0; }
+  #profile :global(.title) { font-style: italic; }
+  #profile :global(.kpis) { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; flex: 1 1 420px; }
+  #profile :global(.kpi) { background: var(--bg-2); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; }
+  #profile :global(.kpi-v) { font: 700 1.25rem/1.2 var(--mono); color: var(--gold-2); }
+  #profile :global(.kpi-l) { color: var(--muted); font-size: 0.8rem; }
+  @media (max-width: 560px) { #profile :global(.kpis) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+  #profile :global(.two) { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); align-items: start; }
+  #profile :global(.ico) { width: 40px; height: 40px; border-radius: 6px; background: var(--bg-2); flex: none; object-fit: contain; }
+  #profile :global(.items), #profile :global(.skills) { list-style: none; margin: 0; padding: 0; }
+  #profile :global(.item) { display: flex; gap: 10px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line); }
+  #profile :global(.item:last-child) { border-bottom: 0; }
+  #profile :global(.item-text) { display: flex; flex-direction: column; min-width: 0; flex: 1; line-height: 1.3; }
+  #profile :global(.item-text > span:last-child) { overflow-wrap: anywhere; }
+  #profile :global(.plus) { font: 600 0.9rem var(--mono); color: var(--soft); white-space: nowrap; }
+  #profile :global(td.num) { text-align: right; font-family: var(--mono); white-space: nowrap; }
+
+  #profile :global(.boards) { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); }
+  #profile :global(.board) { display: flex; gap: 12px; align-items: center; padding: 12px 14px; }
+  #profile :global(.board-text) { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+  #profile :global(.bar-track) { height: 6px; border-radius: 3px; background: var(--bg-2); overflow: hidden; }
+  #profile :global(.bar-fill) { height: 100%; background: var(--gold); }
+
+  #profile :global(.skill-group h3) { margin-top: 1rem; }
+  #profile :global(.skills) { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); }
+  #profile :global(.skill) { display: flex; gap: 10px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px 6px 6px; }
+  #profile :global(.skill.on) { border-color: var(--gold); }
+  #profile :global(.skill-name) { flex: 1; min-width: 0; line-height: 1.3; overflow-wrap: anywhere; }
+  #profile :global(.lvl) { font: 700 0.95rem var(--mono); color: var(--gold-2); }
+
+  #profile :global(.extras) { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); }
+  #profile :global(.extra) { display: flex; gap: 12px; align-items: center; padding: 12px 14px; }
+
+  /* Qualitätsfarben wie in der App (GradeColors) */
+  #profile :global(.g-Unique) { color: #e0a84a; }
+  #profile :global(.g-Legend) { color: #f07c4a; }
+  #profile :global(.g-Epic) { color: #b07cf0; }
+  #profile :global(.g-Special) { color: #4cc3b0; }
+  #profile :global(.g-Rare) { color: #5aa0f0; }
 </style>

@@ -72,3 +72,14 @@ export function pets(): Pet[] {
     }))
     .sort((a, b) => a.name.localeCompare(b.name, 'de'));
 }
+
+/** EU-Server aus servers.json: 13xx Elyos, 23xx Asmodier (wie in der App). */
+export function euServers(): { elyos: { id: number; name: string }[]; asmodian: { id: number; name: string }[] } {
+  const raw = read<{ servers: Record<string, Names> }>('servers.json').servers;
+  const list = (prefix: string) =>
+    Object.entries(raw)
+      .filter(([id]) => id.length === 4 && id.startsWith(prefix))
+      .map(([id, n]) => ({ id: Number(id), name: n.de ?? n.en }))
+      .sort((a, b) => a.name.localeCompare(b.name, 'de'));
+  return { elyos: list('13'), asmodian: list('23') };
+}

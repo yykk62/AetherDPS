@@ -25,7 +25,10 @@
   // Begrenzung pro Minute je Absender (nur im Speicher). Die Tagesgrenzen stehen in src/index.ts (Tabellen senders/day_salt).
   "ratelimits": [
     { "name": "REPORT_LIMIT", "namespace_id": "1001", "simple": { "limit": 5, "period": 60 } },
-    { "name": "PING_LIMIT", "namespace_id": "1002", "simple": { "limit": 3, "period": 60 } }
+    { "name": "PING_LIMIT", "namespace_id": "1002", "simple": { "limit": 3, "period": 60 } },
+    // /api/character: je IP 10 Abrufe pro Minute; zu NCSOFT insgesamt höchstens 10 Anfragen je 10 Sekunden (Schlüssel "ncsoft").
+    { "name": "CHARACTER_LIMIT", "namespace_id": "1003", "simple": { "limit": 10, "period": 60 } },
+    { "name": "NCSOFT_LIMIT", "namespace_id": "1004", "simple": { "limit": 10, "period": 10 } }
   ]
 
   // Secret (nicht hier eintragen!): ADMIN_KEY  ->  `wrangler secret put ADMIN_KEY`
