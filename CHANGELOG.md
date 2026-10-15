@@ -2,6 +2,10 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
+## 0.7.10
+
+- Pet-Radar startet nach dem Update einmal mittig über der Spielkarte (statt an der alten Stelle am Rand, wo es in der neuen Größe aus dem Bild ragte) und bleibt immer ganz auf dem Bildschirm
+
 ## 0.7.9
 
 - **Pet-Radar aufgeräumt:** keine Titelzeile mehr – die Knöpfe liegen klein auf der Karte (⠿ verschieben, ▾ einklappen, ✕ schließen, ☰ Liste, ⌖ zu dir)

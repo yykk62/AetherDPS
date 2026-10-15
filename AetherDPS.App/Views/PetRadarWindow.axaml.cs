@@ -91,20 +91,29 @@ public partial class PetRadarWindow : Window
         return (290, 230);
     }
 
-    /// <summary>Gemerkte Stelle, sonst mittig über der Spielkarte.</summary>
+    /// <summary>
+    /// Gemerkte Stelle, sonst mittig über der Spielkarte. Eine Stelle aus der Zeit vor der Größenänderung (kleines Radar
+    /// am Rand) gilt nicht – sonst ragte das große Radar aus dem Bild. Immer ganz auf dem Bildschirm.
+    /// </summary>
     private void Place()
     {
-        if (settings?.PetRadarLeft is double x && settings.PetRadarTop is double y)
+        if ((Screens.Primary ?? Screens.All.FirstOrDefault()) is not { } primary) return;
+        var (width, map) = Size();
+        double height = map + 220;   // Liste
+        bool sized = settings?.PetRadarWidth is not null;
+        if (sized && settings!.PetRadarLeft is double x && settings.PetRadarTop is double y)
         {
-            Position = new PixelPoint((int)x, (int)y);
+            var at = new PixelPoint((int)x, (int)y);
+            var screen = Screens.ScreenFromPoint(at) ?? primary;
+            var area = screen.WorkingArea;
+            double scale = screen.Scaling;
+            int w = (int)(width * scale), h = (int)(Math.Min(height, area.Height / scale) * scale);
+            Position = new PixelPoint(Math.Clamp(at.X, area.X, Math.Max(area.X, area.Right - w)), Math.Clamp(at.Y, area.Y, Math.Max(area.Y, area.Bottom - h)));
             return;
         }
-        if ((Screens.Primary ?? Screens.All.FirstOrDefault()) is not { } screen) return;
-        var (width, map) = Size();
-        var area = screen.WorkingArea;
-        double scale = screen.Scaling;
-        double height = map + 260;   // Kopf, Liste
-        Position = new PixelPoint(area.X + (int)((area.Width - width * scale) / 2), area.Y + (int)Math.Max(0, (area.Height - height * scale) / 2));
+        var wa = primary.WorkingArea;
+        double s = primary.Scaling;
+        Position = new PixelPoint(wa.X + (int)((wa.Width - width * s) / 2), wa.Y + (int)Math.Max(0, (wa.Height - height * s) / 2));
     }
 
     private void Remember()
@@ -112,6 +121,11 @@ public partial class PetRadarWindow : Window
         if (settings is null || !IsVisible) return;
         settings.PetRadarLeft = Position.X;
         settings.PetRadarTop = Position.Y;
+        if (!IsCollapsed)
+        {
+            settings.PetRadarWidth ??= Math.Round(Width);
+            settings.PetRadarMapHeight ??= Math.Round(RadarMap.Height);
+        }
         settings.Save();
     }
 

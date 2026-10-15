@@ -2,6 +2,10 @@
 
 Newest versions first.
 
+## 0.7.10
+
+- After the update the pet radar opens once centred over the game map (instead of at its old spot at the edge, where the new size stuck out of the screen) and always stays fully on screen
+
 ## 0.7.9
 
 - **Tidier pet radar:** no title bar any more – the buttons sit small on the map (⠿ move, ▾ collapse, ✕ close, ☰ list, ⌖ to you)
