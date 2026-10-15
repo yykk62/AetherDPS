@@ -18,7 +18,10 @@ Dazu gibt es eine passwortgeschützte Admin-Seite (`/admin?key=…`) mit Statist
 
 **Nicht gespeichert und nicht protokolliert:** IP-Adressen, User-Agents, Geräte- oder Nutzerkennungen, Cookies. Der Worker setzt keine Cookies, hat keine `console`-Ausgaben, und Workers Logs/Logpush sind in `wrangler.jsonc` abgeschaltet.
 
-Die IP-Adresse wird nur als flüchtiger Schlüssel für die Begrenzung verwendet (`/v1/report`: 5 pro Minute, `/v1/ping`: 3 pro Minute) (Cloudflare Rate Limiting API, Zähler nur im Arbeitsspeicher des Standorts). Sie wird nirgends abgelegt.
+Die IP-Adresse wird nur als flüchtiger Schlüssel für die Begrenzung verwendet und nirgends abgelegt:
+
+- **Pro Minute** (Cloudflare Rate Limiting API, Zähler nur im Arbeitsspeicher des Standorts): `/v1/report` 5, `/v1/ping` 3.
+- **Pro Tag** (harte Grenze gegen Spam): Je Absender zählt nur **ein Ping pro Tag**, weitere werden mit 204 angenommen, aber nicht gezählt. Je Absender gehen höchstens **5 Berichte pro Tag** ein, insgesamt höchstens **300** (sonst 429). Dafür merkt sich der Worker in `senders` nur einen gekürzten SHA-256-Hash aus der IP und einem **zufälligen Tages-Salz** (`day_salt`). Mit der ersten Anfrage des nächsten Tages werden Salz und alle Hashes des Vortags gelöscht; ohne das Salz lässt sich kein Hash mehr einer IP zuordnen (Verfahren wie bei Plausible Analytics).
 
 Hinweise:
 

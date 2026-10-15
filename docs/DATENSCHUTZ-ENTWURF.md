@@ -53,7 +53,11 @@ Gespeichert wird nur kurz im Arbeitsspeicher (15 Minuten). Rechtsgrundlage: Art.
 ### e) Empfänger
 Nutzungszahl und Fehlerberichte verarbeitet ein Server bei Cloudflare, Inc. (Cloudflare Workers und D1) als
 Auftragsverarbeiter. Cloudflare erhält technisch bedingt deine IP-Adresse, um die Anfrage zuzustellen, und begrenzt
-damit Fehlerberichte (höchstens 5 pro Minute, dafür nur kurzzeitig zwischengespeichert); dauerhaft gespeichert wird sie nicht. Datenschutzhinweise von Cloudflare:
+damit Anfragen (höchstens 5 Fehlerberichte bzw. 3 Signale pro Minute, dafür nur kurzzeitig im Arbeitsspeicher). Damit
+niemand die Zahlen künstlich aufbläht, zählt je Absender nur ein Signal pro Tag und es gehen höchstens 5 Fehlerberichte
+pro Tag ein. Dafür speichert der Server bis zum Ende des Tages nur einen gekürzten Hash aus IP-Adresse und einem
+zufälligen, täglich neuen Wert; am nächsten Tag werden dieser Wert und alle Hashes gelöscht, danach ist keine Zuordnung
+zu einer IP-Adresse mehr möglich. Die IP-Adresse selbst wird nicht gespeichert. Datenschutzhinweise von Cloudflare:
 https://www.cloudflare.com/privacypolicy/
 Der Quellcode des Servers ist öffentlich: https://github.com/yykk62/AetherDPS/tree/main/server
 

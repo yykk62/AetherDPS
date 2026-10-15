@@ -1,6 +1,10 @@
 // AetherDPS API – anonyme Tageszähler und Fehlerberichte.
 // Datenschutz: Dieser Worker speichert und protokolliert keine IP-Adressen, User-Agents,
 // Cookies oder sonstigen Kennungen. Es gibt bewusst keine console.*-Ausgaben.
+// Harte Grenzen gegen Spam: je Absender zählt höchstens ein Ping pro Tag und es gehen höchstens
+// REPORTS_PER_SENDER Berichte pro Tag ein, insgesamt höchstens REPORTS_PER_DAY. Dafür wird nur ein
+// Hash aus IP und einem zufälligen Tages-Salz gemerkt; Salz und Hashes werden am nächsten Tag
+// gelöscht, danach lässt sich nichts mehr einer IP zuordnen (wie bei Plausible Analytics).
 
 import { ADMIN_HTML } from "./admin-page";
 
@@ -18,6 +22,8 @@ export interface Env {
 type Json = Record<string, unknown>;
 
 const KB = 1024;
+const REPORTS_PER_SENDER = 5;
+const REPORTS_PER_DAY = 300;
 const VERSION_RE = /^\d{1,3}\.\d{1,3}\.\d{1,3}$/;
 const LANGS = new Set(["de", "en", "fr", "es", "pt", "ru", "ja", "ko", "zh-Hans", "zh-Hant"]);
 const BASE_HEADERS: Record<string, string> = {
@@ -93,6 +99,37 @@ async function keyMatches(given: string | null, expected: string | undefined): P
   return crypto.subtle.timingSafeEqual(a, b);
 }
 
+/**
+ * Kurzlebige Absender-Kennung: SHA-256 aus zufälligem Tages-Salz und IP (gekürzt). Das Salz entsteht
+ * mit der ersten Anfrage des Tages; dabei werden Salz und Kennungen der Vortage gelöscht.
+ */
+async function sender(req: Request, env: Env, day: string): Promise<string> {
+  const fresh = crypto.randomUUID() + crypto.randomUUID();
+  const created = await env.DB.prepare("INSERT OR IGNORE INTO day_salt (day, salt) VALUES (?1, ?2)").bind(day, fresh).run();
+  if (created.meta.changes > 0) {
+    await env.DB.batch([
+      env.DB.prepare("DELETE FROM day_salt WHERE day < ?1").bind(day),
+      env.DB.prepare("DELETE FROM senders WHERE day < ?1").bind(day),
+    ]);
+  }
+  const row = await env.DB.prepare("SELECT salt FROM day_salt WHERE day = ?1").bind(day).first<{ salt: string }>();
+  const ip = req.headers.get("CF-Connecting-IP") ?? "unknown";
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`${row?.salt ?? fresh}|${ip}`));
+  return [...new Uint8Array(digest).slice(0, 12)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+/** Zähler des Absenders für heute erhöhen; liefert den neuen Stand (1 = erstes Mal heute). */
+async function bump(env: Env, day: string, id: string, column: "pings" | "reports"): Promise<number> {
+  const row = await env.DB.prepare(
+    `INSERT INTO senders (day, id, ${column}) VALUES (?1, ?2, 1)
+     ON CONFLICT (day, id) DO UPDATE SET ${column} = ${column} + 1
+     RETURNING ${column} AS n`,
+  )
+    .bind(day, id)
+    .first<{ n: number }>();
+  return row?.n ?? 1;
+}
+
 // ---------- Öffentliche Endpunkte ----------
 
 async function ping(req: Request, env: Env): Promise<Response> {
@@ -104,12 +141,16 @@ async function ping(req: Request, env: Env): Promise<Response> {
   const isNew = b.new ?? false;
   if (!isVersion(b.v) || !isLang(b.lang) || typeof isNew !== "boolean") return empty(400);
 
+  // Je Absender zählt nur der erste Ping des Tages; weitere werden still angenommen (204), aber nicht gezählt.
+  const day = utcDay();
+  if ((await bump(env, day, await sender(req, env, day), "pings")) > 1) return empty(204);
+
   await env.DB.prepare(
     `INSERT INTO daily (day, version, lang, users, new_installs) VALUES (?1, ?2, ?3, 1, ?4)
      ON CONFLICT (day, version, lang) DO UPDATE
      SET users = users + 1, new_installs = new_installs + excluded.new_installs`,
   )
-    .bind(utcDay(), b.v, b.lang, isNew ? 1 : 0)
+    .bind(day, b.v, b.lang, isNew ? 1 : 0)
     .run();
   return empty(204);
 }
@@ -134,6 +175,14 @@ async function report(req: Request, env: Env): Promise<Response> {
   ) {
     return empty(400);
   }
+
+  // Tagesgrenzen: je Absender und insgesamt
+  const day = utcDay();
+  if ((await bump(env, day, await sender(req, env, day), "reports")) > REPORTS_PER_SENDER) return empty(429);
+  const today = await env.DB.prepare("SELECT COUNT(*) AS n FROM reports WHERE created_at >= ?1")
+    .bind(day + "T00:00:00Z")
+    .first<{ n: number }>();
+  if ((today?.n ?? 0) >= REPORTS_PER_DAY) return empty(429);
 
   const createdAt = new Date().toISOString().slice(0, 19) + "Z";
   const res = await env.DB.prepare(
