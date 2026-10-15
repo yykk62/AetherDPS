@@ -50,6 +50,15 @@
 | 🌍 **10 Sprachen** | Oberfläche, Skills, Monster, Klassen, Dungeons und Servernamen in deiner Sprache |
 | 🔄 **Updates** | Kommen von selbst, geprüft per Prüfsumme. Nach einem Spiel-Patch sagt dir der Meter Bescheid |
 
+## Warum AetherDPS?
+
+- 🐾 **Das Pet-Radar ersetzt deine Karte.** Öffnest du im Spiel die Karte, liegt es genau darüber, folgt dir live (auch im Flug) und zeigt die fehlenden Pets mit Entfernung, Richtung und dem Monster, das die Seele droppt. Kein Extra-Knopf, kein Hotkey.
+- 💥 **Stagger je Spieler:** Nach jeder Stagger-Phase siehst du, ob sie geklappt hat und wer wie viel beigetragen hat.
+- 📶 **Warum laggt es?** Die Verbindungsprüfung sagt, ob es am Heimnetz, am Internetanbieter oder am Spielserver liegt.
+- 👥 **Neu in der Gruppe:** Kampfkraft, Itemstufe, Verzauberung und Waffe erscheinen, sobald jemand beitritt.
+- 🩹 **Ehrlich nach Patches:** Versteht der Meter das Spiel nicht mehr, sagt er es, statt leere oder falsche Zahlen zu zeigen.
+- 🔒 **Deine Daten bleiben bei dir:** keine Uploads, keine Bestenlisten, kein Konto.
+
 ## Funktionen
 
 ### ⚔ Live-DPS-Meter
@@ -263,6 +272,8 @@ Alles mit Lizenzen steht in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). Kl
 ## In English
 
 **AetherDPS** is a free, open-source DPS meter and companion overlay for AION 2, built for the EU servers and available in 10 languages (Settings → Language). The screenshots above show the German interface.
+
+**Why AetherDPS?** The pet radar replaces your in-game map: it opens right on top of it, follows you live and shows the missing pets with distance, direction and the monster that drops the soul, no extra button needed. After every stagger phase you see who contributed how much. The connection check tells you whether lag comes from your home network, your ISP or the game server. And your data stays on your PC: no uploads, no leaderboards, no account.
 
 - **Live DPS meter** with boss card, health and stagger bars, damage, DPS and share for your party only, skill details and death recap
 - **Run archive** named after the dungeon, with boss times, best time and combat analysis, copyable as image or text for Discord
