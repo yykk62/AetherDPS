@@ -18,15 +18,22 @@ public partial class PetRadarWindow : Window
         DataContext = vm;
         this.settings = settings;
         WindowStartupLocation = WindowStartupLocation.Manual;
-        vm.ShowRequested += (_, _) =>
+        EventHandler show = (_, _) =>
         {
             Place();
             if (!IsVisible) Show();
         };
-        vm.HideRequested += (_, _) =>
+        EventHandler hide = (_, _) =>
         {
             Remember();
             Hide();
+        };
+        vm.ShowRequested += show;
+        vm.HideRequested += hide;
+        Closed += (_, _) =>
+        {
+            vm.ShowRequested -= show;
+            vm.HideRequested -= hide;
         };
         Root.PointerPressed += (_, e) =>
         {

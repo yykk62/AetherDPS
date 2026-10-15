@@ -31,12 +31,23 @@ public static class BoolBrush
     public static readonly IValueConverter WarningElseCard =
         new FuncValueConverter<bool, IBrush>(warning => new SolidColorBrush(Color.Parse(warning ? "#2A2418" : "#191E28")));
 
+    /// <summary>Gewählte Zeile (Pet-Radar): leicht golden hinterlegt.</summary>
+    public static readonly IValueConverter SelectedRow =
+        new FuncValueConverter<bool, IBrush>(selected => new SolidColorBrush(Color.Parse(selected ? "#40E0A84A" : "#00000000")));
+
     /// <summary>Ausgewähltes Item im Profil: farbiger Rahmen.</summary>
     public static readonly IValueConverter SelectedBorder =
         new FuncValueConverter<bool, Avalonia.Thickness>(selected => new Avalonia.Thickness(selected ? 1 : 0));
 
     public static readonly IValueConverter WarningBorderElseCard =
         new FuncValueConverter<bool, IBrush>(warning => new SolidColorBrush(Color.Parse(warning ? "#7A5A22" : "#2E3746")));
+}
+
+/// <summary>Größen, die vom Fenster abhängen.</summary>
+public static class Sizes
+{
+    /// <summary>Pet-Karte: möglichst groß (Höhe des Reiters minus Kopf und Legende), mindestens 360.</summary>
+    public static readonly IValueConverter MapHeight = new FuncValueConverter<double, double>(h => Math.Max(360, h - 190));
 }
 
 /// <summary>Schritt-Kreis: erledigt = grün, aktiv = gold, später = grau.</summary>

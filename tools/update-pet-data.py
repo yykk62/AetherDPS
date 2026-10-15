@@ -1,9 +1,10 @@
 # Holt die Pet-Daten und die Weltkarten aus SkeeveAN/Aion-DPS-Meter (MIT, aus dem Spielclient gelesen):
 # welche Monster welche Pet-Seele droppen, wo sie spawnen, die Gebiete je Pet und die Karten-Kalibrierung.
 # Die Kartenkacheln werden verkleinert (512 px) und das Meer (Maske) dunkel eingefärbt, damit die exe klein bleibt.
+# Dazu die Pet-Porträts von NCSOFTs Spieldaten-Server (96 px) – zur Laufzeit lädt die App nichts nach.
 # Aufruf aus dem Repo-Root:  python tools/update-pet-data.py [<commit>]
 # Braucht Pillow (pip install pillow). Karten und Spieldaten sind Eigentum von NCSOFT.
-import io, json, pathlib, sys, urllib.error, urllib.request
+import io, json, pathlib, sys, time, urllib.error, urllib.request
 from PIL import Image
 
 COMMIT = sys.argv[1] if len(sys.argv) > 1 else "968a35312deae2230dfe4146ad72e162a196e5cb"
@@ -11,6 +12,8 @@ BASE = f"https://raw.githubusercontent.com/SkeeveAN/Aion-DPS-Meter/{COMMIT}/Clie
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DATA = ROOT / "AetherDPS.Engine" / "GameData" / "pets"
 TILES = ROOT / "AetherDPS.App" / "Assets" / "maps"
+ICONS = ROOT / "AetherDPS.App" / "Assets" / "pets"
+PORTRAIT = "https://assets.playnccdn.com/static-aion2-gamedata/resources/UT_Vehicle_Portrait_{}.png"   # wie im NCSOFT-Profil
 TILE_SIZE = 512
 SEA = (17, 20, 27)   # Hintergrund des Hub (#11141B)
 
@@ -58,3 +61,14 @@ for key, m in maps["maps"].items():
             tile = Image.composite(jpg, Image.new("RGB", jpg.size, SEA), mask)
             tile.save(folder / f"{col}_{row}.jpg", quality=82, optimize=True)
     print("Karte:", key)
+
+ICONS.mkdir(parents=True, exist_ok=True)
+for pid, pet in pets["pets"].items():
+    try:
+        with urllib.request.urlopen(PORTRAIT.format(pet["key"]), timeout=60) as r:
+            img = Image.open(io.BytesIO(r.read())).convert("RGBA").resize((96, 96), Image.LANCZOS)
+    except urllib.error.HTTPError:
+        continue
+    img.quantize(colors=128, method=Image.Quantize.FASTOCTREE).save(ICONS / f"{pid}.png", optimize=True)
+    time.sleep(0.25)   # höflich bleiben
+print("Porträts:", len(list(ICONS.glob("*.png"))))

@@ -470,8 +470,7 @@
   "radar.title": "Pet-Radar",
   "radar.close_tip": "Bis zum nächsten Öffnen der Karte ausblenden",
   "radar.no_position": "Benutze einen Skill, dann weiß der Meter, wo du stehst.",
-  "radar.enable": "Pet-Radar beim Öffnen der Spielkarte",
-  "radar.enable_hint": "Öffnest du im Spiel die Karte, erscheint am linken Rand ein kleines Fenster: Spawnpunkte der Pets, die dir noch fehlen, um deine Position, und die nächsten mit Entfernung und Richtung. Verschiebbar, ✕ blendet es bis zum nächsten Öffnen aus.",
+  "radar.enable_hint": "Ein kleines Fenster am linken Rand mit den Spawnpunkten der Pets, die dir noch fehlen, rund um deine Position und den nächsten mit Entfernung und Richtung. „Immer“ lässt es dauerhaft stehen, du läufst einfach hin. Deine Position kommt vom Spiel nur, wenn du Skills benutzt. Verschiebbar, ✕ blendet es bis zum nächsten Öffnen der Karte bzw. Kartenwechsel aus.",
   "compass.0": "N",
   "compass.1": "NO",
   "compass.2": "O",
@@ -479,5 +478,11 @@
   "compass.4": "S",
   "compass.5": "SW",
   "compass.6": "W",
-  "compass.7": "NW"
+  "compass.7": "NW",
+  "radar.mode_map": "Solange die Spielkarte offen ist",
+  "radar.mode_always": "Immer (folgt dir)",
+  "radar.mode_off": "Aus",
+  "radar.back": "Radar",
+  "radar.list": "Fehlende Pets",
+  "radar.row_tip": "Klicken: alle Fundorte dieses Pets auf der Karte (nochmal: zurück zum Radar)"
 }

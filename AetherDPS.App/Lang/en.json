@@ -470,8 +470,7 @@
   "radar.title": "Pet radar",
   "radar.close_tip": "Hide until the map is opened again",
   "radar.no_position": "Use a skill so the meter knows where you are.",
-  "radar.enable": "Pet radar when the game map is open",
-  "radar.enable_hint": "When you open the map in game, a small window appears at the left edge: spawn points of the pets you still need around your position, and the nearest ones with distance and direction. Movable; ✕ hides it until the next time.",
+  "radar.enable_hint": "A small window at the left edge with the spawn points of the pets you still need around your position, and the nearest ones with distance and direction. \"Always\" keeps it on screen so you can just walk there. The game only sends your position when you use skills. Movable; ✕ hides it until you open the map again or change maps.",
   "compass.0": "N",
   "compass.1": "NE",
   "compass.2": "E",
@@ -479,5 +478,11 @@
   "compass.4": "S",
   "compass.5": "SW",
   "compass.6": "W",
-  "compass.7": "NW"
+  "compass.7": "NW",
+  "radar.mode_map": "While the game map is open",
+  "radar.mode_always": "Always (follows you)",
+  "radar.mode_off": "Off",
+  "radar.back": "Radar",
+  "radar.list": "Pets you need",
+  "radar.row_tip": "Click: all spawn points of this pet on the map (again: back to radar)"
 }

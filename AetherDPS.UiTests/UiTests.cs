@@ -212,16 +212,33 @@ public sealed class UiTests : IDisposable
         radar.ShowRequested += (_, _) => shown = true;
         Feed(SyntheticPackets.Heartbeat());
         entities.SetSessionPlayerName(4613, "Testheld", 0, "#1317", isUser: true);
-        Feed(SyntheticPackets.PetList(1077, (1003, 3, 0)));
-        Feed(SyntheticPackets.MapLoad(1010));
+        Feed(SyntheticPackets.PetList(1077, (1003, 3, 0)));   // kein Kartenwechsel: Meter nach dem Einloggen gestartet
         Feed(SyntheticPackets.Position(4613, 81_840, -20_010));
         Feed(SyntheticPackets.FieldBossList(1010));
         Settle();
         Assert.True(shown);
         Assert.NotNull(radar.Self);
-        Assert.Equal(6, radar.Rows.Count);
+        Assert.Equal(5, radar.Rows.Count);
         Assert.DoesNotContain(radar.Spawns!, s => provider!.GetRequiredService<Pets>().PetOfNpc(s.Npc) == 1003);   // fertig → nicht im Radar
+        Assert.All(radar.Rows, r => Assert.NotNull(r.Icon));   // Porträt zu jedem Pet
         Shot(new PetRadarWindow(radar, provider!.GetRequiredService<MeterSettings>()), "pet_radar");
+
+        // Pet anklicken: nur seine Fundorte, alle im Blick
+        var pick = radar.Rows[2];
+        radar.SelectCommand.Execute(pick);
+        Assert.Equal(pick.PetId, radar.SelectedPet);
+        Assert.Equal(0, radar.FocusMeters);
+        Assert.All(radar.Spawns!, s => Assert.Equal(pick.PetId, provider!.GetRequiredService<Pets>().PetOfNpc(s.Npc)));
+        Shot(new PetRadarWindow(radar, provider!.GetRequiredService<MeterSettings>()), "pet_radar_auswahl");
+        radar.ShowRadarCommand.Execute(null);
+        Assert.Null(radar.SelectedPet);
+
+        // Modus „immer“: auch ohne offene Karte
+        radar.Close();
+        radar.Mode = PetRadarViewModel.ModeAlways;
+        Assert.True(radar.IsOpen);
+        radar.Mode = PetRadarViewModel.ModeOff;
+        Assert.False(radar.IsOpen);
     }
 
     [AvaloniaFact]
@@ -338,6 +355,7 @@ public sealed class UiTests : IDisposable
         hub.Refresh();
         Settle();
         var pets = hub.Pets;
+        pets.SelectedFilter = pets.FilterOptions[0];   // alle
         Assert.Equal("verteron", pets.Map!.Key);
         Assert.NotEmpty(pets.Rows);
         Assert.NotNull(pets.Self);

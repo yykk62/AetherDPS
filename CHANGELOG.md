@@ -2,6 +2,15 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
+## 0.7.2
+
+- **Pet-Radar behoben:** Es ging nicht auf, wenn der Meter nach dem Einloggen gestartet wurde (z. B. nach einem Update). Jetzt reicht es, die Karte zu öffnen
+- **Pet-Radar „Immer“:** Neben „solange die Spielkarte offen ist“ kann das Radar dauerhaft stehen bleiben und dir folgen (Reiter Pets)
+- **Fehlende Pets im Radar:** Unter der Karte eine aufklappbare Liste der nächsten fehlenden Pets (nach deinem Filter im Reiter Pets). Klick auf ein Pet zeigt alle seine Fundorte auf der Karte, herausgezoomt – so siehst du gleich, wohin du teleportieren musst
+- **Bilder für alle 207 Pets** in Liste, Detail und Radar
+- **Karte im Reiter Pets:** größer, und Ziehen funktioniert jetzt wie gewohnt (nur solange die linke Taste gedrückt ist – vorher konnte die Karte am Mauszeiger kleben bleiben)
+- Der Filter im Reiter Pets wird gemerkt und gilt auch fürs Radar
+
 ## 0.7.1
 
 - **Timer als einzelne Pills:** Der Timer-Kasten ist weg. Jeder Timer ist eine eigene, gleich große Pill, die du frei ziehen kannst. Leg mehrere grob nebeneinander, untereinander oder als Block hin und klick rechts auf **Gruppieren**: Die Anordnung wird übernommen (1×3, 3×1, 2×2 …) und die Gruppe bewegt sich zusammen. Rechtsklick auch zum **Lösen**, **Auflösen**, für **Spalten**, zum **Entfernen** einer Pill (ohne die App zu öffnen) und zum **Sperren** (entsperren im Reiter Timer)

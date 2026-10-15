@@ -470,8 +470,7 @@
   "radar.title": "Radar familiers",
   "radar.close_tip": "Masquer jusqu'à la prochaine ouverture de la carte",
   "radar.no_position": "Utilise une compétence pour que le meter sache où tu es.",
-  "radar.enable": "Radar familiers à l'ouverture de la carte",
-  "radar.enable_hint": "Quand tu ouvres la carte en jeu, une petite fenêtre apparaît à gauche : points d'apparition des familiers qui te manquent autour de toi, et les plus proches avec distance et direction. Déplaçable ; ✕ la masque jusqu'à la prochaine fois.",
+  "radar.enable_hint": "Une petite fenêtre à gauche avec les points d'apparition des familiers qui te manquent autour de toi, et les plus proches avec distance et direction. « Toujours » la garde à l'écran, tu n'as qu'à y aller. Le jeu n'envoie ta position que quand tu utilises des compétences. Déplaçable ; ✕ la masque jusqu'à la prochaine ouverture de la carte ou au changement de carte.",
   "compass.0": "N",
   "compass.1": "NE",
   "compass.2": "E",
@@ -479,5 +478,11 @@
   "compass.4": "S",
   "compass.5": "SO",
   "compass.6": "O",
-  "compass.7": "NO"
+  "compass.7": "NO",
+  "radar.mode_map": "Tant que la carte du jeu est ouverte",
+  "radar.mode_always": "Toujours (te suit)",
+  "radar.mode_off": "Désactivé",
+  "radar.back": "Radar",
+  "radar.list": "Familiers manquants",
+  "radar.row_tip": "Clic : tous les points d'apparition de ce familier (encore : retour au radar)"
 }

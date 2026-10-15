@@ -25,7 +25,10 @@ public sealed record PetFilterOption(string Code, string Name)
 }
 
 /// <summary>Zeile der Pet-Liste: Name, Gattung, eigene Stufe, Zahl der Spawnpunkte auf der gewählten Karte.</summary>
-public sealed record PetRow(PetInfo Pet, string Name, string Species, string LevelText, IBrush LevelBrush, int Spawns, bool Done);
+public sealed record PetRow(PetInfo Pet, string Name, string Species, string LevelText, IBrush LevelBrush, int Spawns, bool Done)
+{
+    public Avalonia.Media.Imaging.Bitmap? Icon => Services.PetIcons.Get(Pet.Id);
+}
 
 /// <summary>Monster eines Pets mit seinen Spawnpunkten auf der Karte.</summary>
 public sealed record PetMonsterRow(string Name, string Count);
@@ -64,6 +67,7 @@ public sealed partial class PetsViewModel : ObservableObject
     [ObservableProperty] private string summary = "";
     [ObservableProperty] private string levelsHint = "";
     [ObservableProperty] private string detailTitle = "";
+    [ObservableProperty] private Avalonia.Media.Imaging.Bitmap? detailIcon;
     [ObservableProperty] private string detailLevel = "";
     [ObservableProperty] private string detailRegions = "";
     [ObservableProperty] private string positionText = "";
@@ -76,7 +80,7 @@ public sealed partial class PetsViewModel : ObservableObject
         SpeciesOptions = new[] { new SpeciesOption(null, Loc.T("pets.species_all")) }
             .Concat(Pets.SpeciesOrder.Select(s => new SpeciesOption(s, Loc.T("pets.species." + s)))).ToList();
         selectedSpecies = SpeciesOptions[0];
-        selectedFilter = FilterOptions[0];
+        selectedFilter = FilterOptions.FirstOrDefault(f => f.Code == settings.PetFilter) ?? FilterOptions[0];
         selectedMap = DefaultMap();
         pets.LevelsChanged += (_, _) => Dispatcher.UIThread.Post(() =>
         {
@@ -85,14 +89,17 @@ public sealed partial class PetsViewModel : ObservableObject
         pets.PositionChanged += (_, _) => Dispatcher.UIThread.Post(UpdatePosition);
     }
 
-    /// <summary>Pet-Radar beim Öffnen der Spielkarte.</summary>
-    public bool RadarEnabled
+    /// <summary>Pet-Radar: aus, solange die Spielkarte offen ist, oder immer.</summary>
+    public IReadOnlyList<PetFilterOption> RadarModes { get; } =
+        [new(PetRadarViewModel.ModeMap, Loc.T("radar.mode_map")), new(PetRadarViewModel.ModeAlways, Loc.T("radar.mode_always")), new(PetRadarViewModel.ModeOff, Loc.T("radar.mode_off"))];
+
+    public PetFilterOption SelectedRadarMode
     {
-        get => settings.PetRadar;
+        get => RadarModes.FirstOrDefault(m => m.Code == settings.PetRadarMode) ?? RadarModes[0];
         set
         {
-            if (settings.PetRadar == value) return;
-            settings.PetRadar = value;
+            if (value is null || settings.PetRadarMode == value.Code) return;
+            settings.PetRadarMode = value.Code;
             settings.Save();
             OnPropertyChanged();
         }
@@ -121,7 +128,12 @@ public sealed partial class PetsViewModel : ObservableObject
     partial void OnSelectedMapChanged(PetMapOption? value) => Rebuild();
     partial void OnSelectedSpeciesChanged(SpeciesOption? value) => Rebuild();
     partial void OnSearchChanged(string value) => Rebuild();
-    partial void OnSelectedFilterChanged(PetFilterOption value) => Rebuild();
+    partial void OnSelectedFilterChanged(PetFilterOption value)
+    {
+        settings.PetFilter = value.Code;   // gilt auch fürs Pet-Radar
+        settings.Save();
+        Rebuild();
+    }
     partial void OnSelectedChanged(PetRow? value) => ShowSelected();
 
     private void Rebuild()
@@ -171,6 +183,7 @@ public sealed partial class PetsViewModel : ObservableObject
         {
             Spawns = [];
             DetailTitle = "";
+            DetailIcon = null;
             DetailLevel = "";
             DetailRegions = "";
             return;
@@ -178,6 +191,7 @@ public sealed partial class PetsViewModel : ObservableObject
         var spawns = pets.Spawns(row.Pet, option.Map);
         Spawns = spawns;
         DetailTitle = $"{row.Name} · {row.Species}";
+        DetailIcon = row.Icon;
         DetailLevel = row.LevelText == "?" ? Loc.T("pets.level_unknown") : row.LevelText;
         var regions = pets.Regions(row.Pet, option.Map);
         DetailRegions = regions.Count > 0 ? string.Join(", ", regions) : "";

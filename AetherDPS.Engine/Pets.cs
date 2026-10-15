@@ -67,7 +67,7 @@ public sealed class Pets
             previous?.Invoke(opcode, data);
             if (opcode == OpPetList) OnPetList(data);
             else if (opcode == OpPosition) OnPosition(data);
-            else if (opcode == FieldBosses.OpList) OnMapOpen();
+            else if (opcode == FieldBosses.OpList) OnMapOpen(data);
         };
     }
 
@@ -171,12 +171,18 @@ public sealed class Pets
     /// <summary>Letzte bekannte eigene Position (Welt) mit Karte und Zeit.</summary>
     public (double X, double Y, int MapId, DateTime At)? Position { get; private set; }
 
-    /// <summary>Karte, auf der man laut Spiel gerade ist (auch in Ebenen wie 101001 von Verteron 1010).</summary>
+    private PetMap? listMap;
+
+    /// <summary>
+    /// Karte, auf der man laut Spiel gerade ist (auch in Ebenen wie 101001 von Verteron 1010). Kam seit dem Start noch
+    /// kein Kartenwechsel (Meter nach dem Einloggen gestartet), gilt die zuletzt im Spiel geöffnete Karte.
+    /// </summary>
     public PetMap? CurrentMap
     {
         get
         {
             int id = zone.MapId;
+            if (id == 0) return listMap;
             return Maps.FirstOrDefault(m => m.MapId != 0 && (id == m.MapId || id / 100 == m.MapId));
         }
     }
@@ -215,8 +221,19 @@ public sealed class Pets
 
     public event EventHandler? MapOpen;
 
-    private void OnMapOpen()
+    /// <summary>Karte, die im Spiel gerade geöffnet ist (aus der Feldboss-Liste).</summary>
+    public PetMap? ViewedMap { get; private set; }
+
+    private void OnMapOpen(byte[] data)
     {
+        // Feldboss-Liste: len | 01 91 | u16 0 | Karte u32 | … (die Einträge braucht das Radar nicht)
+        int pos = SkipLength(data) + 2;
+        int mapId = data.Length >= pos + 6 ? BinaryPrimitives.ReadInt32LittleEndian(data.AsSpan(pos + 2)) : 0;
+        if (Maps.FirstOrDefault(m => m.MapId == mapId) is { } viewed)
+        {
+            ViewedMap = viewed;
+            listMap = viewed;
+        }
         MapOpenSeen = DateTime.Now;
         MapOpen?.Invoke(this, EventArgs.Empty);
     }

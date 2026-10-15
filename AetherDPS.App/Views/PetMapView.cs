@@ -161,9 +161,12 @@ public sealed class PetMapView : Control
         e.Handled = true;
     }
 
+    /// <summary>Ziehen wie bei Google Maps: nur mit gedrückter linker Taste, Loslassen beendet es immer.</summary>
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
+        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
+        e.Handled = true;   // nicht zusätzlich das Fenster verschieben (Pet-Radar)
         if (e.ClickCount == 2)
         {
             Fit();
@@ -177,6 +180,11 @@ public sealed class PetMapView : Control
     {
         base.OnPointerMoved(e);
         if (dragFrom is not { } from) return;
+        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        {
+            EndDrag(e.Pointer);   // Loslassen kam nicht an (z. B. außerhalb losgelassen)
+            return;
+        }
         var now = e.GetPosition(this);
         center = new Point(center.X - (now.X - from.X) / zoom, center.Y - (now.Y - from.Y) / zoom);
         dragFrom = now;
@@ -186,8 +194,19 @@ public sealed class PetMapView : Control
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         base.OnPointerReleased(e);
+        EndDrag(e.Pointer);
+    }
+
+    protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
+    {
+        base.OnPointerCaptureLost(e);
         dragFrom = null;
-        e.Pointer.Capture(null);
+    }
+
+    private void EndDrag(IPointer pointer)
+    {
+        dragFrom = null;
+        if (pointer.Captured == this) pointer.Capture(null);
     }
 
     private static Bitmap?[,] Tiles(PetMap map)

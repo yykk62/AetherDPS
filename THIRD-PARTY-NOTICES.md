@@ -14,7 +14,7 @@ AetherDPS ist GPL-3.0 (siehe LICENSE). Daten und Erkenntnisse aus diesen Projekt
 | [aion2-api](https://github.com/nuriland/aion2-api) (nuriland) | MIT | Adressen der öffentlichen NCSOFT-Charakter-API (Profil, Ausrüstung) |
 | [waffle_meter](https://github.com/Waffle-ens/waffle_meter) (TK-open-public) | MIT | Zuordnung Slot → Feldboss im Paket 0x9101 (`GameData/field_bosses.json`) |
 
-Spieldaten, Namen, Weltkarten und Klassen-Icons: © NCSOFT. AION ist eine Marke von NCSOFT. AetherDPS ist ein inoffizielles Fan-Projekt.
+Spieldaten, Namen, Weltkarten, Pet-Porträts (`Assets/pets/`, einmalig von assets.playnccdn.com übernommen) und Klassen-Icons: © NCSOFT. AION ist eine Marke von NCSOFT. AetherDPS ist ein inoffizielles Fan-Projekt.
 
 ## MIT License – Aion-DPS-Meter
 

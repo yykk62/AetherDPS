@@ -35,8 +35,14 @@ public sealed class MeterSettings
     /// <summary>Tritt jemand der Gruppe bei, sein Profil (Kampfkraft, Itemstufe, Waffe) kurz einblenden – lädt bei NCSOFT.</summary>
     public bool PartyJoinPopup { get; set; } = true;
 
-    /// <summary>Pet-Radar: beim Öffnen der Spielkarte fehlende Pets in der Nähe einblenden. Position in Bildschirm-Pixeln.</summary>
-    public bool PetRadar { get; set; } = true;
+    /// <summary>Pet-Radar (fehlende Pets in der Nähe): „map“ = solange die Spielkarte offen ist, „always“ = dauerhaft, „off“. Position in Bildschirm-Pixeln.</summary>
+    public string PetRadarMode { get; set; } = "map";
+
+    /// <summary>Welche Pets Pet-Finder und Radar zeigen: „all“, „missing“ (noch nicht gesammelt), „open“ (nicht auf Höchststufe).</summary>
+    public string PetFilter { get; set; } = "open";
+
+    /// <summary>Liste unter der Radar-Karte aufgeklappt.</summary>
+    public bool PetRadarList { get; set; } = true;
     public double? PetRadarLeft { get; set; }
     public double? PetRadarTop { get; set; }
 

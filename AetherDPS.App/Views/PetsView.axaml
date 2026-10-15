@@ -28,12 +28,15 @@
           </ListBox.Styles>
           <ListBox.ItemTemplate>
             <DataTemplate x:DataType="vm:PetRow">
-              <Grid ColumnDefinitions="*,Auto">
-                <StackPanel>
+              <Grid ColumnDefinitions="Auto,*,Auto">
+                <Border Width="36" Height="36" CornerRadius="6" Background="#22000000" ClipToBounds="True" Margin="0,0,8,0">
+                  <Image Source="{Binding Icon}" />
+                </Border>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
                   <TextBlock Text="{Binding Name}" FontSize="12.5" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
                   <TextBlock Text="{Binding Species}" Classes="dim" FontSize="10.5" />
                 </StackPanel>
-                <TextBlock Grid.Column="1" Text="{Binding LevelText}" Foreground="{Binding LevelBrush}" FontSize="11" VerticalAlignment="Center" Margin="6,0,0,0" />
+                <TextBlock Grid.Column="2" Text="{Binding LevelText}" Foreground="{Binding LevelBrush}" FontSize="11" VerticalAlignment="Center" Margin="6,0,0,0" />
               </Grid>
             </DataTemplate>
           </ListBox.ItemTemplate>
@@ -46,12 +49,19 @@
       <StackPanel Spacing="12">
         <Border Classes="card" Padding="12">
           <StackPanel Spacing="8">
-            <TextBlock Text="{Binding DetailTitle}" Classes="h2" />
-            <TextBlock Text="{Binding DetailLevel}" Foreground="#E0A84A" FontSize="12" />
-            <TextBlock Text="{Binding DetailRegions}" Classes="dim" FontSize="11.5" TextWrapping="Wrap"
-                       IsVisible="{Binding DetailRegions, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+            <Grid ColumnDefinitions="Auto,*">
+              <Border Width="72" Height="72" CornerRadius="8" Background="#22000000" ClipToBounds="True" Margin="0,0,12,0" VerticalAlignment="Top">
+                <Image Source="{Binding DetailIcon}" />
+              </Border>
+              <StackPanel Grid.Column="1" Spacing="4">
+                <TextBlock Text="{Binding DetailTitle}" Classes="h2" />
+                <TextBlock Text="{Binding DetailLevel}" Foreground="#E0A84A" FontSize="12" />
+                <TextBlock Text="{Binding DetailRegions}" Classes="dim" FontSize="11.5" TextWrapping="Wrap"
+                           IsVisible="{Binding DetailRegions, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+              </StackPanel>
+            </Grid>
             <Border CornerRadius="6" ClipToBounds="True" BorderBrush="#232A36" BorderThickness="1">
-              <views:PetMapView Height="420" Map="{Binding Map}" Spawns="{Binding Spawns}" Self="{Binding Self}" />
+              <views:PetMapView Height="{Binding $parent[UserControl].Bounds.Height, Converter={x:Static l:Sizes.MapHeight}}" Map="{Binding Map}" Spawns="{Binding Spawns}" Self="{Binding Self}" />
             </Border>
             <StackPanel Spacing="4">
               <WrapPanel>
@@ -86,7 +96,10 @@
         </Border>
         <Border Classes="card" Padding="12">
           <StackPanel Spacing="4">
-            <CheckBox IsChecked="{Binding RadarEnabled}" Content="{l:T radar.enable}" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="{l:T radar.title}" VerticalAlignment="Center" FontWeight="SemiBold" />
+              <ComboBox ItemsSource="{Binding RadarModes}" SelectedItem="{Binding SelectedRadarMode}" MinWidth="240" />
+            </StackPanel>
             <TextBlock Text="{l:T radar.enable_hint}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
           </StackPanel>
         </Border>

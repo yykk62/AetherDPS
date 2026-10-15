@@ -7,35 +7,52 @@
         x:DataType="vm:PetRadarViewModel"
         Title="{l:T radar.title}"
         SystemDecorations="None" ShowActivated="False" Topmost="True" ShowInTaskbar="False"
-        CanResize="False" Width="280" SizeToContent="Height"
+        CanResize="False" Width="290" SizeToContent="Height"
         TransparencyLevelHint="Transparent" Background="Transparent">
   <Window.Styles>
     <Style Selector="TextBlock">
       <Setter Property="Foreground" Value="#E6E8EC" />
     </Style>
+    <Style Selector="Button.row">
+      <Setter Property="Padding" Value="4,2" />
+      <Setter Property="Margin" Value="0,1" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="CornerRadius" Value="5" />
+    </Style>
   </Window.Styles>
   <Border Name="Root" Background="#EB141820" BorderBrush="#99E0A84A" BorderThickness="1" CornerRadius="8" Padding="8" Cursor="SizeAll">
     <StackPanel Spacing="6">
-      <Grid ColumnDefinitions="*,Auto">
-        <TextBlock Text="{l:T radar.title}" FontWeight="SemiBold" Foreground="#E0A84A" VerticalAlignment="Center" />
-        <Button Grid.Column="1" Content="✕" Padding="6,0" Background="Transparent" Click="OnClose" ToolTip.Tip="{l:T radar.close_tip}" />
+      <Grid ColumnDefinitions="*,Auto,Auto">
+        <TextBlock Text="{Binding Title}" FontWeight="SemiBold" Foreground="#E0A84A" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+        <Button Grid.Column="1" Content="{l:T radar.back}" Padding="6,0" FontSize="11" Background="#22FFFFFF" Command="{Binding ShowRadarCommand}"
+                IsVisible="{Binding SelectedPet, Converter={x:Static ObjectConverters.IsNotNull}}" Margin="0,0,4,0" />
+        <Button Grid.Column="2" Content="✕" Padding="6,0" Background="Transparent" Click="OnClose" ToolTip.Tip="{l:T radar.close_tip}" />
       </Grid>
-      <Border CornerRadius="6" ClipToBounds="True">
-        <views:PetMapView Height="230" Map="{Binding Map}" Spawns="{Binding Spawns}" Self="{Binding Self}" FocusMeters="600" MaxDot="3" />
+      <Border CornerRadius="6" ClipToBounds="True" Cursor="Hand">
+        <views:PetMapView Height="230" Map="{Binding Map}" Spawns="{Binding Spawns}" Self="{Binding Self}" FocusMeters="{Binding FocusMeters}" MaxDot="4" />
       </Border>
-      <ItemsControl ItemsSource="{Binding Rows}">
-        <ItemsControl.ItemTemplate>
-          <DataTemplate x:DataType="vm:RadarRow">
-            <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,1">
-              <TextBlock Text="{Binding Name}" FontSize="12" TextTrimming="CharacterEllipsis" />
-              <TextBlock Grid.Column="1" Text="{Binding Level}" FontSize="10.5" Foreground="#8E96A3" Margin="6,0" VerticalAlignment="Center" />
-              <TextBlock Grid.Column="2" Text="{Binding Distance}" FontSize="12" FontWeight="SemiBold" Foreground="#E0A84A" />
-            </Grid>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
       <TextBlock Text="{Binding Hint}" Foreground="#8E96A3" FontSize="11" TextWrapping="Wrap"
                  IsVisible="{Binding Hint, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+      <Expander IsExpanded="{Binding ListOpen}" Header="{l:T radar.list}" Padding="0" HorizontalAlignment="Stretch" Cursor="Arrow">
+        <ItemsControl ItemsSource="{Binding Rows}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:RadarRow">
+              <Button Classes="row" Command="{Binding $parent[ItemsControl].((vm:PetRadarViewModel)DataContext).SelectCommand}" CommandParameter="{Binding}"
+                      Background="{Binding IsSelected, Converter={x:Static l:BoolBrush.SelectedRow}}" ToolTip.Tip="{l:T radar.row_tip}">
+                <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                  <Border Width="28" Height="28" CornerRadius="5" Background="#22000000" ClipToBounds="True" Margin="0,0,6,0">
+                    <Image Source="{Binding Icon}" />
+                  </Border>
+                  <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="12" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="2" Text="{Binding Level}" FontSize="10.5" Foreground="#8E96A3" Margin="6,0" VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="3" Text="{Binding Distance}" FontSize="12" FontWeight="SemiBold" Foreground="#E0A84A" VerticalAlignment="Center" />
+                </Grid>
+              </Button>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </Expander>
     </StackPanel>
   </Border>
 </Window>

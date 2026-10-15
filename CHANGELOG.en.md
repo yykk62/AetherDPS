@@ -2,6 +2,15 @@
 
 Newest versions first.
 
+## 0.7.2
+
+- **Pet radar fixed:** it did not open when the meter was started after logging in (e.g. after an update). Now opening the map is enough
+- **Pet radar "always":** besides "while the game map is open" the radar can stay on screen and follow you (Pets tab)
+- **Pets you need in the radar:** a collapsible list of the nearest pets you still need (by your filter in the Pets tab) below the map. Click a pet to see all its spawn points, zoomed out – so you know where to teleport
+- **Pictures for all 207 pets** in the list, details and radar
+- **Map in the Pets tab:** bigger, and dragging works as expected (only while the left button is held – before, the map could stick to the cursor)
+- The filter in the Pets tab is remembered and also applies to the radar
+
 ## 0.7.1
 
 - **Timers as single pills:** the timer box is gone. Every timer is its own pill of the same size that you can drag anywhere. Place several roughly side by side, stacked or as a block and right-click **Group**: the arrangement is kept (1×3, 3×1, 2×2 …) and the group moves together. Right-click also to **take out**, **ungroup**, set **columns**, **remove** a pill (without opening the app) and **lock** (unlock in the Timers tab)

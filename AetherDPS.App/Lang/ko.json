@@ -470,8 +470,7 @@
   "radar.title": "펫 레이더",
   "radar.close_tip": "다음에 지도를 열 때까지 숨기기",
   "radar.no_position": "스킬을 쓰면 미터가 위치를 압니다.",
-  "radar.enable": "지도를 열면 펫 레이더",
-  "radar.enable_hint": "게임에서 지도를 열면 왼쪽에 작은 창이 나옵니다: 아직 없는 펫의 출현 위치와 가까운 것의 거리와 방향. 이동 가능, ✕는 다음까지 숨김.",
+  "radar.enable_hint": "왼쪽 작은 창에 아직 없는 펫의 출현 위치와 가까운 것의 거리와 방향을 표시합니다. 「항상」이면 화면에 남아 그대로 찾아가면 됩니다. 위치는 스킬을 쓸 때만 전송됩니다. 이동 가능, ✕는 다음에 지도를 열거나 지도가 바뀔 때까지 숨김.",
   "compass.0": "북",
   "compass.1": "북동",
   "compass.2": "동",
@@ -479,5 +478,11 @@
   "compass.4": "남",
   "compass.5": "남서",
   "compass.6": "서",
-  "compass.7": "북서"
+  "compass.7": "북서",
+  "radar.mode_map": "게임 지도를 열어 둔 동안",
+  "radar.mode_always": "항상 (따라다님)",
+  "radar.mode_off": "끄기",
+  "radar.back": "레이더",
+  "radar.list": "없는 펫",
+  "radar.row_tip": "클릭: 이 펫의 모든 출현 위치 (다시: 레이더로)"
 }

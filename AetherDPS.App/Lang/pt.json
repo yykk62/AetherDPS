@@ -470,8 +470,7 @@
   "radar.title": "Radar de mascotes",
   "radar.close_tip": "Ocultar até abrir o mapa de novo",
   "radar.no_position": "Use uma habilidade para o medidor saber onde você está.",
-  "radar.enable": "Radar de mascotes ao abrir o mapa",
-  "radar.enable_hint": "Ao abrir o mapa no jogo, aparece uma janela à esquerda: pontos de surgimento dos mascotes que faltam ao seu redor e os mais próximos com distância e direção. Pode mover; ✕ oculta até a próxima vez.",
+  "radar.enable_hint": "Uma janela pequena à esquerda com os pontos de surgimento dos mascotes que faltam ao seu redor e os mais próximos com distância e direção. «Sempre» a mantém na tela para você ir direto. O jogo só envia sua posição quando você usa habilidades. Pode mover; ✕ oculta até abrir o mapa de novo ou trocar de mapa.",
   "compass.0": "N",
   "compass.1": "NE",
   "compass.2": "L",
@@ -479,5 +478,11 @@
   "compass.4": "S",
   "compass.5": "SO",
   "compass.6": "O",
-  "compass.7": "NO"
+  "compass.7": "NO",
+  "radar.mode_map": "Enquanto o mapa do jogo estiver aberto",
+  "radar.mode_always": "Sempre (segue você)",
+  "radar.mode_off": "Desligado",
+  "radar.back": "Radar",
+  "radar.list": "Mascotes que faltam",
+  "radar.row_tip": "Clique: todos os pontos de surgimento deste mascote (de novo: voltar ao radar)"
 }
