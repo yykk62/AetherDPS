@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <AssemblyName>AetherDPS</AssemblyName>
     <RootNamespace>AetherDPS.App</RootNamespace>
-    <Version>0.7.5</Version>
+    <Version>0.7.6</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <ApplicationIcon>Assets\icon.ico</ApplicationIcon>

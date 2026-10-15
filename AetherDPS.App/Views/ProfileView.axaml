@@ -38,6 +38,11 @@
                     IsVisible="{Binding KnowsSelf}" IsEnabled="{Binding !IsLoading}" />
           </Grid>
           <TextBlock Text="{Binding Status}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
+          <!-- NCSOFT liefert nur Slot 1 (keine Slot-Auswahl in der API) -->
+          <StackPanel Orientation="Horizontal" Spacing="5" ToolTip.Tip="{l:T profile.slot_note_tip}">
+            <TextBlock Text="ⓘ" Foreground="#9C8A5E" FontSize="11" VerticalAlignment="Top" />
+            <TextBlock Text="{l:T profile.slot_note}" Foreground="#9C8A5E" FontSize="11" TextWrapping="Wrap" />
+          </StackPanel>
         </StackPanel>
       </Border>
 

@@ -485,5 +485,9 @@
   "radar.row_tip": "Clic : tous les points d'apparition de ce familier (encore : retour au radar)",
   "radar.center": "Centrer sur moi",
   "radar.no_self": "Le meter ne connaît pas encore ton personnage – téléporte-toi une fois ou reconnecte-toi.",
-  "radar.map_tip": "Molette : zoom (mémorisé) · Glisser : regarder ailleurs, après 5 s la carte revient sur toi · Double-clic : sur toi"
+  "radar.map_tip": "Molette : zoom (mémorisé) · Glisser : regarder ailleurs, après 5 s la carte revient sur toi · Double-clic : sur toi",
+  "profile.slot_note": "NCSOFT affiche les compétences (et peut-être l'équipement) du slot 1. Si tu joues avec un autre slot, cela peut différer.",
+  "profile.slot_note_tip": "L'API publique de profils de NCSOFT ne permet pas de choisir le slot. La plupart jouent avec le slot 1 : tout correspond alors.",
+  "radar.settings_title": "Radar de familiers en jeu",
+  "radar.short_hint": "Mini-carte avec les familiers manquants autour de toi – s'affiche avec la carte du jeu ou en permanence."
 }

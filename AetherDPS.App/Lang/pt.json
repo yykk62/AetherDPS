@@ -485,5 +485,9 @@
   "radar.row_tip": "Clique: todos os pontos de surgimento deste mascote (de novo: voltar ao radar)",
   "radar.center": "Centralizar em mim",
   "radar.no_self": "O medidor ainda não conhece seu personagem – teleporte uma vez ou entre de novo.",
-  "radar.map_tip": "Roda do mouse: zoom (fica salvo) · Arrastar: olhar em volta, após 5 s o mapa volta para você · Clique duplo: para você"
+  "radar.map_tip": "Roda do mouse: zoom (fica salvo) · Arrastar: olhar em volta, após 5 s o mapa volta para você · Clique duplo: para você",
+  "profile.slot_note": "A NCSOFT mostra as habilidades (e talvez o equipamento) do slot 1. Se você joga com outro slot, isso pode ser diferente.",
+  "profile.slot_note_tip": "A API pública de perfis da NCSOFT não permite escolher o slot. A maioria joga com o slot 1, e aí tudo confere.",
+  "radar.settings_title": "Radar de mascotes no jogo",
+  "radar.short_hint": "Minimapa com os mascotes que faltam perto de você – aparece com o mapa do jogo ou fica sempre visível."
 }

@@ -485,5 +485,9 @@
   "radar.row_tip": "Click: all spawn points of this pet on the map (again: back to radar)",
   "radar.center": "Center on me",
   "radar.no_self": "The meter doesn't know your character yet – teleport once or log in again.",
-  "radar.map_tip": "Mouse wheel: zoom (remembered) · Drag: look around, after 5 s the map jumps back to you · Double-click: back to you"
+  "radar.map_tip": "Mouse wheel: zoom (remembered) · Drag: look around, after 5 s the map jumps back to you · Double-click: back to you",
+  "profile.slot_note": "NCSOFT shows skills (and possibly gear) from slot 1. If you play with another slot, this may differ.",
+  "profile.slot_note_tip": "NCSOFT's public profile API has no slot selection. Most players use slot 1, in which case everything matches.",
+  "radar.settings_title": "In-game pet radar",
+  "radar.short_hint": "Minimap with the missing pets near you – appears with the game map or stays on permanently."
 }

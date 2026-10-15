@@ -485,5 +485,9 @@
   "radar.row_tip": "Klicken: alle Fundorte dieses Pets auf der Karte (nochmal: zurück zum Radar)",
   "radar.center": "Auf mich zentrieren",
   "radar.no_self": "Der Meter kennt deinen Charakter noch nicht – einmal teleportieren oder neu einloggen.",
-  "radar.map_tip": "Mausrad: Zoom (wird gemerkt) · Ziehen: kurz umschauen, nach 5 s springt die Karte zurück zu dir · Doppelklick: zu dir"
+  "radar.map_tip": "Mausrad: Zoom (wird gemerkt) · Ziehen: kurz umschauen, nach 5 s springt die Karte zurück zu dir · Doppelklick: zu dir",
+  "profile.slot_note": "Skills (und eventuell Ausrüstung) zeigt NCSOFT von Slot 1. Spielst du mit einem anderen Slot, kann das hier abweichen.",
+  "profile.slot_note_tip": "Die öffentliche Profil-API von NCSOFT hat keine Slot-Auswahl. Die meisten spielen mit Slot 1, dann stimmt alles.",
+  "radar.settings_title": "Pet-Radar im Spiel",
+  "radar.short_hint": "Minimap mit den fehlenden Pets in deiner Nähe – erscheint mit der Spielkarte oder bleibt dauerhaft stehen."
 }

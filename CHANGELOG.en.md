@@ -2,6 +2,11 @@
 
 Newest versions first.
 
+## 0.7.6
+
+- **Pets tab redesigned:** everything fits in the window, no more scrolling. The pet radar setting is at the top, the list and map fill the rest. The monsters that drop the soul are shown as small chips above the map
+- **Note in the profile:** NCSOFT shows skills (and possibly gear) from slot 1 – if you play with another slot, values here may differ
+
 ## 0.7.5
 
 - **Pet radar as a minimap:** you are always in the centre, the map follows you – even while flying – and remembers your zoom (also after a restart). The mouse wheel zooms around you; dragging lets you look around, after 5 seconds the map snaps back to you (double-click or ⌖ right away)

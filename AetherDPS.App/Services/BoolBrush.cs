@@ -43,13 +43,6 @@ public static class BoolBrush
         new FuncValueConverter<bool, IBrush>(warning => new SolidColorBrush(Color.Parse(warning ? "#7A5A22" : "#2E3746")));
 }
 
-/// <summary>Größen, die vom Fenster abhängen.</summary>
-public static class Sizes
-{
-    /// <summary>Pet-Karte: möglichst groß (Höhe des Reiters minus Kopf und Legende), mindestens 360.</summary>
-    public static readonly IValueConverter MapHeight = new FuncValueConverter<double, double>(h => Math.Max(360, h - 190));
-}
-
 /// <summary>Schritt-Kreis: erledigt = grün, aktiv = gold, später = grau.</summary>
 public sealed class StepBrush : IValueConverter
 {

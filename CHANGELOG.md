@@ -2,6 +2,11 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
+## 0.7.6
+
+- **Reiter Pets neu aufgebaut:** Alles passt ins Fenster, nichts muss mehr gescrollt werden. Die Einstellung fürs Pet-Radar steht ganz oben, Liste und Karte füllen den Rest. Die Monster, die die Seele droppen, stehen als kleine Kärtchen über der Karte
+- **Hinweis im Profil:** NCSOFT zeigt Skills (und eventuell Ausrüstung) von Slot 1 – wer mit einem anderen Slot spielt, sieht hier evtl. andere Werte
+
 ## 0.7.5
 
 - **Pet-Radar als Minimap:** Du bist immer in der Mitte, die Karte folgt dir – auch im Flug – und merkt sich deinen Zoom (auch nach einem Neustart). Mausrad zoomt um dich herum; Ziehen schaut kurz woanders hin, nach 5 Sekunden springt die Karte zurück zu dir (Doppelklick oder ⌖ sofort)
