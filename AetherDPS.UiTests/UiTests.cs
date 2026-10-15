@@ -5,9 +5,12 @@ using AetherDPS.App.ViewModels;
 using AetherDPS.App.Views;
 using AetherDPS.Engine;
 using AetherDPS.Engine.Capture;
+using AetherDPS.Engine.Community;
 using AetherDPS.Engine.Testing;
 using AetherDPS.Engine.Updates;
+using AionDpsMeter.Core.Models;
 using AionDpsMeter.Services.PacketCapture;
+using AionDpsMeter.Services.Services.Entity;
 using AionDpsMeter.Services.Services.Settings;
 using Avalonia;
 using Avalonia.Controls;
@@ -46,6 +49,7 @@ public sealed class UiTests : IDisposable
     private readonly string dataDir = Path.Combine(Path.GetTempPath(), "aetherdps-uitests", Guid.NewGuid().ToString("N"));
     private ServiceProvider? provider;
     private long clock = 1_000;
+    private readonly FakeNcsoft ncsoft = new();
 
     private ServiceProvider Start(string language = "de")
     {
@@ -67,6 +71,7 @@ public sealed class UiTests : IDisposable
         services.AddAetherDPS(new MeterOptions { DataDir = dataDir, ReplayFile = replay });
         services.AddSingleton(new UpdateService(dataDir, new Version(0, 4, 0)));
         services.AddAetherDPSUi();
+        services.AddSingleton(new Armory(ncsoft));   // nie ins Internet
         provider = services.BuildServiceProvider();
         App.App.Services = provider;
         // Pipeline aufbauen (abonniert den Datenstrom), wie beim echten Start
@@ -147,12 +152,13 @@ public sealed class UiTests : IDisposable
         var fieldBosses = provider!.GetRequiredService<FieldBosses>();
         fieldBosses.SetFavorite(fieldBosses.Maps.First(m => m.Id == 1110).Bosses[0].Npc, true);
         var hub = provider!.GetRequiredService<HubViewModel>();
-        string[] names = ["dps", "laeufe", "gruppe", "timer", "checkliste", "verbindung", "einstellungen"];
+        string[] names = ["dps", "laeufe", "gruppe", "profil", "pets", "timer", "checkliste", "verbindung", "einstellungen"];
         for (int tab = 0; tab < names.Length; tab++)
         {
             var window = new HubWindow(hub);
             hub.SelectedTab = tab;
             hub.Refresh();
+            Settle();
             Shot(window, "hub_" + names[tab]);
         }
     }
@@ -243,6 +249,98 @@ public sealed class UiTests : IDisposable
             Loc.Load("de");
             GameText.Apply("de");
         }
+    }
+
+    /// <summary>Wartet, bis die (gefälschten) NCSOFT-Antworten verarbeitet sind.</summary>
+    private static void Settle()
+    {
+        for (int i = 0; i < 40; i++)
+        {
+            Dispatcher.UIThread.RunJobs();
+            Thread.Sleep(30);
+        }
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    [AvaloniaFact]
+    public void Profil_mit_Itemdetails()
+    {
+        Start();
+        var hub = provider!.GetRequiredService<HubViewModel>();
+        var profile = hub.Profile;
+        hub.SelectedTab = HubViewModel.TabProfile;
+        hub.Refresh();
+        Settle();
+        Assert.True(profile.HasProfile, profile.Status);
+        Assert.Equal("Testheld", profile.Name);
+        Assert.Equal(3, profile.Armor.Count);
+        Assert.Equal(2, profile.Jewelry.Count);
+        Assert.Equal(2, profile.GodStats.Count);
+        Assert.Equal(3, profile.SkillGroups.Count);
+        Assert.Equal("+8.0", profile.AverageEnchant.Replace(',', '.'));
+
+        profile.SelectItemCommand.Execute(profile.Armor[0]);
+        Settle();
+        Assert.True(profile.HasDetail);
+        Assert.Contains(profile.DetailStats, s => s.Value == "223 (+50)");
+        Assert.Contains(profile.DetailStats, s => s.Name == Loc.T("profile.empty_slots", 2));
+        Shot(new HubWindow(hub), "hub_profil_item");
+    }
+
+    [AvaloniaFact]
+    public void Pet_Finder_mit_Karte()
+    {
+        Start();
+        var entities = provider!.GetRequiredService<EntityTracker>();
+        provider!.GetRequiredService<Pets>();   // wie in App.StartMeter: vor dem ersten Paket
+        Feed(SyntheticPackets.Heartbeat());
+        entities.SetSessionPlayerName(4613, "Testheld", 0, "#1317", isUser: true);
+        Feed(SyntheticPackets.PetList(1077, (1077, 1, 12), (1003, 3, 0), (1007, 2, 40)));
+        Feed(SyntheticPackets.MapLoad(1010));
+        Feed(SyntheticPackets.Position(4613, -14_591, 20_691));
+        var hub = provider!.GetRequiredService<HubViewModel>();
+        hub.SelectedTab = HubViewModel.TabPets;
+        hub.Refresh();
+        Settle();
+        var pets = hub.Pets;
+        Assert.Equal("verteron", pets.Map!.Key);
+        Assert.NotEmpty(pets.Rows);
+        Assert.NotNull(pets.Self);
+        Assert.Contains(pets.Rows, r => r.Pet.Id == 1003 && r.Done);
+        pets.Selected = pets.Rows.First(r => r.Pet.Id == 1007);
+        Assert.NotEmpty(pets.Spawns!);
+        Assert.NotEmpty(pets.Monsters);
+        Shot(new HubWindow(hub), "pets_karte");
+    }
+
+    [AvaloniaFact]
+    public void Gruppenbeitritt_zeigt_neue_Mitglieder()
+    {
+        Start();
+        var vm = provider!.GetRequiredService<PartyJoinViewModel>();
+        vm.Start();
+        var entities = provider!.GetRequiredService<EntityTracker>();
+        Player Member(string name, int power) => new() { Name = name, ServerName = "#1317", CharacterLevel = 45, CombatPower = power };
+
+        entities.RaisePartyUpdated([Member("Testheld", 70_000), Member("Spieler A", 72_435)]);
+        Settle();
+        Assert.Single(vm.Cards);   // nur der andere, nie man selbst
+        Assert.Equal("Spieler A", vm.Cards[0].Name);
+        Assert.Equal("1.303", vm.Cards[0].ItemLevel.Replace(",", "."));
+
+        entities.RaisePartyUpdated([Member("Testheld", 70_000), Member("Spieler A", 72_435), Member("Spieler B", 61_000)]);
+        Settle();
+        Assert.Equal(2, vm.Cards.Count);   // nur Spieler B kam dazu
+        Assert.Equal("Spieler B", vm.Cards[0].Name);
+        var window = new PartyJoinWindow();
+        window.Attach(vm);
+        Shot(window, "gruppenbeitritt");
+
+        provider!.GetRequiredService<MeterSettings>().PartyJoinPopup = false;
+        vm.Close();
+        entities.RaisePartyUpdated([Member("Testheld", 70_000), Member("Spieler C", 50_000)]);
+        Settle();
+        Assert.Empty(vm.Cards);
     }
 
     [AvaloniaFact]

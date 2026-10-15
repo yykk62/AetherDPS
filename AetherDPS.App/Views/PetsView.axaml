@@ -1,0 +1,90 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AetherDPS.App.ViewModels"
+             xmlns:views="using:AetherDPS.App.Views"
+             xmlns:l="using:AetherDPS.App.Services"
+             x:Class="AetherDPS.App.Views.PetsView"
+             x:DataType="vm:PetsViewModel">
+  <Grid ColumnDefinitions="270,*" Margin="12,4,22,22">
+    <!-- Liste -->
+    <Border Classes="card" Padding="12" Margin="0,0,12,0">
+      <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,*">
+        <TextBlock Classes="h2" Text="{l:T pets.title}" Margin="0,0,0,8" />
+        <ComboBox Grid.Row="1" ItemsSource="{Binding MapOptions}" SelectedItem="{Binding SelectedMap}" HorizontalAlignment="Stretch" Margin="0,0,0,6" />
+        <ComboBox Grid.Row="2" ItemsSource="{Binding SpeciesOptions}" SelectedItem="{Binding SelectedSpecies}" HorizontalAlignment="Stretch" Margin="0,0,0,6" />
+        <TextBox Grid.Row="3" Text="{Binding Search}" Watermark="{l:T pets.search}" Margin="0,0,0,6" />
+        <CheckBox Grid.Row="4" IsChecked="{Binding OnlyOpen}" Content="{l:T pets.only_open}" />
+        <StackPanel Grid.Row="5" Spacing="2" Margin="0,4,0,6">
+          <TextBlock Text="{Binding Summary}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
+          <TextBlock Text="{Binding LevelsHint}" Foreground="#E0A84A" FontSize="11" TextWrapping="Wrap"
+                     IsVisible="{Binding LevelsHint, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        </StackPanel>
+        <ListBox Grid.Row="6" ItemsSource="{Binding Rows}" SelectedItem="{Binding Selected}" Background="Transparent">
+          <ListBox.Styles>
+            <Style Selector="ListBoxItem">
+              <Setter Property="Padding" Value="6,4" />
+              <Setter Property="CornerRadius" Value="4" />
+            </Style>
+          </ListBox.Styles>
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:PetRow">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel>
+                  <TextBlock Text="{Binding Name}" FontSize="12.5" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                  <TextBlock Text="{Binding Species}" Classes="dim" FontSize="10.5" />
+                </StackPanel>
+                <TextBlock Grid.Column="1" Text="{Binding LevelText}" Foreground="{Binding LevelBrush}" FontSize="11" VerticalAlignment="Center" Margin="6,0,0,0" />
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </Grid>
+    </Border>
+
+    <!-- Karte -->
+    <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Disabled">
+      <StackPanel Spacing="12">
+        <Border Classes="card" Padding="12">
+          <StackPanel Spacing="8">
+            <TextBlock Text="{Binding DetailTitle}" Classes="h2" />
+            <TextBlock Text="{Binding DetailLevel}" Foreground="#E0A84A" FontSize="12" />
+            <TextBlock Text="{Binding DetailRegions}" Classes="dim" FontSize="11.5" TextWrapping="Wrap"
+                       IsVisible="{Binding DetailRegions, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+            <Border CornerRadius="6" ClipToBounds="True" BorderBrush="#232A36" BorderThickness="1">
+              <views:PetMapView Height="420" Map="{Binding Map}" Spawns="{Binding Spawns}" Self="{Binding Self}" />
+            </Border>
+            <StackPanel Spacing="4">
+              <WrapPanel>
+                <StackPanel Orientation="Horizontal" Spacing="5" Margin="0,0,14,0">
+                  <Ellipse Width="9" Height="9" Fill="#E0A84A" VerticalAlignment="Center" />
+                  <TextBlock Text="{l:T pets.legend_spawn}" Classes="dim" FontSize="11" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                  <Ellipse Width="9" Height="9" Fill="#4FC1E9" VerticalAlignment="Center" />
+                  <TextBlock Text="{Binding PositionText}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
+                </StackPanel>
+              </WrapPanel>
+              <TextBlock Text="{l:T pets.map_hint}" Classes="dim" FontSize="10.5" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+        <Border Classes="card" Padding="12">
+          <StackPanel Spacing="6">
+            <TextBlock Text="{l:T pets.monsters}" Classes="h2" />
+            <ItemsControl ItemsSource="{Binding Monsters}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:PetMonsterRow">
+                  <Grid ColumnDefinitions="*,Auto" Margin="0,1">
+                    <TextBlock Text="{Binding Name}" FontSize="12" />
+                    <TextBlock Grid.Column="1" Text="{Binding Count}" Classes="dim" FontSize="11" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock Text="{l:T pets.source}" Classes="dim" FontSize="10.5" TextWrapping="Wrap" Margin="0,4,0,0" />
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

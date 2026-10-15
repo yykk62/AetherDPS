@@ -2,6 +2,12 @@
 
 Newest versions first.
 
+## 0.7.0
+
+- **New Profile tab:** your character at a glance, even without the game running – combat power, item level, average enchant, gear (click an item for its stats, manastones and godstone), all stats with their effects, Daevanion progress per board, titles, pet, wings and skills. Look up any other character on an EU server by name
+- **New in your party:** when someone joins your party, their card appears at the right edge with combat power, item level, enchant, Daevanion and weapon. Click opens the full profile. Can be turned off in the Party tab
+- **Pet finder (Pets tab):** every pet of Verteron, Altgard and the Abyss with your level and progress (read when you log in) and a map with all spawn points of its monsters, their areas and your position. Filter by species, search for pet or monster, "only unfinished"
+
 ## 0.6.4
 
 - **Character profiles in the Party tab:** click yourself ("My character") or a party member to see level, item level, combat power, full gear with enchantments and skills – straight from NCSOFT (the same public data as on aion2.plaync.com). Only requested when you click

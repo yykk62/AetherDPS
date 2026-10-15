@@ -41,12 +41,14 @@ Windows-Benutzername werden vorher aus dem Log entfernt; du kannst dir vor dem S
 Rechtsgrundlage: Art. 6 Abs. 1 lit. a DSGVO (du sendest selbst). Gespeichert bis der Fehler bearbeitet ist,
 höchstens [12 Monate].
 
-### d) Charakter-Profile (nur auf Klick)
-Klickst du im Reiter „Gruppe“ auf dich oder ein Gruppenmitglied, fragt die App bei NCSOFT (api-search.plaync.com,
-aion2.plaync.com) den Charakternamen und Server ab und zeigt die öffentlichen Profildaten (Stufe, Ausrüstung, Skills),
-die NCSOFT auch auf seiner Webseite zeigt. Icons kommen von assets.playnccdn.com. Gespeichert wird nur kurz im
-Arbeitsspeicher (15 Minuten). Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (du forderst die Anzeige selbst an; es
-sind öffentlich abrufbare Daten).
+### d) Charakter-Profile
+Die App fragt bei NCSOFT (api-search.plaync.com, aion2.plaync.com) Charaktername und Server ab und zeigt die
+öffentlichen Profildaten (Stufe, Ausrüstung, Werte, Daevanion, Titel, Skills), die NCSOFT auch auf seiner Webseite
+zeigt. Das passiert nur, wenn du den Reiter „Profil“ öffnest (dein eigener Charakter), selbst einen Namen suchst oder
+anklickst, oder – in der Einstellung im Reiter „Gruppe“ abschaltbar – wenn jemand deiner Gruppe beitritt (dann wird
+sein Profil kurz eingeblendet). Icons und Porträts kommen von assets.playnccdn.com und profileimg.plaync.com.
+Gespeichert wird nur kurz im Arbeitsspeicher (15 Minuten). Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (Anzeige
+öffentlich abrufbarer Spieldaten für Gruppe und Spieler; abschaltbar).
 
 ### e) Empfänger
 Nutzungszahl und Fehlerberichte verarbeitet ein Server bei Cloudflare, Inc. (Cloudflare Workers und D1) als

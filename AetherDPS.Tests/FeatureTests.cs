@@ -214,6 +214,43 @@ public sealed class FeatureTests : IDisposable
         Assert.Equal(40, RunTracker.Overlap(buffs, combat), 3);
     }
 
+    [Fact]
+    public void Pet_Stufen_und_eigene_Position_aus_dem_Spielverkehr()
+    {
+        using var host = NewHost();
+        var pets = host.Get<Pets>();
+        var entities = host.Get<AionDpsMeter.Services.Services.Entity.EntityTracker>();
+        Assert.True(pets.All.Count > 150);
+        Assert.Equal(3, pets.Maps.Count);
+
+        // Katalog: Topfkrabbe (1007) spawnt in Verteron und Altgard, das Monster führt zurück zum Pet
+        var crab = pets.Get(1007)!;
+        Assert.Equal(2, pets.Maps.Count(m => pets.Spawns(crab, m).Count > 0));
+        var spawns = pets.Maps.SelectMany(m => pets.Spawns(crab, m)).ToList();
+        Assert.Equal(1007, pets.PetOfNpc(spawns[0].Npc));
+        Assert.False(pets.HasSpawns(pets.Get(1077)!));   // Harcon (Feldboss) hat keine Pet-Spawns
+
+        host.Feed(SyntheticPackets.Heartbeat(), 1_000);
+        entities.SetSessionPlayerName(4613, "Testheld", 0, "#1317", isUser: true);
+        Assert.Null(pets.Level(1077));   // Liste noch nie gesehen
+        host.Feed(SyntheticPackets.PetList(1077, (1077, 1, 12), (1003, 3, 0)), 1_100);
+        Assert.Equal(1, pets.Level(1077));
+        Assert.Equal(12, pets.Progress(1077));
+        Assert.Equal(3, pets.Level(1003));
+        Assert.Equal(0, pets.Level(1004));   // nicht in der Liste = noch nicht gesammelt
+
+        host.Feed(SyntheticPackets.MapLoad(101001), 1_200);
+        host.Feed(SyntheticPackets.Position(9999, 1, 2), 1_300);      // jemand anderes
+        Assert.Null(pets.Position);
+        host.Feed(SyntheticPackets.Position(4613, 81_840, -20_010), 1_400);
+        Assert.Equal(81_840, pets.Position!.Value.X, 0);
+        Assert.Equal("verteron", pets.CurrentMap!.Key);   // Ebene 101001 gehört zu Verteron 1010
+
+        // überlebt einen Neustart
+        using var again = NewHost();
+        Assert.Equal(1, again.Get<Pets>().Level(1077));
+    }
+
     public void Dispose()
     {
         Environment.CurrentDirectory = originalDir;

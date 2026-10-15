@@ -121,6 +121,7 @@ public partial class App : Application
 
             // Erinnerungen (Timer, Checkliste) und Buff-Leiste
             var timerService = Services.GetRequiredService<TimerService>();
+            Services.GetRequiredService<Pets>();   // Pet-Liste kommt beim Login – vorher schon mithören
             var checklist = Services.GetRequiredService<ChecklistService>();
             timerService.Reminder += (title, text) => Dispatcher.UIThread.Post(() => ShowToast(title, text));
             checklist.Reminder += (title, text) => Dispatcher.UIThread.Post(() => ShowToast(title, text));
@@ -169,7 +170,10 @@ public partial class App : Application
             hubVm.ReportRequested += (_, _) => ShowReport();
             bool replay = Services.GetRequiredService<MeterOptions>().ReplayFile is not null;
             if (!replay)
+            {
                 Services.GetRequiredService<CommunityController>().Start(hubVm, ShowToast, askConsent: AppUpdate.CanSelfUpdate);
+                StartPartyJoinPopup(hubVm);
+            }
         }
         // Wiedergabe: nur das Overlay, das Hauptfenster öffnet sich nicht von selbst
         bool isReplay = Services.GetRequiredService<MeterOptions>().ReplayFile is not null;
@@ -223,6 +227,22 @@ public partial class App : Application
         // Wiedergaben (Tests) öffnen nie das Hauptfenster – sie laufen oft neben dem echten Meter
         if (Services.GetRequiredService<MeterOptions>().ReplayFile is not null) return;
         hub?.ShowTab(tab);
+    }
+
+    private PartyJoinWindow? partyJoin;
+
+    /// <summary>Neue Gruppenmitglieder einblenden; Klick öffnet ihr Profil im Hub.</summary>
+    private void StartPartyJoinPopup(HubViewModel hubVm)
+    {
+        var vm = Services.GetRequiredService<PartyJoinViewModel>();
+        partyJoin = new PartyJoinWindow();
+        partyJoin.Attach(vm);
+        vm.ProfileRequested += (name, server) =>
+        {
+            hubVm.Profile.Show(name, server);
+            ShowHub(HubViewModel.TabProfile);
+        };
+        vm.Start();
     }
 
     private TimersViewModel? timersVm;

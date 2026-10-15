@@ -25,10 +25,12 @@ public sealed partial class HubViewModel : ObservableObject
     public SettingsViewModel Settings { get; }
     public RunsViewModel Runs { get; }
     public PartyViewModel Party { get; }
+    public ProfileViewModel Profile { get; }
+    public PetsViewModel Pets { get; }
     public TimersViewModel Timers { get; }
     public ChecklistViewModel Checklist { get; }
 
-    public const int TabDps = 0, TabRuns = 1, TabParty = 2, TabTimers = 3, TabChecklist = 4, TabConnection = 5, TabSettings = 6;
+    public const int TabDps = 0, TabRuns = 1, TabParty = 2, TabProfile = 3, TabPets = 4, TabTimers = 5, TabChecklist = 6, TabConnection = 7, TabSettings = 8;
     public ObservableCollection<PlayerRow> RunPlayers { get; } = [];
     public ObservableCollection<DiagnosisRow> DiagnosisRows { get; } = [];
 
@@ -67,7 +69,7 @@ public sealed partial class HubViewModel : ObservableObject
 
     public HubViewModel(TrackingMode mode, RunTracker run, ConnectionMonitor monitor, MeterSettings meterSettings,
         PartyRoster roster, MainViewModel overlay, SettingsViewModel settings,
-        RunsViewModel runs, PartyViewModel party, TimersViewModel timers, ChecklistViewModel checklist, LiveTimers live, TimerService timerService, UpdateService updates)
+        RunsViewModel runs, PartyViewModel party, ProfileViewModel profile, PetsViewModel pets, TimersViewModel timers, ChecklistViewModel checklist, LiveTimers live, TimerService timerService, UpdateService updates)
     {
         this.updates = updates;
         this.mode = mode;
@@ -81,6 +83,13 @@ public sealed partial class HubViewModel : ObservableObject
         Settings = settings;
         Runs = runs;
         Party = party;
+        Profile = profile;
+        Pets = pets;
+        party.ProfileRequested += (name, server) =>
+        {
+            Profile.Show(name, server);
+            SelectedTab = TabProfile;
+        };
         Timers = timers;
         Checklist = checklist;
         mode.Changed += (_, _) => Dispatcher.UIThread.Post(Refresh);
@@ -114,6 +123,8 @@ public sealed partial class HubViewModel : ObservableObject
             case TabDps: RefreshRun(); break;
             case TabRuns: Runs.Tick(); break;
             case TabParty: Party.Refresh(); break;
+            case TabProfile: Profile.EnsureLoaded(); break;
+            case TabPets: Pets.Refresh(); break;
             case TabTimers: Timers.Tick(); break;
             case TabChecklist: Checklist.Refresh(); break;
             case TabConnection: RefreshConnection(); break;

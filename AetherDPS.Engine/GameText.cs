@@ -150,4 +150,7 @@ public static class GameText
     public static bool IsInstanceMap(int mapId) => mapId is >= 600_000 and < 700_000 && !openWorldMaps.Contains(mapId);
 
     public static string? ServerName(int id) => servers.GetValueOrDefault(id);
+
+    /// <summary>Alle bekannten Server (ID → Name in der gewählten Sprache).</summary>
+    public static IReadOnlyDictionary<int, string> Servers => servers;
 }

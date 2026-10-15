@@ -129,6 +129,42 @@ public static class SyntheticPackets
         return Frame(body);
     }
 
+    /// <summary>Pet-Liste beim Login (00 90): aktives Pet, je Pet (Id, Id, Stufe), dann je Pet der Fortschritt.</summary>
+    public static byte[] PetList(int active, params (int Pet, int Level, int Progress)[] pets)
+    {
+        var body = new List<byte>();
+        body.AddRange([0x00, 0x90]);
+        AddU32(body, (uint)active);
+        AddVarInt(body, (uint)pets.Length);
+        foreach (var (pet, level, _) in pets)
+        {
+            AddU32(body, (uint)pet);
+            AddU32(body, (uint)pet);
+            AddU32(body, (uint)level);
+        }
+        AddVarInt(body, (uint)pets.Length);
+        foreach (var (pet, _, progress) in pets)
+        {
+            AddU32(body, (uint)pet);
+            AddU32(body, (uint)progress);
+        }
+        return Frame(body);
+    }
+
+    /// <summary>Position einer Einheit (3C 37): Einheit, 03, x, y, z.</summary>
+    public static byte[] Position(int entityId, float x, float y, float z = 100)
+    {
+        var body = new List<byte>();
+        body.AddRange([0x3C, 0x37]);
+        AddVarInt(body, (uint)entityId);
+        body.Add(3);
+        body.AddRange(BitConverter.GetBytes(x));
+        body.AddRange(BitConverter.GetBytes(y));
+        body.AddRange(BitConverter.GetBytes(z));
+        body.AddRange(new byte[8]);
+        return Frame(body);
+    }
+
     /// <summary>LZ4-Container (Opcode FF FF) mit mehreren inneren Paketen.</summary>
     public static byte[] Compressed(params byte[][] inner)
     {

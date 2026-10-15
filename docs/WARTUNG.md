@@ -50,6 +50,7 @@ So wenig wie möglich in Upstream-Dateien ändern. Lieber in der Engine erweiter
 
 - Englische Skills und Mobs kommen mit jedem Upstream-Merge (`AionDpsMeter.Core/GameData/Assets`).
 - Die Spieltexte in allen 10 Sprachen (Skills, NPCs, Buffs, Dungeons, Klassen, Server, Liste der offenen Welt) aktualisiert `powershell -File tools\update-game-data.ps1` nach `AetherDPS.Engine/GameData` (Quelle: A2Tools, GPL-3.0).
+- Pets, Spawnpunkte und Weltkarten aktualisiert `python tools/update-pet-data.py [<commit>]` nach `AetherDPS.Engine/GameData/pets` und `AetherDPS.App/Assets/maps` (Quelle: SkeeveAN/Aion-DPS-Meter, MIT; braucht Pillow). Nach einem großen Patch die neueste Commit-ID dort mitgeben.
 - Fehlt ein Name in der gewählten Sprache, gilt Englisch, zuletzt der Upstream-Name (`GameText`).
 
 ## Fehler aus „Problem melden“ bearbeiten

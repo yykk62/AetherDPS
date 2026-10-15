@@ -31,6 +31,10 @@ public static class BoolBrush
     public static readonly IValueConverter WarningElseCard =
         new FuncValueConverter<bool, IBrush>(warning => new SolidColorBrush(Color.Parse(warning ? "#2A2418" : "#191E28")));
 
+    /// <summary>Ausgewähltes Item im Profil: farbiger Rahmen.</summary>
+    public static readonly IValueConverter SelectedBorder =
+        new FuncValueConverter<bool, Avalonia.Thickness>(selected => new Avalonia.Thickness(selected ? 1 : 0));
+
     public static readonly IValueConverter WarningBorderElseCard =
         new FuncValueConverter<bool, IBrush>(warning => new SolidColorBrush(Color.Parse(warning ? "#7A5A22" : "#2E3746")));
 }

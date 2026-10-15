@@ -2,6 +2,12 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
+## 0.7.0
+
+- **Neuer Reiter Profil:** Dein Charakter auf einen Blick, auch ohne laufendes Spiel – Kampfkraft, Itemstufe, mittlere Verzauberung, Ausrüstung (Klick auf ein Teil zeigt Werte, Manasteine und Götterstein), alle Werte mit ihren Wirkungen, Daevanion-Fortschritt je Brett, Titel, Pet, Flügel und Skills. Jeden anderen Charakter auf einem EU-Server kannst du per Name suchen
+- **Neu in der Gruppe:** Tritt jemand deiner Gruppe bei, erscheint am rechten Rand seine Karte mit Kampfkraft, Itemstufe, Verzauberung, Daevanion und Waffe. Klick öffnet das ganze Profil. Abschaltbar im Reiter Gruppe
+- **Pet-Finder (Reiter Pets):** Alle Pets von Verteron, Altgard und der Abyss mit deiner Stufe und dem Fortschritt (liest der Meter beim Einloggen mit) und einer Karte, auf der alle Spawnpunkte ihrer Monster eingezeichnet sind, samt Gebieten und deiner Position. Filter nach Gattung, Suche nach Pet oder Monster, „nur noch nicht fertige“
+
 ## 0.6.4
 
 - **Charakter-Profile im Reiter Gruppe:** Klick auf dich („Mein Charakter“) oder ein Gruppenmitglied zeigt Stufe, Itemstufe, Kampfkraft, die komplette Ausrüstung mit Verzauberung und die Skills – direkt von NCSOFT (dieselben öffentlichen Daten wie auf aion2.plaync.com). Abgefragt wird nur auf Klick

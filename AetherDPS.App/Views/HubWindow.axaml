@@ -191,6 +191,14 @@
         <views:PartyView DataContext="{Binding Party}" />
       </TabItem>
 
+      <TabItem Header="{l:T hub.tab.profile}">
+        <views:ProfileView DataContext="{Binding Profile}" />
+      </TabItem>
+
+      <TabItem Header="{l:T hub.tab.pets}">
+        <views:PetsView DataContext="{Binding Pets}" />
+      </TabItem>
+
       <TabItem Header="{l:T hub.tab.timers}">
         <views:TimersView DataContext="{Binding Timers}" />
       </TabItem>

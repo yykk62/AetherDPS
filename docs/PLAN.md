@@ -74,11 +74,20 @@ Offizielle APIs (ohne Login, region=eu, geprüft):
 - ToS §6: kein Scraping/Crawling, nichts Kommerzielles → nur auf Nutzer-Klick, cachen, ≤1 Anfrage/s
 
 Ideen daraus (offen, neue Verbindungen nach außen → CLAUDE.md/README/Datenschutz mitziehen):
-- [ ] Patch-Notes-Wächter (Board `update_de`/`notice_de`, Hinweis im Hub bei neuem Eintrag)
+- [x] Reiter Profil (0.7.0): Werte, Daevanion je Brett, Titel, Pet, Flügel, Item-Details (Manasteine, Götterstein)
+- [x] Popup beim Gruppenbeitritt (0.7.0, abschaltbar)
+- [x] Pet-Finder mit Karte (0.7.0): Daten + Kacheln aus SkeeveAN (MIT) über `tools/update-pet-data.py`, Pet-Liste 0x9000 und Position 0x373C an EU-Aufnahme bestätigt
 - [ ] Gear-Vergleich zweier Charaktere (`equipment/item`: Steine, Substats)
-- [ ] Daevanion-Fortschritt im Profil
-- [ ] DPS pro 1000 Kampfkraft im Lauf (Gruppe über Armory nachschlagen)
-- [ ] Feldboss-Minikarte: eigene Position (0x4136) + Bosse aus field_bosses.json, ohne NCSOFT-Kartenbild
+- [ ] DPS pro 1000 Kampfkraft im Lauf (Kampfkraft kommt schon im Gruppen-Paket, keine Abfrage nötig)
+- [ ] Feldbosse auf der Pet-Karte (Koordinaten in field_bosses.json, Lebt/Tot aus 0x9101)
+- Patch-Notes-Wächter: vom Nutzer abgelehnt (15.10.)
+
+Pet-Finder, mit der Aufnahme heute Abend prüfen:
+- [ ] Pet-Fortschritt live ohne Neu-Einloggen: SkeeveAN nennt `petProgress` 0x0D90 (bei uns 0x900D), `petLevel` 0x1490 (0x9014), `petAdded` 0x0990 (0x9009). Seele einsammeln und Pet hochstufen, dann vergleichen
+- [ ] Position: kommt nur bei Skills/Korrekturen. Im offenen Gelände ein paar Skills benutzen und prüfen, ob der Punkt auf der Karte stimmt (Ebenen 101xxx → Verteron 1010 ist geraten)
+- [ ] Gebiete (`regions.json`) zeigen teils Zonen, in denen das Monster laut Spawns gar nicht steht → stichprobenartig prüfen
+
+A2Tools, noch ungenutzt (nur intern, erst mit Aufnahme prüfen): `player_summon_npcs.json` (Beschwörungen sicher dem Besitzer zuordnen statt per Klasse), `dot_skill_ids.json`, `resource_restore_skills.json` (MP-/SP-Wiederherstellung nicht als Heilung zählen), `abnormals.json` (max. Stapel, Icon-Namen – Bilder selbst sind nicht dabei), `skill_icons.json` (nur Namen)
 
 ## Phase 6: Bot-Radar (Idee vom 13.10.2026)
 Ziel: Bots an Farm-Spots erkennen und mit Beweisen melden. Das Tool liest nur passiv mit, es sendet nie etwas und meldet nie automatisch.

@@ -69,6 +69,10 @@ public static class MeterServices
             sp.GetRequiredService<AionDpsMeter.Services.PacketProcessing.Routing.PacketDispatchService>(),
             sp.GetRequiredService<AionDpsMeter.Services.Services.Entity.EntityTracker>(),
             sp.GetRequiredService<MeterSettings>(), sp.GetRequiredService<MeterOptions>()));
+        services.AddSingleton(sp => new Pets(
+            sp.GetRequiredService<AionDpsMeter.Services.PacketProcessing.Routing.PacketDispatchService>(),
+            sp.GetRequiredService<SelfIdentity>(), sp.GetRequiredService<ZoneTracker>(),
+            sp.GetRequiredService<MeterSettings>(), sp.GetRequiredService<MeterOptions>()));
         services.AddSingleton<DeathRecap>();
         services.AddSingleton<BuffWatcher>();
         services.AddSingleton<StaggerTracker>();

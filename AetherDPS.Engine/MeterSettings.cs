@@ -32,6 +32,9 @@ public sealed class MeterSettings
     public string? CharacterServer { get; set; }
     public int CharacterClassId { get; set; }
 
+    /// <summary>Tritt jemand der Gruppe bei, sein Profil (Kampfkraft, Itemstufe, Waffe) kurz einblenden – lädt bei NCSOFT.</summary>
+    public bool PartyJoinPopup { get; set; } = true;
+
     /// <summary>Session-ID des Charakters beim letzten Login/Teleport – gilt, solange das Spiel nicht neu gestartet wurde.</summary>
     public int CharacterSessionId { get; set; }
     public DateTime? CharacterSeenAt { get; set; }

@@ -12,7 +12,6 @@
             <TextBlock Classes="h2" Text="{l:T party.title}" />
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
               <TextBlock Classes="dim" FontSize="11" Text="{Binding Updated}" VerticalAlignment="Center" />
-              <Button Classes="secondary" Content="{l:T armory.show_self}" Command="{Binding ShowSelfCommand}" IsVisible="{Binding CanShowSelf}" />
             </StackPanel>
           </Grid>
           <TextBlock Text="{l:T party.empty}" Classes="dim" IsVisible="{Binding !HasParty}" TextWrapping="Wrap" />
@@ -49,40 +48,15 @@
             </ItemsControl.ItemTemplate>
           </ItemsControl>
           <TextBlock Text="{l:T party.note}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
+          <CheckBox IsChecked="{Binding JoinPopup}">
+            <StackPanel Spacing="2">
+              <TextBlock Text="{l:T party.popup}" />
+              <TextBlock Text="{l:T party.popup_hint}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
+            </StackPanel>
+          </CheckBox>
         </StackPanel>
       </Border>
 
-      <!-- Profil von NCSOFT (auf Klick) -->
-      <Border Classes="card" IsVisible="{Binding ProfileStatus, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-        <StackPanel Spacing="10">
-          <TextBlock Classes="h2" Text="{Binding ProfileTitle}" IsVisible="{Binding HasProfile}" />
-          <TextBlock Text="{Binding ProfileFacts}" FontWeight="SemiBold" Foreground="#E0A84A" IsVisible="{Binding HasProfile}" />
-          <ItemsControl ItemsSource="{Binding Equipment}" IsVisible="{Binding HasProfile}">
-            <ItemsControl.ItemsPanel>
-              <ItemsPanelTemplate>
-                <WrapPanel />
-              </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-              <DataTemplate x:DataType="vm:ArmoryItemRow">
-                <Border Width="250" Margin="0,0,8,6" Padding="6,4" CornerRadius="4" Background="#14FFFFFF">
-                  <Grid ColumnDefinitions="36,*">
-                    <Border Width="32" Height="32" CornerRadius="4" Background="#22000000" BorderBrush="{Binding GradeBrush}" BorderThickness="1">
-                      <Image Source="{Binding Icon}" Width="30" Height="30" />
-                    </Border>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="6,0,0,0">
-                      <TextBlock Text="{Binding Name}" Foreground="{Binding GradeBrush}" FontWeight="SemiBold" FontSize="12" TextTrimming="CharacterEllipsis" />
-                      <TextBlock Text="{Binding Slot}" Classes="dim" FontSize="10.5" />
-                    </StackPanel>
-                  </Grid>
-                </Border>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
-          <TextBlock Text="{Binding ProfileSkills}" Classes="dim" FontSize="11.5" TextWrapping="Wrap" IsVisible="{Binding HasProfile}" />
-          <TextBlock Text="{Binding ProfileStatus}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
-        </StackPanel>
-      </Border>
     </StackPanel>
   </ScrollViewer>
 </UserControl>

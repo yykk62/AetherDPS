@@ -1,0 +1,74 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AetherDPS.App.ViewModels"
+        xmlns:l="using:AetherDPS.App.Services"
+        x:Class="AetherDPS.App.Views.PartyJoinWindow"
+        x:DataType="vm:PartyJoinViewModel"
+        SystemDecorations="None" ShowActivated="False" Topmost="True" ShowInTaskbar="False"
+        CanResize="False" Width="360" SizeToContent="Height"
+        TransparencyLevelHint="Transparent" Background="Transparent">
+  <Window.Styles>
+    <Style Selector="TextBlock">
+      <Setter Property="Foreground" Value="#E6E8EC" />
+    </Style>
+    <Style Selector="TextBlock.dim">
+      <Setter Property="Foreground" Value="#8E96A3" />
+    </Style>
+    <Style Selector="TextBlock.val">
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="#E0A84A" />
+      <Setter Property="FontSize" Value="13" />
+    </Style>
+  </Window.Styles>
+  <Border Background="#F2141820" BorderBrush="#99E0A84A" BorderThickness="1" CornerRadius="8" Padding="10">
+    <StackPanel Spacing="8">
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Text="{l:T party.popup_title}" FontWeight="SemiBold" Foreground="#E0A84A" VerticalAlignment="Center" />
+        <Button Grid.Column="1" Content="✕" Padding="6,0" Background="Transparent" Command="{Binding CloseCommand}" />
+      </Grid>
+      <ItemsControl ItemsSource="{Binding Cards}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:PartyJoinCard">
+            <Button Padding="0" Margin="0,0,0,6" Background="Transparent" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                    Command="{Binding $parent[ItemsControl].((vm:PartyJoinViewModel)DataContext).OpenCommand}" CommandParameter="{Binding}"
+                    ToolTip.Tip="{l:T party.popup_tip}">
+              <Border Padding="8" CornerRadius="6" Background="#14FFFFFF">
+                <Grid ColumnDefinitions="Auto,*">
+                  <Border Width="44" Height="44" CornerRadius="6" Background="#22000000" ClipToBounds="True" Margin="0,0,10,0" VerticalAlignment="Top">
+                    <Image Source="{Binding Portrait}" Stretch="UniformToFill" />
+                  </Border>
+                  <StackPanel Grid.Column="1" Spacing="3">
+                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13.5" />
+                    <TextBlock Text="{Binding Subtitle}" Classes="dim" FontSize="11" TextTrimming="CharacterEllipsis" />
+                    <Grid ColumnDefinitions="*,*,*,*" Margin="0,3,0,0">
+                      <StackPanel>
+                        <TextBlock Text="{l:T party.col.power}" Classes="dim" FontSize="9.5" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="{Binding CombatPower}" Classes="val" />
+                      </StackPanel>
+                      <StackPanel Grid.Column="1">
+                        <TextBlock Text="{l:T profile.itemlevel}" Classes="dim" FontSize="9.5" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="{Binding ItemLevel}" Classes="val" />
+                      </StackPanel>
+                      <StackPanel Grid.Column="2">
+                        <TextBlock Text="{l:T profile.enchant_short}" Classes="dim" FontSize="9.5" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="{Binding Enchant}" Classes="val" />
+                      </StackPanel>
+                      <StackPanel Grid.Column="3">
+                        <TextBlock Text="{l:T profile.daevanion}" Classes="dim" FontSize="9.5" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="{Binding Daevanion}" Classes="val" />
+                      </StackPanel>
+                    </Grid>
+                    <TextBlock Text="{Binding Weapon}" Foreground="{Binding WeaponBrush}" FontSize="11" TextTrimming="CharacterEllipsis"
+                               IsVisible="{Binding Weapon, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                    <TextBlock Text="{Binding Status}" Classes="dim" FontSize="10.5" TextWrapping="Wrap"
+                               IsVisible="{Binding Status, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                  </StackPanel>
+                </Grid>
+              </Border>
+            </Button>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+  </Border>
+</Window>

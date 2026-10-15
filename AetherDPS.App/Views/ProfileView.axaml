@@ -1,0 +1,263 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AetherDPS.App.ViewModels"
+             xmlns:l="using:AetherDPS.App.Services"
+             x:Class="AetherDPS.App.Views.ProfileView"
+             x:DataType="vm:ProfileViewModel">
+  <UserControl.Styles>
+    <Style Selector="TextBlock.big">
+      <Setter Property="FontSize" Value="18" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="#E0A84A" />
+    </Style>
+    <Style Selector="Button.gear">
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="Margin" Value="0,0,0,4" />
+    </Style>
+  </UserControl.Styles>
+
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="12" Margin="12,4,22,22">
+
+      <!-- Suche -->
+      <Border Classes="card">
+        <StackPanel Spacing="8">
+          <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8">
+            <TextBox Text="{Binding SearchName}" Watermark="{l:T profile.name_hint}">
+              <TextBox.KeyBindings>
+                <KeyBinding Gesture="Enter" Command="{Binding SearchCommand}" />
+              </TextBox.KeyBindings>
+            </TextBox>
+            <ComboBox Grid.Column="1" ItemsSource="{Binding Servers}" SelectedItem="{Binding SearchServer}" MinWidth="200"
+                      PlaceholderText="{l:T profile.server_hint}" />
+            <Button Grid.Column="2" Classes="primary" Content="{l:T profile.search}" Command="{Binding SearchCommand}" IsEnabled="{Binding !IsLoading}" />
+            <Button Grid.Column="3" Classes="secondary" Content="{l:T armory.show_self}" Command="{Binding ShowSelfCommand}"
+                    IsVisible="{Binding KnowsSelf}" IsEnabled="{Binding !IsLoading}" />
+          </Grid>
+          <TextBlock Text="{Binding Status}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
+        </StackPanel>
+      </Border>
+
+      <!-- Kopf -->
+      <Border Classes="card" IsVisible="{Binding HasProfile}">
+        <Grid ColumnDefinitions="Auto,*">
+          <Border Width="72" Height="72" CornerRadius="8" Background="#22000000" ClipToBounds="True" Margin="0,0,16,0" VerticalAlignment="Top">
+            <Image Source="{Binding Portrait}" Stretch="UniformToFill" />
+          </Border>
+          <StackPanel Grid.Column="1" Spacing="6">
+            <TextBlock Text="{Binding Name}" FontSize="20" FontWeight="SemiBold" />
+            <TextBlock Text="{Binding Subtitle}" Classes="dim" />
+            <WrapPanel Margin="0,6,0,0">
+              <StackPanel Margin="0,0,28,4">
+                <TextBlock Text="{l:T party.col.power}" Classes="dim" FontSize="11" />
+                <TextBlock Text="{Binding CombatPower}" Classes="big" />
+              </StackPanel>
+              <StackPanel Margin="0,0,28,4">
+                <TextBlock Text="{l:T profile.itemlevel}" Classes="dim" FontSize="11" />
+                <TextBlock Text="{Binding ItemLevel}" Classes="big" />
+              </StackPanel>
+              <StackPanel Margin="0,0,28,4" ToolTip.Tip="{l:T profile.enchant_tip}">
+                <TextBlock Text="{l:T profile.enchant}" Classes="dim" FontSize="11" />
+                <TextBlock Text="{Binding AverageEnchant}" Classes="big" />
+              </StackPanel>
+              <StackPanel Margin="0,0,28,4">
+                <TextBlock Text="{l:T profile.daevanion}" Classes="dim" FontSize="11" />
+                <TextBlock Text="{Binding Daevanion}" Classes="big" />
+              </StackPanel>
+              <StackPanel Margin="0,0,28,4">
+                <TextBlock Text="{l:T profile.titles}" Classes="dim" FontSize="11" />
+                <TextBlock Text="{Binding TitleCount}" Classes="big" />
+              </StackPanel>
+            </WrapPanel>
+            <TextBlock Text="{Binding Extras}" Classes="dim" FontSize="12" TextWrapping="Wrap"
+                       IsVisible="{Binding Extras, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <!-- Ausrüstung -->
+      <Border Classes="card" IsVisible="{Binding HasProfile}">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="{l:T profile.gear}" />
+          <TextBlock Classes="dim" FontSize="11" Text="{l:T profile.gear_hint}" />
+          <Grid ColumnDefinitions="*,12,*">
+            <ItemsControl ItemsSource="{Binding Armor}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:GearRow">
+                  <Button Classes="gear" Command="{Binding $parent[UserControl].((vm:ProfileViewModel)DataContext).SelectItemCommand}" CommandParameter="{Binding}">
+                    <Border Padding="6,4" CornerRadius="4" Background="#14FFFFFF"
+                            BorderBrush="{Binding NameBrush}" BorderThickness="{Binding IsSelected, Converter={x:Static l:BoolBrush.SelectedBorder}}">
+                      <Grid ColumnDefinitions="36,*">
+                        <Border Width="32" Height="32" CornerRadius="4" Background="#22000000" BorderBrush="{Binding NameBrush}" BorderThickness="1">
+                          <Image Source="{Binding Icon}" Width="30" Height="30" />
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="6,0,0,0">
+                          <TextBlock Text="{Binding Name}" Foreground="{Binding NameBrush}" FontWeight="SemiBold" FontSize="12" TextTrimming="CharacterEllipsis" />
+                          <TextBlock Text="{Binding Slot}" Classes="dim" FontSize="10.5" />
+                        </StackPanel>
+                      </Grid>
+                    </Border>
+                  </Button>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <ItemsControl Grid.Column="2" ItemsSource="{Binding Jewelry}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:GearRow">
+                  <Button Classes="gear" Command="{Binding $parent[UserControl].((vm:ProfileViewModel)DataContext).SelectItemCommand}" CommandParameter="{Binding}">
+                    <Border Padding="6,4" CornerRadius="4" Background="#14FFFFFF"
+                            BorderBrush="{Binding NameBrush}" BorderThickness="{Binding IsSelected, Converter={x:Static l:BoolBrush.SelectedBorder}}">
+                      <Grid ColumnDefinitions="36,*">
+                        <Border Width="32" Height="32" CornerRadius="4" Background="#22000000" BorderBrush="{Binding NameBrush}" BorderThickness="1">
+                          <Image Source="{Binding Icon}" Width="30" Height="30" />
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="6,0,0,0">
+                          <TextBlock Text="{Binding Name}" Foreground="{Binding NameBrush}" FontWeight="SemiBold" FontSize="12" TextTrimming="CharacterEllipsis" />
+                          <TextBlock Text="{Binding Slot}" Classes="dim" FontSize="10.5" />
+                        </StackPanel>
+                      </Grid>
+                    </Border>
+                  </Button>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </Grid>
+
+          <!-- Item-Details -->
+          <Border IsVisible="{Binding HasDetail}" Padding="12" CornerRadius="6" Background="#10FFFFFF" BorderBrush="{Binding DetailBrush}" BorderThickness="1">
+            <StackPanel Spacing="6">
+              <TextBlock Text="{Binding DetailTitle}" Foreground="{Binding DetailBrush}" FontWeight="SemiBold" FontSize="14" />
+              <TextBlock Text="{l:T profile.item_loading}" Classes="dim" FontSize="11" IsVisible="{Binding DetailLoading}" />
+              <TextBlock Text="{Binding DetailFacts}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
+              <ItemsControl ItemsSource="{Binding DetailStats}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:StatRow">
+                    <Grid ColumnDefinitions="110,*,Auto" Margin="0,1">
+                      <TextBlock Text="{Binding Effects}" Classes="dim" FontSize="11" />
+                      <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="12" />
+                      <TextBlock Grid.Column="2" Text="{Binding Value}" FontSize="12" FontWeight="SemiBold" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <TextBlock Text="{Binding DetailGods}" FontSize="11.5" Foreground="#C9CED6" TextWrapping="Wrap"
+                         IsVisible="{Binding DetailGods, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </Border>
+
+      <!-- Werte -->
+      <Border Classes="card" IsVisible="{Binding HasProfile}">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="{l:T profile.stats}" />
+          <Grid ColumnDefinitions="*,16,*">
+            <ItemsControl ItemsSource="{Binding BaseStats}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:StatRow">
+                  <StackPanel Margin="0,0,0,6">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <TextBlock Text="{Binding Name}" FontSize="12.5" />
+                      <TextBlock Grid.Column="1" Text="{Binding Value}" FontWeight="SemiBold" />
+                    </Grid>
+                    <TextBlock Text="{Binding Effects}" Classes="dim" FontSize="10.5" TextWrapping="Wrap" />
+                  </StackPanel>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <ItemsControl Grid.Column="2" ItemsSource="{Binding GodStats}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:StatRow">
+                  <StackPanel Margin="0,0,0,6">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <TextBlock Text="{Binding Name}" FontSize="12.5" />
+                      <TextBlock Grid.Column="1" Text="{Binding Value}" FontWeight="SemiBold" />
+                    </Grid>
+                    <TextBlock Text="{Binding Effects}" Classes="dim" FontSize="10.5" TextWrapping="Wrap" />
+                  </StackPanel>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <!-- Daevanion + Titel -->
+      <Border Classes="card" IsVisible="{Binding HasProfile}">
+        <Grid ColumnDefinitions="*,16,*">
+          <StackPanel Spacing="8">
+            <TextBlock Classes="h2" Text="{l:T profile.daevanion}" />
+            <ItemsControl ItemsSource="{Binding Boards}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:BoardRow">
+                  <Grid ColumnDefinitions="26,*,Auto" Margin="0,0,0,6">
+                    <Image Source="{Binding Icon}" Width="20" Height="20" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" Spacing="3" Margin="4,0,10,0">
+                      <TextBlock Text="{Binding Name}" FontSize="12" />
+                      <ProgressBar Height="5" MinHeight="0" Maximum="100" Value="{Binding Percent}" Foreground="#E0A84A" Background="#22FFFFFF" />
+                    </StackPanel>
+                    <TextBlock Grid.Column="2" Text="{Binding Text}" Classes="dim" FontSize="11" VerticalAlignment="Center" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+          <StackPanel Grid.Column="2" Spacing="8">
+            <TextBlock Classes="h2" Text="{l:T profile.titles}" />
+            <ItemsControl ItemsSource="{Binding Titles}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:TitleRow">
+                  <StackPanel Spacing="3" Margin="0,0,0,8">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <TextBlock Text="{Binding Category}" FontSize="12" />
+                      <TextBlock Grid.Column="1" Text="{Binding Text}" Classes="dim" FontSize="11" />
+                    </Grid>
+                    <ProgressBar Height="5" MinHeight="0" Maximum="100" Value="{Binding Percent}" Foreground="#5AA0F0" Background="#22FFFFFF" />
+                    <TextBlock Text="{Binding Name}" Foreground="{Binding Brush}" FontSize="11" />
+                  </StackPanel>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <!-- Skills -->
+      <Border Classes="card" IsVisible="{Binding HasProfile}">
+        <StackPanel Spacing="8">
+          <TextBlock Classes="h2" Text="{l:T profile.skills}" />
+          <ItemsControl ItemsSource="{Binding SkillGroups}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:SkillGroup">
+                <StackPanel Spacing="4" Margin="0,0,0,8">
+                  <TextBlock Text="{Binding Title}" Classes="dim" FontSize="11" />
+                  <ItemsControl ItemsSource="{Binding Skills}">
+                    <ItemsControl.ItemsPanel>
+                      <ItemsPanelTemplate>
+                        <WrapPanel />
+                      </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:ProfileSkillRow">
+                        <Border Width="196" Margin="0,0,6,4" Padding="4" CornerRadius="4" Background="#14FFFFFF">
+                          <Grid ColumnDefinitions="28,*,Auto">
+                            <Image Source="{Binding Icon}" Width="24" Height="24" />
+                            <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="11.5" VerticalAlignment="Center" Margin="6,0" TextTrimming="CharacterEllipsis" />
+                            <TextBlock Grid.Column="2" Text="{Binding Level}" FontSize="11.5" FontWeight="SemiBold" Foreground="#E0A84A" VerticalAlignment="Center" Margin="0,0,4,0" />
+                          </Grid>
+                        </Border>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>
