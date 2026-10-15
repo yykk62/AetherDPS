@@ -57,6 +57,29 @@ Aufnahme: Meter offen lassen (Mitschnitte laufen im Ring mit), danach „Problem
 - [ ] Shugo-Festival: KR :18/:48, Daeva Codex/TheLoop stündlich – EU in der Aufnahme prüfen (Event-Ankündigung im Spiel)
 - [ ] Zusammenarbeit anfragen (nur nach OK des Nutzers): Daeva Codex Companion liest die Position aus der Minimap per Bildschirm und schickt sie an 127.0.0.1; AetherDPS kennt die Position exakt aus den Paketen und könnte sie ihnen liefern. Ihre Marker-Daten (Siegel, Monolith-Fragmente, Hidden Cubes) haben keine offene Lizenz → nur mit Erlaubnis
 
+## Recherche Karten-Daten und APIs (15.10.2026)
+Karten-Daten (Fundorte, Spawns):
+- Alle Live-Maps stammen letztlich aus dem Spielclient (UE 5.3, verschlüsselte `.dat` unter `Content/Data/{Table,Map,WorldMap}`, CUE4Parse kann es seit 06/2026). Wurzel der meisten GitHub-Maps: tc-imba (`aion2-interactive-map`, jetzt `arkive-games/arkive`), Daten CC BY-NC 4.0 → nicht GPL-kompatibel, höchstens als getrennter Laufzeit-Download mit Namensnennung.
+- Questlog.gg (92.854 Marker), interactivemap.app, aion2maps.com, gaming.tools: keine Lizenz → nicht verwenden.
+- SkeeveAN/Aion-DPS-Meter (MIT, Daten „Eigentum NCSOFT“): `pets/spawns.json` (20.791 Spawns), `maps/gather.json`, `kibelisks.json`, `npc_names.json`, Kalibrierung. Weltkoordinaten in cm = dieselben Einheiten wie Spawn-Paket 0x4136 (Median < 1 m). Karte: linear, Parameter aus `Data/WorldMap` (WorldBoundBox).
+- Kartenbilder sind © NCSOFT, nirgends frei. NCSOFT hat keine offizielle Karte.
+- Selbst extrahieren widerspricht den ToS (Reverse Engineering) → nicht machen.
+Noch ungenutzt aus A2Tools/Daevalog (gleiche GPL-Quelle): `player_summon_npcs.json` (SummonMerger), `abnormals.json` (Buff-Icons, max. Stacks), `dot_skill_ids.json`, `skill_icons.json`; Daevalog: `instance_maps.json`, `attack_skills.json`, `skill_groups.json`.
+
+Offizielle APIs (ohne Login, region=eu, geprüft):
+- `aion2.plaync.com/de-de/api/gameinfo/{servers,classes,pcdata}`; `api/character/{info,equipment,equipment/item,daevanion/detail}` (Item-Detail mit Steinen/Substats, Daevanion-Knoten, Titel x/297)
+- `api/ranking/list`: seit 09/2026 leer (`season:null`) → später
+- Patch-Notes/Ankündigungen: `api-global-community.plaync.com/aion2_global/board/{notice,update,cm_story}_de/article/search/moreArticle?moreSize=5&moreDirection=BEFORE`
+- Nicht vorhanden: Legion, Serverstatus/Bevölkerung, Inventar/Kinah, Item-DB für Global (nur TW), Marktpreise (nur Drittseite aion2.exchange, Einzelbetreiber, keine Bedingungen)
+- ToS §6: kein Scraping/Crawling, nichts Kommerzielles → nur auf Nutzer-Klick, cachen, ≤1 Anfrage/s
+
+Ideen daraus (offen, neue Verbindungen nach außen → CLAUDE.md/README/Datenschutz mitziehen):
+- [ ] Patch-Notes-Wächter (Board `update_de`/`notice_de`, Hinweis im Hub bei neuem Eintrag)
+- [ ] Gear-Vergleich zweier Charaktere (`equipment/item`: Steine, Substats)
+- [ ] Daevanion-Fortschritt im Profil
+- [ ] DPS pro 1000 Kampfkraft im Lauf (Gruppe über Armory nachschlagen)
+- [ ] Feldboss-Minikarte: eigene Position (0x4136) + Bosse aus field_bosses.json, ohne NCSOFT-Kartenbild
+
 ## Phase 6: Bot-Radar (Idee vom 13.10.2026)
 Ziel: Bots an Farm-Spots erkennen und mit Beweisen melden. Das Tool liest nur passiv mit, es sendet nie etwas und meldet nie automatisch.
 - [ ] Mitschnitt von 5–10 Minuten an einem Bot-Spot (nach Phase 2)
