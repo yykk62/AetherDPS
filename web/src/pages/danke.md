@@ -6,7 +6,7 @@ description: Wessen Arbeit in AetherDPS und dieser Seite steckt
 
 AetherDPS steht auf den Schultern anderer. Danke an:
 
-- **[Wakayashi](https://wakayashi.gg/aion2)**: Cheat Sheet, Checkliste und Event-Zeiten auf dieser Seite, mit freundlicher Erlaubnis. Video-Guides auf [YouTube](https://www.youtube.com/@wakayashi) und live auf [Twitch](https://twitch.tv/wakayashi).
+- **[Wakayashi](https://wakayashi.gg/aion2)**: Cheat Sheet, Checkliste und Event-Zeiten auf dieser Seite.
 - **[RATmeter / AIon2-Dps-Meter](https://github.com/Kuroukihime/AIon2-Dps-Meter)** (GPL-3.0): die Grundlage des Meters, von der AetherDPS ein Fork ist.
 - **[SkeeveAN/Aion-DPS-Meter](https://github.com/SkeeveAN/Aion-DPS-Meter)** (MIT): Feldbosse, Pet-Daten und Spawnpunkte.
 - **TheLoop705/aion2dps** (GPL-3.0): Zeitplan von Rissen und Artefakt-Belagerung.
