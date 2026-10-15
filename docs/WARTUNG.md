@@ -38,6 +38,7 @@ Für `README.md` gilt `merge=ours` (siehe `.gitattributes`). Einmal pro Klon mus
 | `AionDpsMeter.Services/PacketProcessing/Processors/EntityDeathProcessor.cs` + `EntityTracker.cs` | `RaiseEntityDied` / Event `EntityDied` für jede Einheit | Boss-Timer, Boss-Kill-Zeiten im Lauf |
 | `AionDpsMeter.Services/Services/Entity/EntityTracker.cs` | Event `UserIdentified` in `SetSessionPlayerName` | Charakter dauerhaft merken (`SelfIdentity`) |
 
+| `AionDpsMeter.Services/AionDpsMeter.Services.csproj` | `SQLitePCLRaw.lib.e_sqlite3` 2.1.13 fest eingetragen | Sicherheitslücke GHSA-2m69-gcr7-jv3q in ≤ 2.1.11 (kam über EF Core Sqlite). Die App nutzte über die Engine schon 2.1.13, so warnt auch das Upstream-Projekt nicht mehr |
 | `AionDpsMeter.Core/Data/ServerMap.cs` | `GetName` liefert `#<id>` statt `""` für unbekannte IDs | EU-Server fehlen in der Liste |
 
 | `AionDpsMeter.Services/PacketProcessing/Routing/PacketDispatchService.cs` | Property `Observer` (sieht jedes Paket vor dem Gate) | Dungeon-Erkennung (0x3616), Stagger-Leiste (0xE005) |

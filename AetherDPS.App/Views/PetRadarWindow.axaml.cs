@@ -15,7 +15,7 @@ namespace AetherDPS.App.Views;
 /// </summary>
 public partial class PetRadarWindow : Window
 {
-    private const double MinWidth = 240, MinMap = 160;
+    private const double SmallestWidth = 240, SmallestMap = 160;
     private readonly MeterSettings? settings;
     private Point? resizeFrom;
     private double resizeWidth, resizeMap;
@@ -82,7 +82,7 @@ public partial class PetRadarWindow : Window
     /// <summary>Gemerkte Größe, sonst so groß wie die Spielkarte: Karte ~ halbe Bildschirmhöhe, etwas breiter als hoch.</summary>
     private (double Width, double Map) Size()
     {
-        if (settings?.PetRadarWidth is double w && settings.PetRadarMapHeight is double h) return (Math.Max(MinWidth, w), Math.Max(MinMap, h));
+        if (settings?.PetRadarWidth is double w && settings.PetRadarMapHeight is double h) return (Math.Max(SmallestWidth, w), Math.Max(SmallestMap, h));
         if ((Screens.Primary ?? Screens.All.FirstOrDefault()) is { } screen)
         {
             double map = screen.WorkingArea.Height / screen.Scaling * 0.5;
@@ -173,8 +173,8 @@ public partial class PetRadarWindow : Window
         }
         var now = this.PointToScreen(e.GetPosition(this)).ToPoint(1);
         double scale = RenderScaling;
-        Width = Math.Max(MinWidth, resizeWidth + (now.X - from.X) / scale);
-        RadarMap.Height = Math.Max(MinMap, resizeMap + (now.Y - from.Y) / scale);
+        Width = Math.Max(SmallestWidth, resizeWidth + (now.X - from.X) / scale);
+        RadarMap.Height = Math.Max(SmallestMap, resizeMap + (now.Y - from.Y) / scale);
     }
 
     private void EndResize(IPointer pointer)

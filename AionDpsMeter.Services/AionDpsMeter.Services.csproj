@@ -9,6 +9,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.2" />
+    <!-- AetherDPS: SQLite-Lücke GHSA-2m69-gcr7-jv3q (bis 2.1.11), siehe docs/WARTUNG.md -->
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.13" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.2" />
     <PackageReference Include="PacketDotNet" Version="1.4.7" />
     <PackageReference Include="SharpPcap" Version="6.3.0" />
