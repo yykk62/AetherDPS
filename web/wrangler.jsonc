@@ -1,0 +1,10 @@
+{
+  // Webseite: nur statische Dateien aus dist/ (npm run build). Die Domain wird im Cloudflare-Dashboard
+  // bzw. über "routes" eingetragen, sobald aetherdps.com im Konto ist.
+  "name": "aetherdps-web",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page"
+  }
+}

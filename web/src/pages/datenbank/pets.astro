@@ -1,0 +1,95 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHead from '../../components/PageHead.astro';
+import { t } from '../../i18n';
+import { pets, PET_CATEGORIES } from '../../lib/gamedata';
+
+const list = pets();
+const groups = [...new Set(list.map((p) => p.group).filter(Boolean))];
+// Lange Listen kürzen; die Suche findet trotzdem alle Gebiete und Monster.
+const short = (items: string[], n = 3) => items.slice(0, n).join(', ') + (items.length > n ? ` ${t('db.more', items.length - n)}` : '');
+---
+<Base title={t('db.pets')} description="Alle Pets in AION 2 mit Gattung, Gebiet und dem Monster, das die Seele droppt.">
+  <div class="wrap">
+    <PageHead image="/img/pets.webp" eyebrow={t('db.title')} title={t('db.pets')} lead={t('db.petsText')}>
+      <p class="muted small">In der App siehst du zusätzlich deine Stufe je Pet und das Pet-Radar mit den fehlenden Pets in deiner Nähe.</p>
+    </PageHead>
+
+    <div class="filters">
+      <input type="search" id="q" placeholder={t('common.search')} aria-label={t('common.search')} />
+      <div class="tabs" id="cats">
+        <button aria-selected="true" data-cat="">{t('common.all')}</button>
+        {Object.entries(PET_CATEGORIES).map(([key, c]) => (
+          <button aria-selected="false" data-cat={key} style={`--c:${c.color}`}><span class="dot"></span>{c.name}</button>
+        ))}
+      </div>
+      <select id="group" aria-label={t('db.region')}>
+        <option value="">{t('common.all')}</option>
+        {groups.map((g) => <option>{g}</option>)}
+      </select>
+      <span class="muted small" id="count">{t('db.petCount', list.length)}</span>
+    </div>
+
+    <div class="pets">
+      {list.map((p) => {
+        const c = PET_CATEGORIES[p.category];
+        return (
+          <article class="pet card" data-cat={p.category} data-group={p.group}
+            data-search={[p.name, ...p.regions, ...p.monsters].join(' ').toLowerCase()} style={`--c:${c?.color ?? '#888'}`}>
+            <img src={`/gen/pets/${p.id}.png`} alt="" width="72" height="72" loading="lazy" />
+            <div>
+              <h3>{p.name}</h3>
+              <div class="meta"><span class="cat">{c?.name ?? p.category}</span>{p.group && <span class="muted"> · {p.group}</span>}</div>
+              {p.regions.length > 0 && <p class="small">{short(p.regions)}</p>}
+              {p.monsters.length > 0 && <p class="small muted">{t('db.dropsFrom')}: {short(p.monsters)}</p>}
+            </div>
+          </article>
+        );
+      })}
+    </div>
+  </div>
+</Base>
+
+<script>
+  import { t } from '../../i18n';
+  const q = document.getElementById('q') as HTMLInputElement;
+  const group = document.getElementById('group') as HTMLSelectElement;
+  const count = document.getElementById('count')!;
+  const cards = [...document.querySelectorAll<HTMLElement>('.pet')];
+  const catButtons = [...document.querySelectorAll<HTMLButtonElement>('#cats button')];
+  let cat = '';
+
+  function apply() {
+    const words = q.value.toLowerCase().split(/\s+/).filter(Boolean);
+    let n = 0;
+    for (const el of cards) {
+      const show = (!cat || el.dataset.cat === cat) && (!group.value || el.dataset.group === group.value)
+        && words.every((w) => el.dataset.search!.includes(w));
+      el.hidden = !show;
+      if (show) n++;
+    }
+    count.textContent = t('db.petCount', n);
+  }
+  for (const b of catButtons)
+    b.addEventListener('click', () => {
+      cat = b.dataset.cat!;
+      for (const x of catButtons) x.setAttribute('aria-selected', String(x === b));
+      apply();
+    });
+  q.addEventListener('input', apply);
+  group.addEventListener('change', apply);
+</script>
+
+<style>
+  .filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 20px; }
+  .filters .tabs { margin: 0; }
+  .filters input { flex: 1 1 220px; }
+  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--c); margin-right: 6px; }
+  .pets { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); }
+  .pet { display: flex; gap: 14px; align-items: flex-start; border-left: 3px solid var(--c); }
+  .pet img { width: 72px; height: 72px; border-radius: 10px; background: var(--bg-2); flex: none; object-fit: contain; }
+  .pet h3 { margin: 0; font-size: 1rem; }
+  .pet p { margin: 4px 0 0; color: var(--soft); }
+  .pet .cat { color: var(--c); font-weight: 600; font-size: 0.85rem; }
+  .meta { font-size: 0.85rem; }
+</style>

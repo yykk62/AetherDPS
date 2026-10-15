@@ -1,0 +1,190 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import Credit from '../components/Credit.astro';
+import { t } from '../i18n';
+import { DAILY, WEEKLY, RECHARGES } from '../data/checklist';
+import { describe, DAILY_RESET, WEEKLY_RESET } from '../lib/schedule';
+
+const periods = [
+  { id: 'daily', title: t('checklist.daily'), tasks: DAILY, schedule: DAILY_RESET },
+  { id: 'weekly', title: t('checklist.weekly'), tasks: WEEKLY, schedule: WEEKLY_RESET },
+];
+const data = { periods: periods.map((p) => ({ id: p.id, tasks: p.tasks, schedule: p.schedule })) };
+---
+<Base title={t('checklist.title')} description="Daily- und Weekly-Checkliste für AION 2 mit Main und Twinks, setzt sich zum Reset von selbst zurück.">
+  <div class="wrap">
+    <PageHead image="/img/checkliste.webp" eyebrow="Nichts verpassen" title={t('checklist.title')} lead={t('checklist.lead')} />
+    <Credit href="https://wakayashi.gg/aion2#checklist" />
+
+    <div class="chars" id="chars"></div>
+
+    {periods.map((p) => (
+      <section class="section" data-period={p.id}>
+        <div class="period-head">
+          <h2>{p.title}</h2>
+          <span class="tag">{describe(p.schedule)}</span>
+          <span class="tag warn" title={t('common.unconfirmedHint')}>{t('common.unconfirmed')}</span>
+          <span class="reset muted small"></span>
+        </div>
+        <div class="table-wrap"><table class="tasks"></table></div>
+      </section>
+    ))}
+
+    <section class="section">
+      <h2>{t('checklist.recharge')}</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>{t('checklist.task')}</th><th>Menge</th><th>Für</th></tr></thead>
+          <tbody>
+            {RECHARGES.map((r) => (
+              <tr>
+                <td>{r.name}<span class="en">{r.en}</span></td>
+                <td>{r.amount}{r.note && <span class="en">{r.note}</span>}</td>
+                <td>{r.who === 'main' ? t('checklist.mainOnly') : t('checklist.allChars')}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <p class="muted small">{t('checklist.local')} {t('checklist.appHint')}</p>
+  </div>
+  <script type="application/json" id="checklist-data" set:html={JSON.stringify(data)} />
+</Base>
+
+<script>
+  import { last, next, countdown, type Schedule } from '../lib/schedule';
+  import { t } from '../i18n';
+
+  interface Task { id: string; name: string; en: string; who: 'all' | 'main'; count?: number; label?: string }
+  interface Period { id: string; tasks: Task[]; schedule: Schedule }
+  interface Char { id: string; name: string; role: 'main' | 'twink' }
+  type Marks = Record<string, Record<string, { n: number; at: number }>>;
+
+  const { periods } = JSON.parse(document.getElementById('checklist-data')!.textContent!) as { periods: Period[] };
+  const KEY_CHARS = 'aetherdps.checklist.chars';
+  const KEY_MARKS = 'aetherdps.checklist.marks';
+
+  // localStorage kann gesperrt sein (privates Fenster): dann läuft die Liste nur bis zum Neuladen.
+  const load = <T,>(key: string, fallback: T): T => {
+    try { return JSON.parse(localStorage.getItem(key) ?? '') as T; } catch { return fallback; }
+  };
+  const save = (key: string, value: unknown) => {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* nur für diese Sitzung */ }
+  };
+
+  let chars = load<Char[]>(KEY_CHARS, []);
+  if (!Array.isArray(chars) || !chars.length) chars = [{ id: 'main', name: t('checklist.main'), role: 'main' }];
+  let marks = load<Marks>(KEY_MARKS, {});
+  if (!marks || typeof marks !== 'object') marks = {};
+
+  const applies = (task: Task, c: Char) => task.who === 'all' || c.role === 'main';
+  const value = (p: Period, task: Task, c: Char) => {
+    const m = marks[c.id]?.[task.id];
+    return m && m.at >= last(p.schedule) ? m.n : 0;
+  };
+  const max = (task: Task) => task.count ?? 1;
+  const setValue = (task: Task, c: Char, n: number) => {
+    (marks[c.id] ??= {})[task.id] = { n: Math.max(0, Math.min(max(task), n)), at: Date.now() };
+    save(KEY_MARKS, marks);
+    render();
+  };
+
+  const el = <K extends keyof HTMLElementTagNameMap>(tag: K, props: Partial<HTMLElementTagNameMap[K]> = {}, ...kids: (Node | string)[]) => {
+    const e = Object.assign(document.createElement(tag), props);
+    e.append(...kids);
+    return e;
+  };
+
+  function renderChars() {
+    const box = document.getElementById('chars')!;
+    box.replaceChildren(
+      ...chars.map((c) => {
+        const name = el('input', { value: c.name, ariaLabel: 'Name', size: Math.max(6, c.name.length) });
+        name.addEventListener('change', () => { c.name = name.value.trim() || c.name; save(KEY_CHARS, chars); render(); });
+        const role = el('select', { ariaLabel: 'Rolle' },
+          el('option', { value: 'main', selected: c.role === 'main' }, t('checklist.main')),
+          el('option', { value: 'twink', selected: c.role === 'twink' }, t('checklist.twink')));
+        role.addEventListener('change', () => { c.role = role.value as Char['role']; save(KEY_CHARS, chars); render(); });
+        const remove = el('button', { className: 'icon-btn', title: t('checklist.remove'), ariaLabel: t('checklist.remove') }, '×');
+        remove.hidden = chars.length < 2;
+        remove.addEventListener('click', () => {
+          if (!confirm(t('checklist.removeConfirm', c.name))) return;
+          chars = chars.filter((x) => x !== c);
+          delete marks[c.id];
+          save(KEY_CHARS, chars); save(KEY_MARKS, marks); render();
+        });
+        return el('div', { className: 'char' }, name, role, remove);
+      }),
+      (() => {
+        const add = el('button', { className: 'btn ghost small' }, t('checklist.addChar'));
+        add.addEventListener('click', () => {
+          chars.push({ id: crypto.randomUUID?.() ?? String(Date.now()), name: `${t('checklist.twink')} ${chars.length}`, role: 'twink' });
+          save(KEY_CHARS, chars); render();
+        });
+        return add;
+      })(),
+    );
+  }
+
+  function renderPeriod(p: Period) {
+    const section = document.querySelector<HTMLElement>(`[data-period="${p.id}"]`)!;
+    const table = section.querySelector('table')!;
+    const head = el('tr', {}, el('th', {}, t('checklist.task')), ...chars.map((c) => el('th', { className: 'c' }, c.name)));
+    const rows = p.tasks.map((task) => {
+      const cells = chars.map((c) => {
+        if (!applies(task, c)) return el('td', { className: 'c muted' }, '–');
+        const n = value(p, task, c);
+        const done = n >= max(task);
+        const text = task.count ? `${n}/${task.count}` : done ? '✓' : task.label ?? '';
+        const btn = el('button', { className: `mark${done ? ' done' : n ? ' part' : ''}`, title: `${task.name} · ${c.name}` }, text);
+        btn.addEventListener('click', () => setValue(task, c, n >= max(task) ? 0 : n + 1));
+        btn.addEventListener('contextmenu', (e) => { e.preventDefault(); setValue(task, c, n - 1); });
+        return el('td', { className: 'c' }, btn);
+      });
+      const label = el('td', {}, task.count && task.count > 1 ? `${task.count}× ${task.name}` : task.label ? `${task.name} (${task.label})` : task.name, el('span', { className: 'en' }, task.en));
+      return el('tr', {}, label, ...cells);
+    });
+    table.replaceChildren(el('thead', {}, head), el('tbody', {}, ...rows));
+  }
+
+  function tickResets() {
+    for (const p of periods) {
+      const n = next(p.schedule);
+      const out = document.querySelector(`[data-period="${p.id}"] .reset`);
+      if (n && out) out.textContent = t('checklist.resetIn', countdown(n.at - Date.now(), t('common.days')));
+    }
+  }
+
+  function render() {
+    renderChars();
+    periods.forEach(renderPeriod);
+    tickResets();
+  }
+
+  render();
+  // Jede Sekunde den Countdown, jede Minute die Haken (falls gerade ein Reset war).
+  let ticks = 0;
+  setInterval(() => (++ticks % 60 ? tickResets() : render()), 1000);
+</script>
+
+<style>
+  .chars { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 8px 0 8px; }
+  .chars :global(.char) { display: flex; gap: 6px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 6px; }
+  .chars :global(.char input) { width: auto; }
+  .chars :global(.icon-btn) { background: none; border: 0; color: var(--muted); font-size: 1.2rem; cursor: pointer; padding: 0 6px; }
+  .chars :global(.icon-btn:hover) { color: var(--live); }
+  .period-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-top: 2rem; }
+  .period-head h2 { margin: 0 6px 10px 0; }
+  .period-head .reset { margin-left: auto; font-family: var(--mono); }
+  .tasks :global(th.c), .tasks :global(td.c) { text-align: center; width: 1%; white-space: nowrap; }
+  .tasks :global(.mark) {
+    min-width: 64px; padding: 6px 10px; border-radius: 8px; cursor: pointer; font: 600 0.9rem var(--mono);
+    background: var(--bg-2); color: var(--soft); border: 1px solid var(--line); user-select: none;
+  }
+  .tasks :global(.mark:hover) { border-color: var(--gold); }
+  .tasks :global(.mark.part) { color: var(--gold-2); border-color: rgba(224, 168, 74, 0.5); }
+  .tasks :global(.mark.done) { background: rgba(92, 194, 106, 0.15); color: var(--ok); border-color: rgba(92, 194, 106, 0.5); }
+</style>

@@ -1,0 +1,34 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PageHead from '../../components/PageHead.astro';
+import { t } from '../../i18n';
+
+const guides = (await getCollection('guides', (g) => !g.data.draft)).sort((a, b) => +b.data.updated - +a.data.updated);
+const date = new Intl.DateTimeFormat('de-DE', { dateStyle: 'medium' });
+---
+<Base title={t('guides.title')}>
+  <div class="wrap">
+    <PageHead image="/img/guides.webp" eyebrow="Wissen" title={t('guides.title')} lead={t('guides.lead')} />
+    <div class="grid">
+      {guides.map((g) => (
+        <a class="card" href={`/guides/${g.id}`}>
+          <div class="tags">{g.data.tags.map((tag) => <span class="tag">{tag}</span>)}</div>
+          <h3>{g.data.title}</h3>
+          <p>{g.data.description}</p>
+          <p class="small">{t('guides.updated')} {date.format(g.data.updated)}</p>
+        </a>
+      ))}
+      <a class="card" href="https://wakayashi.gg/aion2" rel="noopener">
+        <div class="tags"><span class="tag gold">Wakayashi</span></div>
+        <h3>{t('guides.classes')} ↗</h3>
+        <p>{t('guides.classesText')}</p>
+      </a>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .tags { display: flex; gap: 6px; margin-bottom: 8px; }
+  .card .small { margin-top: 10px; }
+</style>

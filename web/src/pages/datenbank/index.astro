@@ -1,0 +1,30 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHead from '../../components/PageHead.astro';
+import { t } from '../../i18n';
+
+const entries = [
+  ['🐉', t('db.fieldbosses'), t('db.fieldbossesText'), '/datenbank/feldbosse'],
+  ['🐾', t('db.pets'), t('db.petsText'), '/datenbank/pets'],
+  ['🏰', t('db.dungeons'), t('db.dungeonsText'), ''],
+  ['🌍', t('db.terms'), t('db.termsText'), ''],
+];
+---
+<Base title={t('db.title')}>
+  <div class="wrap">
+    <PageHead image="/img/feldbosse.webp" eyebrow="Spieldaten" title={t('db.title')} lead={t('db.lead')} />
+    <div class="grid">
+      {entries.map(([icon, title, text, href]) =>
+        href ? (
+          <a class="card" href={href}><div class="icon">{icon}</div><h3>{title}</h3><p>{text}</p></a>
+        ) : (
+          <div class="card soon"><div class="icon">{icon}</div><h3>{title} <span class="tag">{t('common.soon')}</span></h3><p>{text}</p></div>
+        ),
+      )}
+    </div>
+  </div>
+</Base>
+
+<style>
+  .soon { opacity: 0.6; }
+</style>

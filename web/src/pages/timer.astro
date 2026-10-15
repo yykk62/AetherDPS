@@ -1,0 +1,114 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import Credit from '../components/Credit.astro';
+import { t } from '../i18n';
+import { EVENTS, EVENT_TYPES } from '../data/events';
+import { describe, DAILY_RESET, WEEKLY_RESET, type Schedule } from '../lib/schedule';
+import { fieldBosses } from '../lib/gamedata';
+
+interface Row { id: string; type: string; name: string; en?: string; note?: string; schedule: Schedule; confirmed: boolean }
+
+const resets: Row[] = [
+  { id: 'daily_reset', type: 'Reset', name: t('timer.dailyReset'), schedule: DAILY_RESET, confirmed: false },
+  { id: 'weekly_reset', type: 'Reset', name: t('timer.weeklyReset'), schedule: WEEKLY_RESET, confirmed: false },
+];
+const events: Row[] = EVENTS.map((e) => ({ ...e, type: EVENT_TYPES[e.type] }));
+const abyss: Row[] = fieldBosses()
+  .flatMap((m) => m.bosses.filter((b) => b.fixed).map((b) => ({ m, b })))
+  .map(({ m, b }) => ({ id: `boss_${b.slot}`, type: 'Boss', name: b.name, note: m.name, schedule: b.fixed!, confirmed: true }));
+
+const groups: [string, Row[]][] = [
+  [t('timer.events'), events],
+  [t('timer.abyssBosses'), abyss],
+  [t('timer.resets'), resets],
+];
+---
+<Base title={t('timer.title')} description="Risse, Weltbosse, Shugofesta und Abyss-Zeiten für AION 2 (EU), live in deiner Ortszeit.">
+  <div class="wrap">
+    <PageHead image="/img/timer.webp" eyebrow="Serverzeiten live" title={t('timer.title')} lead={t('timer.lead')} />
+    <Credit />
+    <p class="muted small">{t('common.localTime')}</p>
+
+    {groups.map(([title, rows]) => (
+      <section class="section">
+        <h2>{title}</h2>
+        <div class="timers">
+          {rows.map((r) => (
+            <article class="timer card" data-schedule={JSON.stringify(r.schedule)}>
+              <div class="top">
+                <span class="tag gold">{r.type}</span>
+                {!r.confirmed && <span class="tag warn" title={t('common.unconfirmedHint')}>{t('common.unconfirmed')}</span>}
+                <span class="tag live" hidden>{t('common.live')}</span>
+              </div>
+              <h3>{r.name}{r.en && <span class="en">{r.en}</span>}</h3>
+              <p class="when muted small">{describe(r.schedule)}{r.note && <> · {r.note}</>}</p>
+              <div class="next"><span class="at">–</span><span class="left"></span></div>
+            </article>
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+</Base>
+
+<script>
+  import { next, countdown } from '../lib/schedule';
+  import { t } from '../i18n';
+
+  const cards = [...document.querySelectorAll<HTMLElement>('.timer')].map((el) => ({
+    el,
+    schedule: JSON.parse(el.dataset.schedule!),
+    at: el.querySelector('.at')!,
+    left: el.querySelector('.left')!,
+    live: el.querySelector<HTMLElement>('.tag.live')!,
+  }));
+  const time = new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit' });
+  const dayDiff = (ms: number) => {
+    const a = new Date(); a.setHours(0, 0, 0, 0);
+    const b = new Date(ms); b.setHours(0, 0, 0, 0);
+    return Math.round((b.getTime() - a.getTime()) / 86_400_000);
+  };
+  const weekday = new Intl.DateTimeFormat('de-DE', { weekday: 'short' });
+  const dayLabel = (ms: number) => {
+    const d = dayDiff(ms);
+    return d === 0 ? t('common.today') : d === 1 ? t('common.tomorrow') : weekday.format(ms);
+  };
+
+  function tick() {
+    const now = Date.now();
+    for (const c of cards) {
+      const n = next(c.schedule, now);
+      if (!n) continue;
+      c.at.textContent = `${dayLabel(n.at)} ${time.format(n.at)} Uhr`;
+      c.left.textContent = n.live ? '' : `${t('common.in')} ${countdown(n.at - now, t('common.days'))}`;
+      c.live.hidden = !n.live;
+      c.el.classList.toggle('is-live', n.live);
+    }
+    // Sortieren: laufende zuerst, dann nach nächstem Termin.
+    for (const grid of document.querySelectorAll('.timers')) {
+      const items = [...grid.children] as HTMLElement[];
+      const key = (el: HTMLElement) => {
+        const n = next(JSON.parse(el.dataset.schedule!), now);
+        return n ? (n.live ? -1 : n.at) : Infinity;
+      };
+      const sorted = [...items].sort((a, b) => key(a) - key(b));
+      if (sorted.some((el, i) => el !== items[i])) grid.append(...sorted);
+    }
+  }
+  tick();
+  setInterval(tick, 1000);
+</script>
+
+<style>
+  .timers { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+  .timer { display: flex; flex-direction: column; gap: 4px; }
+  .timer.is-live { border-color: var(--live); box-shadow: 0 0 0 1px var(--live) inset; }
+  .top { display: flex; gap: 6px; flex-wrap: wrap; }
+  .timer h3 { margin: 6px 0 0; }
+  .timer .en { display: block; color: var(--muted); font-size: 0.82rem; font-weight: 400; }
+  .timer .when { margin: 0; }
+  .next { margin-top: auto; padding-top: 8px; display: flex; justify-content: space-between; gap: 8px; font-family: var(--mono); }
+  .next .at { color: var(--text); }
+  .next .left { color: var(--gold-2); }
+</style>

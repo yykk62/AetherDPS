@@ -1,0 +1,65 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHead from '../../components/PageHead.astro';
+import { t } from '../../i18n';
+import { fieldBosses } from '../../lib/gamedata';
+import { describe } from '../../lib/schedule';
+
+const maps = fieldBosses();
+const duration = (min: number) => (min >= 60 ? `${Math.floor(min / 60)} Std.${min % 60 ? ` ${min % 60} Min.` : ''}` : `${min} Min.`);
+---
+<Base title={t('db.fieldbosses')} description="Alle Feldbosse in AION 2 je Gebiet, mit Respawn-Zeiten und festen Abyss-Zeiten.">
+  <div class="wrap">
+    <PageHead image="/img/feldbosse.webp" eyebrow={t('db.title')} title={t('db.fieldbosses')} lead={t('db.fieldbossesText')}>
+      <p class="muted small">Die genauen Respawn-Zeiten schickt der Server, sobald du im Spiel die Karte öffnest. Die App merkt sie sich und zeigt sie als Timer über dem Spiel.</p>
+    </PageHead>
+
+    <nav class="jump">
+      {maps.map((m) => <a class="tag" href={`#map-${m.id}`}>{m.name}</a>)}
+    </nav>
+
+    {maps.map((m) => (
+      <section class="section" id={`map-${m.id}`}>
+        <h2>{m.name} <span class="muted small">{m.bosses.length} Bosse</span></h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>{t('db.boss')}</th><th>{t('db.respawn')}</th><th></th></tr></thead>
+            <tbody>
+              {m.bosses.map((b) => (
+                <tr>
+                  <td>{b.name}</td>
+                  <td>
+                    {b.fixed ? <span class="tag gold">{describe(b.fixed)}</span> : b.respawn ? duration(b.respawn) : <span class="muted">{t('common.unknown')}</span>}
+                  </td>
+                  <td class="kill">
+                    {b.respawn && !b.fixed && (
+                      <button class="btn ghost small" data-respawn={b.respawn}>{t('db.killed')}</button>
+                    )}
+                    <span class="back muted small"></span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    ))}
+  </div>
+</Base>
+
+<script>
+  import { t } from '../../i18n';
+  const time = new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit' });
+  for (const btn of document.querySelectorAll<HTMLButtonElement>('[data-respawn]'))
+    btn.addEventListener('click', () => {
+      const at = Date.now() + Number(btn.dataset.respawn) * 60_000;
+      btn.nextElementSibling!.textContent = t('db.backAt', `${time.format(at)} Uhr`);
+    });
+</script>
+
+<style>
+  .jump { display: flex; flex-wrap: wrap; gap: 6px; }
+  .jump a:hover { text-decoration: none; background: var(--gold-dim); color: var(--gold-2); }
+  .kill { white-space: nowrap; text-align: right; }
+  .kill .back { margin-left: 8px; }
+</style>

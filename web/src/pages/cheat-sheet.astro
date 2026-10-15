@@ -1,0 +1,158 @@
+---
+// Inhalte von Wakayashi (wakayashi.gg/aion2#sheet), mit Erlaubnis übernommen und mit Nennung.
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import Credit from '../components/Credit.astro';
+import { t } from '../i18n';
+
+const tabs = [
+  ['leveling', 'Leveling'],
+  ['level45', 'Level 45'],
+  ['currency', 'Währungen'],
+  ['abyss', 'Abyss'],
+];
+---
+<Base title={t('sheet.title')} description="AION 2 Cheat Sheet: Leveling bis 45, Level-45-Inhalte, Währungen und Abyss auf einen Blick.">
+  <div class="wrap">
+    <PageHead image="/img/cheat-sheet.webp" eyebrow="AION 2 · Launch" title={t('sheet.title')} lead={t('sheet.lead')} />
+    <Credit href="https://wakayashi.gg/aion2#sheet" />
+
+    <div class="tabs" role="tablist">
+      {tabs.map(([id, label], i) => (
+        <button role="tab" id={`tab-${id}`} aria-controls={id} aria-selected={i === 0 ? 'true' : 'false'}>{label}</button>
+      ))}
+    </div>
+
+    <section id="leveling" role="tabpanel" aria-labelledby="tab-leveling" class="panel">
+      <h2>Leveling bis 45</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Quest</th><th>Was tun?</th></tr></thead>
+          <tbody>
+            <tr><td><span class="dot" style="--c:#e8c24a"></span>Gelb</td><td>Hauptquest, verfolgen.</td></tr>
+            <tr><td><span class="dot" style="--c:#5cc26a"></span>Grün</td><td>Nebenquest, alle unterwegs mitnehmen. Am Ende willst du sie ohnehin.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tips">
+        <div class="note"><strong>Twinks zuerst auf 22.</strong> Spielst du mehrere Charaktere, zieh alle sofort auf Level 22. Erst ab da regeneriert die Energie für Expeditionen und Transzendenz. Dauer: ca. 70–90 Minuten.</div>
+        <div class="note"><strong>Erkundungen nicht looten.</strong> Während der Hauptquest kommen Erkundungs-Expeditionen (Exploration). Die Kiste am Ende liegen lassen, auch für die Hauptquest: Sie kostet Energie, die du später für Eroberungen (Conquest) brauchst.</div>
+      </div>
+      <h3>Aufstiegs-Leiste (Ascension Gauge)</h3>
+      <p>Die rote Leiste muss in jeder Phase der Hauptquest auf 100 % stehen, sonst geht es nicht weiter. Punkte gibt es für Episoden-, Regional- und Aufstiegsquests, Versiegelte Dungeons und Festungen.</p>
+      <h3>Unterwegs einsammeln</h3>
+      <p>Festungen, Versiegelte Dungeons und Federn beim Questen direkt mitnehmen, am Ende holst du sowieso alle nach. Auf der Karte steht erst ein „?“, nah dran wird es zum Symbol.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Was</th><th>Was ist das?</th></tr></thead>
+          <tbody>
+            <tr><td>Festung<span class="en">Stronghold</span></td><td>Kleiner Solo-Dungeon: Dinge einsammeln, am Ende ein Boss.</td></tr>
+            <tr><td>Versiegelter Dungeon<span class="en">Sealed Dungeon</span></td><td>Solo-Instanz mit Rätsel, Mini-Event oder Boss.</td></tr>
+            <tr><td>Feder</td><td>Leuchtet in der Open World, einfach einsammeln.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="level45" role="tabpanel" aria-labelledby="tab-level45" class="panel">
+      <h2>Expeditionen</h2>
+      <p>Dungeons heißen in AION 2 Expeditionen. Erkundungen (Exploration) sind Level-Dungeons und lohnen sich meist nicht, Eroberungen (Conquest) sind das Ziel. Dafür sparst du die Energie.</p>
+      <ul>
+        <li><strong>Energie stapeln:</strong> 4–7 Tage lang, dann läuft sie über (Overcap).</li>
+        <li><strong>Zum EU-Release 2-Sterne-Eroberungen:</strong> Wer den Leveling-Content komplett abgefarmt hat, hat genug Gearscore, um direkt mit 2 Sternen zu starten.</li>
+        <li><strong>Vakron Sky Island (2 Sterne):</strong> der ideale Dungeon, einzigartige Rüstungsteile.</li>
+        <li><strong>Urugugu Canyon (2 Sterne):</strong> gibt Waffen. Die wollen wir lieber craften.</li>
+      </ul>
+      <h2>Events</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Event</th><th>Wann?</th></tr></thead>
+          <tbody>
+            <tr><td>Dimensions-Invasion</td><td>Vermutlich zur halben Stunde (2:30, 3:30, …) <span class="tag warn">{t('common.unconfirmed')}</span></td></tr>
+            <tr><td>Shugofesta</td><td>Zu jeder vollen Stunde. Erst mit Level 45: Auf Max-Level gibt es deutlich mehr Loot, und die Schlüssel gibt es nur täglich.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted small">Die Symbole tauchen neben der Minimap auf. Die Zeiten stehen im <a href="/timer">Event-Timer</a>.</p>
+      <h2>Raum-Zeit-Riss <span class="muted small">Spacetime Rift</span></h2>
+      <p>Festungen und Versiegelte Dungeons gibt es auch auf der anderen Fraktionsseite: als Asmodier bei den Elyos, als Elyos bei den Asmodiern. Federn nicht.</p>
+      <ul>
+        <li>Rüber geht es über den Riss: alle 3 Stunden für 10 Minuten offen, auf der Karte als lila Spirale, mit mehreren Eingängen.</li>
+        <li>Mit Level 45 kommen Riss-Nebenquests, die dich ohnehin rüberschicken.</li>
+        <li><strong>PvE-Modus lassen:</strong> Mit PvP an wirst du drüben meist schnell getötet.</li>
+      </ul>
+      <h2>Tägliche Aufträge (Duty)</h2>
+      <ul>
+        <li><strong>5× täglich, erst mit Level 45:</strong> die Aufträge jeden Tag fünfmal erledigen, aber erst auf Max-Level.</li>
+        <li><strong>Belohnung wählen:</strong> Schlüssel und Pet-Kristalle auswählen.</li>
+        <li><strong>Zufallsloot:</strong> Je weiter links ein Item in der Liste steht, desto wahrscheinlicher bekommst du es.</li>
+      </ul>
+      <h2>Draupnir-Statue</h2>
+      <p>Unter Erfolge → Dungeon → Draupnir gibt es eine Aufgabe: die 1-Sterne-Eroberung Draupnir 10× schaffen. Belohnung ist die einzigartige Statue <em>Transcendent Bakarma</em>. Ins Pantheon gestellt gibt sie Freedom, Death und Space je +12.</p>
+      <div class="note"><strong>Keine Energie verschwenden.</strong> Pro Woche kannst du 10× mitlaufen, um anderen zu helfen. Die Kiste am Ende nicht looten, dann bleibt die Energie gespart. Den Wochenzähler (10/10) zeigt das Eintrittsfenster.</div>
+      <p class="muted">Aus Taiwan/Korea: Wer unter 5 % des Schadens macht, darf die Kiste nicht öffnen, der Erfolg zählt trotzdem. Das kostet weder Energie noch Hilfe-Einträge. Einer muss aber den Schaden machen, ideal sind Twinks von Freunden, während die Mains durchrotieren. Ob das im EU-Release noch geht, ist offen.</p>
+    </section>
+
+    <section id="currency" role="tabpanel" aria-labelledby="tab-currency" class="panel">
+      <h2>Währungen</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Währung</th><th>Wofür &amp; Tipp</th></tr></thead>
+          <tbody>
+            <tr><td>Kinah, ungebunden</td><td>Handelbar. Unbedingt von den Twinks auf den Main schieben.</td></tr>
+            <tr><td>Kinah, gebunden</td><td>Main-Gear an die Twinks weitergeben und das gebundene Kinah fürs Crafting nutzen.</td></tr>
+            <tr><td>Qunah</td><td>Premium-Währung. Mit Euro aufladen oder, mit Mitgliedschaft, Kinah in Qunah tauschen.</td></tr>
+            <tr><td>Abyss-Punkte</td><td>Aus dem Abyss, außerdem aus Aufträgen, Supply Requests und dem Season-Pass. Anfangs vor allem für Stigma-Punkte.</td></tr>
+            <tr><td>Centuryroot-Token</td><td>Marken aus der Shugofesta. In Global holen wir darüber ebenfalls Stigma-Punkte.</td></tr>
+            <tr><td>Daeva Pass Shop Coin</td><td>Für den Season-Pass-Shop.</td></tr>
+            <tr><td>Daeva Pass Shop Coin: Returning</td><td>Ebenfalls Season-Pass.</td></tr>
+            <tr><td>Phantasmal Fragment</td><td>Aus dem Albtraum-Dungeon, für den Albtraum-Shop.</td></tr>
+            <tr><td>Subjugation Mark</td><td>Aus Ordeal-Expeditionen, einem der härtesten Inhalte. In Global vermutlich noch nicht dabei.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note"><strong>Kinah: gebunden zuerst.</strong> Das Währungsfenster zeigt Kinah als Summe aus gebundenem und ungebundenem. Ausgegeben wird immer zuerst das gebundene, danach das ungebundene.</div>
+    </section>
+
+    <section id="abyss" role="tabpanel" aria-labelledby="tab-abyss" class="panel">
+      <h2>Abyss: Zugang</h2>
+      <p>Der Abyss liegt in Reshanta. Das Fenster zeigt auch, wann die nächste Belagerung (Next Siege) ansteht.</p>
+      <ul>
+        <li><strong>Mindest-Gearscore:</strong> Ohne kommst du nicht rein. In Taiwan/Korea waren es Level 45 und Item-Level 1.000, im Global-Release wird der Wert abweichen.</li>
+        <li><strong>Zeitlimit pro Woche:</strong> Die Basis-Nutzungszeit ist begrenzt (z. B. 14 Stunden). Mit Special-Quai- oder Tsenka-Mitgliedschaft verdoppelt sie sich, beim Abschließen gibt es sofort 7 Stunden dazu.</li>
+      </ul>
+      <h2>Abyss: Wochenziel</h2>
+      <p>Im Abyss willst du jede Woche dein Abyss-Punkte-Cap erreichen, über Monster-Farming oder PvP. Das Cap wächst mit den Wochen. Wer später einsteigt, verliert also keine Punkte.</p>
+      <div class="note">Im selben Fenster steht das <strong>tägliche Kinah-Limit</strong> für gebundenes Kinah (Reset um 05:00). Das farmst du in der Open World außerhalb des Abyss.</div>
+    </section>
+  </div>
+</Base>
+
+<script>
+  // Reiter; ohne JavaScript stehen alle Abschnitte untereinander.
+  const tabs = [...document.querySelectorAll<HTMLButtonElement>('[role=tab]')];
+  const show = (id: string) => {
+    for (const tab of tabs) {
+      const on = tab.getAttribute('aria-controls') === id;
+      tab.setAttribute('aria-selected', String(on));
+      document.getElementById(tab.getAttribute('aria-controls')!)!.hidden = !on;
+    }
+  };
+  for (const tab of tabs)
+    tab.addEventListener('click', () => {
+      const id = tab.getAttribute('aria-controls')!;
+      show(id);
+      history.replaceState(null, '', `#${id}`);
+    });
+  const fromHash = location.hash.slice(1);
+  show(tabs.some((t) => t.getAttribute('aria-controls') === fromHash) ? fromHash : tabs[0].getAttribute('aria-controls')!);
+</script>
+
+<style>
+  .panel { max-width: 860px; }
+  .panel h2:first-child { margin-top: 0; }
+  .panel ul { padding-left: 1.2em; }
+  .panel li { margin-bottom: 0.4em; }
+  .tips { display: grid; gap: 0; }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--c); margin-right: 8px; }
+</style>

@@ -1,0 +1,20 @@
+---
+// Layout für reine Textseiten aus Markdown (Impressum, Datenschutz, Danke).
+import Base from './Base.astro';
+const { frontmatter } = Astro.props;
+---
+<Base title={frontmatter.title} description={frontmatter.description}>
+  <div class="wrap">
+    <header class="page-head"><h1>{frontmatter.title}</h1></header>
+    <article class="prose"><slot /></article>
+  </div>
+</Base>
+
+<style>
+  .prose { max-width: 780px; }
+  .prose :global(h2) { font-size: 1.2rem; margin-top: 2rem; }
+  .prose :global(h3) { font-size: 1.05rem; margin-top: 1.4rem; }
+  .prose :global(ul) { padding-left: 1.3em; }
+  .prose :global(blockquote) { margin: 16px 0; border-left: 3px solid var(--gold); background: var(--panel); padding: 10px 16px; border-radius: 0 8px 8px 0; color: var(--soft); }
+  .prose :global(blockquote p) { margin: 0; }
+</style>

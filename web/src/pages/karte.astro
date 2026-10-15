@@ -1,0 +1,22 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import { t } from '../i18n';
+---
+<Base title={t('map.title')}>
+  <div class="wrap">
+    <PageHead image="/img/karte.webp" eyebrow={t('common.soon')} title={t('map.title')} lead={t('map.lead')} />
+    <div class="grid">
+      <div class="card">
+        <div class="icon">🗺</div>
+        <h3>Unsere Karte <span class="tag">{t('common.soon')}</span></h3>
+        <p>Pet-Spawns, Feldbosse und dein Fortschritt auf einer Karte. Die Daten dafür hat die App schon (Pet-Finder und Pet-Radar).</p>
+      </div>
+      <a class="card" href="https://questlog.gg/aion-2/de/map" target="_blank" rel="noopener">
+        <div class="icon">📍</div>
+        <h3>Karte auf QuestLog.gg ↗</h3>
+        <p>Bis dahin: tausende Marker für Sammelobjekte, Monster, NPCs und Dienste, mit Filtern und Routen. Öffnet QuestLog.gg in einem neuen Tab.</p>
+      </a>
+    </div>
+  </div>
+</Base>

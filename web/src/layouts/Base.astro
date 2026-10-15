@@ -1,0 +1,67 @@
+---
+import '../styles/global.css';
+import { t, type Key } from '../i18n';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title, description = t('site.description') } = Astro.props;
+const fullTitle = title ? `${title} · ${t('site.title')}` : `${t('site.title')} · ${t('site.tagline')}`;
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+
+const nav: [string, Key][] = [
+  ['/', 'nav.home'],
+  ['/timer', 'nav.timer'],
+  ['/checkliste', 'nav.checklist'],
+  ['/cheat-sheet', 'nav.cheatsheet'],
+  ['/datenbank', 'nav.database'],
+  ['/charakter', 'nav.character'],
+  ['/guides', 'nav.guides'],
+  ['/karte', 'nav.map'],
+];
+const active = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(href + '/'));
+const DOWNLOAD = 'https://github.com/yykk62/AetherDPS/releases/latest';
+---
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL('/img/hero.webp', Astro.site)} />
+    <meta name="theme-color" content="#10131a" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="/"><img src="/gen/icon.png" alt="" width="30" height="30" />AetherDPS</a>
+        <nav class="nav" aria-label={t('nav.menu')}>
+          {nav.map(([href, key]) => (
+            <a href={href} aria-current={active(href) ? 'page' : undefined}>{t(key)}</a>
+          ))}
+        </nav>
+        <a class="btn small header-cta" href={DOWNLOAD}>⬇ {t('nav.download')}</a>
+      </div>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="wrap">
+        <nav>
+          <a href="/impressum">{t('footer.imprint')}</a>
+          <a href="/datenschutz">{t('footer.privacy')}</a>
+          <a href="/danke">{t('footer.credits')}</a>
+          <a href="https://github.com/yykk62/AetherDPS">{t('footer.source')}</a>
+        </nav>
+        <p>{t('footer.fanproject')} {t('footer.noTracking')}</p>
+      </div>
+    </footer>
+  </body>
+</html>

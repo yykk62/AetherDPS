@@ -1,0 +1,35 @@
+---
+// Seitenkopf; mit image als breites Titelbild (Bilder in public/img, mit Higgsfield erzeugt).
+interface Props { eyebrow?: string; title: string; lead?: string; image?: string }
+const { eyebrow, title, lead, image } = Astro.props;
+---
+<header class:list={['page-head', { banner: image }]} style={image ? `--img: url(${image})` : undefined}>
+  {eyebrow && <div class="eyebrow">{eyebrow}</div>}
+  <h1>{title}</h1>
+  {lead && <p>{lead}</p>}
+  <slot />
+</header>
+
+<style>
+  .banner {
+    /* Volle Breite, Inhalt bleibt auf der Linie von .wrap */
+    margin: 0 calc(50% - 50vw) 16px;
+    padding: 88px calc(50vw - 50%) 36px;
+    min-height: 320px;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    background:
+      linear-gradient(90deg, var(--bg) 0%, rgba(16, 19, 26, 0.85) 30%, rgba(16, 19, 26, 0.25) 65%, rgba(16, 19, 26, 0.05) 100%),
+      linear-gradient(0deg, var(--bg) 0%, transparent 45%),
+      var(--img) 70% 35% / cover no-repeat;
+  }
+  .banner h1 { text-shadow: 0 2px 16px rgba(0, 0, 0, 0.6); }
+  .banner p { max-width: 56ch; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8); }
+  @media (max-width: 760px) {
+    .banner {
+      padding-top: 140px;
+      background:
+        linear-gradient(0deg, var(--bg) 0%, rgba(16, 19, 26, 0.7) 55%, rgba(16, 19, 26, 0.1) 100%),
+        var(--img) 70% 30% / cover no-repeat;
+    }
+  }
+</style>

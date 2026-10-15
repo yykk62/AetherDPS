@@ -1,0 +1,10 @@
+---
+// Nennung von Wakayashi auf jeder Seite, die Inhalte von wakayashi.gg nutzt (Erlaubnis liegt vor).
+import { t } from '../i18n';
+interface Props { href?: string }
+const { href = 'https://wakayashi.gg/aion2' } = Astro.props;
+---
+<div class="credit">
+  <span>{t('common.thanks')} <a href={href} rel="noopener">Wakayashi</a>, {t('common.thanksWith')}.</span>
+  <span class="muted">Video-Guides auf <a href="https://www.youtube.com/@wakayashi" rel="noopener">YouTube</a> und <a href="https://www.twitch.tv/wakayashi" rel="noopener">Twitch</a>.</span>
+</div>

@@ -1,0 +1,29 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import { t } from '../i18n';
+---
+<Base title={t('char.title')}>
+  <div class="wrap">
+    <PageHead image="/img/charakter.webp" eyebrow={t('common.soon')} title={t('char.title')} lead={t('char.lead')} />
+
+    <form class="card connect" onsubmit="return false">
+      <input placeholder="Charaktername" disabled aria-label="Charaktername" />
+      <select disabled aria-label="Server"><option>Server</option></select>
+      <button class="btn" disabled>Verbinden</button>
+    </form>
+
+    <div class="grid section">
+      <div class="card"><div class="icon">🧙</div><h3>Einmal verbinden</h3><p>Name und Server wählen. Gespeichert wird das nur in deinem Browser, ohne Konto.</p></div>
+      <div class="card"><div class="icon">🔄</div><h3>Immer aktuell</h3><p>Bei jedem Besuch werden Ausrüstung, Werte, Daevanion und Skills neu abgefragt, dieselben öffentlichen Daten wie bei NCSOFT.</p></div>
+      <div class="card"><div class="icon">✅</div><h3>Guide-Check</h3><p>Guides prüfen deinen Build: Welche Skills haben schon die Ziel-Stufe, welches Stigma fehlt noch?</p></div>
+    </div>
+
+    <p class="muted small">Bis dahin gibt es das Profil schon in der App (Reiter Profil), dort auch für jeden anderen Charakter auf einem EU-Server.</p>
+  </div>
+</Base>
+
+<style>
+  .connect { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; opacity: 0.6; }
+  .connect input { flex: 1 1 220px; }
+</style>

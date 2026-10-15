@@ -1,0 +1,11 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import { t } from '../i18n';
+---
+<Base title={t('notfound.title')}>
+  <div class="wrap">
+    <PageHead eyebrow="404" title={t('notfound.title')} lead={t('notfound.text')} />
+    <a class="btn" href="/">{t('notfound.back')}</a>
+  </div>
+</Base>

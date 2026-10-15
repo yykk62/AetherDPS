@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.astro/
+.wrangler/
+# Von scripts/sync-assets.mjs aus dem Repo kopiert (eine Quelle für App und Webseite)
+public/gen/
+public/favicon.png
