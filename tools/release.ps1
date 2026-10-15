@@ -41,11 +41,6 @@ Copy-Item (Join-Path $publish 'AetherDPS.exe') $exe -Force
 $hash = (Get-FileHash $exe -Algorithm SHA256).Hash
 # Format wie sha256sum: "<hash>  <datei>"
 [IO.File]::WriteAllText("$exe.sha256", "$hash  AetherDPS.exe`n")
-# Übergang: Versionen bis 0.5.0 hießen Aion2Meter und suchen im Release nach Aion2Meter.exe.
-# Dieselbe Datei unter altem Namen, damit sie sich auf AetherDPS aktualisieren.
-$legacy = Join-Path $OutDir 'Aion2Meter.exe'
-Copy-Item $exe $legacy -Force
-[IO.File]::WriteAllText("$legacy.sha256", "$hash  Aion2Meter.exe`n")
 
 $size = [math]::Round((Get-Item $exe).Length / 1MB, 1)
 Write-Host "AetherDPS $Version → $exe ($size MB)"

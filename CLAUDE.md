@@ -1,6 +1,6 @@
 # AetherDPS – Hinweise für Claude
 
-Ein quelloffener DPS-Meter für AION 2 (EU), deutsch zuerst, in 10 Sprachen, als Fork von RATmeter (GPL-3.0). Hieß bis 0.5.0 „Aion2Meter“ (Übergang: `LegacyMigration`, Mutex-Name, zusätzliches Release-Asset `Aion2Meter.exe`).
+Ein quelloffener DPS-Meter für AION 2 (EU), deutsch zuerst, in 10 Sprachen, als Fork von RATmeter (GPL-3.0). Hieß bis 0.5.0 „Aion2Meter“ (Übergang: `LegacyMigration`, Mutex-Name; das zusätzliche Release-Asset `Aion2Meter.exe` entfällt seit 0.7.10).
 
 - **Lesen:** `docs/WARTUNG.md` (Aufbau, Upstream-Merge, Patch-Liste), `docs/PROTOKOLL.md`, `docs/PLAN.md` (nächste Schritte)
 - **Bauen und testen:** `dotnet build AetherDPS.slnx`, `dotnet test AetherDPS.Tests`. Es braucht das .NET-10-SDK. `dotnet` liegt nicht im PATH, also den vollen Pfad `C:\Program Files\dotnet\dotnet.exe` verwenden.

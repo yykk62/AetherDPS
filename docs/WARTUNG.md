@@ -84,7 +84,7 @@ Die exe entpackt Sprachdateien und Spieldaten beim ersten Start nach `%TEMP%\.ne
 
 **Nur ein Meter gleichzeitig:** Ein zweiter Start holt das Hauptfenster der laufenden Instanz nach vorn (Mutex `Local\Aion2Meter` – bewusst der alte Name, damit die neue Version nach dem Update von 0.5.0 auf die alte wartet). Wiedergaben mit `--replay` sind davon ausgenommen.
 
-**Umbenennung (0.6.0):** Bis 0.5.0 hieß alles „Aion2Meter“. Alte Versionen suchen im Release nach `Aion2Meter.exe`, deshalb lädt die Pipeline dieselbe Datei zusätzlich unter diesem Namen hoch (`tools/release.ps1`). Kann entfallen, wenn die Nutzungszahlen keine Version ≤ 0.5.0 mehr zeigen. Der alte Datenordner zieht beim ersten Start um (`LegacyMigration`). GitHub leitet `yykk62/Aion2Meter` auf `yykk62/AetherDPS` um.
+**Umbenennung (0.6.0):** Bis 0.5.0 hieß alles „Aion2Meter“. Alte Versionen suchten im Release nach `Aion2Meter.exe`; die Pipeline hat dieselbe Datei deshalb bis 0.7.10 zusätzlich unter diesem Namen hochgeladen. Seit 15.10.2026 nicht mehr: Nutzungszahlen und Downloads zeigten keine Installation ≤ 0.5.0 mehr (`Aion2Meter.exe` seit 0.6.0 nie geladen). Der alte Datenordner zieht beim ersten Start um (`LegacyMigration`). GitHub leitet `yykk62/Aion2Meter` auf `yykk62/AetherDPS` um.
 
 ## Feldbosse
 
