@@ -51,11 +51,11 @@ public sealed partial class PetRadarViewModel : ObservableObject
     /// <summary>So viele Pets stehen in der Liste (scrollbar, sichtbar sind fünf).</summary>
     public const int ListSize = 30;
 
-    /// <summary>Gewähltes Pet: Karte zeigt nur dessen Fundorte, herausgezoomt (wohin teleportieren?).</summary>
+    /// <summary>Gewähltes Pet: Karte zeigt nur dessen Fundorte (Zoom bleibt; liegt keiner im Bild, so weit raus, dass der nächste zu sehen ist).</summary>
     [ObservableProperty] private int? selectedPet;
-    [ObservableProperty] private double focusMeters = RadiusMeters;
     [ObservableProperty] private string title = Loc.T("radar.title");
 
+    /// <summary>Standard-Umkreis der Minimap in Metern, bis man selbst zoomt (dann gemerkt in PetRadarMeters).</summary>
     public const double RadiusMeters = 600;
 
     /// <summary>Liste unter der Karte auf-/zugeklappt (wird gemerkt).</summary>
@@ -96,6 +96,7 @@ public sealed partial class PetRadarViewModel : ObservableObject
         pets.PositionChanged += (_, _) => Dispatcher.UIThread.Post(() =>
         {
             Update();
+            FollowSelf();
             Moved();
         });
         pets.LevelsChanged += (_, _) => Dispatcher.UIThread.Post(() =>
@@ -219,7 +220,6 @@ public sealed partial class PetRadarViewModel : ObservableObject
         }
         SpawnBrushes = brushes;
         Spawns = shown.SelectMany(s => pets.Spawns(s.Pet, current)).ToList();
-        FocusMeters = selected is null ? RadiusMeters : 0;   // gewähltes Pet: alle Fundorte im Blick
         Title = selected is null ? Loc.T("radar.title") : selected.Name;
 
         foreach (var (pet, distance) in list)
@@ -231,7 +231,14 @@ public sealed partial class PetRadarViewModel : ObservableObject
         }
     }
 
-    /// <summary>Neue Position: Liste und Ausschnitt neu, sobald man sich ein Stück bewegt hat.</summary>
+    /// <summary>Jede neue Position: der Punkt (und mit ihm die Minimap) wandert sofort mit.</summary>
+    private void FollowSelf()
+    {
+        if (!IsOpen || Map is null || pets.Position is not { } pos || pets.CurrentMap != Map) return;
+        Self = new Point(pos.X, pos.Y);
+    }
+
+    /// <summary>Neue Position: Liste neu, sobald man sich ein Stück bewegt hat.</summary>
     private void Moved()
     {
         if (!IsOpen || pets.Position is not { } pos) return;

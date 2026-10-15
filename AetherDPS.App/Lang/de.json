@@ -104,8 +104,6 @@
   "check.daily_reset": "Täglich um",
   "check.weekly_reset": "Wöchentlich am",
   "check.reset_note": "Haken verschwinden automatisch nach dem Reset. 30 Minuten vor dem Reset erinnert der Meter an offene Punkte. Reset-Zeiten bitte einmal mit dem Spiel abgleichen.",
-  "settings.buffbar": "Buff-Leiste unter dem Meter",
-  "settings.buffbar_hint": "Deine aktiven Buffs mit Restlaufzeit, solange der Meter läuft. Mausklicks gehen hindurch.",
   "conn.now": "Aktuell",
   "conn.avg": "Ø 1 Minute",
   "conn.jitter": "Schwankung",
@@ -486,5 +484,6 @@
   "radar.list": "Fehlende Pets",
   "radar.row_tip": "Klicken: alle Fundorte dieses Pets auf der Karte (nochmal: zurück zum Radar)",
   "radar.center": "Auf mich zentrieren",
-  "radar.no_self": "Der Meter kennt deinen Charakter noch nicht – einmal teleportieren oder neu einloggen."
+  "radar.no_self": "Der Meter kennt deinen Charakter noch nicht – einmal teleportieren oder neu einloggen.",
+  "radar.map_tip": "Mausrad: Zoom (wird gemerkt) · Ziehen: kurz umschauen, nach 5 s springt die Karte zurück zu dir · Doppelklick: zu dir"
 }

@@ -135,12 +135,6 @@
           </CheckBox>
           <TextBlock Classes="hint" Text="{l:T settings.stagger_warning_hint}" />
         </StackPanel>
-        <StackPanel Spacing="4">
-          <CheckBox IsChecked="{Binding BuffBarEnabled}">
-            <TextBlock Classes="label" Text="{l:T settings.buffbar}" />
-          </CheckBox>
-          <TextBlock Classes="hint" Text="{l:T settings.buffbar_hint}" />
-        </StackPanel>
       </StackPanel>
     </Border>
 

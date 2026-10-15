@@ -29,7 +29,6 @@ public sealed partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private bool partyOnly;
     [ObservableProperty] private bool hideName;
     [ObservableProperty] private bool screenshotEnabled;
-    [ObservableProperty] private bool buffBarEnabled;
     [ObservableProperty] private bool launchGameWithMeter;
     [ObservableProperty] private bool autoUpdate;
     [ObservableProperty] private bool autoTrack;
@@ -80,7 +79,6 @@ public sealed partial class SettingsViewModel : ObservableObject
         partyOnly = meter.PartyOnly;
         hideName = upstream.IsNicknameHidden;
         screenshotEnabled = meter.ScreenshotEnabled;
-        buffBarEnabled = meter.BuffBarEnabled;
         launchGameWithMeter = meter.LaunchGameWithMeter;
     }
 
@@ -198,12 +196,6 @@ public sealed partial class SettingsViewModel : ObservableObject
     [RelayCommand]
     private void OpenReleases() => System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
         $"https://github.com/{UpdateService.Repository}/releases") { UseShellExecute = true });
-
-    partial void OnBuffBarEnabledChanged(bool value)
-    {
-        meter.BuffBarEnabled = value;
-        meter.Save();
-    }
 
     partial void OnHideNameChanged(bool value) => upstream.IsNicknameHidden = value;
 

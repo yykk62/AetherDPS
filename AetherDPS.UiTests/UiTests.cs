@@ -243,7 +243,6 @@ public sealed class UiTests : IDisposable
         var pick = radar.Rows[2];
         radar.SelectCommand.Execute(pick);
         Assert.Equal(pick.PetId, radar.SelectedPet);
-        Assert.Equal(0, radar.FocusMeters);
         Assert.All(radar.Spawns!, s => Assert.Equal(pick.PetId, provider!.GetRequiredService<Pets>().PetOfNpc(s.Npc)));
         Shot(new PetRadarWindow(radar, provider!.GetRequiredService<MeterSettings>()), "pet_radar_auswahl");
         radar.ShowRadarCommand.Execute(null);
@@ -255,6 +254,53 @@ public sealed class UiTests : IDisposable
         Assert.True(radar.IsOpen);
         radar.Mode = PetRadarViewModel.ModeOff;
         Assert.False(radar.IsOpen);
+    }
+
+    /// <summary>Radar als Minimap: folgt dir, behält den Zoom; ein angeklicktes Pet zoomt nur so weit raus wie nötig.</summary>
+    [AvaloniaFact]
+    public void Radar_Minimap_folgt_und_behaelt_den_Zoom()
+    {
+        Start();
+        var map = provider!.GetRequiredService<Pets>().Maps.First(m => m.Key == "verteron");
+        var view = new PetMapView { Width = 274, Height = 230, Minimap = true, ViewMeters = 300, Map = map, Self = new Point(0, 0) };
+        var window = new Window { Width = 274, Height = 230, Content = view };
+        PetSpawn Spawn(double meters) => new(1, meters * 100, 0);
+        view.Spawns = [Spawn(80)];
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        AvaloniaHeadlessPlatform.ForceRenderTimerTick();
+        Point Px(double x, double y) => new(map.ToPixel(x, y).X, map.ToPixel(x, y).Y);
+        double zoom = view.View.Zoom;
+        Assert.Equal(Px(0, 0), view.View.Center);
+
+        // laufen/fliegen: Mitte wandert mit, Zoom bleibt
+        view.Self = new Point(40_000, 25_000);
+        Assert.Equal(Px(40_000, 25_000), view.View.Center);
+        Assert.Equal(zoom, view.View.Zoom, 6);
+
+        // Mausrad: näher ran, bleibt auf dir, wird gemerkt
+        bool saved = false;
+        view.ViewChanged += (_, _) => saved = true;
+        window.MouseWheel(new Point(30, 30), new Vector(0, 1));
+        Assert.True(saved);
+        Assert.True(view.View.Zoom > zoom);
+        Assert.True(view.ViewMeters < 300);
+        Assert.Equal(Px(40_000, 25_000), view.View.Center);
+        double mine = view.View.Zoom;
+
+        // Pet mit Fundort in der Nähe angeklickt → Zoom bleibt
+        view.Spawns = [new PetSpawn(2, 40_000 + 3_000, 25_000)];
+        Assert.Equal(mine, view.View.Zoom, 6);
+        // nur weit weg → so weit raus, dass der nächste zu sehen ist, nicht auf die ganze Karte
+        view.Spawns = [new PetSpawn(3, 40_000 + 150_000, 25_000), new PetSpawn(3, -200_000, -200_000)];
+        Assert.True(view.View.Zoom < mine);
+        double half = Math.Min(view.Bounds.Width, view.Bounds.Height) / 2 / view.View.Zoom;
+        Assert.InRange(map.Scale * 150_000, half * 0.6, half);
+        Assert.True(view.View.Zoom > Math.Min(view.Bounds.Width, view.Bounds.Height) / map.Size * 2);
+        // zurück zum Radar (Fundorte in der Nähe) → wieder der eigene Zoom
+        view.Spawns = [new PetSpawn(1, 40_000 + 8_000, 25_000)];
+        Assert.Equal(mine, view.View.Zoom, 6);
+        window.Close();
     }
 
     [AvaloniaFact]

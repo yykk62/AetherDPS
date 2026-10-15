@@ -104,8 +104,6 @@
   "check.daily_reset": "Daily at",
   "check.weekly_reset": "Weekly on",
   "check.reset_note": "Checkmarks clear automatically after the reset. 30 minutes before the reset, the meter reminds you of open items. Please double-check the reset times against the game once.",
-  "settings.buffbar": "Buff bar below the meter",
-  "settings.buffbar_hint": "Your active buffs with remaining duration while the meter is running. Mouse clicks pass through.",
   "conn.now": "Current",
   "conn.avg": "Avg. 1 minute",
   "conn.jitter": "Jitter",
@@ -486,5 +484,6 @@
   "radar.list": "Pets you need",
   "radar.row_tip": "Click: all spawn points of this pet on the map (again: back to radar)",
   "radar.center": "Center on me",
-  "radar.no_self": "The meter doesn't know your character yet – teleport once or log in again."
+  "radar.no_self": "The meter doesn't know your character yet – teleport once or log in again.",
+  "radar.map_tip": "Mouse wheel: zoom (remembered) · Drag: look around, after 5 s the map jumps back to you · Double-click: back to you"
 }

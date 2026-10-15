@@ -104,8 +104,6 @@
   "check.daily_reset": "Diariamente às",
   "check.weekly_reset": "Toda semana:",
   "check.reset_note": "As marcações somem sozinhas depois do reset. 30 minutos antes do reset, o medidor lembra você das tarefas pendentes. Confira os horários de reset com o jogo uma vez.",
-  "settings.buffbar": "Barra de buffs abaixo do medidor",
-  "settings.buffbar_hint": "Seus buffs ativos com o tempo restante, enquanto o medidor estiver rodando. Os cliques passam através dela.",
   "conn.now": "Atual",
   "conn.avg": "Ø 1 minuto",
   "conn.jitter": "Variação",
@@ -486,5 +484,6 @@
   "radar.list": "Mascotes que faltam",
   "radar.row_tip": "Clique: todos os pontos de surgimento deste mascote (de novo: voltar ao radar)",
   "radar.center": "Centralizar em mim",
-  "radar.no_self": "O medidor ainda não conhece seu personagem – teleporte uma vez ou entre de novo."
+  "radar.no_self": "O medidor ainda não conhece seu personagem – teleporte uma vez ou entre de novo.",
+  "radar.map_tip": "Roda do mouse: zoom (fica salvo) · Arrastar: olhar em volta, após 5 s o mapa volta para você · Clique duplo: para você"
 }

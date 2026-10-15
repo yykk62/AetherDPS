@@ -2,6 +2,13 @@
 
 Newest versions first.
 
+## 0.7.5
+
+- **Pet radar as a minimap:** you are always in the centre, the map follows you – even while flying – and remembers your zoom (also after a restart). The mouse wheel zooms around you; dragging lets you look around, after 5 seconds the map snaps back to you (double-click or ⌖ right away)
+- **Clicking a pet no longer zooms far out:** your zoom stays. Only if no spawn point is in view does the map zoom out just enough to show the nearest one
+- **Buff and cooldown bar below the meter removed** – it was too imprecise and too busy. Character detection and the buff analysis in runs stay
+- Field boss data rebuilt (slots by our own rule, the meter learns respawn times itself), credits tidied up
+
 ## 0.7.4
 
 - **Colours by species:** every pet species has a fixed colour – Cogni blue, Fera orange, Natura green, Varian purple, Special yellow – in the list, on the map in the Pets tab and in the radar

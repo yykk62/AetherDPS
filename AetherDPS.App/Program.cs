@@ -159,7 +159,6 @@ public static class AppServices
         services.AddSingleton<PartyJoinViewModel>();
         services.AddSingleton<TimersViewModel>();
         services.AddSingleton<ChecklistViewModel>();
-        services.AddSingleton<BuffBarViewModel>();
         services.AddSingleton<TimerOverlayViewModel>();
         services.AddSingleton<HubWindow>();
         services.AddSingleton<StaggerWarningViewModel>();

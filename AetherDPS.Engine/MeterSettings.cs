@@ -24,8 +24,6 @@ public sealed class MeterSettings
     public uint ScreenshotKey { get; set; } = 0x53;
     public string ScreenshotText { get; set; } = "STRG+S";
 
-    /// <summary>Buff-/Abklingzeit-Leiste unter dem Meter (nur im aktiven Modus sichtbar).</summary>
-    public bool BuffBarEnabled { get; set; } = true;
 
     /// <summary>Zuletzt erkannter eigener Charakter – damit der Name auch ohne Teleport stimmt.</summary>
     public string? CharacterName { get; set; }
@@ -48,6 +46,9 @@ public sealed class MeterSettings
     public bool PetRadarList { get; set; } = true;
     public double? PetRadarLeft { get; set; }
     public double? PetRadarTop { get; set; }
+
+    /// <summary>Zoom des Pet-Radars: sichtbarer Umkreis in Metern (null = Standard 600 m).</summary>
+    public double? PetRadarMeters { get; set; }
 
     /// <summary>Session-ID des Charakters beim letzten Login/Teleport – gilt, solange das Spiel nicht neu gestartet wurde.</summary>
     public int CharacterSessionId { get; set; }

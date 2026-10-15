@@ -76,7 +76,7 @@ Das Overlay liegt über dem Spiel und zeigt **nur deine Gruppe**: Fremde in der 
 
 **☰ oder Klick auf einen Spieler** zeigt seine Skills mit Schaden, Treffern und Krit-Quote, direkt im Overlay.
 
-Unter dem Meter zeigt eine **Buff-Leiste** deine Buffs (gold) und Abklingzeiten (blau). Nach deinem Tod zeigt der Meter, **woran du gestorben bist**.
+Nach deinem Tod zeigt der Meter, **woran du gestorben bist**, und läuft ein langer Buff aus, sagt er Bescheid.
 
 </td>
   </tr>
@@ -118,7 +118,7 @@ Alle Pets von Verteron, Altgard und der Abyss mit **deiner Stufe und deinem Fort
 
 <p align="center"><img src="docs/media/pets.png" width="100%" alt="Pet-Finder mit Liste und Spawnkarte" /></p>
 
-Das **Pet-Radar** erscheint, sobald du im Spiel die Karte öffnest, oder bleibt auf Wunsch dauerhaft stehen und folgt dir. Es zeigt die fehlenden Pets in deiner Nähe mit **Entfernung und Richtung**. Klick auf ein Pet zeigt alle seine Fundorte, so siehst du gleich, wohin du teleportieren musst.
+Das **Pet-Radar** erscheint, sobald du im Spiel die Karte öffnest, oder bleibt auf Wunsch dauerhaft stehen. Es ist eine **Minimap wie im Spiel**: Du bist immer in der Mitte, sie folgt dir (auch im Flug) und merkt sich deinen Zoom. Darauf die fehlenden Pets in deiner Nähe mit **Entfernung und Richtung**. Klick auf ein Pet zeigt seine Fundorte; liegt keiner im Bild, zoomt die Karte nur so weit heraus, dass der nächste zu sehen ist.
 
 <p align="center"><img src="docs/media/pet-radar.png" width="100%" alt="Pet-Radar: je Gattung, eine Gattung gewählt, ein Pet angeklickt" /></p>
 
@@ -215,7 +215,7 @@ Wer das Hauptfenster schließt, lässt den Meter im Tray weiterlaufen.
 | Skill-Details | ☰ oder auf einen Spieler klicken |
 | Sperren (Mausklicks gehen ins Spiel) | Schloss-Symbol. Zum Entsperren wieder aufs Schloss klicken, es bleibt immer klickbar |
 | Timer-Pills | ziehen; Rechtsklick → Gruppieren, Lösen, Entfernen, Sperren. Entsperren im Reiter Timer |
-| Pet-Radar | erscheint mit der Spielkarte (Reiter Pets: auch „Immer“). ⌖ zentriert auf dich, ✕ blendet es bis zum nächsten Öffnen aus |
+| Pet-Radar | erscheint mit der Spielkarte (Reiter Pets: auch „Immer“). Mausrad zoomt (wird gemerkt), Ziehen schaut kurz woanders hin, nach 5 s ist die Karte wieder bei dir. ✕ blendet es bis zum nächsten Öffnen aus |
 | Einstellungen | ⚙ oder Tray-Symbol: Hotkey ändern, Deckkraft, nur meine Gruppe (Standard: an), „Du“ statt Name |
 | Screenshot auf den Zweitbildschirm | **STRG+S** im Spiel (änderbar). Der Spiel-Bildschirm erscheint im Vollbild auf dem anderen Monitor, jeder neue ersetzt das alte Bild. Klick oder ESC blendet aus |
 | AION 2 starten | Knopf im Hauptfenster oder Einstellung „AION 2 mit dem Meter starten“ (Steam). Läuft der Meter beim Login schon, kennt er deinen Charakter sofort |
@@ -241,20 +241,17 @@ Aufbau und Wartung stehen in [docs/WARTUNG.md](docs/WARTUNG.md), das Protokoll i
 
 ## Danke an
 
-Alle Quellen mit Lizenz stehen in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). Besonders:
+- **[RATmeter](https://github.com/Kuroukihime/AIon2-Dps-Meter)** von Kuroukihime (GPL-3.0): die Grundlage. AetherDPS ist ein Fork davon (Netzwerkmitschnitt, Paketverarbeitung, Kampf-Sessions, Skill- und Mob-Daten)
+- **[A2Tools](https://github.com/taengu/A2Tools-DPS-Meter)** von taengu (GPL-3.0): Spieltexte in 10 Sprachen und die Dungeon-Erkennung
+- **[Aion-DPS-Meter](https://github.com/SkeeveAN/Aion-DPS-Meter)** von SkeeveTV (MIT): Pet-Daten, Spawnpunkte, Weltkarten und Feldboss-Positionen
 
-- **[RATmeter](https://github.com/Kuroukihime/AIon2-Dps-Meter)** von Kuroukihime (GPL-3.0): Netzwerkmitschnitt, Paketverarbeitung, Kampf-Sessions und die Mob-/Skill-Datenbank. Dieses Projekt ist ein Fork davon.
-- **[A2Tools](https://github.com/taengu/A2Tools-DPS-Meter)** von taengu (GPL-3.0): Skill-, NPC-, Buff-, Dungeon- und Servernamen in 10 Sprachen sowie die Erkenntnis, wie man den Kartenwechsel (und damit den Dungeon) im Netzwerkverkehr erkennt
-- **[Daevalog](https://github.com/Seralth/Daevalog)** von Seralth (GPL-3.0): Buff-Daten, über A2Tools übernommen
-- **[aion2dps](https://github.com/TheLoop705/aion2dps)** (GPL-3.0+), **[Aion-DPS-Meter](https://github.com/SkeeveAN/Aion-DPS-Meter)** (MIT), **[waffle_meter](https://github.com/Waffle-ens/waffle_meter)** (MIT) und **[aion2-dps-meter](https://github.com/cyberbadger6969/aion2-dps-meter)** (GPL-3.0): Feldboss-Liste, EU-Respawn-Zeiten und Zeitlimit-Paket
-- **[Aion-DPS-Meter](https://github.com/SkeeveAN/Aion-DPS-Meter)** von SkeeveTV (MIT): Pet-Daten, Spawnpunkte, Weltkarten und der Aufbau von Pet-Liste und Positions-Paket
-- Klassen-Icons, Weltkarten, Pet-Porträts sowie Item- und Skill-Icons: © NCSOFT, aus AION 2 bzw. von NCSOFTs Spieldaten-Server, als Fan-Inhalt verwendet. Sie fallen nicht unter die GPL.
+Alles mit Lizenzen steht in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). Klassen-Icons, Weltkarten, Pet-Porträts sowie Item- und Skill-Icons: © NCSOFT, als Fan-Inhalt verwendet; sie fallen nicht unter die GPL.
 
 ## In English
 
 **AetherDPS** is a free, open-source DPS meter and companion overlay for AION 2, built for the EU servers and available in 10 languages (Settings → Language). The screenshots above show the German interface.
 
-- **Live DPS meter** with boss card, health and stagger bars, damage, DPS and share for your party only, skill details, buff bar and death recap
+- **Live DPS meter** with boss card, health and stagger bars, damage, DPS and share for your party only, skill details and death recap
 - **Run archive** named after the dungeon, with boss times, best time and combat analysis, copyable as image or text for Discord
 - **Profile** of your character (or anyone on an EU server) even without the game running: gear with manastones and godstone, stats, Daevanion, titles, skills and stigmas
 - **Party join cards:** when someone joins, their combat power, item level, enchant level and weapon pop up

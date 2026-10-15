@@ -104,8 +104,6 @@
   "check.daily_reset": "매일",
   "check.weekly_reset": "매주",
   "check.reset_note": "초기화가 지나면 체크가 자동으로 사라져요. 초기화 30분 전에 남은 항목을 알려 줘요. 초기화 시간은 한 번 게임과 맞춰 보세요.",
-  "settings.buffbar": "미터 아래 버프 바",
-  "settings.buffbar_hint": "미터가 작동하는 동안 내 활성 버프와 남은 시간을 보여 줘요. 마우스 클릭은 통과돼요.",
   "conn.now": "현재",
   "conn.avg": "Ø 1분",
   "conn.jitter": "지터",
@@ -486,5 +484,6 @@
   "radar.list": "없는 펫",
   "radar.row_tip": "클릭: 이 펫의 모든 출현 위치 (다시: 레이더로)",
   "radar.center": "내 위치로",
-  "radar.no_self": "아직 캐릭터를 모릅니다. 한 번 순간이동하거나 다시 접속하세요."
+  "radar.no_self": "아직 캐릭터를 모릅니다. 한 번 순간이동하거나 다시 접속하세요.",
+  "radar.map_tip": "마우스 휠: 확대/축소(기억됨) · 드래그: 둘러보기, 5초 후 내 위치로 돌아옴 · 더블클릭: 내 위치로"
 }

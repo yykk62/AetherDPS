@@ -88,7 +88,7 @@ Die exe entpackt Sprachdateien und Spieldaten beim ersten Start nach `%TEMP%\.ne
 
 ## Feldbosse
 
-- Daten: `AetherDPS.Engine/GameData/field_bosses.json`, neu bauen mit `python tools/build-field-bosses.py` (SkeeveAN + Waffle, MIT; Respawn-Minuten TheLoop705, GPL-3.0+). Namen kommen per NPC-Code aus `GameData/<sprache>/npcs.json`.
+- Daten: `AetherDPS.Engine/GameData/field_bosses.json`, neu bauen mit `python tools/build-field-bosses.py` (Bosse und Koordinaten von SkeeveAN, MIT; Slots nach eigener Regel, Respawn-Minuten selbst gemessen – der Meter lernt sie zusätzlich bei jedem beobachteten Kill). Namen kommen per NPC-Code aus `GameData/<sprache>/npcs.json`.
 - `FieldBosses` liest das Paket 0x9101 (siehe PROTOKOLL.md), Zustand pro Server in `%LOCALAPPDATA%\AetherDPSeldbosse.json` (inkl. Sternen und selbst gemessener Respawn-Dauer).
 - Eltnen/Morheim sind in der EU noch nicht live; ihre Karten erscheinen erst, wenn der Server sie schickt.
 

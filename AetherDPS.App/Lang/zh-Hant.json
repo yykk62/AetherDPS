@@ -104,8 +104,6 @@
   "check.daily_reset": "每日",
   "check.weekly_reset": "每週",
   "check.reset_note": "重置後勾選會自動清除。重置前 30 分鐘會提醒未完成的項目。請先對照遊戲確認一次重置時間。",
-  "settings.buffbar": "統計下方的增益列",
-  "settings.buffbar_hint": "統計執行時顯示你目前的增益和剩餘時間。滑鼠點擊可穿透。",
   "conn.now": "目前",
   "conn.avg": "Ø 1 分鐘",
   "conn.jitter": "抖動",
@@ -486,5 +484,6 @@
   "radar.list": "缺少的寵物",
   "radar.row_tip": "點擊：顯示此寵物的所有出現點（再點：回到雷達）",
   "radar.center": "以我為中心",
-  "radar.no_self": "計量器還不知道你的角色——傳送一次或重新登入。"
+  "radar.no_self": "計量器還不知道你的角色——傳送一次或重新登入。",
+  "radar.map_tip": "滾輪：縮放（會記住）· 拖曳：四處看看，5 秒後地圖回到你身上 · 雙擊：回到你"
 }

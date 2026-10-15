@@ -5,6 +5,7 @@ using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Avalonia.Threading;
 
 namespace AetherDPS.App.Views;
 
@@ -17,9 +18,6 @@ public sealed class PetMapView : Control
     public static readonly StyledProperty<PetMap?> MapProperty = AvaloniaProperty.Register<PetMapView, PetMap?>(nameof(Map));
     public static readonly StyledProperty<IReadOnlyList<PetSpawn>?> SpawnsProperty = AvaloniaProperty.Register<PetMapView, IReadOnlyList<PetSpawn>?>(nameof(Spawns));
     public static readonly StyledProperty<Point?> SelfProperty = AvaloniaProperty.Register<PetMapView, Point?>(nameof(Self));
-
-    /// <summary>&gt; 0: Ausschnitt um die eigene Position mit diesem Radius in Metern (Pet-Radar) statt „alle Punkte“.</summary>
-    public static readonly StyledProperty<double> FocusMetersProperty = AvaloniaProperty.Register<PetMapView, double>(nameof(FocusMeters));
 
     private const int TileSource = 512;
     private static readonly Dictionary<string, Bitmap?[,]> TileCache = [];
@@ -50,15 +48,20 @@ public sealed class PetMapView : Control
             var after = e.NewValue as IReadOnlyList<PetSpawn>;
             bool same = before is not null && after is not null && before.Count == after.Count && (after.Count == 0 || before[0] == after[0]);
             if (!v.AutoFit) return;   // Pet-Finder: Zoom und Ausschnitt bleiben, nur die Punkte ändern sich
+            if (v.Minimap)
+            {
+                if (!same) v.Reveal();
+                return;
+            }
             if (!same) v.following = true;
             if (v.following) v.fitted = false;
         });
-        SelfProperty.Changed.AddClassHandler<PetMapView>((v, _) =>
+        SelfProperty.Changed.AddClassHandler<PetMapView>((v, e) =>
         {
-            if (v.FocusMeters > 0 && v.following) v.fitted = false;
+            if (v.Minimap && e.OldValue is null) v.fitted = false;   // Position erst jetzt bekannt → auf dich einstellen
+            else if (v.Minimap) v.FollowSelf();
         });
         AffectsRender<PetMapView>(SpawnBrushesProperty, DotBrushProperty);
-        AffectsRender<PetMapView>(FocusMetersProperty);
     }
 
     public PetMapView()
@@ -72,8 +75,6 @@ public sealed class PetMapView : Control
 
     /// <summary>Eigene Position in Weltkoordinaten (null = nicht auf dieser Karte).</summary>
     public Point? Self { get => GetValue(SelfProperty); set => SetValue(SelfProperty, value); }
-
-    public double FocusMeters { get => GetValue(FocusMetersProperty); set => SetValue(FocusMetersProperty, value); }
 
     /// <summary>Farbe je Monster (Radar: jedes Pet eigene Farbe); fehlt eins, gilt Gold.</summary>
     public static readonly StyledProperty<IReadOnlyDictionary<int, IBrush>?> SpawnBrushesProperty =
@@ -89,11 +90,70 @@ public sealed class PetMapView : Control
     /// <summary>Folgt der Ausschnitt der eigenen Position? Aus, sobald man selbst schiebt oder zoomt; ⌖ schaltet es wieder an.</summary>
     private bool following = true;
 
+    /// <summary>
+    /// Minimap (Pet-Radar): immer auf dich zentriert und folgt dir, der Zoom bleibt (<see cref="ViewMeters"/>, gemerkt).
+    /// Ziehen schaut kurz woanders hin, nach ein paar Sekunden springt die Karte zurück zu dir.
+    /// </summary>
+    public bool Minimap { get; set; }
+
+    /// <summary>Minimap: sichtbarer Umkreis in Metern (halbe kürzere Seite). Ändert sich nur durch das Mausrad.</summary>
+    public double ViewMeters { get; set; } = 600;
+
+    /// <summary>Minimap: Zoom per Mausrad geändert (zum Merken).</summary>
+    public event EventHandler? ViewChanged;
+
+    private static readonly TimeSpan BackToSelf = TimeSpan.FromSeconds(5);
+    private DispatcherTimer? backTimer;
+
+    private double ZoomFor(PetMap map, double meters) =>
+        Math.Clamp(Math.Min(Bounds.Width, Bounds.Height) / (2 * meters * 100 * map.Scale),
+            Math.Min(Bounds.Width, Bounds.Height) / map.Size, MaxZoom(map));
+
+    private double MetersFor(PetMap map) => Math.Min(Bounds.Width, Bounds.Height) / (2 * zoom * 100 * map.Scale);
+
+    /// <summary>Minimap: neue Position → Mitte mitziehen, Zoom bleibt.</summary>
+    private void FollowSelf()
+    {
+        if (!following || !fitted || Map is not { } map || Self is not { } me) return;
+        var (x, y) = map.ToPixel(me.X, me.Y);
+        center = new Point(x, y);
+        InvalidateVisual();
+    }
+
+    /// <summary>
+    /// Minimap: andere Punkte (z. B. ein Pet angeklickt) → eigener Zoom, zentriert auf dich. Liegt kein Punkt im
+    /// Ausschnitt, nur so weit herauszoomen, dass der nächste zu sehen ist.
+    /// </summary>
+    private void Reveal()
+    {
+        if (!fitted || Map is not { } map || Self is not { } me || Bounds.Width < 10) return;
+        following = true;
+        var (sx, sy) = map.ToPixel(me.X, me.Y);
+        center = new Point(sx, sy);
+        zoom = ZoomFor(map, ViewMeters);
+        double half = Math.Min(Bounds.Width, Bounds.Height) / 2 / zoom;
+        var nearest = (Spawns ?? []).Select(s => map.ToPixel(s.X, s.Y))
+            .Select(p => Math.Max(Math.Abs(p.X - sx), Math.Abs(p.Y - sy))).DefaultIfEmpty(0).Min();
+        if (nearest > half * 0.9)
+            zoom = Math.Clamp(Math.Min(Bounds.Width, Bounds.Height) / 2 / (nearest * 1.2), Math.Min(Bounds.Width, Bounds.Height) / map.Size, MaxZoom(map));
+        InvalidateVisual();
+    }
+
     /// <summary>⌖: Ausschnitt auf die eigene Position (wie bei Google Maps), danach folgt er wieder.</summary>
     public void CenterOnSelf()
     {
         following = true;
+        backTimer?.Stop();
         if (Map is not { } map || Self is not { } me) return;
+        if (Minimap)
+        {
+            var (mx, my) = map.ToPixel(me.X, me.Y);
+            center = new Point(mx, my);
+            zoom = ZoomFor(map, ViewMeters);
+            fitted = true;
+            InvalidateVisual();
+            return;
+        }
         var (x, y) = map.ToPixel(me.X, me.Y);
         center = new Point(x, y);
         double close = Math.Min(Bounds.Width, Bounds.Height) / (2 * 800 * 100 * map.Scale);   // ~800 m Umkreis
@@ -123,11 +183,12 @@ public sealed class PetMapView : Control
         var points = (Spawns ?? []).Select(s => map.ToPixel(s.X, s.Y)).ToList();
         if (Self is { } self) points.Add(map.ToPixel(self.X, self.Y));
         double minZoom = Math.Min(Bounds.Width, Bounds.Height) / map.Size;
-        if (FocusMeters > 0 && Self is { } me)
+        if (Minimap && Self is { } at)
         {
-            var (sx, sy) = map.ToPixel(me.X, me.Y);
-            center = new Point(sx, sy);
-            zoom = Math.Clamp(Math.Min(Bounds.Width, Bounds.Height) / (2 * FocusMeters * 100 * map.Scale), minZoom, MaxZoom(map));
+            var (ax, ay) = map.ToPixel(at.X, at.Y);
+            center = new Point(ax, ay);
+            zoom = ZoomFor(map, ViewMeters);
+            following = true;
         }
         else if (points.Count == 0 || !AutoFit)
         {
@@ -163,6 +224,9 @@ public sealed class PetMapView : Control
         }
         fitted = true;
     }
+
+    /// <summary>Aktueller Ausschnitt (für Tests): Zoom und Mitte in Karten-Pixeln.</summary>
+    public (double Zoom, Point Center) View => (zoom, center);
 
     private double MaxZoom(PetMap map) => 3.0 * TileSource / map.Tile;   // höchstens 3-fach über der Kachel-Auflösung
 
@@ -221,6 +285,20 @@ public sealed class PetMapView : Control
         var before = ToMap(at);
         double minZoom = Math.Min(Bounds.Width, Bounds.Height) / map.Size;
         zoom = Math.Clamp(zoom * (e.Delta.Y > 0 ? 1.25 : 0.8), minZoom, MaxZoom(map));
+        if (Minimap)
+        {
+            // Minimap: Zoom um dich (folgt sie gerade) bzw. um die Maus, und merken
+            if (!following)
+            {
+                var moved = ToMap(at);
+                center = new Point(center.X + before.X - moved.X, center.Y + before.Y - moved.Y);
+            }
+            ViewMeters = MetersFor(map);
+            ViewChanged?.Invoke(this, EventArgs.Empty);
+            InvalidateVisual();
+            e.Handled = true;
+            return;
+        }
         var after = ToMap(at);
         center = new Point(center.X + before.X - after.X, center.Y + before.Y - after.Y);   // Punkt unter der Maus bleibt stehen
         following = false;
@@ -236,11 +314,17 @@ public sealed class PetMapView : Control
         e.Handled = true;   // nicht zusätzlich das Fenster verschieben (Pet-Radar)
         if (e.ClickCount == 2)
         {
+            if (Minimap)
+            {
+                CenterOnSelf();
+                return;
+            }
             following = true;
             Fit();
             return;
         }
         dragFrom = e.GetPosition(this);
+        backTimer?.Stop();
         e.Pointer.Capture(this);
     }
 
@@ -274,8 +358,16 @@ public sealed class PetMapView : Control
 
     private void EndDrag(IPointer pointer)
     {
+        bool dragged = dragFrom is not null && !following;
         dragFrom = null;
         if (pointer.Captured == this) pointer.Capture(null);
+        if (Minimap && dragged)
+        {
+            // kurz woanders hingeschaut → gleich wieder zu dir
+            backTimer ??= new DispatcherTimer(BackToSelf, DispatcherPriority.Background, (_, _) => CenterOnSelf());
+            backTimer.Stop();
+            backTimer.Start();
+        }
     }
 
     private static Bitmap?[,] Tiles(PetMap map)

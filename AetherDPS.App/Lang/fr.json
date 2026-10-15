@@ -104,8 +104,6 @@
   "check.daily_reset": "Chaque jour à",
   "check.weekly_reset": "Chaque semaine le",
   "check.reset_note": "Les coches disparaissent automatiquement après le reset. 30 minutes avant le reset, le meter te rappelle les tâches restantes. Vérifie une fois les heures de reset dans le jeu.",
-  "settings.buffbar": "Barre de buffs sous le meter",
-  "settings.buffbar_hint": "Tes buffs actifs avec leur durée restante, tant que le meter tourne. Les clics passent au travers.",
   "conn.now": "Actuel",
   "conn.avg": "Ø 1 minute",
   "conn.jitter": "Variation",
@@ -486,5 +484,6 @@
   "radar.list": "Familiers manquants",
   "radar.row_tip": "Clic : tous les points d'apparition de ce familier (encore : retour au radar)",
   "radar.center": "Centrer sur moi",
-  "radar.no_self": "Le meter ne connaît pas encore ton personnage – téléporte-toi une fois ou reconnecte-toi."
+  "radar.no_self": "Le meter ne connaît pas encore ton personnage – téléporte-toi une fois ou reconnecte-toi.",
+  "radar.map_tip": "Molette : zoom (mémorisé) · Glisser : regarder ailleurs, après 5 s la carte revient sur toi · Double-clic : sur toi"
 }

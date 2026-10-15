@@ -18,6 +18,13 @@ public partial class PetRadarWindow : Window
         DataContext = vm;
         this.settings = settings;
         WindowStartupLocation = WindowStartupLocation.Manual;
+        // Minimap: Zoom vom letzten Mal
+        RadarMap.ViewMeters = settings.PetRadarMeters is > 20 and < 100_000 and var meters ? meters : PetRadarViewModel.RadiusMeters;
+        RadarMap.ViewChanged += (_, _) =>
+        {
+            settings.PetRadarMeters = Math.Round(RadarMap.ViewMeters);
+            settings.Save();
+        };
         EventHandler show = (_, _) =>
         {
             Place();

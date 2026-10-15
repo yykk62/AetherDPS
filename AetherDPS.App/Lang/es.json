@@ -104,8 +104,6 @@
   "check.daily_reset": "A diario a las",
   "check.weekly_reset": "Cada semana el",
   "check.reset_note": "Las marcas desaparecen solas tras el reinicio. 30 minutos antes del reinicio, el medidor te recuerda las tareas pendientes. Comprueba una vez las horas de reinicio con el juego.",
-  "settings.buffbar": "Barra de buffs bajo el medidor",
-  "settings.buffbar_hint": "Tus buffs activos con su tiempo restante, mientras el medidor esté en marcha. Los clics pasan a través.",
   "conn.now": "Actual",
   "conn.avg": "Ø 1 minuto",
   "conn.jitter": "Variación",
@@ -486,5 +484,6 @@
   "radar.list": "Mascotas que faltan",
   "radar.row_tip": "Clic: todos los puntos de aparición de esta mascota (otra vez: volver al radar)",
   "radar.center": "Centrar en mí",
-  "radar.no_self": "El medidor aún no conoce tu personaje: teletranspórtate una vez o vuelve a iniciar sesión."
+  "radar.no_self": "El medidor aún no conoce tu personaje: teletranspórtate una vez o vuelve a iniciar sesión.",
+  "radar.map_tip": "Rueda: zoom (se recuerda) · Arrastrar: mirar alrededor, a los 5 s el mapa vuelve a ti · Doble clic: a ti"
 }

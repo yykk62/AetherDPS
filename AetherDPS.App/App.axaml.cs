@@ -119,7 +119,7 @@ public partial class App : Application
             new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, (_, _) => mode.Tick(DateTime.Now)).Start();
             hotkey.ScreenshotPressed += (_, foreground) => TakeScreenshot(foreground);
 
-            // Erinnerungen (Timer, Checkliste) und Buff-Leiste
+            // Erinnerungen (Timer, Checkliste)
             var timerService = Services.GetRequiredService<TimerService>();
             Services.GetRequiredService<Pets>();   // Pet-Liste kommt beim Login – vorher schon mithören
             if (Services.GetRequiredService<MeterOptions>().ReplayFile is null)
@@ -128,8 +128,6 @@ public partial class App : Application
             timerService.Reminder += (title, text) => Dispatcher.UIThread.Post(() => ShowToast(title, text));
             checklist.Reminder += (title, text) => Dispatcher.UIThread.Post(() => ShowToast(title, text));
             var meterSettings = Services.GetRequiredService<MeterSettings>();
-            var buffVm = Services.GetRequiredService<BuffBarViewModel>();
-            buffBar = new BuffBarWindow(buffVm);
             new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, (_, _) =>
             {
                 timerService.Tick();
@@ -145,17 +143,6 @@ public partial class App : Application
             {
                 Services.GetRequiredService<StaggerTracker>().Tick();
                 UpdateStaggerWarning(meterSettings);
-                bool show = mode.IsCapturing && meterSettings.BuffBarEnabled && window.IsVisible;
-                if (show) buffVm.Refresh();
-                if (show && buffVm.HasItems)
-                {
-                    buffBar.FollowBelow(window);
-                    if (!buffBar.IsVisible) buffBar.Show();
-                }
-                else if (buffBar.IsVisible)
-                {
-                    buffBar.Hide();
-                }
             }).Start();
 
             // Timer-Overlay – eigenes Fenster, unabhängig von STRG+W
@@ -274,7 +261,6 @@ public partial class App : Application
     }
 
     private ScreenshotWindow? screenshotWindow;
-    private BuffBarWindow? buffBar;
     private ToastWindow? toast;
 
     private void ShowToast(string title, string text)

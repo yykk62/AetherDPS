@@ -32,7 +32,7 @@
       <Border CornerRadius="6" ClipToBounds="True" Cursor="Hand">
         <Panel>
           <views:PetMapView Name="RadarMap" Height="230" Map="{Binding Map}" Spawns="{Binding Spawns}" Self="{Binding Self}"
-                            SpawnBrushes="{Binding SpawnBrushes}" FocusMeters="{Binding FocusMeters}" MaxDot="4.5" />
+                            SpawnBrushes="{Binding SpawnBrushes}" Minimap="True" MaxDot="4.5" ToolTip.Tip="{l:T radar.map_tip}" />
           <Button Content="⌖" Click="OnCenter" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="6" Padding="7,2"
                   FontSize="15" Background="#CC141820" Foreground="#E6E8EC" ToolTip.Tip="{l:T radar.center}" />
         </Panel>

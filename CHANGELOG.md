@@ -2,6 +2,13 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
+## 0.7.5
+
+- **Pet-Radar als Minimap:** Du bist immer in der Mitte, die Karte folgt dir – auch im Flug – und merkt sich deinen Zoom (auch nach einem Neustart). Mausrad zoomt um dich herum; Ziehen schaut kurz woanders hin, nach 5 Sekunden springt die Karte zurück zu dir (Doppelklick oder ⌖ sofort)
+- **Pet anklicken zoomt nicht mehr weit heraus:** Dein Zoom bleibt. Nur wenn kein Fundort im Bild liegt, geht die Karte so weit heraus, dass der nächste zu sehen ist
+- **Buff- und Abklingzeit-Leiste unter dem Meter entfernt** – sie war zu ungenau und zu unruhig. Die Erkennung deines Charakters und die Buff-Auswertung in den Läufen bleiben
+- Feldboss-Daten neu aufgebaut (Slots nach eigener Regel, Respawn-Zeiten lernt der Meter selbst), Danksagung aufgeräumt
+
 ## 0.7.4
 
 - **Farben nach Gattung:** Jede Pet-Gattung hat eine feste Farbe – Cognia blau, Fera orange, Natura grün, Varia lila, Specia gelb – in der Liste, auf der Karte im Reiter Pets und im Radar
