@@ -2,6 +2,10 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
+## 0.7.8
+
+- Reiter Pets: Es stehen immer **alle** Monster eines Pets über der Karte (vorher waren ab der dritten Zeile welche weggescrollt und nicht zu sehen)
+
 ## 0.7.7
 
 - **Pet-Radar so groß wie die Spielkarte:** Beim ersten Öffnen liegt es mittig genau über der Spielkarte und kann sie ersetzen. Größe per Ecke unten rechts ziehen, Position und Größe werden gemerkt

@@ -2,6 +2,10 @@
 
 Newest versions first.
 
+## 0.7.8
+
+- Pets tab: **all** monsters of a pet are always shown above the map (before, anything past the second row was scrolled out of view)
+
 ## 0.7.7
 
 - **Pet radar as big as the game map:** the first time it opens centred right over the game map and can replace it. Drag the bottom-right corner to resize; position and size are remembered

@@ -36,8 +36,8 @@
     <Style Selector="Border.chip">
       <Setter Property="Background" Value="#262D3A" />
       <Setter Property="CornerRadius" Value="11" />
-      <Setter Property="Padding" Value="8,2" />
-      <Setter Property="Margin" Value="0,0,5,5" />
+      <Setter Property="Padding" Value="7,1" />
+      <Setter Property="Margin" Value="0,0,4,4" />
     </Style>
   </UserControl.Styles>
 
@@ -147,8 +147,8 @@
           </Grid>
 
           <!-- Monster, die die Seele droppen -->
-          <ScrollViewer Grid.Row="1" MaxHeight="44" HorizontalScrollBarVisibility="Disabled">
-          <ItemsControl ItemsSource="{Binding Monsters}" ToolTip.Tip="{l:T pets.monsters}">
+          <!-- alle Monster sichtbar (kein verstecktes Scrollen), dafür kompakt -->
+          <ItemsControl Grid.Row="1" ItemsSource="{Binding Monsters}" ToolTip.Tip="{l:T pets.monsters}" Margin="0,0,0,3">
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>
                 <WrapPanel />
@@ -158,14 +158,13 @@
               <DataTemplate x:DataType="vm:PetMonsterRow">
                 <Border Classes="chip" ToolTip.Tip="{Binding Count}">
                   <StackPanel Orientation="Horizontal" Spacing="5">
-                    <TextBlock Text="{Binding Name}" FontSize="11" />
-                    <TextBlock Text="{Binding Number}" Foreground="#E0A84A" FontSize="10.5" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding Name}" FontSize="10.5" />
+                    <TextBlock Text="{Binding Number}" Foreground="#E0A84A" FontSize="10" VerticalAlignment="Center" />
                   </StackPanel>
                 </Border>
               </DataTemplate>
             </ItemsControl.ItemTemplate>
           </ItemsControl>
-          </ScrollViewer>
 
           <Border Grid.Row="2" CornerRadius="6" ClipToBounds="True" BorderBrush="#232A36" BorderThickness="1" MinHeight="220">
             <Panel>
