@@ -172,6 +172,25 @@ def overlay_gif():
     gif(out, "overlay", fps=4, width=520)
 
 
+# ── Pet-Radar unterwegs ─────────────────────────────────────────────────────────────────────
+
+def radar_gif():
+    files = sorted((RAW / "frames_radar").glob("*.png"))
+    if not files:
+        return
+    frames = [Image.open(f).convert("RGBA") for f in files]
+    w = max(f.width for f in frames) + 140
+    h = max(f.height for f in frames) + 140
+    bg = stage(w, h, glow=(0.3, 0.0))
+    out = []
+    for f in frames:
+        canvas = bg.copy()
+        place(canvas, f, (70, 70))
+        out.append(rounded(canvas, 30))
+    out += [out[-1]] * 8
+    gif(out, "radar", fps=10, width=460)
+
+
 # ── Timer-Pills: hinlegen, Rechtsklick „Gruppieren“, fertig ─────────────────────────────────
 
 def menu_image(items, highlight=0, scale=2):
@@ -293,6 +312,7 @@ def hero():
 
 def main():
     overlay_gif()
+    radar_gif()
     pills_gif()
     hero()
     card(load("hub_runs"), "runs")

@@ -305,6 +305,31 @@ public sealed class ReadmeMedia : IDisposable
             Snap(new PetRadarWindow(radar, settings), "pet_radar_pick");
             radar.ShowRadarCommand.Execute(null);
         }
+        RadarWalk(radar, settings);
+    }
+
+    /// <summary>Radar unterwegs (GIF): du fliegst los, die Minimap folgt, die Entfernungen laufen mit; zwischendurch ein Pet angeklickt.</summary>
+    private void RadarWalk(PetRadarViewModel radar, MeterSettings settings)
+    {
+        settings.PetRadarMeters = 220;
+        var window = new PetRadarWindow(radar, settings);
+        window.Show();
+        Directory.CreateDirectory(Path.Combine(Out!, "frames_radar"));
+        double x = 81_840, y = -20_010;
+        for (int i = 0; i < 70; i++)
+        {
+            // geschwungener Weg nach Nordosten, ~2 m je Bild
+            double angle = 0.9 + Math.Sin(i / 14.0) * 0.6;
+            x += Math.Cos(angle) * 200;
+            y -= Math.Sin(angle) * 200;
+            Feed(SyntheticPackets.EffectOn(5001, SelfId, (float)x, (float)y));
+            Dispatcher.UIThread.RunJobs();
+            if (i == 42 && radar.Rows.Count > 2) radar.SelectCommand.Execute(radar.Rows[2]);
+            if (i == 62) radar.ShowRadarCommand.Execute(null);
+            Snap(window, Path.Combine("frames_radar", $"{i:D3}"), keepOpen: true);
+        }
+        window.Close();
+        settings.PetRadarMeters = null;
     }
 
     // ── Timer ────────────────────────────────────────────────────────────────────────────

@@ -120,6 +120,19 @@ Alle Pets von Verteron, Altgard und der Abyss mit **deiner Stufe und deinem Fort
 
 Das **Pet-Radar** erscheint, sobald du im Spiel die Karte öffnest, genau darüber und so groß wie sie, oder bleibt auf Wunsch dauerhaft stehen. Es ist eine **Minimap wie im Spiel**: Du bist immer in der Mitte, sie folgt dir (auch im Flug) und merkt sich deinen Zoom. Darauf die fehlenden Pets in deiner Nähe mit **Entfernung, Richtung und dem Monster, das die Seele droppt**. Klick auf ein Pet zeigt seine Fundorte; liegt keiner im Bild, zoomt die Karte nur so weit heraus, dass der nächste zu sehen ist. Größe per Ecke ziehen, ▾ klappt es zu einer kleinen Leiste ein.
 
+<table>
+  <tr>
+    <td width="42%"><img src="docs/media/radar.gif" width="100%" alt="Pet-Radar unterwegs: die Minimap folgt, Entfernungen laufen mit" /></td>
+    <td>
+
+**Unterwegs:** Du fliegst los, die Minimap bleibt auf dir und die Entfernungen zählen mit. Unter jedem Pet steht das Monster am nächsten Fundort, denn die Seele heißt oft anders als das Monster (die Bienen-Abart droppt z. B. von der Schwarzmusterbiene).
+
+Ein Klick auf ein Pet zeigt nur noch seine Fundorte, nochmal klicken bringt das Radar zurück. Der Punkt am Bild zeigt die Farbe auf der Karte.
+
+</td>
+  </tr>
+</table>
+
 <p align="center"><img src="docs/media/pet-radar.png" width="100%" alt="Pet-Radar: je Gattung, eine Gattung gewählt, ein Pet angeklickt" /></p>
 
 ### ⏱ Timer & Feldbosse
