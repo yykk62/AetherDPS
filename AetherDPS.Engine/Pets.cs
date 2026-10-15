@@ -24,7 +24,7 @@ public sealed record PetSpawn(int Npc, double X, double Y);
 /// </summary>
 public sealed class Pets
 {
-    public const ushort OpPetList = 0x9000, OpPosition = 0x373C;
+    public const ushort OpPetList = 0x9000, OpPosition = 0x373C, OpEffectOn = 0x382A, OpEffectRenewed = 0x382B;
     public const int TopLevel = 3;
 
     /// <summary>Gattungen in der Reihenfolge des Pet-Fensters.</summary>
@@ -67,6 +67,7 @@ public sealed class Pets
             previous?.Invoke(opcode, data);
             if (opcode == OpPetList) OnPetList(data);
             else if (opcode == OpPosition) OnPosition(data);
+            else if (opcode is OpEffectOn or OpEffectRenewed) OnEffect(data, opcode == OpEffectRenewed);
             else if (opcode == FieldBosses.OpList) OnMapOpen(data);
         };
     }
@@ -168,6 +169,9 @@ public sealed class Pets
 
     public bool KnowsLevels { get { lock (gate) return Mine() is not null; } }
 
+    /// <summary>Weiß der Meter, welche Einheit man selbst ist? (Sonst lässt sich keine Position zuordnen.)</summary>
+    public bool KnowsSelf => self.SelfId is not null;
+
     /// <summary>Letzte bekannte eigene Position (Welt) mit Karte und Zeit.</summary>
     public (double X, double Y, int MapId, DateTime At)? Position { get; private set; }
 
@@ -262,6 +266,37 @@ public sealed class Pets
 
     /// <summary>Himmelsrichtung als Kürzel (N, NO, O …) aus dem Winkel.</summary>
     public static string Compass(double bearing) => Loc.T("compass." + (int)Math.Round(bearing / 45) % 8);
+
+    /// <summary>Jeder Effekt, den man wirkt, trägt am Ende die eigene Position – viel häufiger als das Positions-Paket.</summary>
+    private void OnEffect(byte[] data, bool renewed)
+    {
+        if (self.SelfId is not int selfId || ParseEffectCaster(data, renewed) is not { } e || e.Caster != selfId) return;
+        Position = (e.X, e.Y, zone.MapId, DateTime.Now);
+        PositionChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>
+    /// Effekt auf einer Einheit (38 2A „an“, 38 2B „erneuert“): <c>Ziel (varint) | [an: 01] | Typ (1) | Instanz (varint) | Effekt u32 |
+    /// Dauer u32 | bleibt u32 | 8 Byte | Wirker (varint) | … | x, y, z (f32) am Ende</c>. Die letzten 12 Byte sind der Ort des Wirkers.
+    /// Aufbau aus SkeeveAN (MIT); an der EU-Aufnahme vom 14.10. geprüft (eigener Charakter: 249 gültige Positionen, Positions-Paket: 2).
+    /// </summary>
+    public static (long Caster, double X, double Y)? ParseEffectCaster(byte[] data, bool renewed)
+    {
+        var f = data.AsSpan(SkipLength(data));
+        int p = 2;
+        if (!TryVarint(f, ref p, out long target) || target < 1 || p + 2 > f.Length) return null;
+        if (!renewed && f[p++] != 1) return null;
+        p += 1;   // Typ
+        if (!TryVarint(f, ref p, out _) || p + 20 > f.Length) return null;
+        p += 20;
+        if (!TryVarint(f, ref p, out long caster) || caster < 1 || f.Length - 12 <= p) return null;
+        float x = BinaryPrimitives.ReadSingleLittleEndian(f[^12..]);
+        float y = BinaryPrimitives.ReadSingleLittleEndian(f[^8..]);
+        float z = BinaryPrimitives.ReadSingleLittleEndian(f[^4..]);
+        if (!float.IsFinite(x) || !float.IsFinite(y) || !float.IsFinite(z)
+            || Math.Abs(x) is <= 100 or >= 500_000 || Math.Abs(y) is <= 100 or >= 500_000 || Math.Abs(z) >= 50_000) return null;
+        return (caster, x, y);
+    }
 
     public sealed record PetList(int Active, Dictionary<int, int> Levels, Dictionary<int, int> Progress);
 

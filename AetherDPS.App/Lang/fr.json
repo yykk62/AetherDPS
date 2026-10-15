@@ -469,7 +469,7 @@
   "pets.filter_open": "Pas au niveau max",
   "radar.title": "Radar familiers",
   "radar.close_tip": "Masquer jusqu'à la prochaine ouverture de la carte",
-  "radar.no_position": "Utilise une compétence pour que le meter sache où tu es.",
+  "radar.no_position": "Attaque ou utilise un buff – le meter saura où tu es.",
   "radar.enable_hint": "Une petite fenêtre à gauche avec les points d'apparition des familiers qui te manquent autour de toi, et les plus proches avec distance et direction. « Toujours » la garde à l'écran, tu n'as qu'à y aller. Le jeu n'envoie ta position que quand tu utilises des compétences. Déplaçable ; ✕ la masque jusqu'à la prochaine ouverture de la carte ou au changement de carte.",
   "compass.0": "N",
   "compass.1": "NE",
@@ -484,5 +484,7 @@
   "radar.mode_off": "Désactivé",
   "radar.back": "Radar",
   "radar.list": "Familiers manquants",
-  "radar.row_tip": "Clic : tous les points d'apparition de ce familier (encore : retour au radar)"
+  "radar.row_tip": "Clic : tous les points d'apparition de ce familier (encore : retour au radar)",
+  "radar.center": "Centrer sur moi",
+  "radar.no_self": "Le meter ne connaît pas encore ton personnage – téléporte-toi une fois ou reconnecte-toi."
 }

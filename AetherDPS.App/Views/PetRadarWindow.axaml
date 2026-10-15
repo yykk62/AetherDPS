@@ -30,20 +30,30 @@
         <Button Grid.Column="2" Content="✕" Padding="6,0" Background="Transparent" Click="OnClose" ToolTip.Tip="{l:T radar.close_tip}" />
       </Grid>
       <Border CornerRadius="6" ClipToBounds="True" Cursor="Hand">
-        <views:PetMapView Height="230" Map="{Binding Map}" Spawns="{Binding Spawns}" Self="{Binding Self}" FocusMeters="{Binding FocusMeters}" MaxDot="4" />
+        <Panel>
+          <views:PetMapView Name="RadarMap" Height="230" Map="{Binding Map}" Spawns="{Binding Spawns}" Self="{Binding Self}"
+                            SpawnBrushes="{Binding SpawnBrushes}" FocusMeters="{Binding FocusMeters}" MaxDot="4.5" />
+          <Button Content="⌖" Click="OnCenter" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="6" Padding="7,2"
+                  FontSize="15" Background="#CC141820" Foreground="#E6E8EC" ToolTip.Tip="{l:T radar.center}" />
+        </Panel>
       </Border>
       <TextBlock Text="{Binding Hint}" Foreground="#8E96A3" FontSize="11" TextWrapping="Wrap"
                  IsVisible="{Binding Hint, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
       <Expander IsExpanded="{Binding ListOpen}" Header="{l:T radar.list}" Padding="0" HorizontalAlignment="Stretch" Cursor="Arrow">
+        <ScrollViewer MaxHeight="172" HorizontalScrollBarVisibility="Disabled">
         <ItemsControl ItemsSource="{Binding Rows}">
           <ItemsControl.ItemTemplate>
             <DataTemplate x:DataType="vm:RadarRow">
               <Button Classes="row" Command="{Binding $parent[ItemsControl].((vm:PetRadarViewModel)DataContext).SelectCommand}" CommandParameter="{Binding}"
                       Background="{Binding IsSelected, Converter={x:Static l:BoolBrush.SelectedRow}}" ToolTip.Tip="{l:T radar.row_tip}">
                 <Grid ColumnDefinitions="Auto,*,Auto,Auto">
-                  <Border Width="28" Height="28" CornerRadius="5" Background="#22000000" ClipToBounds="True" Margin="0,0,6,0">
-                    <Image Source="{Binding Icon}" />
-                  </Border>
+                  <Panel Margin="0,0,6,0">
+                    <Border Width="28" Height="28" CornerRadius="5" Background="#22000000" ClipToBounds="True">
+                      <Image Source="{Binding Icon}" />
+                    </Border>
+                    <Ellipse Width="9" Height="9" Fill="{Binding Color}" Stroke="#141820" StrokeThickness="1.5" IsVisible="{Binding HasColor}"
+                             HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-2,-2" />
+                  </Panel>
                   <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="12" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
                   <TextBlock Grid.Column="2" Text="{Binding Level}" FontSize="10.5" Foreground="#8E96A3" Margin="6,0" VerticalAlignment="Center" />
                   <TextBlock Grid.Column="3" Text="{Binding Distance}" FontSize="12" FontWeight="SemiBold" Foreground="#E0A84A" VerticalAlignment="Center" />
@@ -52,6 +62,7 @@
             </DataTemplate>
           </ItemsControl.ItemTemplate>
         </ItemsControl>
+        </ScrollViewer>
       </Expander>
     </StackPanel>
   </Border>

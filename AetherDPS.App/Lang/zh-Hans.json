@@ -469,7 +469,7 @@
   "pets.filter_open": "未满级",
   "radar.title": "宠物雷达",
   "radar.close_tip": "隐藏，直到再次打开地图",
-  "radar.no_position": "使用一个技能，计量器就知道你在哪。",
+  "radar.no_position": "攻击目标或使用增益——计量器就知道你在哪。",
   "radar.enable_hint": "左侧小窗口显示你还缺的宠物出现点，以及最近的距离和方向。「始终显示」会一直留在屏幕上，直接走过去即可。游戏只在你使用技能时发送位置。可移动，✕ 隐藏到再次打开地图或切换地图。",
   "compass.0": "北",
   "compass.1": "东北",
@@ -484,5 +484,7 @@
   "radar.mode_off": "关闭",
   "radar.back": "雷达",
   "radar.list": "缺少的宠物",
-  "radar.row_tip": "点击：显示此宠物的所有出现点（再点：回到雷达）"
+  "radar.row_tip": "点击：显示此宠物的所有出现点（再点：回到雷达）",
+  "radar.center": "以我为中心",
+  "radar.no_self": "计量器还不知道你的角色——传送一次或重新登录。"
 }

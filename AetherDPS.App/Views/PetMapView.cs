@@ -26,8 +26,8 @@ public sealed class PetMapView : Control
     private static readonly IBrush Background = new SolidColorBrush(Color.Parse("#11141B"));
     private static readonly IBrush SpawnFill = new SolidColorBrush(Color.Parse("#E0A84A"));
     private static readonly IPen SpawnPen = new Pen(new SolidColorBrush(Color.Parse("#1A1206")), 1.5);
-    private static readonly IBrush SelfFill = new SolidColorBrush(Color.Parse("#4FC1E9"));
-    private static readonly IPen SelfPen = new Pen(Brushes.White, 2);
+    private static readonly IBrush SelfFill = Brushes.White;
+    private static readonly IPen SelfPen = new Pen(new SolidColorBrush(Color.Parse("#1E6FD9")), 3);
     private static readonly IPen SelfRing = new Pen(new SolidColorBrush(Color.Parse("#884FC1E9")), 2);
 
     private double zoom = 1;          // Bildschirm-Pixel je Karten-Pixel
@@ -38,12 +38,26 @@ public sealed class PetMapView : Control
     static PetMapView()
     {
         AffectsRender<PetMapView>(MapProperty, SpawnsProperty, SelfProperty);
-        MapProperty.Changed.AddClassHandler<PetMapView>((v, _) => v.fitted = false);
-        SpawnsProperty.Changed.AddClassHandler<PetMapView>((v, _) => v.fitted = false);
+        MapProperty.Changed.AddClassHandler<PetMapView>((v, _) =>
+        {
+            v.fitted = false;
+            v.following = true;
+        });
+        // neue Auswahl (andere Punkte) → neu einpassen; gleiche Punkte neu gesetzt (Radar beim Laufen) → nur wenn er folgt
+        SpawnsProperty.Changed.AddClassHandler<PetMapView>((v, e) =>
+        {
+            var before = e.OldValue as IReadOnlyList<PetSpawn>;
+            var after = e.NewValue as IReadOnlyList<PetSpawn>;
+            bool same = before is not null && after is not null && before.Count == after.Count && (after.Count == 0 || before[0] == after[0]);
+            if (!v.AutoFit) return;   // Pet-Finder: Zoom und Ausschnitt bleiben, nur die Punkte ändern sich
+            if (!same) v.following = true;
+            if (v.following) v.fitted = false;
+        });
         SelfProperty.Changed.AddClassHandler<PetMapView>((v, _) =>
         {
-            if (v.FocusMeters > 0) v.fitted = false;
+            if (v.FocusMeters > 0 && v.following) v.fitted = false;
         });
+        AffectsRender<PetMapView>(SpawnBrushesProperty);
         AffectsRender<PetMapView>(FocusMetersProperty);
     }
 
@@ -60,6 +74,33 @@ public sealed class PetMapView : Control
     public Point? Self { get => GetValue(SelfProperty); set => SetValue(SelfProperty, value); }
 
     public double FocusMeters { get => GetValue(FocusMetersProperty); set => SetValue(FocusMetersProperty, value); }
+
+    /// <summary>Farbe je Monster (Radar: jedes Pet eigene Farbe); fehlt eins, gilt Gold.</summary>
+    public static readonly StyledProperty<IReadOnlyDictionary<int, IBrush>?> SpawnBrushesProperty =
+        AvaloniaProperty.Register<PetMapView, IReadOnlyDictionary<int, IBrush>?>(nameof(SpawnBrushes));
+
+    public IReadOnlyDictionary<int, IBrush>? SpawnBrushes { get => GetValue(SpawnBrushesProperty); set => SetValue(SpawnBrushesProperty, value); }
+
+    /// <summary>Folgt der Ausschnitt der eigenen Position? Aus, sobald man selbst schiebt oder zoomt; ⌖ schaltet es wieder an.</summary>
+    private bool following = true;
+
+    /// <summary>⌖: Ausschnitt auf die eigene Position (wie bei Google Maps), danach folgt er wieder.</summary>
+    public void CenterOnSelf()
+    {
+        following = true;
+        if (Map is not { } map || Self is not { } me) return;
+        var (x, y) = map.ToPixel(me.X, me.Y);
+        center = new Point(x, y);
+        double close = Math.Min(Bounds.Width, Bounds.Height) / (2 * 800 * 100 * map.Scale);   // ~800 m Umkreis
+        if (zoom < close) zoom = Math.Min(close, MaxZoom(map));
+        InvalidateVisual();
+    }
+
+    /// <summary>
+    /// Ausschnitt an die Punkte anpassen? Aus (Pet-Finder): immer die ganze Karte bzw. der Ausschnitt, den man selbst
+    /// gewählt hat – ein anderes Pet setzt nur die Markierungen.
+    /// </summary>
+    public bool AutoFit { get; set; } = true;
 
     /// <summary>Größter Radius der Spawnpunkte in Pixeln (Radar: kleiner, weil viele Pets auf einmal).</summary>
     public double MaxDot { get; set; } = 6;
@@ -83,10 +124,29 @@ public sealed class PetMapView : Control
             center = new Point(sx, sy);
             zoom = Math.Clamp(Math.Min(Bounds.Width, Bounds.Height) / (2 * FocusMeters * 100 * map.Scale), minZoom, MaxZoom(map));
         }
-        else if (points.Count == 0)
+        else if (points.Count == 0 || !AutoFit)
         {
-            zoom = minZoom;
-            center = new Point(map.Size / 2, map.Size / 2);
+            // ganze Karte = alle vorhandenen Kacheln (das Meer drumherum weglassen)
+            var tiles = Tiles(map);
+            int c0 = int.MaxValue, c1 = -1, r0 = int.MaxValue, r1 = -1;
+            for (int col = 0; col < map.Grid; col++)
+                for (int row = 0; row < map.Grid; row++)
+                    if (tiles[col, row] is not null)
+                    {
+                        c0 = Math.Min(c0, col); c1 = Math.Max(c1, col);
+                        r0 = Math.Min(r0, row); r1 = Math.Max(r1, row);
+                    }
+            if (c1 < 0)
+            {
+                zoom = minZoom;
+                center = new Point(map.Size / 2, map.Size / 2);
+            }
+            else
+            {
+                double w = (c1 - c0 + 1) * map.Tile, h = (r1 - r0 + 1) * map.Tile;
+                zoom = Math.Clamp(Math.Min(Bounds.Width / w, Bounds.Height / h), minZoom, MaxZoom(map));
+                center = new Point((c0 * map.Tile + (c1 + 1) * map.Tile) / 2.0, (r0 * map.Tile + (r1 + 1) * map.Tile) / 2.0);
+            }
         }
         else
         {
@@ -129,7 +189,8 @@ public sealed class PetMapView : Control
         {
             var (x, y) = map.ToPixel(s.X, s.Y);
             var p = ToScreen(new Point(x, y));
-            if (bounds.Inflate(r).Contains(p)) context.DrawEllipse(SpawnFill, SpawnPen, p, r, r);
+            var fill = SpawnBrushes is { } brushes && brushes.TryGetValue(s.Npc, out var b) ? b : SpawnFill;
+            if (bounds.Inflate(r).Contains(p)) context.DrawEllipse(fill, SpawnPen, p, r, r);
         }
 
         if (Self is { } self)
@@ -157,6 +218,7 @@ public sealed class PetMapView : Control
         zoom = Math.Clamp(zoom * (e.Delta.Y > 0 ? 1.25 : 0.8), minZoom, MaxZoom(map));
         var after = ToMap(at);
         center = new Point(center.X + before.X - after.X, center.Y + before.Y - after.Y);   // Punkt unter der Maus bleibt stehen
+        following = false;
         InvalidateVisual();
         e.Handled = true;
     }
@@ -169,6 +231,7 @@ public sealed class PetMapView : Control
         e.Handled = true;   // nicht zusätzlich das Fenster verschieben (Pet-Radar)
         if (e.ClickCount == 2)
         {
+            following = true;
             Fit();
             return;
         }
@@ -188,6 +251,7 @@ public sealed class PetMapView : Control
         var now = e.GetPosition(this);
         center = new Point(center.X - (now.X - from.X) / zoom, center.Y - (now.Y - from.Y) / zoom);
         dragFrom = now;
+        following = false;
         InvalidateVisual();
     }
 

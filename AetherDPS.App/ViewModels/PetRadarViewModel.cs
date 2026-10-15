@@ -9,8 +9,11 @@ using CommunityToolkit.Mvvm.ComponentModel;
 namespace AetherDPS.App.ViewModels;
 
 /// <summary>Pet in der Liste unter der Radar-Karte; Klick zeigt alle seine Fundorte.</summary>
-public sealed partial class RadarRow(int petId, string name, string distance, string level, Bitmap? icon) : ObservableObject
+public sealed partial class RadarRow(int petId, string name, string distance, string level, Bitmap? icon, Avalonia.Media.IBrush? color = null) : ObservableObject
 {
+    /// <summary>Farbe seiner Punkte auf der Karte (nur die ersten fünf), sonst null.</summary>
+    public Avalonia.Media.IBrush? Color { get; } = color;
+    public bool HasColor => Color is not null;
     public int PetId { get; } = petId;
     public string Name { get; } = name;
     public string Distance { get; } = distance;
@@ -43,6 +46,14 @@ public sealed partial class PetRadarViewModel : ObservableObject
     [ObservableProperty] private IReadOnlyList<PetSpawn>? spawns;
     [ObservableProperty] private Point? self;
     [ObservableProperty] private string hint = "";
+    [ObservableProperty] private IReadOnlyDictionary<int, Avalonia.Media.IBrush>? spawnBrushes;
+
+    /// <summary>Farben der fünf nächsten Pets auf der Radar-Karte.</summary>
+    private static readonly Avalonia.Media.IBrush[] Palette =
+        new[] { "#E0A84A", "#3FD0B0", "#E86AB0", "#8BD65A", "#A88BEB" }.Select(c => (Avalonia.Media.IBrush)new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse(c))).ToArray();
+
+    /// <summary>So viele Pets stehen in der Liste (scrollbar, sichtbar sind fünf).</summary>
+    public const int ListSize = 30;
 
     /// <summary>Gewähltes Pet: Karte zeigt nur dessen Fundorte, herausgezoomt (wohin teleportieren?).</summary>
     [ObservableProperty] private int? selectedPet;
@@ -178,36 +189,46 @@ public sealed partial class PetRadarViewModel : ObservableObject
         Rows.Clear();
         if (current is null) return;
         var selected = SelectedPet is int id ? pets.Get(id) : null;
-        Spawns = selected is not null ? pets.Spawns(selected, current)
-            : pets.All.Where(Wanted).SelectMany(p => pets.Spawns(p, current)).ToList();
+        bool here = pets.Position is { } pos && pets.CurrentMap == current;
+        Self = here ? new Point(pets.Position!.Value.X, pets.Position.Value.Y) : null;
+        Hint = here ? "" : Loc.T(pets.KnowsSelf ? "radar.no_position" : "radar.no_self");
+        if (here) shownAt = (pets.Position!.Value.X, pets.Position.Value.Y);
+
+        // Liste: die nächsten gewünschten Pets (ohne Position: nach Name), scrollbar
+        var list = here
+            ? pets.Nearest(current, Self!.Value.X, Self.Value.Y, Wanted, ListSize).Select(n => (n.Pet, Distance: $"{n.Meters:N0} m {Pets.Compass(n.Bearing)}")).ToList()
+            : pets.All.Where(p => Wanted(p) && pets.Spawns(p, current).Count > 0).OrderBy(p => p.Name).Take(ListSize).Select(p => (Pet: p, Distance: "")).ToList();
+        if (selected is not null && list.All(l => l.Pet.Id != selected.Id)) list.Insert(0, (selected, ""));
+
+        // Karte: gewähltes Pet allein, sonst nur die fünf nächsten – jedes in seiner Farbe (statt aller Punkte auf einmal)
+        var shown = selected is not null ? [selected] : list.Take(Palette.Length).Select(l => l.Pet).ToList();
+        var brushes = new Dictionary<int, Avalonia.Media.IBrush>();
+        var colorOf = new Dictionary<int, Avalonia.Media.IBrush>();
+        for (int i = 0; i < shown.Count; i++)
+        {
+            var brush = selected is not null ? Palette[0] : Palette[i];
+            colorOf[shown[i].Id] = brush;
+            foreach (var npc in shown[i].Npcs) brushes[npc] = brush;
+        }
+        SpawnBrushes = brushes;
+        Spawns = shown.SelectMany(p => pets.Spawns(p, current)).ToList();
         FocusMeters = selected is null ? RadiusMeters : 0;   // gewähltes Pet: alle Fundorte im Blick
         Title = selected is null ? Loc.T("radar.title") : selected.Name;
 
-        bool here = pets.Position is { } pos && pets.CurrentMap == current;
-        Self = here ? new Point(pets.Position!.Value.X, pets.Position.Value.Y) : null;
-        Hint = here ? "" : Loc.T("radar.no_position");
-        if (here) shownAt = (pets.Position!.Value.X, pets.Position.Value.Y);
-
-        // Liste: die nächsten gewünschten Pets (ohne Position: nach Name)
-        IEnumerable<(PetInfo Pet, string Distance)> list = here
-            ? pets.Nearest(current, Self!.Value.X, Self.Value.Y, Wanted, 5).Select(n => (n.Pet, $"{n.Meters:N0} m {Pets.Compass(n.Bearing)}"))
-            : pets.All.Where(p => Wanted(p) && pets.Spawns(p, current).Count > 0).OrderBy(p => p.Name).Take(5).Select(p => (p, ""));
         foreach (var (pet, distance) in list)
         {
             int? level = pets.Level(pet.Id);
             Rows.Add(new RadarRow(pet.Id, pet.Name, distance,
-                level is null ? "" : level == 0 ? Loc.T("pets.missing") : Loc.T("profile.level", level), PetIcons.Get(pet.Id))
+                level is null ? "" : level == 0 ? Loc.T("pets.missing") : Loc.T("profile.level", level), PetIcons.Get(pet.Id), colorOf.GetValueOrDefault(pet.Id))
             { IsSelected = pet.Id == SelectedPet });
         }
-        if (selected is not null && Rows.All(r => r.PetId != selected.Id))
-            Rows.Insert(0, new RadarRow(selected.Id, selected.Name, "", "", PetIcons.Get(selected.Id)) { IsSelected = true });
     }
 
     /// <summary>Neue Position: Liste und Ausschnitt neu, sobald man sich ein Stück bewegt hat.</summary>
     private void Moved()
     {
         if (!IsOpen || pets.Position is not { } pos) return;
-        if (shownAt is { } at && Math.Abs(at.X - pos.X) + Math.Abs(at.Y - pos.Y) < 500) return;   // unter 5 m
+        if (shownAt is { } at && Math.Abs(at.X - pos.X) + Math.Abs(at.Y - pos.Y) < 1500) return;   // unter 15 m
         Refresh();
     }
 }

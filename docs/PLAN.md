@@ -87,7 +87,7 @@ Skill-Slots (Frage 15.10.): Die NCSOFT-API (`character/equipment`) kennt nur cha
 
 Pet-Finder, mit der Aufnahme heute Abend prüfen:
 - [ ] Pet-Fortschritt live ohne Neu-Einloggen: SkeeveAN nennt `petProgress` 0x0D90 (bei uns 0x900D), `petLevel` 0x1490 (0x9014), `petAdded` 0x0990 (0x9009). Seele einsammeln und Pet hochstufen, dann vergleichen
-- [ ] Position: kommt nur bei Skills/Korrekturen. Im offenen Gelände ein paar Skills benutzen und prüfen, ob der Punkt auf der Karte stimmt (Ebenen 101xxx → Verteron 1010 ist geraten)
+- [x] Position zusätzlich aus Effekten (0x382A/0x382B, Wirker-Ort in den letzten 12 Byte; Aufnahme: 249 statt 2 Positionen). Offen:  Im offenen Gelände ein paar Skills benutzen und prüfen, ob der Punkt auf der Karte stimmt (Ebenen 101xxx → Verteron 1010 ist geraten)
 - [ ] Gebiete (`regions.json`) zeigen teils Zonen, in denen das Monster laut Spawns gar nicht steht → stichprobenartig prüfen
 
 A2Tools, noch ungenutzt (nur intern, erst mit Aufnahme prüfen): `player_summon_npcs.json` (Beschwörungen sicher dem Besitzer zuordnen statt per Klasse), `dot_skill_ids.json`, `resource_restore_skills.json` (MP-/SP-Wiederherstellung nicht als Heilung zählen), `abnormals.json` (max. Stapel, Icon-Namen – Bilder selbst sind nicht dabei), `skill_icons.json` (nur Namen)

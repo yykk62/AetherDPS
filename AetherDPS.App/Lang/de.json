@@ -454,7 +454,7 @@
   "pets.position_none": "Deine Position erscheint, sobald du auf dieser Karte kämpfst.",
   "pets.search": "Pet oder Monster suchen",
   "pets.legend_spawn": "Spawnpunkt",
-  "pets.map_hint": "Mausrad: Zoom · Ziehen: verschieben · Doppelklick: alles",
+  "pets.map_hint": "Mausrad: Zoom · Ziehen: verschieben · Doppelklick: ganze Karte · ⌖: zu dir",
   "pets.monsters": "Monster, die die Seele droppen",
   "pets.source": "Spawnpunkte und Karten aus den Spieldaten (über SkeeveAN/Aion-DPS-Meter, MIT). Karten © NCSOFT.",
   "timer_pill.group": "Gruppieren (Pills in der Nähe)",
@@ -469,7 +469,7 @@
   "pets.filter_open": "Noch nicht auf Höchststufe",
   "radar.title": "Pet-Radar",
   "radar.close_tip": "Bis zum nächsten Öffnen der Karte ausblenden",
-  "radar.no_position": "Benutze einen Skill, dann weiß der Meter, wo du stehst.",
+  "radar.no_position": "Greif etwas an oder benutze einen Buff – dann weiß der Meter, wo du stehst.",
   "radar.enable_hint": "Ein kleines Fenster am linken Rand mit den Spawnpunkten der Pets, die dir noch fehlen, rund um deine Position und den nächsten mit Entfernung und Richtung. „Immer“ lässt es dauerhaft stehen, du läufst einfach hin. Deine Position kommt vom Spiel nur, wenn du Skills benutzt. Verschiebbar, ✕ blendet es bis zum nächsten Öffnen der Karte bzw. Kartenwechsel aus.",
   "compass.0": "N",
   "compass.1": "NO",
@@ -484,5 +484,7 @@
   "radar.mode_off": "Aus",
   "radar.back": "Radar",
   "radar.list": "Fehlende Pets",
-  "radar.row_tip": "Klicken: alle Fundorte dieses Pets auf der Karte (nochmal: zurück zum Radar)"
+  "radar.row_tip": "Klicken: alle Fundorte dieses Pets auf der Karte (nochmal: zurück zum Radar)",
+  "radar.center": "Auf mich zentrieren",
+  "radar.no_self": "Der Meter kennt deinen Charakter noch nicht – einmal teleportieren oder neu einloggen."
 }

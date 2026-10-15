@@ -469,7 +469,7 @@
   "pets.filter_open": "Sem nível máximo",
   "radar.title": "Radar de mascotes",
   "radar.close_tip": "Ocultar até abrir o mapa de novo",
-  "radar.no_position": "Use uma habilidade para o medidor saber onde você está.",
+  "radar.no_position": "Ataque algo ou use um buff – assim o medidor sabe onde você está.",
   "radar.enable_hint": "Uma janela pequena à esquerda com os pontos de surgimento dos mascotes que faltam ao seu redor e os mais próximos com distância e direção. «Sempre» a mantém na tela para você ir direto. O jogo só envia sua posição quando você usa habilidades. Pode mover; ✕ oculta até abrir o mapa de novo ou trocar de mapa.",
   "compass.0": "N",
   "compass.1": "NE",
@@ -484,5 +484,7 @@
   "radar.mode_off": "Desligado",
   "radar.back": "Radar",
   "radar.list": "Mascotes que faltam",
-  "radar.row_tip": "Clique: todos os pontos de surgimento deste mascote (de novo: voltar ao radar)"
+  "radar.row_tip": "Clique: todos os pontos de surgimento deste mascote (de novo: voltar ao radar)",
+  "radar.center": "Centralizar em mim",
+  "radar.no_self": "O medidor ainda não conhece seu personagem – teleporte uma vez ou entre de novo."
 }

@@ -165,6 +165,27 @@ public static class SyntheticPackets
         return Frame(body);
     }
 
+    /// <summary>Effekt „an“ (2A 38) von <paramref name="caster"/> auf <paramref name="target"/>, mit dem Ort des Wirkers am Ende.</summary>
+    public static byte[] EffectOn(int target, int caster, float x, float y, float z = 100)
+    {
+        var body = new List<byte>();
+        body.AddRange([0x2A, 0x38]);
+        AddVarInt(body, (uint)target);
+        body.Add(1);
+        body.Add(0);                    // Typ
+        AddVarInt(body, 77);            // Instanz
+        AddU32(body, 14020000);         // Effekt
+        AddU32(body, 10_000);           // Dauer
+        AddU32(body, 0);                // bleibt
+        body.AddRange(new byte[8]);     // Serverzeit
+        AddVarInt(body, (uint)caster);
+        body.AddRange(new byte[6]);
+        body.AddRange(BitConverter.GetBytes(x));
+        body.AddRange(BitConverter.GetBytes(y));
+        body.AddRange(BitConverter.GetBytes(z));
+        return Frame(body);
+    }
+
     /// <summary>LZ4-Container (Opcode FF FF) mit mehreren inneren Paketen.</summary>
     public static byte[] Compressed(params byte[][] inner)
     {

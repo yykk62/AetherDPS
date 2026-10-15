@@ -469,7 +469,7 @@
   "pets.filter_open": "Sin nivel máximo",
   "radar.title": "Radar de mascotas",
   "radar.close_tip": "Ocultar hasta volver a abrir el mapa",
-  "radar.no_position": "Usa una habilidad para que el medidor sepa dónde estás.",
+  "radar.no_position": "Ataca algo o usa un buff: así el medidor sabrá dónde estás.",
   "radar.enable_hint": "Una ventana pequeña a la izquierda con los puntos de aparición de las mascotas que te faltan alrededor de ti y las más cercanas con distancia y dirección. «Siempre» la deja en pantalla para que vayas directamente. El juego solo envía tu posición al usar habilidades. Se puede mover; ✕ la oculta hasta abrir el mapa de nuevo o cambiar de mapa.",
   "compass.0": "N",
   "compass.1": "NE",
@@ -484,5 +484,7 @@
   "radar.mode_off": "Apagado",
   "radar.back": "Radar",
   "radar.list": "Mascotas que faltan",
-  "radar.row_tip": "Clic: todos los puntos de aparición de esta mascota (otra vez: volver al radar)"
+  "radar.row_tip": "Clic: todos los puntos de aparición de esta mascota (otra vez: volver al radar)",
+  "radar.center": "Centrar en mí",
+  "radar.no_self": "El medidor aún no conoce tu personaje: teletranspórtate una vez o vuelve a iniciar sesión."
 }

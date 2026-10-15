@@ -213,12 +213,15 @@ public sealed class UiTests : IDisposable
         Feed(SyntheticPackets.Heartbeat());
         entities.SetSessionPlayerName(4613, "Testheld", 0, "#1317", isUser: true);
         Feed(SyntheticPackets.PetList(1077, (1003, 3, 0)));   // kein Kartenwechsel: Meter nach dem Einloggen gestartet
-        Feed(SyntheticPackets.Position(4613, 81_840, -20_010));
+        Feed(SyntheticPackets.EffectOn(5001, 4613, 81_840, -20_010));   // Position kommt mit jedem eigenen Effekt
         Feed(SyntheticPackets.FieldBossList(1010));
         Settle();
         Assert.True(shown);
         Assert.NotNull(radar.Self);
-        Assert.Equal(5, radar.Rows.Count);
+        Assert.Equal(PetRadarViewModel.ListSize, radar.Rows.Count);          // scrollbar, sichtbar sind fünf
+        Assert.Equal(5, radar.Rows.Count(r => r.HasColor));                    // nur die fünf nächsten auf der Karte
+        var shownPets = radar.Rows.Where(r => r.HasColor).Select(r => r.PetId).ToHashSet();
+        Assert.All(radar.Spawns!, s => Assert.Contains(provider!.GetRequiredService<Pets>().PetOfNpc(s.Npc)!.Value, shownPets));
         Assert.DoesNotContain(radar.Spawns!, s => provider!.GetRequiredService<Pets>().PetOfNpc(s.Npc) == 1003);   // fertig → nicht im Radar
         Assert.All(radar.Rows, r => Assert.NotNull(r.Icon));   // Porträt zu jedem Pet
         Shot(new PetRadarWindow(radar, provider!.GetRequiredService<MeterSettings>()), "pet_radar");

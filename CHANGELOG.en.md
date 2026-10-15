@@ -2,6 +2,13 @@
 
 Newest versions first.
 
+## 0.7.3
+
+- **Your position on the map:** the meter now reads it from every effect you cast (attacks, buffs) – about 40 times more often than before. The dot shows up as soon as you fight or buff
+- **Pet radar tidied up:** the map only shows the five nearest pets you still need, each in its own colour (the dot on the picture in the list shows which). The list scrolls and shows up to 30 pets
+- **⌖ Center** like Google Maps, in the radar and the Pets tab. The radar follows you; if you pan yourself it stays put until you press ⌖
+- **Map in the Pets tab:** always shows the whole map or your own view – picking another pet only sets the markers, without zooming. Double-click: whole map
+
 ## 0.7.2
 
 - **Pet radar fixed:** it did not open when the meter was started after logging in (e.g. after an update). Now opening the map is enough

@@ -2,6 +2,13 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
+## 0.7.3
+
+- **Deine Position auf der Karte:** Der Meter liest sie jetzt aus jedem Effekt, den du wirkst (Angriffe, Buffs) – rund 40-mal öfter als vorher. Der Punkt erscheint also, sobald du kämpfst oder dich bufft
+- **Pet-Radar aufgeräumt:** Auf der Karte stehen nur noch die fünf nächsten fehlenden Pets, jedes in eigener Farbe (der Punkt am Bild in der Liste zeigt sie). Die Liste lässt sich scrollen und zeigt bis zu 30 Pets
+- **⌖ Zentrieren** wie bei Google Maps, im Radar und im Reiter Pets. Das Radar folgt dir; verschiebst du selbst, bleibt es stehen, bis du ⌖ drückst
+- **Karte im Reiter Pets:** zeigt immer die ganze Karte bzw. deinen eigenen Ausschnitt – ein anderes Pet setzt nur die Markierungen, ohne zu zoomen. Doppelklick: ganze Karte
+
 ## 0.7.2
 
 - **Pet-Radar behoben:** Es ging nicht auf, wenn der Meter nach dem Einloggen gestartet wurde (z. B. nach einem Update). Jetzt reicht es, die Karte zu öffnen

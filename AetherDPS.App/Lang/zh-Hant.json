@@ -469,7 +469,7 @@
   "pets.filter_open": "未滿級",
   "radar.title": "寵物雷達",
   "radar.close_tip": "隱藏，直到再次開啟地圖",
-  "radar.no_position": "使用一個技能，計量器就知道你在哪。",
+  "radar.no_position": "攻擊目標或使用增益——計量器就知道你在哪。",
   "radar.enable_hint": "左側小視窗顯示你還缺的寵物出現點，以及最近的距離和方向。「始終顯示」會一直留在畫面上，直接走過去即可。遊戲只在你使用技能時傳送位置。可移動，✕ 隱藏到再次開啟地圖或切換地圖。",
   "compass.0": "北",
   "compass.1": "東北",
@@ -484,5 +484,7 @@
   "radar.mode_off": "關閉",
   "radar.back": "雷達",
   "radar.list": "缺少的寵物",
-  "radar.row_tip": "點擊：顯示此寵物的所有出現點（再點：回到雷達）"
+  "radar.row_tip": "點擊：顯示此寵物的所有出現點（再點：回到雷達）",
+  "radar.center": "以我為中心",
+  "radar.no_self": "計量器還不知道你的角色——傳送一次或重新登入。"
 }

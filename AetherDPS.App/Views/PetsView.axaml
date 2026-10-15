@@ -61,7 +61,11 @@
               </StackPanel>
             </Grid>
             <Border CornerRadius="6" ClipToBounds="True" BorderBrush="#232A36" BorderThickness="1">
-              <views:PetMapView Height="{Binding $parent[UserControl].Bounds.Height, Converter={x:Static l:Sizes.MapHeight}}" Map="{Binding Map}" Spawns="{Binding Spawns}" Self="{Binding Self}" />
+              <Panel>
+                <views:PetMapView Name="FinderMap" AutoFit="False" Height="{Binding $parent[UserControl].Bounds.Height, Converter={x:Static l:Sizes.MapHeight}}" Map="{Binding Map}" Spawns="{Binding Spawns}" Self="{Binding Self}" />
+                <Button Content="⌖" Click="OnCenter" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="8" Padding="8,3"
+                        FontSize="16" Background="#CC141820" Foreground="#E6E8EC" ToolTip.Tip="{l:T radar.center}" />
+              </Panel>
             </Border>
             <StackPanel Spacing="4">
               <WrapPanel>
@@ -70,7 +74,7 @@
                   <TextBlock Text="{l:T pets.legend_spawn}" Classes="dim" FontSize="11" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Spacing="5">
-                  <Ellipse Width="9" Height="9" Fill="#4FC1E9" VerticalAlignment="Center" />
+                  <Ellipse Width="10" Height="10" Fill="White" Stroke="#1E6FD9" StrokeThickness="2.5" VerticalAlignment="Center" />
                   <TextBlock Text="{Binding PositionText}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
                 </StackPanel>
               </WrapPanel>

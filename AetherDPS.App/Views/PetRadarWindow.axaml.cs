@@ -63,5 +63,7 @@ public partial class PetRadarWindow : Window
         settings.Save();
     }
 
+    private void OnCenter(object? sender, RoutedEventArgs e) => RadarMap.CenterOnSelf();
+
     private void OnClose(object? sender, RoutedEventArgs e) => (DataContext as PetRadarViewModel)?.Dismiss();
 }

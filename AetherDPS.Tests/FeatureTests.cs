@@ -266,6 +266,13 @@ public sealed class FeatureTests : IDisposable
         Assert.Equal(81_840, pets.Position!.Value.X, 0);
         Assert.Equal("verteron", pets.CurrentMap!.Key);   // Ebene 101001 gehört zu Verteron 1010
 
+        // Effekte: fremder Wirker zählt nicht, eigener liefert die Position
+        host.Feed(SyntheticPackets.EffectOn(5001, 9999, 1_000, 2_000), 1_450);
+        Assert.Equal(81_840, pets.Position!.Value.X, 0);
+        host.Feed(SyntheticPackets.EffectOn(5001, 4613, 25_889, -101_643), 1_460);
+        Assert.Equal(25_889, pets.Position!.Value.X, 0);
+        Assert.Equal(-101_643, pets.Position!.Value.Y, 0);
+
         // Nächste Pets: Entfernung in Metern, Richtung
         var near = pets.Nearest(pets.CurrentMap!, 81_840, -20_010, _ => true, 3);
         Assert.Equal(3, near.Count);
