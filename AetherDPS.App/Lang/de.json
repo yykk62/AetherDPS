@@ -489,5 +489,11 @@
   "profile.slot_note": "Skills (und eventuell Ausrüstung) zeigt NCSOFT von Slot 1. Spielst du mit einem anderen Slot, kann das hier abweichen.",
   "profile.slot_note_tip": "Die öffentliche Profil-API von NCSOFT hat keine Slot-Auswahl. Die meisten spielen mit Slot 1, dann stimmt alles.",
   "radar.settings_title": "Pet-Radar im Spiel",
-  "radar.short_hint": "Minimap mit den fehlenden Pets in deiner Nähe – erscheint mit der Spielkarte oder bleibt dauerhaft stehen."
+  "radar.short_hint": "Minimap mit den fehlenden Pets in deiner Nähe – erscheint mit der Spielkarte oder bleibt dauerhaft stehen.",
+  "pets.filter_short.all": "Alle",
+  "pets.filter_short.missing": "Fehlen",
+  "pets.filter_short.open": "Nicht max.",
+  "radar.collapse_tip": "Einklappen – nur eine kleine Leiste bleibt",
+  "radar.expand_tip": "Klicken: aufklappen · Ziehen: verschieben",
+  "radar.resize_tip": "Ziehen: Größe ändern"
 }

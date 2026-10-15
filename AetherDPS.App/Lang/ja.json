@@ -489,5 +489,11 @@
   "profile.slot_note": "NCSOFTが表示するのはスロット1のスキル（装備も含む可能性あり）です。別のスロットで遊んでいる場合は異なることがあります。",
   "profile.slot_note_tip": "NCSOFTの公開プロフィールAPIではスロットを選べません。多くの人はスロット1なので、その場合はすべて一致します。",
   "radar.settings_title": "ゲーム内ペットレーダー",
-  "radar.short_hint": "近くの未入手ペットを表示するミニマップ。ゲームのマップと一緒に、または常に表示。"
+  "radar.short_hint": "近くの未入手ペットを表示するミニマップ。ゲームのマップと一緒に、または常に表示。",
+  "pets.filter_short.all": "すべて",
+  "pets.filter_short.missing": "未入手",
+  "pets.filter_short.open": "未最大",
+  "radar.collapse_tip": "折りたたむ（小さなバーだけ残る）",
+  "radar.expand_tip": "クリック：展開・ドラッグ：移動",
+  "radar.resize_tip": "ドラッグ：サイズ変更"
 }

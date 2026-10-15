@@ -9,8 +9,11 @@ using CommunityToolkit.Mvvm.ComponentModel;
 namespace AetherDPS.App.ViewModels;
 
 /// <summary>Pet in der Liste unter der Radar-Karte; Klick zeigt alle seine Fundorte.</summary>
-public sealed partial class RadarRow(int petId, string name, string distance, string level, Bitmap? icon, Avalonia.Media.IBrush? color = null) : ObservableObject
+public sealed partial class RadarRow(int petId, string name, string distance, string level, Bitmap? icon, Avalonia.Media.IBrush? color = null, string monster = "") : ObservableObject
 {
+    /// <summary>Monster am nächsten Fundort (die Seele heißt oft anders als das Monster, z. B. Bienen-Abart ← Schwarzmusterbiene).</summary>
+    public string Monster { get; } = monster;
+    public bool HasMonster => Monster.Length > 0;
     /// <summary>Farbe seiner Punkte auf der Karte (nur die ersten fünf), sonst null.</summary>
     public Avalonia.Media.IBrush? Color { get; } = color;
     public bool HasColor => Color is not null;
@@ -195,9 +198,11 @@ public sealed partial class PetRadarViewModel : ObservableObject
 
         // Liste: die nächsten gewünschten Pets (ohne Position: nach Name), scrollbar
         var list = here
-            ? pets.Nearest(current, Self!.Value.X, Self.Value.Y, Wanted, ListSize).Select(n => (n.Pet, Distance: $"{n.Meters:N0} m {Pets.Compass(n.Bearing)}")).ToList()
-            : pets.All.Where(p => Wanted(p) && pets.Spawns(p, current).Count > 0).OrderBy(p => p.Name).Take(ListSize).Select(p => (Pet: p, Distance: "")).ToList();
-        if (selected is not null && list.All(l => l.Pet.Id != selected.Id)) list.Insert(0, (selected, ""));
+            ? pets.Nearest(current, Self!.Value.X, Self.Value.Y, Wanted, ListSize)
+                .Select(n => (n.Pet, Distance: $"{n.Meters:N0} m {Pets.Compass(n.Bearing)}", Monster: GameText.NpcName(n.Spawn.Npc) ?? "")).ToList()
+            : pets.All.Where(p => Wanted(p) && pets.Spawns(p, current).Count > 0).OrderBy(p => p.Name).Take(ListSize)
+                .Select(p => (Pet: p, Distance: "", Monster: "")).ToList();
+        if (selected is not null && list.All(l => l.Pet.Id != selected.Id)) list.Insert(0, (selected, "", ""));
 
         // Karte: gewähltes Pet allein, sonst höchstens fünf. Ohne Gattungs-Filter das nächste je Gattung in der Farbe
         // der Gattung, mit Filter die fünf nächsten dieser Gattung in unterschiedlichen Farben.
@@ -222,11 +227,12 @@ public sealed partial class PetRadarViewModel : ObservableObject
         Spawns = shown.SelectMany(s => pets.Spawns(s.Pet, current)).ToList();
         Title = selected is null ? Loc.T("radar.title") : selected.Name;
 
-        foreach (var (pet, distance) in list)
+        foreach (var (pet, distance, monster) in list)
         {
             int? level = pets.Level(pet.Id);
             Rows.Add(new RadarRow(pet.Id, pet.Name, distance,
-                level is null ? "" : level == 0 ? Loc.T("pets.missing") : Loc.T("profile.level", level), PetIcons.Get(pet.Id), colorOf.GetValueOrDefault(pet.Id))
+                level is null ? "" : level == 0 ? Loc.T("pets.missing") : Loc.T("profile.level", level), PetIcons.Get(pet.Id), colorOf.GetValueOrDefault(pet.Id),
+                monster == pet.Name ? "" : monster)
             { IsSelected = pet.Id == SelectedPet });
         }
     }

@@ -13,14 +13,19 @@ public sealed record PetMapOption(PetMap Map, string Name)
     public override string ToString() => Name;
 }
 
-public sealed record SpeciesOption(string? Key, string Name)
+/// <summary>Gattung als Bild-Knopf: Porträt eines typischen Pets, Rahmen in der Farbe der Gattung („alle“: ohne Bild).</summary>
+public sealed record SpeciesOption(string? Key, string Name, Avalonia.Media.Imaging.Bitmap? Icon = null)
 {
+    public IBrush Brush => Key is null ? Brushes.Transparent : Services.PetColors.ForSpecies(Key);
+    public bool IsAll => Key is null;
     public override string ToString() => Name;
 }
 
 /// <summary>Filter nach eigenem Stand: alle, noch nicht gesammelt (Stufe 0), noch nicht auf Höchststufe.</summary>
-public sealed record PetFilterOption(string Code, string Name)
+public sealed record PetFilterOption(string Code, string Name, string? Short = null)
 {
+    /// <summary>Kurzer Text für den Knopf (der lange steht im Tooltip).</summary>
+    public string Label => Short ?? Name;
     public override string ToString() => Name;
 }
 
@@ -32,7 +37,7 @@ public sealed record PetRow(PetInfo Pet, string Name, string Species, string Lev
 }
 
 /// <summary>Monster eines Pets mit seinen Spawnpunkten auf der Karte.</summary>
-public sealed record PetMonsterRow(string Name, string Count);
+public sealed record PetMonsterRow(string Name, string Count, int Number = 0);
 
 /// <summary>
 /// Reiter „Pets“: alle Pets, deren Monster auf einer Weltkarte spawnen, mit deiner Stufe (aus der Pet-Liste beim Login)
@@ -52,7 +57,14 @@ public sealed partial class PetsViewModel : ObservableObject
     public IReadOnlyList<PetMapOption> MapOptions { get; }
     public IReadOnlyList<SpeciesOption> SpeciesOptions { get; }
     public IReadOnlyList<PetFilterOption> FilterOptions { get; } =
-        [new("all", Loc.T("pets.filter_all")), new("missing", Loc.T("pets.filter_missing")), new("open", Loc.T("pets.filter_open"))];
+    [
+        new("all", Loc.T("pets.filter_all"), Loc.T("pets.filter_short.all")),
+        new("missing", Loc.T("pets.filter_missing"), Loc.T("pets.filter_short.missing")),
+        new("open", Loc.T("pets.filter_open"), Loc.T("pets.filter_short.open")),
+    ];
+
+    /// <summary>Mehr als eine Karte zur Auswahl? (Elyos: Verteron + Abyss, Asmodier: Altgard + Abyss)</summary>
+    public bool HasMapChoice => MapOptions.Count > 1;
     public ObservableCollection<PetRow> Rows { get; } = [];
     public ObservableCollection<PetMonsterRow> Monsters { get; } = [];
 
@@ -78,9 +90,13 @@ public sealed partial class PetsViewModel : ObservableObject
     {
         this.pets = pets;
         this.settings = settings;
-        MapOptions = pets.Maps.Select(m => new PetMapOption(m, Loc.T("pets.map." + m.Key))).ToList();
+        // Nur die Karten der eigenen Seite (Server 13xx = Elyos, 23xx = Asmodier), die Abyss teilen sich beide
+        var server = Engine.Community.Armory.ServerId(settings.CharacterServer);
+        string? otherSide = server switch { >= 2000 => "verteron", >= 1000 => "altgard", _ => null };
+        MapOptions = pets.Maps.Where(m => m.Key != otherSide)
+            .Select(m => new PetMapOption(m, Loc.T("pets.map." + m.Key).Split(" (")[0])).ToList();
         SpeciesOptions = new[] { new SpeciesOption(null, Loc.T("pets.species_all")) }
-            .Concat(Pets.SpeciesOrder.Select(s => new SpeciesOption(s, Loc.T("pets.species." + s)))).ToList();
+            .Concat(Pets.SpeciesOrder.Select(s => new SpeciesOption(s, Loc.T("pets.species." + s), SpeciesIcon(pets, s)))).ToList();
         selectedSpecies = SpeciesOptions.FirstOrDefault(s => s.Key == settings.PetSpecies) ?? SpeciesOptions[0];
         selectedFilter = FilterOptions.FirstOrDefault(f => f.Code == settings.PetFilter) ?? FilterOptions[0];
         selectedMap = DefaultMap();
@@ -89,6 +105,18 @@ public sealed partial class PetsViewModel : ObservableObject
             if (built) Rebuild();
         });
         pets.PositionChanged += (_, _) => Dispatcher.UIThread.Post(UpdatePosition);
+    }
+
+    /// <summary>Bild einer Gattung: typische Vertreter, sonst das erste Pet der Gattung mit Porträt.</summary>
+    private static Avalonia.Media.Imaging.Bitmap? SpeciesIcon(Pets pets, string species)
+    {
+        int[] preferred = species switch
+        {
+            "Intellect" => [1002], "Feral" => [1004], "Nature" => [1003], "Special" => [1001], _ => [],
+        };
+        foreach (var id in preferred.Concat(pets.All.Where(p => p.Species == species).Select(p => p.Id)))
+            if (Services.PetIcons.Get(id) is { } icon && pets.Get(id)?.Species == species) return icon;
+        return null;
     }
 
     /// <summary>Pet-Radar: aus, solange die Spielkarte offen ist, oder immer.</summary>
@@ -204,7 +232,7 @@ public sealed partial class PetsViewModel : ObservableObject
         var regions = pets.Regions(row.Pet, option.Map);
         DetailRegions = regions.Count > 0 ? string.Join(", ", regions) : "";
         foreach (var g in spawns.GroupBy(s => s.Npc).OrderByDescending(g => g.Count()))
-            Monsters.Add(new PetMonsterRow(GameText.NpcName(g.Key) ?? $"#{g.Key}", Loc.T("pets.spawn_count", g.Count())));
+            Monsters.Add(new PetMonsterRow(GameText.NpcName(g.Key) ?? $"#{g.Key}", Loc.T("pets.spawn_count", g.Count()), g.Count()));
     }
 
     private void UpdatePosition()

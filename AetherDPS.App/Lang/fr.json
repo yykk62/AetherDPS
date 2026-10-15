@@ -489,5 +489,11 @@
   "profile.slot_note": "NCSOFT affiche les compétences (et peut-être l'équipement) du slot 1. Si tu joues avec un autre slot, cela peut différer.",
   "profile.slot_note_tip": "L'API publique de profils de NCSOFT ne permet pas de choisir le slot. La plupart jouent avec le slot 1 : tout correspond alors.",
   "radar.settings_title": "Radar de familiers en jeu",
-  "radar.short_hint": "Mini-carte avec les familiers manquants autour de toi – s'affiche avec la carte du jeu ou en permanence."
+  "radar.short_hint": "Mini-carte avec les familiers manquants autour de toi – s'affiche avec la carte du jeu ou en permanence.",
+  "pets.filter_short.all": "Tous",
+  "pets.filter_short.missing": "Manquants",
+  "pets.filter_short.open": "Pas max",
+  "radar.collapse_tip": "Réduire – seule une petite barre reste",
+  "radar.expand_tip": "Clic : déplier · Glisser : déplacer",
+  "radar.resize_tip": "Glisser : redimensionner"
 }

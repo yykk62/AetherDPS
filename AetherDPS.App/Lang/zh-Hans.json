@@ -489,5 +489,11 @@
   "profile.slot_note": "NCSOFT 显示的是槽位 1 的技能（可能也包括装备）。如果你使用其他槽位，这里可能不一致。",
   "profile.slot_note_tip": "NCSOFT 的公开角色接口无法选择槽位。大多数人使用槽位 1，这种情况下全部一致。",
   "radar.settings_title": "游戏内宠物雷达",
-  "radar.short_hint": "显示你附近缺少的宠物的小地图——随游戏地图出现或一直显示。"
+  "radar.short_hint": "显示你附近缺少的宠物的小地图——随游戏地图出现或一直显示。",
+  "pets.filter_short.all": "全部",
+  "pets.filter_short.missing": "未获得",
+  "pets.filter_short.open": "未满级",
+  "radar.collapse_tip": "折叠——只留下一条小栏",
+  "radar.expand_tip": "单击：展开 · 拖动：移动",
+  "radar.resize_tip": "拖动：调整大小"
 }

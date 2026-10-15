@@ -2,6 +2,13 @@
 
 Newest versions first.
 
+## 0.7.7
+
+- **Pet radar as big as the game map:** the first time it opens centred right over the game map and can replace it. Drag the bottom-right corner to resize; position and size are remembered
+- **Collapse:** ▾ shrinks the radar to a tiny bar, one click opens it again
+- **Which monster?** In the radar list each pet shows the monster at the nearest spawn – the soul often has a different name (Aberrant Bee drops from the Black-patterned Bee, for example)
+- **Pets tab with buttons instead of dropdowns:** map (only your side and the Abyss), species as pictures in their colour, status as "All · Missing · Not max". The monsters are shown more compactly above the map
+
 ## 0.7.6
 
 - **Pets tab redesigned:** everything fits in the window, no more scrolling. The pet radar setting is at the top, the list and map fill the rest. The monsters that drop the soul are shown as small chips above the map

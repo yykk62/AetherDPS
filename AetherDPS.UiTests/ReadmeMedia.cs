@@ -99,6 +99,8 @@ public sealed class ReadmeMedia : IDisposable
         settings.CharacterClassId = selfClass;
         settings.CharacterServer = selfServer;
         settings.PetFilter = "open";
+        settings.PetRadarWidth = 300;      // Radar kompakt (sonst so groß wie die Spielkarte)
+        settings.PetRadarMapHeight = 240;
         settings.Save();
         WriteRuns();
         WriteChecklist();

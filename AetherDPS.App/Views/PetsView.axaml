@@ -6,11 +6,38 @@
              x:Class="AetherDPS.App.Views.PetsView"
              x:DataType="vm:PetsViewModel">
   <UserControl.Styles>
+    <!-- Knopfleiste statt Dropdown: ein ListBox mit nebeneinander gleich breiten Feldern -->
+    <Style Selector="ListBox.seg">
+      <Setter Property="Background" Value="#14181F" />
+      <Setter Property="CornerRadius" Value="7" />
+      <Setter Property="Padding" Value="3" />
+      <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+      <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
+      <Setter Property="ItemsPanel">
+        <ItemsPanelTemplate>
+          <UniformGrid Rows="1" />
+        </ItemsPanelTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="ListBox.seg ListBoxItem">
+      <Setter Property="Padding" Value="4,5" />
+      <Setter Property="Margin" Value="1,0" />
+      <Setter Property="CornerRadius" Value="5" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="MinHeight" Value="0" />
+    </Style>
+    <Style Selector="ListBox.seg ListBoxItem:selected /template/ ContentPresenter">
+      <Setter Property="Background" Value="#3A3120" />
+    </Style>
+    <Style Selector="ListBox.seg ListBoxItem:selected TextBlock">
+      <Setter Property="Foreground" Value="#E0A84A" />
+    </Style>
     <Style Selector="Border.chip">
       <Setter Property="Background" Value="#262D3A" />
       <Setter Property="CornerRadius" Value="11" />
-      <Setter Property="Padding" Value="9,3" />
-      <Setter Property="Margin" Value="0,0,6,6" />
+      <Setter Property="Padding" Value="8,2" />
+      <Setter Property="Margin" Value="0,0,5,5" />
     </Style>
   </UserControl.Styles>
 
@@ -38,13 +65,38 @@
         <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
           <TextBlock Classes="h2" Text="{l:T pets.title}" Margin="0,0,0,8" />
           <StackPanel Grid.Row="1" Spacing="6" Margin="0,0,0,6">
-            <ComboBox ItemsSource="{Binding MapOptions}" SelectedItem="{Binding SelectedMap}" HorizontalAlignment="Stretch" />
-            <ComboBox ItemsSource="{Binding SpeciesOptions}" SelectedItem="{Binding SelectedSpecies}" HorizontalAlignment="Stretch" />
+            <!-- Karte: nur die der eigenen Seite (+ Abyss) -->
+            <ListBox Classes="seg" ItemsSource="{Binding MapOptions}" SelectedItem="{Binding SelectedMap}" IsVisible="{Binding HasMapChoice}">
+              <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:PetMapOption">
+                  <TextBlock Text="{Binding Name}" FontSize="12" TextTrimming="CharacterEllipsis" />
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+            <!-- Gattung: Bild-Knöpfe -->
+            <ListBox Classes="seg" ItemsSource="{Binding SpeciesOptions}" SelectedItem="{Binding SelectedSpecies}">
+              <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:SpeciesOption">
+                  <Panel ToolTip.Tip="{Binding Name}" Height="30">
+                    <TextBlock Text="{l:T pets.filter_short.all}" FontSize="12" IsVisible="{Binding IsAll}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                    <Border Width="30" Height="30" CornerRadius="15" ClipToBounds="True" BorderBrush="{Binding Brush}" BorderThickness="2"
+                            IsVisible="{Binding !IsAll}" Background="#22000000">
+                      <Image Source="{Binding Icon}" Stretch="UniformToFill" />
+                    </Border>
+                  </Panel>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+            <!-- Stand: alle / fehlen / nicht max -->
+            <ListBox Classes="seg" ItemsSource="{Binding FilterOptions}" SelectedItem="{Binding SelectedFilter}">
+              <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:PetFilterOption">
+                  <TextBlock Text="{Binding Label}" ToolTip.Tip="{Binding Name}" FontSize="12" TextTrimming="CharacterEllipsis" />
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
           </StackPanel>
-          <Grid Grid.Row="2" RowDefinitions="Auto,Auto" Margin="0,0,0,6">
-            <TextBox Text="{Binding Search}" Watermark="{l:T pets.search}" Margin="0,0,0,6" />
-            <ComboBox Grid.Row="1" ItemsSource="{Binding FilterOptions}" SelectedItem="{Binding SelectedFilter}" HorizontalAlignment="Stretch" />
-          </Grid>
+          <TextBox Grid.Row="2" Text="{Binding Search}" Watermark="{l:T pets.search}" Margin="0,0,0,6" />
           <StackPanel Grid.Row="3" Spacing="2" Margin="2,0,0,6">
             <TextBlock Text="{Binding Summary}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
             <TextBlock Text="{Binding LevelsHint}" Foreground="#E0A84A" FontSize="11" TextWrapping="Wrap"
@@ -95,7 +147,8 @@
           </Grid>
 
           <!-- Monster, die die Seele droppen -->
-          <ItemsControl Grid.Row="1" ItemsSource="{Binding Monsters}" ToolTip.Tip="{l:T pets.monsters}">
+          <ScrollViewer Grid.Row="1" MaxHeight="44" HorizontalScrollBarVisibility="Disabled">
+          <ItemsControl ItemsSource="{Binding Monsters}" ToolTip.Tip="{l:T pets.monsters}">
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>
                 <WrapPanel />
@@ -103,15 +156,16 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
               <DataTemplate x:DataType="vm:PetMonsterRow">
-                <Border Classes="chip">
-                  <StackPanel Orientation="Horizontal" Spacing="6">
-                    <TextBlock Text="{Binding Name}" FontSize="11.5" />
-                    <TextBlock Text="{Binding Count}" Classes="dim" FontSize="10.5" VerticalAlignment="Center" />
+                <Border Classes="chip" ToolTip.Tip="{Binding Count}">
+                  <StackPanel Orientation="Horizontal" Spacing="5">
+                    <TextBlock Text="{Binding Name}" FontSize="11" />
+                    <TextBlock Text="{Binding Number}" Foreground="#E0A84A" FontSize="10.5" VerticalAlignment="Center" />
                   </StackPanel>
                 </Border>
               </DataTemplate>
             </ItemsControl.ItemTemplate>
           </ItemsControl>
+          </ScrollViewer>
 
           <Border Grid.Row="2" CornerRadius="6" ClipToBounds="True" BorderBrush="#232A36" BorderThickness="1" MinHeight="220">
             <Panel>

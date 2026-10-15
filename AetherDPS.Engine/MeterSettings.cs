@@ -50,6 +50,13 @@ public sealed class MeterSettings
     /// <summary>Zoom des Pet-Radars: sichtbarer Umkreis in Metern (null = Standard 600 m).</summary>
     public double? PetRadarMeters { get; set; }
 
+    /// <summary>Größe des Pet-Radars (Breite und Kartenhöhe in DIP; null = so groß wie die Spielkarte, mittig).</summary>
+    public double? PetRadarWidth { get; set; }
+    public double? PetRadarMapHeight { get; set; }
+
+    /// <summary>Pet-Radar eingeklappt: nur eine kleine Leiste, Klick klappt es wieder auf.</summary>
+    public bool PetRadarCollapsed { get; set; }
+
     /// <summary>Session-ID des Charakters beim letzten Login/Teleport – gilt, solange das Spiel nicht neu gestartet wurde.</summary>
     public int CharacterSessionId { get; set; }
     public DateTime? CharacterSeenAt { get; set; }

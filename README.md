@@ -118,7 +118,7 @@ Alle Pets von Verteron, Altgard und der Abyss mit **deiner Stufe und deinem Fort
 
 <p align="center"><img src="docs/media/pets.png" width="100%" alt="Pet-Finder mit Liste und Spawnkarte" /></p>
 
-Das **Pet-Radar** erscheint, sobald du im Spiel die Karte öffnest, oder bleibt auf Wunsch dauerhaft stehen. Es ist eine **Minimap wie im Spiel**: Du bist immer in der Mitte, sie folgt dir (auch im Flug) und merkt sich deinen Zoom. Darauf die fehlenden Pets in deiner Nähe mit **Entfernung und Richtung**. Klick auf ein Pet zeigt seine Fundorte; liegt keiner im Bild, zoomt die Karte nur so weit heraus, dass der nächste zu sehen ist.
+Das **Pet-Radar** erscheint, sobald du im Spiel die Karte öffnest, genau darüber und so groß wie sie, oder bleibt auf Wunsch dauerhaft stehen. Es ist eine **Minimap wie im Spiel**: Du bist immer in der Mitte, sie folgt dir (auch im Flug) und merkt sich deinen Zoom. Darauf die fehlenden Pets in deiner Nähe mit **Entfernung, Richtung und dem Monster, das die Seele droppt**. Klick auf ein Pet zeigt seine Fundorte; liegt keiner im Bild, zoomt die Karte nur so weit heraus, dass der nächste zu sehen ist. Größe per Ecke ziehen, ▾ klappt es zu einer kleinen Leiste ein.
 
 <p align="center"><img src="docs/media/pet-radar.png" width="100%" alt="Pet-Radar: je Gattung, eine Gattung gewählt, ein Pet angeklickt" /></p>
 

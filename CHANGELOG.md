@@ -2,6 +2,13 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
+## 0.7.7
+
+- **Pet-Radar so groß wie die Spielkarte:** Beim ersten Öffnen liegt es mittig genau über der Spielkarte und kann sie ersetzen. Größe per Ecke unten rechts ziehen, Position und Größe werden gemerkt
+- **Einklappen:** ▾ macht das Radar zu einer winzigen Leiste, ein Klick darauf klappt es wieder auf
+- **Welches Monster?** In der Radar-Liste steht unter jedem Pet das Monster am nächsten Fundort – die Seele heißt oft anders (Bienen-Abart droppt z. B. von der Schwarzmusterbiene)
+- **Reiter Pets mit Knöpfen statt Listen:** Karte (nur deine Seite und die Abyss), Gattung als Bilder in ihrer Farbe, Stand als „Alle · Fehlen · Nicht max.“. Die Monster stehen kompakter über der Karte
+
 ## 0.7.6
 
 - **Reiter Pets neu aufgebaut:** Alles passt ins Fenster, nichts muss mehr gescrollt werden. Die Einstellung fürs Pet-Radar steht ganz oben, Liste und Karte füllen den Rest. Die Monster, die die Seele droppen, stehen als kleine Kärtchen über der Karte

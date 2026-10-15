@@ -230,6 +230,17 @@ public sealed class UiTests : IDisposable
         Assert.DoesNotContain(radar.Spawns!, s => provider!.GetRequiredService<Pets>().PetOfNpc(s.Npc) == 1003);   // fertig → nicht im Radar
         Assert.All(radar.Rows, r => Assert.NotNull(r.Icon));   // Porträt zu jedem Pet
         Shot(new PetRadarWindow(radar, provider!.GetRequiredService<MeterSettings>()), "pet_radar");
+        Assert.Contains(radar.Rows, r => r.HasMonster);   // Monster am nächsten Fundort steht dabei
+
+        // eingeklappt: nur eine kleine Leiste, Zustand wird gemerkt
+        var mini = new PetRadarWindow(radar, provider!.GetRequiredService<MeterSettings>());
+        mini.SetCollapsed(true);
+        mini.Show();
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(mini.Bounds.Width < 200 && mini.Bounds.Height < 60, mini.Bounds.ToString());
+        Assert.True(provider!.GetRequiredService<MeterSettings>().PetRadarCollapsed);
+        Shot(mini, "pet_radar_mini");
+        new PetRadarWindow(radar, provider!.GetRequiredService<MeterSettings>()).SetCollapsed(false);
 
         // Gattung gewählt: nur diese, die fünf nächsten in unterschiedlichen Farben
         provider!.GetRequiredService<MeterSettings>().PetSpecies = "Feral";

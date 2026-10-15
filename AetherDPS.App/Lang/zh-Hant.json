@@ -489,5 +489,11 @@
   "profile.slot_note": "NCSOFT 顯示的是欄位 1 的技能（可能也包括裝備）。如果你使用其他欄位，這裡可能不一致。",
   "profile.slot_note_tip": "NCSOFT 的公開角色介面無法選擇欄位。大多數人使用欄位 1，這種情況下全部一致。",
   "radar.settings_title": "遊戲內寵物雷達",
-  "radar.short_hint": "顯示你附近缺少的寵物的小地圖——隨遊戲地圖出現或一直顯示。"
+  "radar.short_hint": "顯示你附近缺少的寵物的小地圖——隨遊戲地圖出現或一直顯示。",
+  "pets.filter_short.all": "全部",
+  "pets.filter_short.missing": "未獲得",
+  "pets.filter_short.open": "未滿級",
+  "radar.collapse_tip": "摺疊——只留下一條小欄",
+  "radar.expand_tip": "點擊：展開 · 拖曳：移動",
+  "radar.resize_tip": "拖曳：調整大小"
 }

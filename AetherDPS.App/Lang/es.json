@@ -489,5 +489,11 @@
   "profile.slot_note": "NCSOFT muestra las habilidades (y quizá el equipo) del espacio 1. Si juegas con otro espacio, puede no coincidir.",
   "profile.slot_note_tip": "La API pública de perfiles de NCSOFT no permite elegir el espacio. La mayoría juega con el espacio 1 y entonces todo coincide.",
   "radar.settings_title": "Radar de mascotas en el juego",
-  "radar.short_hint": "Minimapa con las mascotas que te faltan cerca – aparece con el mapa del juego o se queda fijo."
+  "radar.short_hint": "Minimapa con las mascotas que te faltan cerca – aparece con el mapa del juego o se queda fijo.",
+  "pets.filter_short.all": "Todas",
+  "pets.filter_short.missing": "Faltan",
+  "pets.filter_short.open": "No máx.",
+  "radar.collapse_tip": "Contraer – solo queda una barra pequeña",
+  "radar.expand_tip": "Clic: desplegar · Arrastrar: mover",
+  "radar.resize_tip": "Arrastrar: cambiar tamaño"
 }

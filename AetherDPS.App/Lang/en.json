@@ -489,5 +489,11 @@
   "profile.slot_note": "NCSOFT shows skills (and possibly gear) from slot 1. If you play with another slot, this may differ.",
   "profile.slot_note_tip": "NCSOFT's public profile API has no slot selection. Most players use slot 1, in which case everything matches.",
   "radar.settings_title": "In-game pet radar",
-  "radar.short_hint": "Minimap with the missing pets near you – appears with the game map or stays on permanently."
+  "radar.short_hint": "Minimap with the missing pets near you – appears with the game map or stays on permanently.",
+  "pets.filter_short.all": "All",
+  "pets.filter_short.missing": "Missing",
+  "pets.filter_short.open": "Not max",
+  "radar.collapse_tip": "Collapse – only a small bar stays",
+  "radar.expand_tip": "Click: expand · Drag: move",
+  "radar.resize_tip": "Drag: resize"
 }
