@@ -5,6 +5,7 @@ Ein quelloffener DPS-Meter für AION 2 (EU), deutsch zuerst, in 10 Sprachen, als
 - **Lesen:** `docs/WARTUNG.md` (Aufbau, Upstream-Merge, Patch-Liste), `docs/PROTOKOLL.md`, `docs/PLAN.md` (nächste Schritte)
 - **Bauen und testen:** `dotnet build AetherDPS.slnx`, `dotnet test AetherDPS.Tests`. Es braucht das .NET-10-SDK. `dotnet` liegt nicht im PATH, also den vollen Pfad `C:\Program Files\dotnet\dotnet.exe` verwenden.
 - **Oberfläche ohne Bildschirm prüfen:** `dotnet test AetherDPS.UiTests` rendert alle Fenster unsichtbar. Mit `AETHERDPS_SHOTS=<ordner>` werden die Bilder gespeichert. So lässt sich das Aussehen prüfen, ohne dass Fenster über einem laufenden Spiel aufgehen
+- **README-Bilder** (`docs/media/`): `AETHERDPS_README=<ordner>` (+ `AETHERDPS_README_FROM=%LOCALAPPDATA%\AetherDPS` für den eigenen Charakter mit echtem Profil, ausdrücklich so gewünscht), `dotnet test AetherDPS.UiTests --filter ReadmeMedia`, dann `python tools/readme-media.py <ordner>`. Mitspieler nur mit Pseudonymen, nie fremde echte Namen; der eigene Name steht nie im Code
 - **Nie echte Fenster öffnen, solange AION2.exe läuft** (der Nutzer spielt dann). Wiedergaben laufen mit eigenem Datenordner
 - **Ohne Spiel testen:** `aetherdps-cli demo x.txt`, danach `AetherDPS.exe --replay x.txt`
 - **Upstream-Dateien** (`AionDpsMeter.*`) nur minimal ändern und jede Änderung in die Tabelle in `docs/WARTUNG.md` eintragen
