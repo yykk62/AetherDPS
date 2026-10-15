@@ -8,7 +8,7 @@
     "prebuild": "node scripts/sync-assets.mjs",
     "build": "astro build",
     "preview": "astro preview",
-    "deploy": "npm run build && npx wrangler deploy"
+    "deploy": "npm run build && npx --prefix ../server wrangler deploy"
   },
   "dependencies": {
     "astro": "7.3.8"

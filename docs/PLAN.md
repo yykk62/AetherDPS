@@ -96,8 +96,8 @@ A2Tools, noch ungenutzt (nur intern, erst mit Aufnahme prüfen): `player_summon_
 Astro-Seite in `web/`, statisch, über Cloudflare (Konto des Nutzers, Domain aetherdps.com gekauft). Spieldaten kommen beim Bauen direkt aus `AetherDPS.Engine/GameData`, Bilder aus `AetherDPS.App/Assets` und `docs/media`.
 - [x] Gerüst: Start, Timer, Checkliste (mehrere Charaktere), Cheat Sheet, Datenbank (Feldbosse, Pets), Charakter, Guides, Karte, Impressum, Datenschutz, Danke (15.10.)
 - [x] Titelbilder mit Higgsfield (je Motiv einmal erzeugt, `web/public/img`)
-- [ ] Impressum und Datenschutz: Platzhalter ausfüllen (Name, Anschrift, E-Mail)
-- [ ] Domain im Cloudflare-Dashboard mit dem Worker `aetherdps-web` verbinden, erstes `npm run deploy` (nur nach OK)
+- [x] Live unter aetherdps.com und www.aetherdps.com (15.10., Worker `aetherdps-web`, Custom Domains). Impressum-Angaben in `web/.impressum.json` (nicht im Repo)
+- [x] E-Mail: Cloudflare Email Routing, kontakt@ und alle anderen Adressen an die Gmail des Nutzers (15.10.)
 - [ ] **Resetzeit klären:** App nimmt 06:00 an (`ChecklistService`), Wakayashi 09:00 täglich und Mi 09:00. Webseite nutzt 09:00 (`web/src/lib/schedule.ts`). Im Spiel prüfen, dann beide angleichen
 - [ ] Unbestätigte Zeiten prüfen: Beritra, Shugofesta, Dimensions-Invasion, Reshanta-Weltbosse (`web/src/data/events.ts`)
 - [ ] Mein Charakter: Abfrage über den Worker (CORS), nur der eigene Charakter, mit Cache und Begrenzung; Charakter im localStorage. Neue Verbindung nach außen → README, Datenschutz, CLAUDE.md

@@ -4,13 +4,12 @@ title: Datenschutz
 description: Datenschutzerklärung für die Webseite und die App AetherDPS
 ---
 
-> **Entwurf:** Keine Rechtsberatung. Platzhalter in [eckigen Klammern] vor dem Veröffentlichen ausfüllen. Abgeleitet aus `docs/DATENSCHUTZ-ENTWURF.md`; ändert sich dort etwas, hier nachziehen.
+<!-- Abgeleitet aus docs/DATENSCHUTZ-ENTWURF.md; ändert sich dort oder in der App etwas, hier nachziehen. -->
 
 ## 1. Verantwortlicher
 
-[Vorname Nachname]
-[Anschrift]
-E-Mail: [Adresse]
+Verantwortlich ist der im [Impressum](/impressum) genannte Betreiber dieser Seite und der App.
+E-Mail: [kontakt@aetherdps.com](mailto:kontakt@aetherdps.com)
 
 ## 2. Diese Webseite
 
@@ -22,6 +21,9 @@ Die Seite setzt keine Cookies, nutzt keine Analyse- oder Werbedienste und lädt 
 
 ### Speicher im Browser
 Die Checkliste speichert deine Charakternamen und Haken im Speicher deines Browsers (localStorage). Diese Daten verlassen deinen Browser nie und lassen sich über die Browser-Einstellungen löschen. Das Speichern ist für die von dir gewünschte Funktion unbedingt erforderlich (§ 25 Abs. 2 Nr. 2 TDDDG).
+
+### E-Mail
+Schreibst du an eine Adresse unter aetherdps.com, nimmt Cloudflare (Email Routing) die Nachricht an und leitet sie an ein Postfach bei Google (Gmail) weiter. Wir nutzen deine Nachricht und Adresse nur, um zu antworten, und löschen sie, wenn sie nicht mehr gebraucht werden. Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (Beantwortung deiner Anfrage). Datenschutzhinweise von Google: <https://policies.google.com/privacy>
 
 ### Externe Links
 Links zu GitHub, YouTube, Twitch, Wakayashi oder QuestLog.gg sind normale Links. Erst wenn du sie anklickst, wird die jeweilige Seite geladen.
@@ -37,7 +39,7 @@ Beim Start und danach stündlich fragt die App bei GitHub (GitHub Inc., USA) die
 Nur wenn du beim ersten Start zustimmst, sendet die App höchstens einmal pro Tag `{"v":"0.7.10","lang":"de","new":false}`: App-Version, Sprache und ob es die erste Nutzung ist. Keine Kennung, kein Name, kein Server. Rechtsgrundlage: Einwilligung (Art. 6 Abs. 1 lit. a DSGVO, § 25 Abs. 1 TDDDG), jederzeit widerrufbar unter Einstellungen → Datenschutz.
 
 ### c) Fehlerberichte (nur auf Klick)
-Wenn du „Problem melden“ nutzt, werden deine Beschreibung, auf Wunsch das Log, App-Version, Sprache und Windows-Version übertragen. Namen von Spielern und dein Windows-Benutzername werden vorher entfernt. Gespeichert bis der Fehler bearbeitet ist, höchstens [12 Monate].
+Wenn du „Problem melden“ nutzt, werden deine Beschreibung, auf Wunsch das Log, App-Version, Sprache und Windows-Version übertragen. Namen von Spielern und dein Windows-Benutzername werden vorher entfernt. Gespeichert bis der Fehler bearbeitet ist, höchstens 12 Monate.
 
 ### d) Charakter-Profile
 Die App fragt bei NCSOFT (api-search.plaync.com, aion2.plaync.com) Charaktername und Server ab und zeigt die öffentlichen Profildaten, die NCSOFT auch auf seiner Webseite zeigt. Das passiert nur, wenn du den Reiter Profil öffnest, selbst suchst oder klickst, oder (abschaltbar) wenn jemand deiner Gruppe beitritt. Gespeichert wird nur 15 Minuten im Arbeitsspeicher.
@@ -52,4 +54,4 @@ Nutzungszahl und Fehlerberichte verarbeitet ein Server bei Cloudflare, Inc. als 
 
 Auskunft, Berichtigung, Löschung, Einschränkung, Widerspruch, Datenübertragbarkeit und Widerruf einer Einwilligung (Art. 15–21, Art. 7 Abs. 3 DSGVO) sowie Beschwerde bei einer Datenschutz-Aufsichtsbehörde.
 
-Stand: [Datum]
+Stand: 15.10.2026

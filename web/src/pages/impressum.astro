@@ -1,0 +1,38 @@
+---
+// Name und Anschrift stehen nicht im Repo, sondern in web/.impressum.json (gitignored).
+// Fehlt die Datei, bricht der Build ab, damit die Seite nie ohne Impressum online geht.
+import fs from 'node:fs';
+import path from 'node:path';
+import Base from '../layouts/Base.astro';
+
+const file = path.resolve(process.cwd(), '.impressum.json');
+if (!fs.existsSync(file)) throw new Error('web/.impressum.json fehlt (Name, Anschrift, E-Mail für das Impressum), siehe web/README.md');
+const i = JSON.parse(fs.readFileSync(file, 'utf8')) as { name: string; street: string; city: string; country: string; email: string };
+---
+<Base title="Impressum" description="Impressum von aetherdps.com">
+  <div class="wrap prose">
+    <header class="page-head"><h1>Impressum</h1></header>
+
+    <h2>Angaben gemäß § 5 DDG</h2>
+    <p>{i.name}<br />{i.street}<br />{i.city}<br />{i.country}</p>
+
+    <h2>Kontakt</h2>
+    <p>E-Mail: <a href={`mailto:${i.email}`}>{i.email}</a></p>
+
+    <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
+    <p>{i.name}, Anschrift wie oben</p>
+
+    <h2>Hinweis</h2>
+    <p>
+      AetherDPS ist ein kostenloses, inoffizielles Fan-Projekt und steht in keiner Verbindung zu NCSOFT. AION 2, die
+      Spielinhalte, Namen und Bilder aus dem Spiel sind Eigentum von NCSOFT. Inhalte des Cheat Sheets und der Checkliste
+      stammen mit Erlaubnis von <a href="https://wakayashi.gg/aion2">Wakayashi</a>.
+    </p>
+    <p>Für Inhalte externer Links sind ausschließlich deren Betreiber verantwortlich.</p>
+  </div>
+</Base>
+
+<style>
+  .prose { max-width: 780px; }
+  .prose h2 { font-size: 1.2rem; margin-top: 2rem; }
+</style>

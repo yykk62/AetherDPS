@@ -5,3 +5,5 @@ dist/
 # Von scripts/sync-assets.mjs aus dem Repo kopiert (eine Quelle für App und Webseite)
 public/gen/
 public/favicon.png
+# Impressum-Angaben (Name, Anschrift) – nie ins Repo, CLAUDE.md: der eigene Name steht nie im Code
+.impressum.json
