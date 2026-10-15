@@ -219,12 +219,25 @@ public sealed class UiTests : IDisposable
         Assert.True(shown);
         Assert.NotNull(radar.Self);
         Assert.Equal(PetRadarViewModel.ListSize, radar.Rows.Count);          // scrollbar, sichtbar sind fünf
-        Assert.Equal(5, radar.Rows.Count(r => r.HasColor));                    // nur die fünf nächsten auf der Karte
-        var shownPets = radar.Rows.Where(r => r.HasColor).Select(r => r.PetId).ToHashSet();
+        var petData = provider!.GetRequiredService<Pets>();
+        // ohne Gattungs-Filter: das nächste Pet je Gattung, in der Farbe der Gattung
+        var colored = radar.Rows.Where(r => r.HasColor).ToList();
+        Assert.InRange(colored.Count, 4, 5);
+        Assert.Equal(colored.Count, colored.Select(r => petData.Get(r.PetId)!.Species).Distinct().Count());
+        Assert.All(colored, r => Assert.Same(PetColors.ForSpecies(petData.Get(r.PetId)!.Species), r.Color));
+        var shownPets = colored.Select(r => r.PetId).ToHashSet();
         Assert.All(radar.Spawns!, s => Assert.Contains(provider!.GetRequiredService<Pets>().PetOfNpc(s.Npc)!.Value, shownPets));
         Assert.DoesNotContain(radar.Spawns!, s => provider!.GetRequiredService<Pets>().PetOfNpc(s.Npc) == 1003);   // fertig → nicht im Radar
         Assert.All(radar.Rows, r => Assert.NotNull(r.Icon));   // Porträt zu jedem Pet
         Shot(new PetRadarWindow(radar, provider!.GetRequiredService<MeterSettings>()), "pet_radar");
+
+        // Gattung gewählt: nur diese, die fünf nächsten in unterschiedlichen Farben
+        provider!.GetRequiredService<MeterSettings>().PetSpecies = "Feral";
+        radar.Refresh();
+        Assert.All(radar.Rows, r => Assert.Equal("Feral", petData.Get(r.PetId)!.Species));
+        Assert.Equal(5, radar.Rows.Where(r => r.HasColor).Select(r => r.Color).Distinct().Count());
+        provider!.GetRequiredService<MeterSettings>().PetSpecies = null;
+        radar.Refresh();
 
         // Pet anklicken: nur seine Fundorte, alle im Blick
         var pick = radar.Rows[2];

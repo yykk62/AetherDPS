@@ -48,10 +48,6 @@ public sealed partial class PetRadarViewModel : ObservableObject
     [ObservableProperty] private string hint = "";
     [ObservableProperty] private IReadOnlyDictionary<int, Avalonia.Media.IBrush>? spawnBrushes;
 
-    /// <summary>Farben der fünf nächsten Pets auf der Radar-Karte.</summary>
-    private static readonly Avalonia.Media.IBrush[] Palette =
-        new[] { "#E0A84A", "#3FD0B0", "#E86AB0", "#8BD65A", "#A88BEB" }.Select(c => (Avalonia.Media.IBrush)new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse(c))).ToArray();
-
     /// <summary>So viele Pets stehen in der Liste (scrollbar, sichtbar sind fünf).</summary>
     public const int ListSize = 30;
 
@@ -175,12 +171,14 @@ public sealed partial class PetRadarViewModel : ObservableObject
     }
 
     /// <summary>Gewünscht laut Filter im Reiter Pets: noch nicht gesammelt, nicht auf Höchststufe oder alle (Stufen unbekannt → alle).</summary>
-    private bool Wanted(PetInfo pet) => pets.Level(pet.Id) is not int level || settings.PetFilter switch
-    {
-        "missing" => level == 0,
-        "all" => true,
-        _ => level < Pets.TopLevel,
-    };
+    private bool Wanted(PetInfo pet) =>
+        (settings.PetSpecies is not { } species || pet.Species == species)
+        && (pets.Level(pet.Id) is not int level || settings.PetFilter switch
+        {
+            "missing" => level == 0,
+            "all" => true,
+            _ => level < Pets.TopLevel,
+        });
 
     public void Refresh()
     {
@@ -200,18 +198,27 @@ public sealed partial class PetRadarViewModel : ObservableObject
             : pets.All.Where(p => Wanted(p) && pets.Spawns(p, current).Count > 0).OrderBy(p => p.Name).Take(ListSize).Select(p => (Pet: p, Distance: "")).ToList();
         if (selected is not null && list.All(l => l.Pet.Id != selected.Id)) list.Insert(0, (selected, ""));
 
-        // Karte: gewähltes Pet allein, sonst nur die fünf nächsten – jedes in seiner Farbe (statt aller Punkte auf einmal)
-        var shown = selected is not null ? [selected] : list.Take(Palette.Length).Select(l => l.Pet).ToList();
+        // Karte: gewähltes Pet allein, sonst höchstens fünf. Ohne Gattungs-Filter das nächste je Gattung in der Farbe
+        // der Gattung, mit Filter die fünf nächsten dieser Gattung in unterschiedlichen Farben.
+        bool oneSpecies = settings.PetSpecies is not null;
+        var shown = new List<(PetInfo Pet, Avalonia.Media.IBrush Brush)>();
+        if (selected is not null) shown.Add((selected, oneSpecies ? PetColors.Palette[0] : PetColors.ForSpecies(selected.Species)));
+        else if (oneSpecies)
+            shown.AddRange(list.Take(PetColors.Palette.Length).Select((l, i) => (l.Pet, PetColors.Palette[i])));
+        else
+            shown.AddRange(Pets.SpeciesOrder
+                .Select(sp => list.Select(l => l.Pet).FirstOrDefault(p => p.Species == sp))
+                .Where(p => p is not null)
+                .Select(p => (p!, PetColors.ForSpecies(p!.Species))));
         var brushes = new Dictionary<int, Avalonia.Media.IBrush>();
         var colorOf = new Dictionary<int, Avalonia.Media.IBrush>();
-        for (int i = 0; i < shown.Count; i++)
+        foreach (var (pet, brush) in shown)
         {
-            var brush = selected is not null ? Palette[0] : Palette[i];
-            colorOf[shown[i].Id] = brush;
-            foreach (var npc in shown[i].Npcs) brushes[npc] = brush;
+            colorOf[pet.Id] = brush;
+            foreach (var npc in pet.Npcs) brushes[npc] = brush;
         }
         SpawnBrushes = brushes;
-        Spawns = shown.SelectMany(p => pets.Spawns(p, current)).ToList();
+        Spawns = shown.SelectMany(s => pets.Spawns(s.Pet, current)).ToList();
         FocusMeters = selected is null ? RadiusMeters : 0;   // gewähltes Pet: alle Fundorte im Blick
         Title = selected is null ? Loc.T("radar.title") : selected.Name;
 

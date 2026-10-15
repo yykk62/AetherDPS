@@ -34,7 +34,7 @@
                 </Border>
                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                   <TextBlock Text="{Binding Name}" FontSize="12.5" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
-                  <TextBlock Text="{Binding Species}" Classes="dim" FontSize="10.5" />
+                  <TextBlock Text="{Binding Species}" Foreground="{Binding SpeciesBrush}" FontSize="10.5" />
                 </StackPanel>
                 <TextBlock Grid.Column="2" Text="{Binding LevelText}" Foreground="{Binding LevelBrush}" FontSize="11" VerticalAlignment="Center" Margin="6,0,0,0" />
               </Grid>
@@ -62,7 +62,7 @@
             </Grid>
             <Border CornerRadius="6" ClipToBounds="True" BorderBrush="#232A36" BorderThickness="1">
               <Panel>
-                <views:PetMapView Name="FinderMap" AutoFit="False" Height="{Binding $parent[UserControl].Bounds.Height, Converter={x:Static l:Sizes.MapHeight}}" Map="{Binding Map}" Spawns="{Binding Spawns}" Self="{Binding Self}" />
+                <views:PetMapView Name="FinderMap" AutoFit="False" DotBrush="{Binding DotBrush}" Height="{Binding $parent[UserControl].Bounds.Height, Converter={x:Static l:Sizes.MapHeight}}" Map="{Binding Map}" Spawns="{Binding Spawns}" Self="{Binding Self}" />
                 <Button Content="⌖" Click="OnCenter" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="8" Padding="8,3"
                         FontSize="16" Background="#CC141820" Foreground="#E6E8EC" ToolTip.Tip="{l:T radar.center}" />
               </Panel>
@@ -70,7 +70,7 @@
             <StackPanel Spacing="4">
               <WrapPanel>
                 <StackPanel Orientation="Horizontal" Spacing="5" Margin="0,0,14,0">
-                  <Ellipse Width="9" Height="9" Fill="#E0A84A" VerticalAlignment="Center" />
+                  <Ellipse Width="9" Height="9" Fill="{Binding DotBrush}" VerticalAlignment="Center" />
                   <TextBlock Text="{l:T pets.legend_spawn}" Classes="dim" FontSize="11" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Spacing="5">

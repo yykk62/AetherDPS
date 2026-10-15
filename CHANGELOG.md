@@ -2,6 +2,11 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
+## 0.7.4
+
+- **Farben nach Gattung:** Jede Pet-Gattung hat eine feste Farbe – Cognia blau, Fera orange, Natura grün, Varia lila, Specia gelb – in der Liste, auf der Karte im Reiter Pets und im Radar
+- **Radar mit Logik:** Ohne Gattungs-Filter zeigt es das nächste fehlende Pet **je Gattung** in deren Farbe. Wählst du im Reiter Pets eine Gattung, zeigt es die fünf nächsten dieser Gattung in unterschiedlichen Farben. Die gewählte Gattung wird gemerkt
+
 ## 0.7.3
 
 - **Deine Position auf der Karte:** Der Meter liest sie jetzt aus jedem Effekt, den du wirkst (Angriffe, Buffs) – rund 40-mal öfter als vorher. Der Punkt erscheint also, sobald du kämpfst oder dich bufft

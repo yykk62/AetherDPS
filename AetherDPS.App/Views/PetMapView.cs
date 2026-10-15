@@ -57,7 +57,7 @@ public sealed class PetMapView : Control
         {
             if (v.FocusMeters > 0 && v.following) v.fitted = false;
         });
-        AffectsRender<PetMapView>(SpawnBrushesProperty);
+        AffectsRender<PetMapView>(SpawnBrushesProperty, DotBrushProperty);
         AffectsRender<PetMapView>(FocusMetersProperty);
     }
 
@@ -80,6 +80,11 @@ public sealed class PetMapView : Control
         AvaloniaProperty.Register<PetMapView, IReadOnlyDictionary<int, IBrush>?>(nameof(SpawnBrushes));
 
     public IReadOnlyDictionary<int, IBrush>? SpawnBrushes { get => GetValue(SpawnBrushesProperty); set => SetValue(SpawnBrushesProperty, value); }
+
+    /// <summary>Farbe aller Punkte, wenn keine Farbe je Monster gesetzt ist (Pet-Finder: Farbe der Gattung).</summary>
+    public static readonly StyledProperty<IBrush?> DotBrushProperty = AvaloniaProperty.Register<PetMapView, IBrush?>(nameof(DotBrush));
+
+    public IBrush? DotBrush { get => GetValue(DotBrushProperty); set => SetValue(DotBrushProperty, value); }
 
     /// <summary>Folgt der Ausschnitt der eigenen Position? Aus, sobald man selbst schiebt oder zoomt; ⌖ schaltet es wieder an.</summary>
     private bool following = true;
@@ -189,7 +194,7 @@ public sealed class PetMapView : Control
         {
             var (x, y) = map.ToPixel(s.X, s.Y);
             var p = ToScreen(new Point(x, y));
-            var fill = SpawnBrushes is { } brushes && brushes.TryGetValue(s.Npc, out var b) ? b : SpawnFill;
+            var fill = SpawnBrushes is { } brushes && brushes.TryGetValue(s.Npc, out var b) ? b : DotBrush ?? SpawnFill;
             if (bounds.Inflate(r).Contains(p)) context.DrawEllipse(fill, SpawnPen, p, r, r);
         }
 

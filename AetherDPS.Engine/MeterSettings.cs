@@ -41,6 +41,9 @@ public sealed class MeterSettings
     /// <summary>Welche Pets Pet-Finder und Radar zeigen: „all“, „missing“ (noch nicht gesammelt), „open“ (nicht auf Höchststufe).</summary>
     public string PetFilter { get; set; } = "open";
 
+    /// <summary>Gattung im Pet-Finder (null = alle) – gilt auch fürs Radar.</summary>
+    public string? PetSpecies { get; set; }
+
     /// <summary>Liste unter der Radar-Karte aufgeklappt.</summary>
     public bool PetRadarList { get; set; } = true;
     public double? PetRadarLeft { get; set; }

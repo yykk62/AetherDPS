@@ -27,6 +27,7 @@ public sealed record PetFilterOption(string Code, string Name)
 /// <summary>Zeile der Pet-Liste: Name, Gattung, eigene Stufe, Zahl der Spawnpunkte auf der gewählten Karte.</summary>
 public sealed record PetRow(PetInfo Pet, string Name, string Species, string LevelText, IBrush LevelBrush, int Spawns, bool Done)
 {
+    public IBrush SpeciesBrush => Services.PetColors.ForSpecies(Pet.Species);
     public Avalonia.Media.Imaging.Bitmap? Icon => Services.PetIcons.Get(Pet.Id);
 }
 
@@ -68,6 +69,7 @@ public sealed partial class PetsViewModel : ObservableObject
     [ObservableProperty] private string levelsHint = "";
     [ObservableProperty] private string detailTitle = "";
     [ObservableProperty] private Avalonia.Media.Imaging.Bitmap? detailIcon;
+    [ObservableProperty] private IBrush dotBrush = Services.PetColors.Palette[0];
     [ObservableProperty] private string detailLevel = "";
     [ObservableProperty] private string detailRegions = "";
     [ObservableProperty] private string positionText = "";
@@ -79,7 +81,7 @@ public sealed partial class PetsViewModel : ObservableObject
         MapOptions = pets.Maps.Select(m => new PetMapOption(m, Loc.T("pets.map." + m.Key))).ToList();
         SpeciesOptions = new[] { new SpeciesOption(null, Loc.T("pets.species_all")) }
             .Concat(Pets.SpeciesOrder.Select(s => new SpeciesOption(s, Loc.T("pets.species." + s)))).ToList();
-        selectedSpecies = SpeciesOptions[0];
+        selectedSpecies = SpeciesOptions.FirstOrDefault(s => s.Key == settings.PetSpecies) ?? SpeciesOptions[0];
         selectedFilter = FilterOptions.FirstOrDefault(f => f.Code == settings.PetFilter) ?? FilterOptions[0];
         selectedMap = DefaultMap();
         pets.LevelsChanged += (_, _) => Dispatcher.UIThread.Post(() =>
@@ -126,7 +128,12 @@ public sealed partial class PetsViewModel : ObservableObject
     }
 
     partial void OnSelectedMapChanged(PetMapOption? value) => Rebuild();
-    partial void OnSelectedSpeciesChanged(SpeciesOption? value) => Rebuild();
+    partial void OnSelectedSpeciesChanged(SpeciesOption? value)
+    {
+        settings.PetSpecies = value?.Key;   // gilt auch fürs Pet-Radar
+        settings.Save();
+        Rebuild();
+    }
     partial void OnSearchChanged(string value) => Rebuild();
     partial void OnSelectedFilterChanged(PetFilterOption value)
     {
@@ -192,6 +199,7 @@ public sealed partial class PetsViewModel : ObservableObject
         Spawns = spawns;
         DetailTitle = $"{row.Name} · {row.Species}";
         DetailIcon = row.Icon;
+        DotBrush = row.SpeciesBrush;
         DetailLevel = row.LevelText == "?" ? Loc.T("pets.level_unknown") : row.LevelText;
         var regions = pets.Regions(row.Pet, option.Map);
         DetailRegions = regions.Count > 0 ? string.Join(", ", regions) : "";

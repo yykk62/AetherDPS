@@ -2,6 +2,11 @@
 
 Newest versions first.
 
+## 0.7.4
+
+- **Colours by species:** every pet species has a fixed colour – Cogni blue, Fera orange, Natura green, Varian purple, Special yellow – in the list, on the map in the Pets tab and in the radar
+- **Smarter radar:** without a species filter it shows the nearest missing pet **per species** in that colour. If you pick a species in the Pets tab, it shows the five nearest of that species in different colours. The chosen species is remembered
+
 ## 0.7.3
 
 - **Your position on the map:** the meter now reads it from every effect you cast (attacks, buffs) – about 40 times more often than before. The dot shows up as soon as you fight or buff
