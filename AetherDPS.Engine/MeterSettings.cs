@@ -35,6 +35,11 @@ public sealed class MeterSettings
     /// <summary>Tritt jemand der Gruppe bei, sein Profil (Kampfkraft, Itemstufe, Waffe) kurz einblenden – lädt bei NCSOFT.</summary>
     public bool PartyJoinPopup { get; set; } = true;
 
+    /// <summary>Pet-Radar: beim Öffnen der Spielkarte fehlende Pets in der Nähe einblenden. Position in Bildschirm-Pixeln.</summary>
+    public bool PetRadar { get; set; } = true;
+    public double? PetRadarLeft { get; set; }
+    public double? PetRadarTop { get; set; }
+
     /// <summary>Session-ID des Charakters beim letzten Login/Teleport – gilt, solange das Spiel nicht neu gestartet wurde.</summary>
     public int CharacterSessionId { get; set; }
     public DateTime? CharacterSeenAt { get; set; }

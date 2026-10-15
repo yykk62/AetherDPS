@@ -6,66 +6,49 @@ using CommunityToolkit.Mvvm.Input;
 namespace AetherDPS.App.ViewModels;
 
 /// <summary>
-/// Timer-Overlay: eine schmale Gruppe (passt sich der Anzahl an) plus einzeln gelöste Timer,
-/// die als eigene Leisten frei verteilt werden können. Unabhängig vom DPS-Meter und STRG+W.
+/// Timer-Overlay: jeder Timer ist eine eigene Pill. Pills stehen allein oder in Gruppen (<see cref="TimerGroup"/>),
+/// die Fenster dazu verwaltet <see cref="Views.TimerPills"/>. Unabhängig vom DPS-Meter und STRG+W.
 /// </summary>
 public sealed partial class TimerOverlayViewModel : ObservableObject
 {
-    private const int MaxRows = 12;
     private readonly TimersViewModel timers;
 
-    /// <summary>Timer in der Gruppe.</summary>
+    /// <summary>Alle Timer, die gerade im Overlay stehen sollen (nach Fälligkeit sortiert).</summary>
     public ObservableCollection<TimerRow> Rows { get; } = [];
 
-    /// <summary>Einzeln gelöste Timer – je eine eigene Leiste.</summary>
-    public ObservableCollection<TimerRow> Detached { get; } = [];
+    /// <summary>Welche Timer sichtbar sind, hat sich geändert (nicht nur die Restzeit).</summary>
+    public event EventHandler? LayoutChanged;
 
-    [ObservableProperty] private bool hasRows;
-    [ObservableProperty] private bool isClickThrough;
-
-    /// <summary>„+“ oder Klick auf einen Timer → Hauptfenster, Reiter „Timer“.</summary>
+    /// <summary>„Bearbeiten“ → Hauptfenster, Reiter „Timer“.</summary>
     public event EventHandler? EditRequested;
     public event EventHandler? HideRequested;
 
     public TimerOverlayViewModel(TimersViewModel timers)
     {
         this.timers = timers;
-        columns = Math.Clamp(timers.Service.Settings.OverlayColumns, 1, 4);
         timers.Service.Changed += (_, _) => Avalonia.Threading.Dispatcher.UIThread.Post(Rebuild);
+        timers.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(TimersViewModel.OverlayLocked)) LockChanged?.Invoke(this, EventArgs.Empty);
+        };
         Rebuild();
     }
 
     public TimerService Service => timers.Service;
 
-    /// <summary>Spalten der Gruppe (1–4), per Rechtsklick auf den Kopf.</summary>
-    [ObservableProperty] private int columns;
-
-    partial void OnColumnsChanged(int value)
+    /// <summary>Gesperrt: Klicks gehen durch die Pills ins Spiel. Wird gespeichert.</summary>
+    public bool IsLocked
     {
-        if (timers.Service.Settings.OverlayColumns == value) return;
-        timers.Service.Settings.OverlayColumns = value;
-        timers.Service.SaveQuiet();
+        get => timers.OverlayLocked;
+        set => timers.OverlayLocked = value;
     }
 
-    [RelayCommand]
-    private void SetColumns(string count) => Columns = Math.Clamp(int.Parse(count), 1, 4);
-
-    /// <summary>Alle Timer als einzelne Kacheln lösen.</summary>
-    [RelayCommand]
-    private void DetachAll()
-    {
-        foreach (var row in Rows.ToList()) timers.Service.SetDetached(row.Item.Name, true);
-    }
-
-    /// <summary>Alle einzelnen Kacheln zurück in die Gruppe.</summary>
-    [RelayCommand]
-    private void AttachAll()
-    {
-        foreach (var row in Detached.ToList()) timers.Service.SetDetached(row.Item.Name, false);
-    }
+    public event EventHandler? LockChanged;
 
     /// <summary>Etwas anzuzeigen? (Modus „nur kurz vorher“ blendet sonst aus.)</summary>
-    public bool HasContent => Rows.Count > 0 || Detached.Count > 0;
+    public bool HasContent => Rows.Count > 0;
+
+    public TimerRow? Row(string name) => Rows.FirstOrDefault(r => r.Item.Name == name);
 
     private bool Visible(TimerItem item, DateTime now)
     {
@@ -80,50 +63,38 @@ public sealed partial class TimerOverlayViewModel : ObservableObject
         var now = DateTime.Now;
         var items = timers.Service.Items()
             .Where(i => Visible(i, now))
+            .GroupBy(i => i.Name).Select(g => g.First())   // Name ist der Schlüssel der Pill
             .OrderBy(i => i.DueAt ?? DateTime.MaxValue)
             .ToList();
-        Sync(Rows, items.Where(i => !timers.Service.IsDetached(i.Name)).Take(MaxRows));
-        Sync(Detached, items.Where(i => timers.Service.IsDetached(i.Name)));
-        HasRows = Rows.Count > 0;
-        UpdateRows(now);
-    }
-
-    private void UpdateRows(DateTime now)
-    {
-        foreach (var row in Rows) row.Update(now);
-        foreach (var row in Detached) row.Update(now);
-    }
-
-    /// <summary>Liste nur ändern, wo sich etwas geändert hat – sonst flackern die Leisten-Fenster.</summary>
-    private void Sync(ObservableCollection<TimerRow> target, IEnumerable<TimerItem> items)
-    {
-        var wanted = items.ToList();
-        for (int i = target.Count - 1; i >= 0; i--)
-            if (!wanted.Any(w => w.Name == target[i].Item.Name && w.Kind == target[i].Item.Kind))
-                target.RemoveAt(i);
-        for (int i = 0; i < wanted.Count; i++)
+        var before = Rows.Select(r => r.Item.Name).ToHashSet();
+        Rows.Clear();
+        foreach (var item in items)
         {
-            int existing = -1;
-            for (int j = 0; j < target.Count; j++)
-                if (target[j].Item.Name == wanted[i].Name && target[j].Item.Kind == wanted[i].Kind) existing = j;
-            var row = new TimerRow(timers, wanted[i]);
-            if (existing < 0) target.Insert(Math.Min(i, target.Count), row);
-            else if (target[existing].Item.DueAt != wanted[i].DueAt || target[existing].Item.Detail != wanted[i].Detail) target[existing] = row;
-            else if (existing != i && i < target.Count) target.Move(existing, i);
+            var row = new TimerRow(timers, item);
+            row.Update(now);
+            Rows.Add(row);
         }
+        if (!before.SetEquals(items.Select(i => i.Name))) LayoutChanged?.Invoke(this, EventArgs.Empty);
+        else RowsReplaced?.Invoke(this, EventArgs.Empty);
     }
+
+    /// <summary>Gleiche Timer, neue Daten (z. B. neue Fälligkeit) – Pills neu binden, ohne Fenster umzubauen.</summary>
+    public event EventHandler? RowsReplaced;
 
     public void Tick()
     {
         var now = DateTime.Now;
         if (timers.OverlayMode == "soon"
-            || Rows.Concat(Detached).Any(r => r.Item.Kind == TimerKind.Schedule && r.Item.DueAt is DateTime due && due <= now))
+            || Rows.Any(r => r.Item.Kind == TimerKind.Schedule && r.Item.DueAt is DateTime due && due <= now))
         {
             Rebuild();
             return;
         }
-        UpdateRows(now);
+        foreach (var row in Rows) row.Update(now);
     }
+
+    /// <summary>Pill komplett entfernen (eigener Timer weg, fester Termin aus, Feldboss ohne Stern).</summary>
+    public void RemoveTimer(TimerRow row) => Service.RemoveFromOverlay(row.Item.Kind, row.Item.Name);
 
     [RelayCommand]
     private void Edit() => EditRequested?.Invoke(this, EventArgs.Empty);

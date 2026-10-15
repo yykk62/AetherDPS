@@ -67,6 +67,7 @@ public sealed class Pets
             previous?.Invoke(opcode, data);
             if (opcode == OpPetList) OnPetList(data);
             else if (opcode == OpPosition) OnPosition(data);
+            else if (opcode == FieldBosses.OpList) OnMapOpen();
         };
     }
 
@@ -205,6 +206,45 @@ public sealed class Pets
         Position = (p.X, p.Y, zone.MapId, DateTime.Now);
         PositionChanged?.Invoke(this, EventArgs.Empty);
     }
+
+    /// <summary>
+    /// Die Spielkarte ist offen: Solange Karte oder Feldboss-Liste im Spiel offen sind, schickt der Server etwa
+    /// jede Sekunde die Feldboss-Liste (0x9101). Bleibt sie ein paar Sekunden aus, ist die Karte zu.
+    /// </summary>
+    public DateTime? MapOpenSeen { get; private set; }
+
+    public event EventHandler? MapOpen;
+
+    private void OnMapOpen()
+    {
+        MapOpenSeen = DateTime.Now;
+        MapOpen?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>Ein Spawnpunkt in der Nähe: Pet, Entfernung in Metern, Himmelsrichtung (0 = Nord, im Uhrzeigersinn).</summary>
+    public sealed record Nearby(PetInfo Pet, PetSpawn Spawn, double Meters, double Bearing);
+
+    /// <summary>Nächster Spawnpunkt je Pet (nur gewünschte Pets), sortiert nach Entfernung.</summary>
+    public IReadOnlyList<Nearby> Nearest(PetMap map, double x, double y, Func<PetInfo, bool> wanted, int count)
+    {
+        var list = new List<Nearby>();
+        foreach (var pet in All.Where(wanted))
+        {
+            Nearby? best = null;
+            foreach (var s in Spawns(pet, map))
+            {
+                double dx = s.X - x, dy = s.Y - y;
+                double meters = Math.Sqrt(dx * dx + dy * dy) / 100;   // Weltkoordinaten in cm
+                if (best is null || meters < best.Meters)
+                    best = new Nearby(pet, s, meters, (Math.Atan2(dx, -dy) * 180 / Math.PI + 360) % 360);   // +y = Süden (Karte nach unten)
+            }
+            if (best is not null) list.Add(best);
+        }
+        return list.OrderBy(n => n.Meters).Take(count).ToList();
+    }
+
+    /// <summary>Himmelsrichtung als Kürzel (N, NO, O …) aus dem Winkel.</summary>
+    public static string Compass(double bearing) => Loc.T("compass." + (int)Math.Round(bearing / 45) % 8);
 
     public sealed record PetList(int Active, Dictionary<int, int> Levels, Dictionary<int, int> Progress);
 

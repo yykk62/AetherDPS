@@ -18,6 +18,12 @@ public sealed record SpeciesOption(string? Key, string Name)
     public override string ToString() => Name;
 }
 
+/// <summary>Filter nach eigenem Stand: alle, noch nicht gesammelt (Stufe 0), noch nicht auf Höchststufe.</summary>
+public sealed record PetFilterOption(string Code, string Name)
+{
+    public override string ToString() => Name;
+}
+
 /// <summary>Zeile der Pet-Liste: Name, Gattung, eigene Stufe, Zahl der Spawnpunkte auf der gewählten Karte.</summary>
 public sealed record PetRow(PetInfo Pet, string Name, string Species, string LevelText, IBrush LevelBrush, int Spawns, bool Done);
 
@@ -41,13 +47,15 @@ public sealed partial class PetsViewModel : ObservableObject
 
     public IReadOnlyList<PetMapOption> MapOptions { get; }
     public IReadOnlyList<SpeciesOption> SpeciesOptions { get; }
+    public IReadOnlyList<PetFilterOption> FilterOptions { get; } =
+        [new("all", Loc.T("pets.filter_all")), new("missing", Loc.T("pets.filter_missing")), new("open", Loc.T("pets.filter_open"))];
     public ObservableCollection<PetRow> Rows { get; } = [];
     public ObservableCollection<PetMonsterRow> Monsters { get; } = [];
 
     [ObservableProperty] private PetMapOption? selectedMap;
     [ObservableProperty] private SpeciesOption? selectedSpecies;
     [ObservableProperty] private string search = "";
-    [ObservableProperty] private bool onlyOpen;
+    [ObservableProperty] private PetFilterOption selectedFilter;
     [ObservableProperty] private PetRow? selected;
 
     [ObservableProperty] private PetMap? map;
@@ -68,12 +76,26 @@ public sealed partial class PetsViewModel : ObservableObject
         SpeciesOptions = new[] { new SpeciesOption(null, Loc.T("pets.species_all")) }
             .Concat(Pets.SpeciesOrder.Select(s => new SpeciesOption(s, Loc.T("pets.species." + s)))).ToList();
         selectedSpecies = SpeciesOptions[0];
+        selectedFilter = FilterOptions[0];
         selectedMap = DefaultMap();
         pets.LevelsChanged += (_, _) => Dispatcher.UIThread.Post(() =>
         {
             if (built) Rebuild();
         });
         pets.PositionChanged += (_, _) => Dispatcher.UIThread.Post(UpdatePosition);
+    }
+
+    /// <summary>Pet-Radar beim Öffnen der Spielkarte.</summary>
+    public bool RadarEnabled
+    {
+        get => settings.PetRadar;
+        set
+        {
+            if (settings.PetRadar == value) return;
+            settings.PetRadar = value;
+            settings.Save();
+            OnPropertyChanged();
+        }
     }
 
     /// <summary>Beim ersten Öffnen aufbauen (Karte und Liste).</summary>
@@ -99,7 +121,7 @@ public sealed partial class PetsViewModel : ObservableObject
     partial void OnSelectedMapChanged(PetMapOption? value) => Rebuild();
     partial void OnSelectedSpeciesChanged(SpeciesOption? value) => Rebuild();
     partial void OnSearchChanged(string value) => Rebuild();
-    partial void OnOnlyOpenChanged(bool value) => Rebuild();
+    partial void OnSelectedFilterChanged(PetFilterOption value) => Rebuild();
     partial void OnSelectedChanged(PetRow? value) => ShowSelected();
 
     private void Rebuild()
@@ -117,7 +139,8 @@ public sealed partial class PetsViewModel : ObservableObject
             var row = Row(pet, count);
             if (row.Done) done++;
             if (SelectedSpecies?.Key is { } species && pet.Species != species) continue;
-            if (OnlyOpen && row.Done) continue;
+            if (SelectedFilter.Code == "open" && row.Done) continue;
+            if (SelectedFilter.Code == "missing" && pets.Level(pet.Id) is > 0) continue;
             if (Search.Trim() is { Length: > 0 } term && !pet.Name.Contains(term, StringComparison.CurrentCultureIgnoreCase)
                 && !pet.Npcs.Any(n => (GameText.NpcName(n) ?? "").Contains(term, StringComparison.CurrentCultureIgnoreCase))) continue;
             rows.Add(row);

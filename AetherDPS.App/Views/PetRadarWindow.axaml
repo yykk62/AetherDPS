@@ -1,0 +1,41 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AetherDPS.App.ViewModels"
+        xmlns:views="using:AetherDPS.App.Views"
+        xmlns:l="using:AetherDPS.App.Services"
+        x:Class="AetherDPS.App.Views.PetRadarWindow"
+        x:DataType="vm:PetRadarViewModel"
+        Title="{l:T radar.title}"
+        SystemDecorations="None" ShowActivated="False" Topmost="True" ShowInTaskbar="False"
+        CanResize="False" Width="280" SizeToContent="Height"
+        TransparencyLevelHint="Transparent" Background="Transparent">
+  <Window.Styles>
+    <Style Selector="TextBlock">
+      <Setter Property="Foreground" Value="#E6E8EC" />
+    </Style>
+  </Window.Styles>
+  <Border Name="Root" Background="#EB141820" BorderBrush="#99E0A84A" BorderThickness="1" CornerRadius="8" Padding="8" Cursor="SizeAll">
+    <StackPanel Spacing="6">
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Text="{l:T radar.title}" FontWeight="SemiBold" Foreground="#E0A84A" VerticalAlignment="Center" />
+        <Button Grid.Column="1" Content="✕" Padding="6,0" Background="Transparent" Click="OnClose" ToolTip.Tip="{l:T radar.close_tip}" />
+      </Grid>
+      <Border CornerRadius="6" ClipToBounds="True">
+        <views:PetMapView Height="230" Map="{Binding Map}" Spawns="{Binding Spawns}" Self="{Binding Self}" FocusMeters="600" MaxDot="3" />
+      </Border>
+      <ItemsControl ItemsSource="{Binding Rows}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:RadarRow">
+            <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,1">
+              <TextBlock Text="{Binding Name}" FontSize="12" TextTrimming="CharacterEllipsis" />
+              <TextBlock Grid.Column="1" Text="{Binding Level}" FontSize="10.5" Foreground="#8E96A3" Margin="6,0" VerticalAlignment="Center" />
+              <TextBlock Grid.Column="2" Text="{Binding Distance}" FontSize="12" FontWeight="SemiBold" Foreground="#E0A84A" />
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <TextBlock Text="{Binding Hint}" Foreground="#8E96A3" FontSize="11" TextWrapping="Wrap"
+                 IsVisible="{Binding Hint, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+    </StackPanel>
+  </Border>
+</Window>

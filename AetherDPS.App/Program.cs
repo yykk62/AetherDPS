@@ -155,6 +155,7 @@ public static class AppServices
         services.AddSingleton<PartyViewModel>();
         services.AddSingleton<ProfileViewModel>();
         services.AddSingleton<PetsViewModel>();
+        services.AddSingleton<PetRadarViewModel>();
         services.AddSingleton<PartyJoinViewModel>();
         services.AddSingleton<TimersViewModel>();
         services.AddSingleton<ChecklistViewModel>();

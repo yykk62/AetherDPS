@@ -1,0 +1,20 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AetherDPS.App.ViewModels"
+             xmlns:l="using:AetherDPS.App.Services"
+             x:Class="AetherDPS.App.Views.TimerPill"
+             x:DataType="vm:TimerRow"
+             Width="150" Height="46">
+  <!-- Eine Pill: alle gleich groß, Name oben klein, Restzeit groß -->
+  <Border Name="Root" Background="#E6141820" CornerRadius="23" BorderBrush="#2A3240" BorderThickness="1"
+          Padding="16,4,16,5" Cursor="SizeAll" ToolTip.Tip="{Binding At}">
+    <StackPanel VerticalAlignment="Center">
+      <StackPanel Orientation="Horizontal" Spacing="4">
+        <TextBlock Text="{Binding Icon}" Foreground="#E0A84A" FontSize="10" VerticalAlignment="Center" />
+        <TextBlock Text="{Binding Name}" Foreground="#8E96A3" FontSize="10.5" FontWeight="SemiBold" MaxWidth="100" TextTrimming="CharacterEllipsis" />
+      </StackPanel>
+      <TextBlock Text="{Binding Remaining}" FontSize="15" FontWeight="Bold" Margin="0,-1,0,0"
+                 Foreground="{Binding IsSoon, Converter={x:Static l:BoolBrush.DueGreenElseText}}" />
+    </StackPanel>
+  </Border>
+</UserControl>

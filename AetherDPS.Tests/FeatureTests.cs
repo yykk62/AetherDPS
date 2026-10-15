@@ -215,6 +215,26 @@ public sealed class FeatureTests : IDisposable
     }
 
     [Fact]
+    public void Pills_werden_nach_ihrer_Lage_gruppiert()
+    {
+        const double w = 150, h = 46;
+        // nebeneinander (leicht schief) → eine Zeile
+        var row = PillLayout.Infer([("A", 100, 50), ("B", 260, 58), ("C", 410, 45)], w, h);
+        Assert.Equal([(0, 0), (1, 0), (2, 0)], row.Select(c => (c.Col, c.Row)));
+        // untereinander → eine Spalte
+        var col = PillLayout.Infer([("A", 100, 50), ("B", 108, 102), ("C", 95, 150)], w, h);
+        Assert.Equal([(0, 0), (0, 1), (0, 2)], col.Select(c => (c.Col, c.Row)));
+        // 2 oben, 2 unten → 2×2
+        var block = PillLayout.Infer([("A", 100, 50), ("B", 255, 52), ("C", 98, 101), ("D", 260, 99)], w, h);
+        Assert.Equal(["A:0,0", "B:1,0", "C:0,1", "D:1,1"], block.Select(c => $"{c.Name}:{c.Col},{c.Row}"));
+        // fast übereinander → keine doppelte Zelle
+        var stacked = PillLayout.Infer([("A", 100, 50), ("B", 110, 55)], w, h);
+        Assert.Equal(2, stacked.Select(c => (c.Col, c.Row)).Distinct().Count());
+        // feste Spaltenzahl
+        Assert.Equal([(0, 0), (1, 0), (0, 1)], PillLayout.Grid(["A", "B", "C"], 2).Select(c => (c.Col, c.Row)));
+    }
+
+    [Fact]
     public void Pet_Stufen_und_eigene_Position_aus_dem_Spielverkehr()
     {
         using var host = NewHost();
@@ -245,6 +265,17 @@ public sealed class FeatureTests : IDisposable
         host.Feed(SyntheticPackets.Position(4613, 81_840, -20_010), 1_400);
         Assert.Equal(81_840, pets.Position!.Value.X, 0);
         Assert.Equal("verteron", pets.CurrentMap!.Key);   // Ebene 101001 gehört zu Verteron 1010
+
+        // Nächste Pets: Entfernung in Metern, Richtung
+        var near = pets.Nearest(pets.CurrentMap!, 81_840, -20_010, _ => true, 3);
+        Assert.Equal(3, near.Count);
+        Assert.True(near[0].Meters <= near[1].Meters);
+        Assert.InRange(near[0].Bearing, 0, 360);
+
+        // Spielkarte offen = Feldboss-Liste kommt
+        Assert.Null(pets.MapOpenSeen);
+        host.Feed(SyntheticPackets.FieldBossList(1010), 1_500);
+        Assert.NotNull(pets.MapOpenSeen);
 
         // überlebt einen Neustart
         using var again = NewHost();

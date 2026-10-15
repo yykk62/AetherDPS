@@ -122,6 +122,8 @@ public partial class App : Application
             // Erinnerungen (Timer, Checkliste) und Buff-Leiste
             var timerService = Services.GetRequiredService<TimerService>();
             Services.GetRequiredService<Pets>();   // Pet-Liste kommt beim Login – vorher schon mithören
+            if (Services.GetRequiredService<MeterOptions>().ReplayFile is null)
+                petRadar = new PetRadarWindow(Services.GetRequiredService<PetRadarViewModel>(), Services.GetRequiredService<MeterSettings>());
             var checklist = Services.GetRequiredService<ChecklistService>();
             timerService.Reminder += (title, text) => Dispatcher.UIThread.Post(() => ShowToast(title, text));
             checklist.Reminder += (title, text) => Dispatcher.UIThread.Post(() => ShowToast(title, text));
@@ -159,7 +161,7 @@ public partial class App : Application
             // Timer-Overlay – eigenes Fenster, unabhängig von STRG+W
             timersVm = Services.GetRequiredService<TimersViewModel>();
             var timerOverlayVm = Services.GetRequiredService<TimerOverlayViewModel>();
-            timerOverlay = new TimerOverlayWindow(timerOverlayVm, timerService);
+            timerOverlay = new TimerPills(timerOverlayVm, timerService);
             timerOverlayVm.EditRequested += (_, _) => ShowHub(HubViewModel.TabTimers);
             timerOverlayVm.HideRequested += (_, _) => timersVm.HideOverlay();
             timersVm.OverlayVisibilityChanged += (_, _) => UpdateTimerOverlay();
@@ -230,6 +232,7 @@ public partial class App : Application
     }
 
     private PartyJoinWindow? partyJoin;
+    private PetRadarWindow? petRadar;
 
     /// <summary>Neue Gruppenmitglieder einblenden; Klick öffnet ihr Profil im Hub.</summary>
     private void StartPartyJoinPopup(HubViewModel hubVm)
@@ -246,7 +249,7 @@ public partial class App : Application
     }
 
     private TimersViewModel? timersVm;
-    private TimerOverlayWindow? timerOverlay;
+    private TimerPills? timerOverlay;
 
     private void UpdateTimerOverlay()
     {

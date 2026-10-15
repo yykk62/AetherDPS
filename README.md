@@ -32,7 +32,7 @@
 | 🗺 **Dungeons** | Der Meter erkennt, in welchem Dungeon du bist (mit Schwierigkeit), und benennt Läufe danach |
 | 👥 **Nur deine Gruppe** | Fremde in der Nähe erscheinen nie. Beschwörungen zählen zu ihrem Besitzer. Tritt jemand bei, siehst du sofort Kampfkraft, Itemstufe, Verzauberung und Waffe |
 | 🧙 **Profil** | Dein Charakter (oder jeder andere auf einem EU-Server) auch ohne laufendes Spiel: Ausrüstung mit Manasteinen und Götterstein, Werte, Daevanion, Titel, Skills |
-| 🐾 **Pet-Finder** | Alle Pets mit deiner Stufe und einer Karte, wo ihre Monster spawnen, dazu deine Position |
+| 🐾 **Pet-Finder** | Alle Pets mit deiner Stufe und einer Karte, wo ihre Monster spawnen, dazu deine Position. Öffnest du im Spiel die Karte, zeigt das Pet-Radar die fehlenden Pets in deiner Nähe mit Entfernung und Richtung |
 | 🏆 **Läufe-Archiv** | Jeder Dungeon mit Boss-Zeiten, Bestzeit, Erfassungsquote und Kampfanalyse (inkl. erlittenem Schaden), als Bild oder Text kopierbar oder per Klick in deinen Discord-Kanal |
 | ⏱ **Timer & Feldbosse** | Alle Feldbosse mit den echten Respawn-Zeiten des Servers (Karte im Spiel öffnen genügt), Risse, Artefakt-Belagerung, eigene Timer, mit Erinnerung und eigenem Overlay. Im Dungeon läuft das Zeitlimit mit |
 | 💥 **Stagger & Tode** | Stagger-Leiste des Bosses mit Auswertung danach (wer hat wie viel beigetragen?). Nach deinem Tod: woran du gestorben bist |

@@ -2,6 +2,13 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
+## 0.7.1
+
+- **Timer als einzelne Pills:** Der Timer-Kasten ist weg. Jeder Timer ist eine eigene, gleich große Pill, die du frei ziehen kannst. Leg mehrere grob nebeneinander, untereinander oder als Block hin und klick rechts auf **Gruppieren**: Die Anordnung wird übernommen (1×3, 3×1, 2×2 …) und die Gruppe bewegt sich zusammen. Rechtsklick auch zum **Lösen**, **Auflösen**, für **Spalten**, zum **Entfernen** einer Pill (ohne die App zu öffnen) und zum **Sperren** (entsperren im Reiter Timer)
+- **Pet-Radar:** Öffnest du im Spiel die Karte, erscheint am linken Rand ein kleines Fenster mit den Spawnpunkten der Pets, die dir noch fehlen, rund um deine Position, und den nächsten mit Entfernung und Richtung. Verschiebbar, abschaltbar im Reiter Pets
+- **Pet-Finder:** Filter „Noch nicht gesammelt“ und „Noch nicht auf Höchststufe“ statt des einen Hakens
+- Profil: Stigma-Skills heißen jetzt so
+
 ## 0.7.0
 
 - **Neuer Reiter Profil:** Dein Charakter auf einen Blick, auch ohne laufendes Spiel – Kampfkraft, Itemstufe, mittlere Verzauberung, Ausrüstung (Klick auf ein Teil zeigt Werte, Manasteine und Götterstein), alle Werte mit ihren Wirkungen, Daevanion-Fortschritt je Brett, Titel, Pet, Flügel und Skills. Jeden anderen Charakter auf einem EU-Server kannst du per Name suchen

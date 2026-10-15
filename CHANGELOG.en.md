@@ -2,6 +2,13 @@
 
 Newest versions first.
 
+## 0.7.1
+
+- **Timers as single pills:** the timer box is gone. Every timer is its own pill of the same size that you can drag anywhere. Place several roughly side by side, stacked or as a block and right-click **Group**: the arrangement is kept (1×3, 3×1, 2×2 …) and the group moves together. Right-click also to **take out**, **ungroup**, set **columns**, **remove** a pill (without opening the app) and **lock** (unlock in the Timers tab)
+- **Pet radar:** when you open the map in game, a small window at the left edge shows the spawn points of the pets you still need around your position, plus the nearest ones with distance and direction. Movable, can be turned off in the Pets tab
+- **Pet finder:** filters "not collected yet" and "not at max level" instead of the single checkbox
+- Profile: stigma skills are now called that
+
 ## 0.7.0
 
 - **New Profile tab:** your character at a glance, even without the game running – combat power, item level, average enchant, gear (click an item for its stats, manastones and godstone), all stats with their effects, Daevanion progress per board, titles, pet, wings and skills. Look up any other character on an EU server by name

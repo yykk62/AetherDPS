@@ -31,6 +31,7 @@
             <TextBox Text="{Binding ReminderMinutes}" Width="50" />
             <Button Classes="secondary" Content="{l:T timers.save}" Command="{Binding SaveReminderCommand}" />
           </StackPanel>
+          <CheckBox IsChecked="{Binding OverlayLocked}" Content="{l:T timers.overlay_locked}" />
           <TextBlock Text="{l:T timers.overlay_hint}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
         </StackPanel>
       </Border>

@@ -164,29 +164,64 @@ public sealed class UiTests : IDisposable
     }
 
     [AvaloniaFact]
-    public void Timer_Gruppe_und_gelöste_Leiste()
+    public void Timer_Pills_gruppieren_loesen_entfernen()
     {
         Start();
         var service = provider!.GetRequiredService<TimerService>();
-        service.AddCustom("Gildenboss", 42);
-        service.StartCustom("Gildenboss");
-        service.AddCustom("Pause", 15);
-        service.StartCustom("Pause");
-        service.AddCustom("Buff-Essen", 30);
-        service.StartCustom("Buff-Essen");
+        foreach (var (name, min) in new[] { ("Gildenboss", 42), ("Pause", 15), ("Buff-Essen", 30), ("Kiste", 55) })
+        {
+            service.AddCustom(name, min);
+            service.StartCustom(name);
+        }
         var vm = provider!.GetRequiredService<TimerOverlayViewModel>();
-        vm.Tick();
-        Shot(new TimerOverlayWindow(vm, service), "timer_gruppe");
-        vm.SetColumnsCommand.Execute("2");
-        Shot(new TimerOverlayWindow(vm, service), "timer_gruppe_2spalten");
-        vm.SetColumnsCommand.Execute("1");
-
-        var row = vm.Rows.First(r => r.Item.Name == "Gildenboss");
-        row.DetachCommand.Execute(null);
         Dispatcher.UIThread.RunJobs();
-        var bar = vm.Detached.Single();
-        Assert.DoesNotContain(vm.Rows, r => r.Item.Name == "Gildenboss");
-        Shot(new TimerBarWindow(bar, service, vm, new PixelPoint(0, 0)), "timer_leiste");
+        var pills = new TimerPills(vm, service);
+        pills.ShowAll();
+        Assert.Equal(vm.Rows.Count, pills.Windows.Count);   // jede Pill allein
+
+        // grob als 2×2 hinlegen und gruppieren
+        var spots = new[] { (100, 100), (258, 104), (96, 152), (262, 150) };
+        string[] mine = ["Gildenboss", "Pause", "Buff-Essen", "Kiste"];
+        var windows = mine.Select(n => pills.Windows.Single(w => w.Group.Cells[0].Name == n)).ToList();
+        for (int i = 0; i < 4; i++) windows[i].Position = new PixelPoint(spots[i].Item1, spots[i].Item2);
+        Dispatcher.UIThread.RunJobs();
+        pills.GroupAround(windows[0]);
+        var group = pills.Windows.Single(w => w.Group.Cells.Count > 1);
+        Assert.Equal(4, group.Group.Cells.Count);
+        Assert.Equal(2, group.Group.Cells.Max(c => c.Col) + 1);
+        Assert.Equal(2, group.Group.Cells.Max(c => c.Row) + 1);
+        Assert.Equal(vm.Rows.Count - 3, service.Settings.Groups.Count);
+
+        // einzelne Pill komplett entfernen (eigener Timer → weg)
+        vm.RemoveTimer(vm.Rows.First(r => r.Item.Name == "Kiste"));
+        Dispatcher.UIThread.RunJobs();
+        Assert.DoesNotContain(service.Items(), i => i.Name == "Kiste");
+        group = pills.Windows.Single(w => w.Group.Cells.Count > 1);
+        Assert.Equal(3, group.Pills.Count);
+        Shot(group, "timer_pills");
+    }
+
+    [AvaloniaFact]
+    public void Pet_Radar_bei_offener_Karte()
+    {
+        Start();
+        var entities = provider!.GetRequiredService<EntityTracker>();
+        provider!.GetRequiredService<Pets>();
+        var radar = provider!.GetRequiredService<PetRadarViewModel>();
+        bool shown = false;
+        radar.ShowRequested += (_, _) => shown = true;
+        Feed(SyntheticPackets.Heartbeat());
+        entities.SetSessionPlayerName(4613, "Testheld", 0, "#1317", isUser: true);
+        Feed(SyntheticPackets.PetList(1077, (1003, 3, 0)));
+        Feed(SyntheticPackets.MapLoad(1010));
+        Feed(SyntheticPackets.Position(4613, 81_840, -20_010));
+        Feed(SyntheticPackets.FieldBossList(1010));
+        Settle();
+        Assert.True(shown);
+        Assert.NotNull(radar.Self);
+        Assert.Equal(6, radar.Rows.Count);
+        Assert.DoesNotContain(radar.Spawns!, s => provider!.GetRequiredService<Pets>().PetOfNpc(s.Npc) == 1003);   // fertig → nicht im Radar
+        Shot(new PetRadarWindow(radar, provider!.GetRequiredService<MeterSettings>()), "pet_radar");
     }
 
     [AvaloniaFact]

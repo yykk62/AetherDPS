@@ -46,8 +46,72 @@ public sealed class TimerSettings
     public double? OverlayWidth { get; set; }
     public double? OverlayHeight { get; set; }
 
-    /// <summary>Einzeln gelöste Timer (eigene Leiste) mit Position [x, y] – Schlüssel = Name.</summary>
+    /// <summary>Alt (bis 0.7.0): einzeln gelöste Timer mit Position [x, y] – wird in <see cref="Groups"/> übernommen.</summary>
     public Dictionary<string, double[]> Detached { get; set; } = [];
+
+    /// <summary>Ab 0.7.1: jeder Timer ist eine Pill; Pills stehen allein oder in Gruppen (Position in Bildschirm-Pixeln).</summary>
+    public List<TimerGroup> Groups { get; set; } = [];
+
+    /// <summary>1 = alte Gruppe/Leisten schon in Pills übernommen.</summary>
+    public int PillsVersion { get; set; }
+
+    /// <summary>Pills gesperrt: Klicks gehen ins Spiel (entsperren im Reiter Timer oder im Tray).</summary>
+    public bool OverlayLocked { get; set; }
+}
+
+/// <summary>Pills, die zusammen verschoben werden: je Timer eine Zelle (Spalte, Zeile) im Raster.</summary>
+public sealed class TimerGroup
+{
+    public double X { get; set; }
+    public double Y { get; set; }
+    public List<TimerCell> Cells { get; set; } = [];
+}
+
+public sealed record TimerCell(string Name, int Col, int Row);
+
+/// <summary>
+/// Gruppieren nach Augenmaß: aus der Lage lose hingezogener Pills ein Raster ableiten. Nebeneinander → eine Zeile,
+/// untereinander → eine Spalte, 2 oben + 2 unten → 2×2. Mittelpunkte, die weniger als eine halbe Pill auseinander
+/// liegen, landen in derselben Spalte bzw. Zeile.
+/// </summary>
+public static class PillLayout
+{
+    public static List<TimerCell> Infer(IReadOnlyList<(string Name, double X, double Y)> centers, double width, double height)
+    {
+        if (centers.Count == 0) return [];
+        var cols = Bands(centers.Select(c => c.X), width / 2);
+        var rows = Bands(centers.Select(c => c.Y), height / 2);
+        var cells = new List<TimerCell>();
+        var taken = new HashSet<(int, int)>();
+        foreach (var c in centers.OrderBy(c => c.Y).ThenBy(c => c.X))
+        {
+            int col = Band(cols, c.X), row = Band(rows, c.Y);
+            // zwei Pills fast übereinander → die zweite rückt in die nächste freie Zelle der Zeile
+            while (!taken.Add((col, row))) col++;
+            cells.Add(new TimerCell(c.Name, col, row));
+        }
+        return cells.OrderBy(c => c.Row).ThenBy(c => c.Col).ToList();
+    }
+
+    /// <summary>Zeilenweise mit fester Spaltenzahl (für „Spalten: n“).</summary>
+    public static List<TimerCell> Grid(IEnumerable<string> names, int columns) =>
+        names.Select((n, i) => new TimerCell(n, i % Math.Max(1, columns), i / Math.Max(1, columns))).ToList();
+
+    private static List<double> Bands(IEnumerable<double> values, double tolerance)
+    {
+        var bands = new List<double>();
+        foreach (var v in values.Order())
+            if (bands.Count == 0 || v - bands[^1] > tolerance) bands.Add(v);
+        return bands;
+    }
+
+    private static int Band(List<double> bands, double v)
+    {
+        int best = 0;
+        for (int i = 1; i < bands.Count; i++)
+            if (Math.Abs(bands[i] - v) < Math.Abs(bands[best] - v)) best = i;
+        return best;
+    }
 }
 
 public enum TimerKind { Schedule, Boss, Custom, FieldBoss }
@@ -286,21 +350,6 @@ public sealed class TimerService
         Save();
     }
 
-    public bool IsDetached(string name) { lock (gate) return Settings.Detached.ContainsKey(name); }
-
-    public double[]? DetachedPosition(string name) { lock (gate) return Settings.Detached.GetValueOrDefault(name); }
-
-    /// <summary>Timer als eigene Leiste lösen (Position null = neben der Gruppe) oder zurück in die Gruppe.</summary>
-    public void SetDetached(string name, bool detached, double[]? position = null)
-    {
-        lock (gate)
-        {
-            if (detached) Settings.Detached[name] = position ?? Settings.Detached.GetValueOrDefault(name) ?? [];
-            else Settings.Detached.Remove(name);
-        }
-        Save();
-    }
-
     public void SetOverlayFlag(TimerKind kind, string name, bool show)
     {
         if (kind != TimerKind.Schedule) return;
@@ -309,6 +358,27 @@ public sealed class TimerService
             foreach (var s in Settings.Schedules!.Where(s => s.Name == name)) s.ShowInOverlay = show;
         }
         Save();
+    }
+
+    /// <summary>Pill entfernen: eigener Timer/Bosskill weg, fester Termin aus, Feldboss ohne Stern.</summary>
+    public void RemoveFromOverlay(TimerKind kind, string name)
+    {
+        if (kind == TimerKind.FieldBoss)
+        {
+            var boss = fieldBosses.Maps.SelectMany(m => m.Bosses).FirstOrDefault(b => b.Name == name);
+            if (boss is not null) fieldBosses.SetFavorite(boss.Npc, false);
+            return;
+        }
+        if (kind == TimerKind.Schedule)
+        {
+            lock (gate)
+            {
+                foreach (var s in Settings.Schedules!.Where(s => s.DisplayName == name || s.Name == name)) s.Enabled = false;
+            }
+            Save();
+            return;
+        }
+        Remove(kind, name);
     }
 
     public void Remove(TimerKind kind, string name)

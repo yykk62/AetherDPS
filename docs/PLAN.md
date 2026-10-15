@@ -82,6 +82,9 @@ Ideen daraus (offen, neue Verbindungen nach außen → CLAUDE.md/README/Datensch
 - [ ] Feldbosse auf der Pet-Karte (Koordinaten in field_bosses.json, Lebt/Tot aus 0x9101)
 - Patch-Notes-Wächter: vom Nutzer abgelehnt (15.10.)
 
+Skill-Slots (Frage 15.10.): Die NCSOFT-API (`character/equipment`) kennt nur characterId/serverId/lang, keinen Skill-Slot – sie liefert den Stand, den NCSOFT gespeichert hat (vermutlich der beim Ausloggen aktive Slot), genau wie aion2.plaync.com. Mit der Aufnahme prüfen: Slot 1→2→3 wechseln (je F8) und schauen, ob das Skill-Paket (SkeeveAN `skills` 0x0051, bei uns 0x5100) die Slots enthält.
+- [ ] Pet-Radar: Öffnet die Karte zuverlässig 0x9101 auch außerhalb von Feldboss-Gebieten? Position aktualisiert sich nur bei Skills
+
 Pet-Finder, mit der Aufnahme heute Abend prüfen:
 - [ ] Pet-Fortschritt live ohne Neu-Einloggen: SkeeveAN nennt `petProgress` 0x0D90 (bei uns 0x900D), `petLevel` 0x1490 (0x9014), `petAdded` 0x0990 (0x9009). Seele einsammeln und Pet hochstufen, dann vergleichen
 - [ ] Position: kommt nur bei Skills/Korrekturen. Im offenen Gelände ein paar Skills benutzen und prüfen, ob der Punkt auf der Karte stimmt (Ebenen 101xxx → Verteron 1010 ist geraten)

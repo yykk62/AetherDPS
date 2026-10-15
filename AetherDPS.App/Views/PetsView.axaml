@@ -13,7 +13,7 @@
         <ComboBox Grid.Row="1" ItemsSource="{Binding MapOptions}" SelectedItem="{Binding SelectedMap}" HorizontalAlignment="Stretch" Margin="0,0,0,6" />
         <ComboBox Grid.Row="2" ItemsSource="{Binding SpeciesOptions}" SelectedItem="{Binding SelectedSpecies}" HorizontalAlignment="Stretch" Margin="0,0,0,6" />
         <TextBox Grid.Row="3" Text="{Binding Search}" Watermark="{l:T pets.search}" Margin="0,0,0,6" />
-        <CheckBox Grid.Row="4" IsChecked="{Binding OnlyOpen}" Content="{l:T pets.only_open}" />
+        <ComboBox Grid.Row="4" ItemsSource="{Binding FilterOptions}" SelectedItem="{Binding SelectedFilter}" HorizontalAlignment="Stretch" />
         <StackPanel Grid.Row="5" Spacing="2" Margin="0,4,0,6">
           <TextBlock Text="{Binding Summary}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
           <TextBlock Text="{Binding LevelsHint}" Foreground="#E0A84A" FontSize="11" TextWrapping="Wrap"
@@ -82,6 +82,12 @@
               </ItemsControl.ItemTemplate>
             </ItemsControl>
             <TextBlock Text="{l:T pets.source}" Classes="dim" FontSize="10.5" TextWrapping="Wrap" Margin="0,4,0,0" />
+          </StackPanel>
+        </Border>
+        <Border Classes="card" Padding="12">
+          <StackPanel Spacing="4">
+            <CheckBox IsChecked="{Binding RadarEnabled}" Content="{l:T radar.enable}" />
+            <TextBlock Text="{l:T radar.enable_hint}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
           </StackPanel>
         </Border>
       </StackPanel>

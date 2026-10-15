@@ -67,13 +67,6 @@ public sealed partial class TimerRow(TimersViewModel owner, TimerItem item) : Ob
     [RelayCommand]
     private void HideInOverlay() => owner.SetOverlay(Item, false);
 
-    /// <summary>Als eigene, frei verschiebbare Leiste anzeigen.</summary>
-    [RelayCommand]
-    private void Detach() => owner.Service.SetDetached(Item.Name, true);
-
-    /// <summary>Zurück in die Timer-Gruppe.</summary>
-    [RelayCommand]
-    private void Attach() => owner.Service.SetDetached(Item.Name, false);
 }
 
 /// <summary>Fester Termin (Riss, Belagerung …) – nur an/aus und Erinnerung, die Zeiten stimmen von selbst.</summary>
@@ -296,6 +289,19 @@ public sealed partial class TimersViewModel : ObservableObject
         timers.Settings.OverlaySoonMinutes = m;
         timers.Save();
         OverlayVisibilityChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>Pills gesperrt (Klicks gehen ins Spiel) – entsperren hier oder im Tray.</summary>
+    public bool OverlayLocked
+    {
+        get => timers.Settings.OverlayLocked;
+        set
+        {
+            if (timers.Settings.OverlayLocked == value) return;
+            timers.Settings.OverlayLocked = value;
+            timers.SaveQuiet();
+            OnPropertyChanged();
+        }
     }
 
     /// <summary>✕ im Overlay: aus.</summary>

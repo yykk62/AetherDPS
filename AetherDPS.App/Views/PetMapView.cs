@@ -18,6 +18,9 @@ public sealed class PetMapView : Control
     public static readonly StyledProperty<IReadOnlyList<PetSpawn>?> SpawnsProperty = AvaloniaProperty.Register<PetMapView, IReadOnlyList<PetSpawn>?>(nameof(Spawns));
     public static readonly StyledProperty<Point?> SelfProperty = AvaloniaProperty.Register<PetMapView, Point?>(nameof(Self));
 
+    /// <summary>&gt; 0: Ausschnitt um die eigene Position mit diesem Radius in Metern (Pet-Radar) statt „alle Punkte“.</summary>
+    public static readonly StyledProperty<double> FocusMetersProperty = AvaloniaProperty.Register<PetMapView, double>(nameof(FocusMeters));
+
     private const int TileSource = 512;
     private static readonly Dictionary<string, Bitmap?[,]> TileCache = [];
     private static readonly IBrush Background = new SolidColorBrush(Color.Parse("#11141B"));
@@ -37,6 +40,11 @@ public sealed class PetMapView : Control
         AffectsRender<PetMapView>(MapProperty, SpawnsProperty, SelfProperty);
         MapProperty.Changed.AddClassHandler<PetMapView>((v, _) => v.fitted = false);
         SpawnsProperty.Changed.AddClassHandler<PetMapView>((v, _) => v.fitted = false);
+        SelfProperty.Changed.AddClassHandler<PetMapView>((v, _) =>
+        {
+            if (v.FocusMeters > 0) v.fitted = false;
+        });
+        AffectsRender<PetMapView>(FocusMetersProperty);
     }
 
     public PetMapView()
@@ -51,6 +59,11 @@ public sealed class PetMapView : Control
     /// <summary>Eigene Position in Weltkoordinaten (null = nicht auf dieser Karte).</summary>
     public Point? Self { get => GetValue(SelfProperty); set => SetValue(SelfProperty, value); }
 
+    public double FocusMeters { get => GetValue(FocusMetersProperty); set => SetValue(FocusMetersProperty, value); }
+
+    /// <summary>Größter Radius der Spawnpunkte in Pixeln (Radar: kleiner, weil viele Pets auf einmal).</summary>
+    public double MaxDot { get; set; } = 6;
+
     /// <summary>Ausschnitt so wählen, dass alle Spawnpunkte (und die eigene Position) sichtbar sind.</summary>
     public void Fit()
     {
@@ -64,7 +77,13 @@ public sealed class PetMapView : Control
         var points = (Spawns ?? []).Select(s => map.ToPixel(s.X, s.Y)).ToList();
         if (Self is { } self) points.Add(map.ToPixel(self.X, self.Y));
         double minZoom = Math.Min(Bounds.Width, Bounds.Height) / map.Size;
-        if (points.Count == 0)
+        if (FocusMeters > 0 && Self is { } me)
+        {
+            var (sx, sy) = map.ToPixel(me.X, me.Y);
+            center = new Point(sx, sy);
+            zoom = Math.Clamp(Math.Min(Bounds.Width, Bounds.Height) / (2 * FocusMeters * 100 * map.Scale), minZoom, MaxZoom(map));
+        }
+        else if (points.Count == 0)
         {
             zoom = minZoom;
             center = new Point(map.Size / 2, map.Size / 2);
@@ -105,7 +124,7 @@ public sealed class PetMapView : Control
                 if (rect.Intersects(bounds)) context.DrawImage(tile, new Rect(tile.Size), rect.Inflate(0.5));
             }
 
-        double r = Math.Clamp(3 + zoom * 40, 3.5, 6);
+        double r = Math.Clamp(3 + zoom * 40, Math.Min(3.5, MaxDot), MaxDot);
         foreach (var s in Spawns ?? [])
         {
             var (x, y) = map.ToPixel(s.X, s.Y);
