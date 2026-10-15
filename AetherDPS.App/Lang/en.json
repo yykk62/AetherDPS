@@ -480,7 +480,6 @@
   "radar.mode_map": "While the game map is open",
   "radar.mode_always": "Always (follows you)",
   "radar.mode_off": "Off",
-  "radar.back": "Radar",
   "radar.list": "Pets you need",
   "radar.row_tip": "Click: all spawn points of this pet on the map (again: back to radar)",
   "radar.center": "Center on me",
@@ -495,5 +494,6 @@
   "pets.filter_short.open": "Not max",
   "radar.collapse_tip": "Collapse – only a small bar stays",
   "radar.expand_tip": "Click: expand · Drag: move",
-  "radar.resize_tip": "Drag: resize"
+  "radar.resize_tip": "Drag: resize",
+  "radar.move_tip": "Drag: move the radar"
 }

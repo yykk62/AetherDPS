@@ -480,7 +480,6 @@
   "radar.mode_map": "游戏地图打开时",
   "radar.mode_always": "始终显示（跟随你）",
   "radar.mode_off": "关闭",
-  "radar.back": "雷达",
   "radar.list": "缺少的宠物",
   "radar.row_tip": "点击：显示此宠物的所有出现点（再点：回到雷达）",
   "radar.center": "以我为中心",
@@ -495,5 +494,6 @@
   "pets.filter_short.open": "未满级",
   "radar.collapse_tip": "折叠——只留下一条小栏",
   "radar.expand_tip": "单击：展开 · 拖动：移动",
-  "radar.resize_tip": "拖动：调整大小"
+  "radar.resize_tip": "拖动：调整大小",
+  "radar.move_tip": "拖动：移动雷达"
 }

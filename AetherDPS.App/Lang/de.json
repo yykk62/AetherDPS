@@ -480,7 +480,6 @@
   "radar.mode_map": "Solange die Spielkarte offen ist",
   "radar.mode_always": "Immer (folgt dir)",
   "radar.mode_off": "Aus",
-  "radar.back": "Radar",
   "radar.list": "Fehlende Pets",
   "radar.row_tip": "Klicken: alle Fundorte dieses Pets auf der Karte (nochmal: zurück zum Radar)",
   "radar.center": "Auf mich zentrieren",
@@ -495,5 +494,6 @@
   "pets.filter_short.open": "Nicht max.",
   "radar.collapse_tip": "Einklappen – nur eine kleine Leiste bleibt",
   "radar.expand_tip": "Klicken: aufklappen · Ziehen: verschieben",
-  "radar.resize_tip": "Ziehen: Größe ändern"
+  "radar.resize_tip": "Ziehen: Größe ändern",
+  "radar.move_tip": "Ziehen: Radar verschieben"
 }

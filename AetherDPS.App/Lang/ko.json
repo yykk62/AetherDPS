@@ -480,7 +480,6 @@
   "radar.mode_map": "게임 지도를 열어 둔 동안",
   "radar.mode_always": "항상 (따라다님)",
   "radar.mode_off": "끄기",
-  "radar.back": "레이더",
   "radar.list": "없는 펫",
   "radar.row_tip": "클릭: 이 펫의 모든 출현 위치 (다시: 레이더로)",
   "radar.center": "내 위치로",
@@ -495,5 +494,6 @@
   "pets.filter_short.open": "미최대",
   "radar.collapse_tip": "접기 – 작은 바만 남음",
   "radar.expand_tip": "클릭: 펼치기 · 드래그: 이동",
-  "radar.resize_tip": "드래그: 크기 조절"
+  "radar.resize_tip": "드래그: 크기 조절",
+  "radar.move_tip": "드래그: 레이더 이동"
 }

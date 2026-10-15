@@ -56,7 +56,6 @@ public sealed partial class PetRadarViewModel : ObservableObject
 
     /// <summary>Gewähltes Pet: Karte zeigt nur dessen Fundorte (Zoom bleibt; liegt keiner im Bild, so weit raus, dass der nächste zu sehen ist).</summary>
     [ObservableProperty] private int? selectedPet;
-    [ObservableProperty] private string title = Loc.T("radar.title");
 
     /// <summary>Standard-Umkreis der Minimap in Metern, bis man selbst zoomt (dann gemerkt in PetRadarMeters).</summary>
     public const double RadiusMeters = 600;
@@ -225,7 +224,6 @@ public sealed partial class PetRadarViewModel : ObservableObject
         }
         SpawnBrushes = brushes;
         Spawns = shown.SelectMany(s => pets.Spawns(s.Pet, current)).ToList();
-        Title = selected is null ? Loc.T("radar.title") : selected.Name;
 
         foreach (var (pet, distance, monster) in list)
         {

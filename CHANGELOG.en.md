@@ -2,6 +2,11 @@
 
 Newest versions first.
 
+## 0.7.9
+
+- **Tidier pet radar:** no title bar any more – the buttons sit small on the map (⠿ move, ▾ collapse, ✕ close, ☰ list, ⌖ to you)
+- **List fully hidden:** ☰ hides the missing pets completely instead of leaving an empty bar; ☰ again brings them back
+
 ## 0.7.8
 
 - Pets tab: **all** monsters of a pet are always shown above the map (before, anything past the second row was scrolled out of view)

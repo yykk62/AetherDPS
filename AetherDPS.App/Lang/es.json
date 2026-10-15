@@ -480,7 +480,6 @@
   "radar.mode_map": "Mientras el mapa del juego esté abierto",
   "radar.mode_always": "Siempre (te sigue)",
   "radar.mode_off": "Apagado",
-  "radar.back": "Radar",
   "radar.list": "Mascotas que faltan",
   "radar.row_tip": "Clic: todos los puntos de aparición de esta mascota (otra vez: volver al radar)",
   "radar.center": "Centrar en mí",
@@ -495,5 +494,6 @@
   "pets.filter_short.open": "No máx.",
   "radar.collapse_tip": "Contraer – solo queda una barra pequeña",
   "radar.expand_tip": "Clic: desplegar · Arrastrar: mover",
-  "radar.resize_tip": "Arrastrar: cambiar tamaño"
+  "radar.resize_tip": "Arrastrar: cambiar tamaño",
+  "radar.move_tip": "Arrastrar: mover el radar"
 }

@@ -2,6 +2,11 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
+## 0.7.9
+
+- **Pet-Radar aufgeräumt:** keine Titelzeile mehr – die Knöpfe liegen klein auf der Karte (⠿ verschieben, ▾ einklappen, ✕ schließen, ☰ Liste, ⌖ zu dir)
+- **Liste ganz weg:** ☰ blendet die fehlenden Pets komplett aus statt eines leeren Balkens; nochmal ☰ holt sie zurück
+
 ## 0.7.8
 
 - Reiter Pets: Es stehen immer **alle** Monster eines Pets über der Karte (vorher waren ab der dritten Zeile welche weggescrollt und nicht zu sehen)

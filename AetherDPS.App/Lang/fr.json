@@ -480,7 +480,6 @@
   "radar.mode_map": "Tant que la carte du jeu est ouverte",
   "radar.mode_always": "Toujours (te suit)",
   "radar.mode_off": "Désactivé",
-  "radar.back": "Radar",
   "radar.list": "Familiers manquants",
   "radar.row_tip": "Clic : tous les points d'apparition de ce familier (encore : retour au radar)",
   "radar.center": "Centrer sur moi",
@@ -495,5 +494,6 @@
   "pets.filter_short.open": "Pas max",
   "radar.collapse_tip": "Réduire – seule une petite barre reste",
   "radar.expand_tip": "Clic : déplier · Glisser : déplacer",
-  "radar.resize_tip": "Glisser : redimensionner"
+  "radar.resize_tip": "Glisser : redimensionner",
+  "radar.move_tip": "Glisser : déplacer le radar"
 }

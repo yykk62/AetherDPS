@@ -8,8 +8,9 @@ using Avalonia.Interactivity;
 namespace AetherDPS.App.Views;
 
 /// <summary>
-/// Pet-Radar über dem Spiel. Beim ersten Mal mittig und so groß wie die Spielkarte (es kann sie ersetzen);
-/// Ziehen verschiebt, die Ecke unten rechts ändert die Größe, ▾ klappt es zu einer kleinen Leiste ein.
+/// Pet-Radar über dem Spiel. Beim ersten Mal mittig und so groß wie die Spielkarte (es kann sie ersetzen).
+/// Alle Knöpfe liegen klein auf der Karte: ⠿ (oder der Rand) verschiebt, die Ecke unten rechts ändert die Größe,
+/// ▾ klappt es zu einer kleinen Leiste ein, ☰ blendet die Liste ein/aus.
 /// Position, Größe und Zustand werden gemerkt.
 /// </summary>
 public partial class PetRadarWindow : Window
@@ -51,6 +52,7 @@ public partial class PetRadarWindow : Window
             vm.HideRequested -= hide;
         };
         Root.PointerPressed += OnRootPressed;
+        MoveHandle.PointerPressed += OnRootPressed;   // auf der Karte selbst verschiebt Ziehen den Ausschnitt
         Grip.PointerPressed += OnGripPressed;
         Grip.PointerMoved += OnGripMoved;
         Grip.PointerReleased += (_, e) => EndResize(e.Pointer);
@@ -173,6 +175,14 @@ public partial class PetRadarWindow : Window
     }
 
     private void OnCenter(object? sender, RoutedEventArgs e) => RadarMap.CenterOnSelf();
+
+    /// <summary>☰: Liste der fehlenden Pets ein/aus. Zu = ganz weg; ein gewähltes Pet wird dabei abgewählt.</summary>
+    private void OnToggleList(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not PetRadarViewModel vm) return;
+        vm.ListOpen = !vm.ListOpen;
+        if (!vm.ListOpen && vm.SelectedPet is not null) vm.ShowRadarCommand.Execute(null);
+    }
 
     private void OnClose(object? sender, RoutedEventArgs e) => (DataContext as PetRadarViewModel)?.Dismiss();
 }

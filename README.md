@@ -118,7 +118,7 @@ Alle Pets von Verteron, Altgard und der Abyss mit **deiner Stufe und deinem Fort
 
 <p align="center"><img src="docs/media/pets.png" width="100%" alt="Pet-Finder mit Liste und Spawnkarte" /></p>
 
-Das **Pet-Radar** erscheint, sobald du im Spiel die Karte öffnest, genau darüber und so groß wie sie, oder bleibt auf Wunsch dauerhaft stehen. Es ist eine **Minimap wie im Spiel**: Du bist immer in der Mitte, sie folgt dir (auch im Flug) und merkt sich deinen Zoom. Darauf die fehlenden Pets in deiner Nähe mit **Entfernung, Richtung und dem Monster, das die Seele droppt**. Klick auf ein Pet zeigt seine Fundorte; liegt keiner im Bild, zoomt die Karte nur so weit heraus, dass der nächste zu sehen ist. Größe per Ecke ziehen, ▾ klappt es zu einer kleinen Leiste ein.
+Das **Pet-Radar** erscheint, sobald du im Spiel die Karte öffnest, genau darüber und so groß wie sie, oder bleibt auf Wunsch dauerhaft stehen. Es ist eine **Minimap wie im Spiel**: Du bist immer in der Mitte, sie folgt dir (auch im Flug) und merkt sich deinen Zoom. Darauf die fehlenden Pets in deiner Nähe mit **Entfernung, Richtung und dem Monster, das die Seele droppt**. Klick auf ein Pet zeigt seine Fundorte; liegt keiner im Bild, zoomt die Karte nur so weit heraus, dass der nächste zu sehen ist. Alle Knöpfe liegen klein auf der Karte; ☰ blendet die Liste aus, ▾ klappt das Radar zu einer kleinen Leiste ein, die Ecke unten rechts ändert die Größe.
 
 <table>
   <tr>
@@ -228,7 +228,7 @@ Wer das Hauptfenster schließt, lässt den Meter im Tray weiterlaufen.
 | Skill-Details | ☰ oder auf einen Spieler klicken |
 | Sperren (Mausklicks gehen ins Spiel) | Schloss-Symbol. Zum Entsperren wieder aufs Schloss klicken, es bleibt immer klickbar |
 | Timer-Pills | ziehen; Rechtsklick → Gruppieren, Lösen, Entfernen, Sperren. Entsperren im Reiter Timer |
-| Pet-Radar | erscheint mit der Spielkarte (Reiter Pets: auch „Immer“). Mausrad zoomt (wird gemerkt), Ziehen schaut kurz woanders hin, nach 5 s ist die Karte wieder bei dir. ✕ blendet es bis zum nächsten Öffnen aus |
+| Pet-Radar | erscheint mit der Spielkarte (Reiter Pets: auch „Immer“). Mausrad zoomt (wird gemerkt), Ziehen schaut kurz woanders hin, nach 5 s ist die Karte wieder bei dir. Knöpfe auf der Karte: ⠿ verschieben, ▾ einklappen, ✕ bis zum nächsten Öffnen ausblenden, ☰ Liste ein/aus, ⌖ zu dir. Größe über die Ecke unten rechts |
 | Einstellungen | ⚙ oder Tray-Symbol: Hotkey ändern, Deckkraft, nur meine Gruppe (Standard: an), „Du“ statt Name |
 | Screenshot auf den Zweitbildschirm | **STRG+S** im Spiel (änderbar). Der Spiel-Bildschirm erscheint im Vollbild auf dem anderen Monitor, jeder neue ersetzt das alte Bild. Klick oder ESC blendet aus |
 | AION 2 starten | Knopf im Hauptfenster oder Einstellung „AION 2 mit dem Meter starten“ (Steam). Läuft der Meter beim Login schon, kennt er deinen Charakter sofort |
