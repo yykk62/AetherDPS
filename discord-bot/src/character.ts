@@ -35,7 +35,8 @@ const classOf = (name: string) => {
   return c ? { key: c[1], color: c[2] } : { key: "", color: GOLD };
 };
 
-const GRADES: Record<string, string> = { Unique: "🟨", Legend: "🟧", Epic: "🟪", Special: "🟩", Rare: "🟦" };
+// Wie im Spiel (EU-Client): Unique = Einzigartig gold, Legend blau
+const GRADES: Record<string, string> = { Unique: "🟨", Legend: "🟦", Epic: "🟪", Special: "🟩", Rare: "🟢" };
 const grade = (g: string) => GRADES[g] ?? "⬜";
 
 const SLOTS: Record<string, string> = {
@@ -131,19 +132,20 @@ export function render(env: Env, p: Profile, view: View): Message {
   const e: any = header(env, p);
   if (view === "main") {
     const weapon = p.equipment.find((i) => i.slot === "MainHand");
+    // Lange Namen als volle Zeilen oben, in den 3er-Spalten nur kurze Zahlen (sonst bricht Discord um)
     e.description = [
       p.title ? `🏅 *„${p.title.name}“*` : "",
-      weapon ? `${grade(weapon.grade)} **${weapon.name}**${plus(weapon)}` : "",
+      weapon ? `🗡️ ${grade(weapon.grade)} ${weapon.name}${plus(weapon)}` : "",
+      p.wing ? `🪽 ${grade(p.wing.grade)} ${p.wing.name}${plus(p.wing)}` : "",
+      p.pet ? `🐾 ${p.pet.name} · Stufe ${p.pet.level}` : "",
     ].filter(Boolean).join("\n") || undefined;
     e.fields = [
       { name: "⚔️ Kampfkraft", value: `**${nf.format(p.combatPower)}**`, inline: true },
       { name: "🎒 Itemstufe", value: `**${nf.format(p.itemLevel)}**`, inline: true },
-      { name: "✨ Ø Verzauberung", value: `**+${averageEnchant(p).toFixed(1).replace(".", ",")}**`, inline: true },
+      { name: "✨ Ø Verzaub.", value: `**+${averageEnchant(p).toFixed(1).replace(".", ",")}**`, inline: true },
       { name: "🔮 Daevanion", value: `**${daevanion(p)} %**`, inline: true },
-      { name: "🪽 Flügel", value: p.wing ? `${grade(p.wing.grade)} ${p.wing.name}${plus(p.wing)}` : "–", inline: true },
-      { name: "🐾 Pet", value: p.pet ? `${p.pet.name} · St. ${p.pet.level}` : "–", inline: true },
-      { name: "🏆 Titel", value: nf.format(p.titles.owned), inline: true },
-      { name: "📚 Skills", value: `${p.skills.filter((s) => s.equipped).length} ausgerüstet · ${p.skills.length} gelernt`, inline: true },
+      { name: "🏆 Titel", value: `**${nf.format(p.titles.owned)}**`, inline: true },
+      { name: "📚 Skills", value: `**${p.skills.length}**`, inline: true },
     ];
   } else if (view === "gear") {
     const row = (i: Item) => `${grade(i.grade)} ${slotName(i.slot)} · ${i.name}${plus(i)}`;
@@ -155,22 +157,35 @@ export function render(env: Env, p: Profile, view: View): Message {
     ];
     e.description = `Ø Verzauberung (Waffe + Rüstung): **+${averageEnchant(p).toFixed(1).replace(".", ",")}** · Itemstufe **${nf.format(p.itemLevel)}**`;
   } else if (view === "stats") {
+    // Volle Breite statt schmaler Spalten: nichts bricht mitten im Namen um
     const base = p.stats.filter((s) => !s.name.includes("["));
     const gods = p.stats.filter((s) => s.name.includes("["));
-    const line = (s: Profile["stats"][number]) => `${s.name} **${nf.format(s.value)}**`;
+    const god = (s: Profile["stats"][number]) => {
+      const [, name, deity] = /^(.*?)\s*\[(.*)\]$/.exec(s.name) ?? [, s.name, ""];
+      return `**${nf.format(s.value)}** ${name}${deity ? ` · *${deity}*` : ""}`;
+    };
+    const half = Math.ceil(gods.length / 2);
     e.fields = [
-      { name: "💪 Grundwerte", value: cut(base.map(line).join("\n") || "–", 1024), inline: true },
-      { name: "✴️ Götter-Werte", value: cut(gods.map(line).join("\n") || "–", 1024), inline: true },
+      { name: "💪 Grundwerte", value: cut(base.map((s) => `${s.name} **${nf.format(s.value)}**`).join("  ·  ") || "–", 1024) },
+      ...(gods.length ? [
+        { name: "✴️ Götter-Werte", value: cut(gods.slice(0, half).map(god).join("\n"), 1024), inline: true },
+        { name: "​", value: cut(gods.slice(half).map(god).join("\n") || "​", 1024), inline: true },
+      ] : []),
     ];
   } else if (view === "skills") {
-    const group = (cat: string) =>
-      p.skills.filter((s) => s.category === cat).slice(0, 18)
-        .map((s) => `${s.equipped ? "🔹" : "▫️"} ${s.name} **${s.level}**`).join("\n");
-    e.fields = [
-      { name: "⚡ Aktiv", value: cut(group("Active") || "–", 1024), inline: true },
-      { name: "🛡️ Passiv", value: cut(group("Passive") || "–", 1024), inline: true },
-      ...(p.skills.some((s) => s.category === "Dp") ? [{ name: "🌟 DP-Skills", value: cut(group("Dp"), 1024), inline: true }] : []),
-    ];
+    // Je Gruppe eine Zeile über die volle Breite: ausgerüstete zuerst, die übrigen klein darunter
+    const group = (cat: string) => {
+      const list = p.skills.filter((s) => s.category === cat);
+      const fmt = (x: typeof list) => x.map((s) => `${s.name} **${s.level}**`).join("  ·  ");
+      // Passive markiert NCSOFT nie als ausgerüstet (sie wirken immer): dann alle normal zeigen
+      const marked = list.some((s) => s.equipped);
+      const on = marked ? list.filter((s) => s.equipped) : list;
+      const off = marked ? list.filter((s) => !s.equipped) : [];
+      return [on.length ? `${marked ? "🔹 " : ""}${fmt(on)}` : "",off.length ? `-# Nicht ausgerüstet: ${fmt(off)}` : ""].filter(Boolean).join("\n");
+    };
+    const NAMES: [string, string][] = [["Active", "⚡ Aktiv"], ["Passive", "🛡️ Passiv"], ["Dp", "🌟 DP-Skills"]];
+    e.fields = NAMES.filter(([cat]) => p.skills.some((s) => s.category === cat))
+      .map(([cat, name]) => ({ name, value: cut(group(cat), 1024) }));
     e.description = "🔹 ausgerüstet · Zahl = Skill-Stufe\n-# NCSOFT zeigt die Skills von Slot 1. Wer mit einem anderen Slot spielt, sieht hier andere Werte.";
   } else {
     e.description = p.boards.length

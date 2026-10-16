@@ -16,11 +16,12 @@ public static class GradeColors
 {
     private static readonly Dictionary<string, IBrush> Brushes = new()
     {
+        // Wie im Spiel (EU-Client): Unique = Einzigartig gold, Legend blau
         ["Unique"] = new SolidColorBrush(Color.Parse("#E0A84A")),
-        ["Legend"] = new SolidColorBrush(Color.Parse("#F07C4A")),
+        ["Legend"] = new SolidColorBrush(Color.Parse("#5AA0F0")),
         ["Epic"] = new SolidColorBrush(Color.Parse("#B07CF0")),
         ["Special"] = new SolidColorBrush(Color.Parse("#4CC3B0")),
-        ["Rare"] = new SolidColorBrush(Color.Parse("#5AA0F0")),
+        ["Rare"] = new SolidColorBrush(Color.Parse("#5CC26A")),
     };
 
     public static IBrush For(string grade) => Brushes.GetValueOrDefault(grade) ?? new SolidColorBrush(Color.Parse("#C9CED6"));
