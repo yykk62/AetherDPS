@@ -16,6 +16,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Styling;
 using Avalonia.Themes.Fluent;
 using Avalonia.Threading;
@@ -31,6 +32,8 @@ public sealed class TestApp : Application
     public override void Initialize()
     {
         Styles.Add(new FluentTheme());
+        // dieselben Farben und Karten wie die echte App (App.axaml bindet Theme.axaml genauso ein)
+        Styles.Add(new StyleInclude(new Uri("avares://AetherDPS/")) { Source = new Uri("avares://AetherDPS/Theme.axaml") });
         RequestedThemeVariant = ThemeVariant.Dark;
     }
 

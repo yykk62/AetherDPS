@@ -93,6 +93,8 @@ Alles Eigene liegt in `assets/brand/` (Übersicht und Anleitung: `assets/brand/R
 Banner und Hintergründe. Quelle sind Higgsfield-Sheets (4k, lokal; im Repo nur die 2k-WebP-Kopie und die Manifeste).
 Nachziehen: `python tools/icons/slice.py` (zerlegen, freistellen, Übersichten) → `python tools/icons/sync.py` (nach `docs/media/brand`; die App bindet `assets/brand/icons/ui` direkt ein) → `python tools/icons/art.py` (Banner mit Text, Hintergründe, Zierleiste). In XAML: `{l:Icon name, Size=12}` (`Services/Icons.cs`),
 auf der Webseite `<Icon name="…" />`. Keine NCSOFT-Grafiken darin.
+Logo: `python tools/icons/logo.py` (aus `assets/brand/art/raw-logo.png` → `assets/brand/logo/`, `AetherDPS.App/Assets/icon.png|ico`, `docs/media/brand/logo.png`).
+Farben und gemeinsame Styles der App (Gold statt Windows-Akzent, Karten, Knöpfe `primary`/`secondary`/`danger`/`plain`) stehen in `AetherDPS.App/Theme.axaml`; die UI-Tests binden dieselbe Datei ein, Fenster-Styles nur noch für Besonderes.
 
 ## Feldbosse
 

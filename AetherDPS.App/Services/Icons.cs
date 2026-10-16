@@ -40,6 +40,10 @@ public static class Icons
     /// <summary>★ / ☆ als Icon: Favorit an/aus.</summary>
     public static readonly IValueConverter StarFilledElseOutline =
         new FuncValueConverter<bool, Bitmap?>(on => Get(on ? "star" : "star-outline", 14));
+
+    /// <summary>Statuszeile: Warnung bei Fehler, sonst Info.</summary>
+    public static readonly IValueConverter WarningElseInfo =
+        new FuncValueConverter<bool, Bitmap?>(bad => Get(bad ? "warning" : "info", 12));
 }
 
 /// <summary>XAML: Source="{l:Icon close, Size=12}" – Bitmap aus dem eigenen Icon-Set.</summary>

@@ -27,6 +27,10 @@ public static class BoolBrush
     public static readonly IValueConverter ErrorRedElseText =
         new FuncValueConverter<bool, IBrush>(error => error ? Red : Text);
 
+    /// <summary>Statuszeile unter einer Suche: Fehler rötlich, sonst gedämpft.</summary>
+    public static readonly IValueConverter ErrorRedElseMuted =
+        new FuncValueConverter<bool, IBrush>(error => error ? Red : new SolidColorBrush(Color.Parse("#8E96A3")));
+
     /// <summary>Kachel hinter dem Icon der Kampfkarte: Boss rötlich, normales Ziel goldbraun.</summary>
     public static readonly IValueConverter BossRedElseGoldTile =
         new FuncValueConverter<bool, IBrush>(boss => boss ? new SolidColorBrush(Color.Parse("#3A1F24")) : new SolidColorBrush(Color.Parse("#2A2416")));

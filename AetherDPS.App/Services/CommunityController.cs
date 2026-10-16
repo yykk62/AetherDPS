@@ -140,7 +140,7 @@ public sealed partial class CommunityController(
         // Erster Start überhaupt: nichts „Neues“ zeigen
         if (last is null || !Version.TryParse(last, out var lastVersion) || lastVersion >= Version.Parse(current)) return;
         if (ChangelogSection(current) is not { } text) return;
-        hub?.ShowNotice(new HubNotice { Id = "whatsnew", Icon = "scroll", Title = Loc.T("whatsnew.title", current), Text = text });
+        hub?.ShowNotice(new HubNotice { Id = "whatsnew", Icon = "scroll", Title = Loc.T("whatsnew.title", current), Text = text, IsExpanded = false });
     }
 
     /// <summary>Abschnitt „## 0.6.0“ aus dem eingebetteten CHANGELOG (Englisch für alle außer Deutsch).</summary>

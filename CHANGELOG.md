@@ -2,6 +2,15 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
+## 0.8.1
+
+- **Neues Logo:** goldener Aether-Kristall zwischen Daeva-Flügeln, als Fenster-, Tray- und Web-Icon (vorher drei Balken)
+- **Hauptfenster aufgeräumt:** Hinweise wie „Neu in Version …“ sind nur noch eine Zeile und lassen sich aufklappen, statt das halbe Fenster zu füllen. Versionsplakette im Kopf, gewählter Reiter mit goldener Fläche
+- **Ein Farbton für alles:** Auswahl in Listen, Haken, Fokusrahmen und Aufklapper sind jetzt gold statt Windows-Blau; Knöpfe, Felder und Auswahllisten dunkel mit feiner Linie. „Löschen“ ist rötlich
+- **Ruhigerer Hintergrund:** ein einzelner Flügel unten rechts, oben links läuft er in die Grundfarbe aus, Karten liegen klar darüber
+- **Profil:** die Suche bei NCSOFT zeigt jetzt deutlich „Charakter wird gesucht …“ mit Laufbalken; ein Fehlschlag steht rot mit Warnsymbol, ohne Profil gibt es eine leere Karte mit Hinweis
+- „AION 2 läuft“ ist ein grüner Status statt eines ausgegrauten Knopfs
+
 ## 0.8.0
 
 - **Neues Aussehen:** eigenes Icon-Set im Aether-Stil (Gold mit violettem Schein) statt Text und Symbolen. Reiter, Knöpfe im Overlay und im Pet-Radar, Timer-Pills, Hinweiskarten und Einstellungen haben jetzt echte Icons, scharf bei 100 % und 150 % Skalierung

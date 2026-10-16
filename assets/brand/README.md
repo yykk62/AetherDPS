@@ -10,7 +10,7 @@ Eigenes, durchgängiges Set für App, Webseite (aetherdps.com), README und Disco
 | Hintergrund `#10131a`, Fläche `#191e28`, Linie `#2c3442` | Gold `#e0a84a` (Akzent), Violett `#c9a8f2` |
 | Text `#e6e8ec`, gedämpft `#8e96a3` | OK `#5cc26a`, Live/Rot `#e2554f` |
 
-Logo: drei aufsteigende goldene Balken (`AetherDPS.App/Assets/icon.png`), Premium-Variante mit Daeva-Flügeln (`discord-bot/assets/avatar.webp`).
+Logo: goldener Aether-Kristall zwischen Daeva-Flügeln mit drei aufsteigenden Balken (`assets/brand/logo/`, daraus `AetherDPS.App/Assets/icon.png` + `icon.ico`, `docs/media/brand/logo.png`; Webseite holt sich `icon.png` beim Bauen). Rohbild `art/raw-logo.png` (Higgsfield, auf Magenta), zerlegt mit `tools/icons/logo.py`. Discord-Avatar (`discord-bot/assets/avatar.webp`) ist noch die ältere Balken-Variante.
 Schrift auf Grafiken: Bahnschrift, lokal gesetzt (`tools/icons/art.py`), nie aus der KI.
 
 ## UI-Icons (App) – Relief-Stil, 91 Stück

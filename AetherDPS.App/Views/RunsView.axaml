@@ -36,8 +36,10 @@
               <StackPanel Spacing="2">
                 <TextBlock Text="{Binding RunTitle}" FontSize="17" FontWeight="SemiBold" />
                 <TextBlock Text="{Binding RunSummary}" Classes="dim" FontSize="12" TextWrapping="Wrap" />
-                <TextBlock Text="{Binding Comparison}" Foreground="#E0A84A" FontSize="12" TextWrapping="Wrap"
-                           IsVisible="{Binding Comparison, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{Binding Comparison, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                  <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon trophy, Size=13}" Width="13" Height="13" VerticalAlignment="Top" Margin="0,1,0,0" />
+                  <TextBlock Text="{Binding Comparison}" Foreground="#E0A84A" FontSize="12" TextWrapping="Wrap" />
+                </StackPanel>
               </StackPanel>
             </Grid>
 
@@ -97,7 +99,7 @@
           <Button Classes="secondary" Content="{l:T runs.copy_text}" Command="{Binding CopyTextCommand}" />
           <Button Classes="secondary" Content="{l:T runs.send_discord}" Command="{Binding SendToDiscordCommand}"
                   IsVisible="{Binding HasWebhook}" IsEnabled="{Binding !IsPosting}" />
-          <Button Classes="secondary" Content="{l:T runs.delete}" Command="{Binding DeleteRunCommand}" />
+          <Button Classes="danger" Content="{l:T runs.delete}" Command="{Binding DeleteRunCommand}" />
           <TextBlock Text="{Binding Notice}" Classes="dim" VerticalAlignment="Center" FontSize="12" />
         </StackPanel>
 

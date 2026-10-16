@@ -1,0 +1,160 @@
+<!-- Farbwelt der App (assets/brand/README.md). Wird in App.axaml nach dem FluentTheme eingebunden
+     und ebenso in den UI-Tests (AetherDPS.UiTests), damit Bilder dort genauso aussehen wie im Programm.
+     Fluent-Standardfarben (Windows-Blau, Grau) werden auf Gold und die dunklen Flächen umgebogen,
+     damit Auswahl, Haken, Fokus und Knöpfe überall gleich aussehen. -->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Styles.Resources>
+    <ResourceDictionary>
+      <!-- Akzent: Gold statt Windows-Akzentfarbe (Auswahl, Haken, Fokusrahmen, Reiter-Streifen, Fortschritt) -->
+      <Color x:Key="SystemAccentColor">#E0A84A</Color>
+      <Color x:Key="SystemAccentColorDark1">#C9933C</Color>
+      <Color x:Key="SystemAccentColorDark2">#B07F31</Color>
+      <Color x:Key="SystemAccentColorDark3">#966A27</Color>
+      <Color x:Key="SystemAccentColorLight1">#E8B862</Color>
+      <Color x:Key="SystemAccentColorLight2">#F0C87E</Color>
+      <Color x:Key="SystemAccentColorLight3">#F6D79C</Color>
+      <CornerRadius x:Key="ControlCornerRadius">6</CornerRadius>
+
+      <!-- Knöpfe (Standard = „secondary“): dunkle Fläche mit feiner Linie -->
+      <SolidColorBrush x:Key="ButtonBackground" Color="#1F2530" />
+      <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#283040" />
+      <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#171C24" />
+      <SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="#171B23" />
+      <SolidColorBrush x:Key="ButtonForeground" Color="#E6E8EC" />
+      <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="ButtonForegroundPressed" Color="#C9CED6" />
+      <SolidColorBrush x:Key="ButtonForegroundDisabled" Color="#5C6473" />
+      <SolidColorBrush x:Key="ButtonBorderBrush" Color="#2C3442" />
+      <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="#3C4657" />
+      <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#2C3442" />
+      <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="#232A36" />
+
+      <!-- Eingabefelder -->
+      <SolidColorBrush x:Key="TextControlBackground" Color="#12161D" />
+      <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#151A22" />
+      <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#12161D" />
+      <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="#12161D" />
+      <SolidColorBrush x:Key="TextControlBorderBrush" Color="#2C3442" />
+      <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="#3C4657" />
+      <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="#E0A84A" />
+      <SolidColorBrush x:Key="TextControlForeground" Color="#E6E8EC" />
+      <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="#6C7483" />
+      <SolidColorBrush x:Key="TextControlPlaceholderForegroundPointerOver" Color="#7A8392" />
+      <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="#6C7483" />
+
+      <!-- Auswahllisten -->
+      <SolidColorBrush x:Key="ComboBoxBackground" Color="#1F2530" />
+      <SolidColorBrush x:Key="ComboBoxBackgroundPointerOver" Color="#283040" />
+      <SolidColorBrush x:Key="ComboBoxBackgroundPressed" Color="#171C24" />
+      <SolidColorBrush x:Key="ComboBoxBorderBrush" Color="#2C3442" />
+      <SolidColorBrush x:Key="ComboBoxBorderBrushPointerOver" Color="#3C4657" />
+      <SolidColorBrush x:Key="ComboBoxBorderBrushPressed" Color="#E0A84A" />
+      <SolidColorBrush x:Key="ComboBoxDropDownBackground" Color="#1C2230" />
+      <SolidColorBrush x:Key="ComboBoxDropDownBorderBrush" Color="#2C3442" />
+      <SolidColorBrush x:Key="ComboBoxItemBackgroundPointerOver" Color="#283040" />
+      <SolidColorBrush x:Key="ComboBoxItemBackgroundSelected" Color="#2E2818" />
+      <SolidColorBrush x:Key="ComboBoxItemBackgroundSelectedPointerOver" Color="#38301C" />
+      <SolidColorBrush x:Key="ComboBoxItemBackgroundSelectedPressed" Color="#2E2818" />
+      <SolidColorBrush x:Key="ComboBoxItemForegroundSelected" Color="#F0C87E" />
+
+      <!-- Listen (Läufe, Pets, Auswahllisten): gewählte Zeile warm getönt statt knallblau.
+           Fluent nimmt dafür die Highlight-Pinsel (Akzent mit Deckkraft); hier deckend und dunkel. -->
+      <SolidColorBrush x:Key="SystemControlHighlightListLowBrush" Color="#1F2530" />
+      <SolidColorBrush x:Key="SystemControlHighlightListMediumBrush" Color="#283040" />
+      <SolidColorBrush x:Key="SystemControlHighlightListAccentLowBrush" Color="#352C19" />
+      <SolidColorBrush x:Key="SystemControlHighlightListAccentMediumBrush" Color="#40351E" />
+      <SolidColorBrush x:Key="SystemControlHighlightListAccentHighBrush" Color="#4A3D22" />
+
+      <!-- Haken: dunkles Häkchen auf Gold -->
+      <SolidColorBrush x:Key="CheckBoxCheckGlyphForegroundChecked" Color="#141820" />
+      <SolidColorBrush x:Key="CheckBoxCheckGlyphForegroundCheckedPointerOver" Color="#141820" />
+      <SolidColorBrush x:Key="CheckBoxCheckGlyphForegroundCheckedPressed" Color="#141820" />
+      <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeUnchecked" Color="#3C4657" />
+      <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeUncheckedPointerOver" Color="#E0A84A" />
+      <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillUnchecked" Color="#12161D" />
+      <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillUncheckedPointerOver" Color="#151A22" />
+
+      <!-- Aufklappbereiche (Feldbosse) -->
+      <SolidColorBrush x:Key="ExpanderHeaderBackground" Color="#1F2530" />
+      <SolidColorBrush x:Key="ExpanderHeaderBackgroundPointerOver" Color="#283040" />
+      <SolidColorBrush x:Key="ExpanderHeaderBackgroundPressed" Color="#171C24" />
+      <SolidColorBrush x:Key="ExpanderHeaderBorderBrush" Color="#2C3442" />
+      <SolidColorBrush x:Key="ExpanderContentBackground" Color="#151A22" />
+      <SolidColorBrush x:Key="ExpanderContentBorderBrush" Color="#2C3442" />
+
+      <!-- Bildlaufleisten, Tooltips -->
+      <SolidColorBrush x:Key="ScrollBarThumbFill" Color="#3C4657" />
+      <SolidColorBrush x:Key="ScrollBarThumbFillPointerOver" Color="#4C5768" />
+      <SolidColorBrush x:Key="ScrollBarThumbFillPressed" Color="#5C6778" />
+      <SolidColorBrush x:Key="ToolTipBackground" Color="#1C2230" />
+      <SolidColorBrush x:Key="ToolTipBorderBrush" Color="#2C3442" />
+      <SolidColorBrush x:Key="ToolTipForeground" Color="#E6E8EC" />
+    </ResourceDictionary>
+  </Styles.Resources>
+
+    <!-- Eigene Icons (Assets/icons): werden aus der doppelten Auflösung herunterskaliert, deshalb hochwertig filtern -->
+  <Style Selector="Image.ic">
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+
+  <!-- Karten und Knöpfe, überall gleich -->
+  <Style Selector="Border.card">
+    <Setter Property="Background" Value="#F2191E28" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Padding" Value="18" />
+    <Setter Property="BorderBrush" Value="#262E3B" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
+  <Style Selector="Button.primary">
+    <Setter Property="Background" Value="#E0A84A" />
+    <Setter Property="Foreground" Value="#141820" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Padding" Value="18,8" />
+    <Setter Property="CornerRadius" Value="6" />
+  </Style>
+  <Style Selector="Button.primary:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="#F0BC62" />
+    <Setter Property="Foreground" Value="#141820" />
+  </Style>
+  <Style Selector="Button.primary:pressed /template/ ContentPresenter">
+    <Setter Property="Background" Value="#C9933C" />
+    <Setter Property="Foreground" Value="#141820" />
+  </Style>
+  <Style Selector="Button.primary:disabled /template/ ContentPresenter">
+    <Setter Property="Background" Value="#4A3D22" />
+    <Setter Property="Foreground" Value="#8E8469" />
+  </Style>
+  <Style Selector="Button.secondary">
+    <Setter Property="Padding" Value="14,8" />
+    <Setter Property="CornerRadius" Value="6" />
+  </Style>
+  <!-- Löschen und Ähnliches: rötlich, aber ruhig -->
+  <Style Selector="Button.danger">
+    <Setter Property="Padding" Value="14,8" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Background" Value="#2A1B1E" />
+    <Setter Property="BorderBrush" Value="#4A2A30" />
+    <Setter Property="Foreground" Value="#F0908A" />
+  </Style>
+  <Style Selector="Button.danger:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="#3A2328" />
+    <Setter Property="Foreground" Value="#FFA8A2" />
+  </Style>
+  <!-- Nur Icon, keine Fläche (Schließen, Aufklappen) -->
+  <Style Selector="Button.plain">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="6,4" />
+    <Setter Property="MinWidth" Value="0" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="CornerRadius" Value="5" />
+  </Style>
+  <Style Selector="Button.plain:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="#1AFFFFFF" />
+  </Style>
+  <Style Selector="Button.plain:pressed /template/ ContentPresenter">
+    <Setter Property="Background" Value="#0DFFFFFF" />
+  </Style>
+</Styles>

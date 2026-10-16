@@ -5,6 +5,7 @@
 - Zierleiste und Kopf-Banner nach docs/media/brand/
 
 Aufruf: python tools/icons/art.py   (Rohbilder müssen lokal liegen; die Ergebnisse sind im Repo)
+Das Logo macht tools/icons/logo.py.
 """
 from __future__ import annotations
 
@@ -127,12 +128,12 @@ def main() -> None:
     background(RAW / "raw-bg-stars.png", WEB / "bg-stars.webp")
     background(RAW / "raw-banner-hero.png", WEB / "hero-wide.webp", w=2000)
     divider(RAW / "raw-divider.png", [WEB / "divider.webp", DOCS / "divider.webp"])
-    # Hauptfenster der App: Flügel als sehr dunkles Wasserzeichen hinter den Karten
+    # Hauptfenster der App: eigener, sehr dunkler Hintergrund (ein Flügel unten rechts, Nebel unten),
+    # leicht zur Fenster-Grundfarbe hin gemischt; das Fenster legt oben links noch einen Verlauf darüber
     app_bg = ROOT / "AetherDPS.App" / "Assets" / "art" / "hub-bg.jpg"
     app_bg.parent.mkdir(parents=True, exist_ok=True)
-    im = Image.open(RAW / "raw-bg-wings.png").convert("RGB")
-    im = im.resize((1280, round(im.height * 1280 / im.width)), Image.LANCZOS)
-    Image.blend(im, Image.new("RGB", im.size, (17, 20, 27)), 0.1).save(app_bg, quality=82, optimize=True)
+    im = cover(Image.open(RAW / "raw-bg-hub.png").convert("RGB"), 1600, 900)
+    Image.blend(im, Image.new("RGB", im.size, (17, 20, 27)), 0.25).save(app_bg, quality=84, optimize=True)
     print(app_bg.relative_to(ROOT), im.size, f"{app_bg.stat().st_size // 1024} KB")
 
 

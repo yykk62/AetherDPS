@@ -37,12 +37,37 @@
             <Button Grid.Column="3" Classes="secondary" Content="{l:T armory.show_self}" Command="{Binding ShowSelfCommand}"
                     IsVisible="{Binding KnowsSelf}" IsEnabled="{Binding !IsLoading}" />
           </Grid>
-          <TextBlock Text="{Binding Status}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
+          <!-- Suche läuft: deutlich sichtbar, mit Laufbalken -->
+          <Border IsVisible="{Binding IsLoading}" Background="#14E0A84A" BorderBrush="#33E0A84A" BorderThickness="1" CornerRadius="6" Padding="12,10">
+            <StackPanel Spacing="8">
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon search, Size=18}" Width="18" Height="18" />
+                <StackPanel Spacing="1">
+                  <TextBlock Text="{l:T profile.loading_title}" FontWeight="SemiBold" FontSize="13" />
+                  <TextBlock Text="{l:T profile.loading_text}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
+                </StackPanel>
+              </StackPanel>
+              <ProgressBar IsIndeterminate="True" Height="4" MinHeight="0" Foreground="#E0A84A" Background="#22FFFFFF" />
+            </StackPanel>
+          </Border>
+          <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding !IsLoading}">
+            <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{Binding LoadFailed, Converter={x:Static l:Icons.WarningElseInfo}}" Width="12" Height="12" VerticalAlignment="Top" Margin="0,1,0,0" Opacity="0.85" />
+            <TextBlock Text="{Binding Status}" Foreground="{Binding LoadFailed, Converter={x:Static l:BoolBrush.ErrorRedElseMuted}}" FontSize="11" TextWrapping="Wrap" />
+          </StackPanel>
           <!-- NCSOFT liefert nur Slot 1 (keine Slot-Auswahl in der API) -->
           <StackPanel Orientation="Horizontal" Spacing="5" ToolTip.Tip="{l:T profile.slot_note_tip}">
             <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon info, Size=12}" Width="12" Height="12" VerticalAlignment="Top" Margin="0,1,0,0" Opacity="0.8" />
             <TextBlock Text="{l:T profile.slot_note}" Foreground="#9C8A5E" FontSize="11" TextWrapping="Wrap" />
           </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <!-- Leerer Zustand -->
+      <Border Classes="card" IsVisible="{Binding ShowEmpty}" Padding="24">
+        <StackPanel Spacing="8" HorizontalAlignment="Center">
+          <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon helmet, Size=48}" Width="48" Height="48" Opacity="0.6" HorizontalAlignment="Center" />
+          <TextBlock Text="{l:T profile.empty_title}" FontSize="14" FontWeight="SemiBold" HorizontalAlignment="Center" />
+          <TextBlock Text="{l:T profile.unknown_self}" Classes="dim" FontSize="12" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="420" />
         </StackPanel>
       </Border>
 

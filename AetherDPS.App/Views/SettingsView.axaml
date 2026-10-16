@@ -29,19 +29,6 @@
       <Setter Property="FontSize" Value="11" />
       <Setter Property="Margin" Value="28,0,0,0" />
     </Style>
-    <Style Selector="Border.card">
-      <Setter Property="Background" Value="#191E28" />
-      <Setter Property="CornerRadius" Value="8" />
-      <Setter Property="Padding" Value="18,16" />
-      <Setter Property="BorderBrush" Value="#232A36" />
-      <Setter Property="BorderThickness" Value="1" />
-    </Style>
-    <Style Selector="Button.primary">
-      <Setter Property="Background" Value="#E0A84A" />
-      <Setter Property="Foreground" Value="#141820" />
-      <Setter Property="FontWeight" Value="SemiBold" />
-      <Setter Property="CornerRadius" Value="6" />
-    </Style>
   </UserControl.Styles>
 
   <StackPanel Spacing="14" MaxWidth="620" HorizontalAlignment="Left">

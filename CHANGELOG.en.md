@@ -2,6 +2,15 @@
 
 Newest versions first.
 
+## 0.8.1
+
+- **New logo:** a golden aether crystal between Daeva wings, used as the window, tray and web icon (previously three bars)
+- **Tidier main window:** notices like "New in version …" are a single line now and expand on click instead of filling half the window. Version badge in the header, selected tab with a golden background
+- **One colour for everything:** list selection, check marks, focus rings and expanders are gold instead of Windows blue; buttons, fields and dropdowns are dark with a fine outline. "Delete" is reddish
+- **Calmer background:** a single wing bottom right, fading into the base colour top left, cards sit clearly on top
+- **Profile:** the NCSOFT lookup now clearly shows "Looking up character …" with a progress bar; a failure is red with a warning icon, and without a profile there is an empty card with a hint
+- "AION 2 running" is a green status instead of a greyed-out button
+
 ## 0.8.0
 
 - **New look:** an own icon set in the Aether style (gold with a violet glow) replaces text and symbols. Tabs, the overlay and pet-radar buttons, timer pills, notices and settings now have real icons, crisp at 100 % and 150 % scaling

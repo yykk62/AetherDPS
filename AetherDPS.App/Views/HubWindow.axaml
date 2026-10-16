@@ -21,39 +21,26 @@
       <Setter Property="FontSize" Value="15" />
       <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
-    <Style Selector="Border.card">
-      <Setter Property="Background" Value="#191E28" />
-      <Setter Property="CornerRadius" Value="8" />
-      <Setter Property="Padding" Value="18" />
-      <Setter Property="BorderBrush" Value="#232A36" />
-      <Setter Property="BorderThickness" Value="1" />
-    </Style>
-    <Style Selector="Button.primary">
-      <Setter Property="Background" Value="#E0A84A" />
-      <Setter Property="Foreground" Value="#141820" />
-      <Setter Property="FontWeight" Value="SemiBold" />
-      <Setter Property="Padding" Value="20,9" />
-      <Setter Property="CornerRadius" Value="6" />
-    </Style>
-    <Style Selector="Button.primary:pointerover /template/ ContentPresenter">
-      <Setter Property="Background" Value="#F0BC62" />
-      <Setter Property="Foreground" Value="#141820" />
-    </Style>
-    <Style Selector="Button.secondary">
-      <Setter Property="Padding" Value="16,9" />
-      <Setter Property="CornerRadius" Value="6" />
-    </Style>
     <Style Selector="TabControl">
       <Setter Property="Padding" Value="0" />
     </Style>
     <Style Selector="TabItem">
       <Setter Property="FontSize" Value="14" />
-      <Setter Property="Padding" Value="18,10" />
+      <Setter Property="Padding" Value="16,9" />
+      <Setter Property="Margin" Value="0,1" />
       <Setter Property="MinHeight" Value="0" />
       <Setter Property="Foreground" Value="#8E96A3" />
+      <Setter Property="CornerRadius" Value="8" />
     </Style>
     <Style Selector="TabItem:selected">
       <Setter Property="Foreground" Value="#E6E8EC" />
+    </Style>
+    <!-- gewählter Reiter: sanft goldene Fläche, Streifen links -->
+    <Style Selector="TabItem:selected /template/ Border#PART_LayoutRoot">
+      <Setter Property="Background" Value="#16E0A84A" />
+    </Style>
+    <Style Selector="TabItem:pointerover /template/ Border#PART_LayoutRoot">
+      <Setter Property="Background" Value="#0DFFFFFF" />
     </Style>
     <Style Selector="TabItem:selected /template/ Border#PART_SelectedPipe">
       <Setter Property="Background" Value="#E0A84A" />
@@ -82,26 +69,47 @@
       <Setter Property="Foreground" Value="#C9CED6" />
     </Style>
     <Style Selector="Border.tile">
-      <Setter Property="Background" Value="#191E28" />
-      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Background" Value="#F2191E28" />
+      <Setter Property="CornerRadius" Value="10" />
       <Setter Property="Padding" Value="14,10" />
       <Setter Property="Margin" Value="0,0,10,0" />
-      <Setter Property="BorderBrush" Value="#232A36" />
+      <Setter Property="BorderBrush" Value="#262E3B" />
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <!-- Hinweiskarten: schlanke Titelzeile, Rest aufklappbar -->
+    <Style Selector="Border.notice">
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Padding" Value="10,6,6,6" />
+      <Setter Property="Margin" Value="0,0,0,6" />
       <Setter Property="BorderThickness" Value="1" />
     </Style>
   </Window.Styles>
 
   <Panel>
-  <!-- Flügel als dunkles Wasserzeichen unten rechts, Karten liegen darüber -->
-  <Image Source="/Assets/art/hub-bg.jpg" Stretch="UniformToFill" Opacity="0.7" IsHitTestVisible="False"
-         HorizontalAlignment="Stretch" VerticalAlignment="Bottom" RenderOptions.BitmapInterpolationMode="HighQuality" />
+  <!-- Flügel als sehr dunkles Wasserzeichen unten rechts; oben links läuft es in die Grundfarbe aus,
+       damit Kopf, Reiter und Hinweise auf ruhiger Fläche liegen und nur die Karten über dem Bild schweben -->
+  <Image Source="/Assets/art/hub-bg.jpg" Stretch="UniformToFill" IsHitTestVisible="False"
+         HorizontalAlignment="Right" VerticalAlignment="Bottom" RenderOptions.BitmapInterpolationMode="HighQuality" />
+  <Border IsHitTestVisible="False">
+    <Border.Background>
+      <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+        <GradientStop Color="#FF11141B" Offset="0" />
+        <GradientStop Color="#CC11141B" Offset="0.35" />
+        <GradientStop Color="#3311141B" Offset="0.75" />
+        <GradientStop Color="#0011141B" Offset="1" />
+      </LinearGradientBrush>
+    </Border.Background>
+  </Border>
   <Grid RowDefinitions="Auto,Auto,*">
     <!-- Kopf -->
-    <Grid ColumnDefinitions="*,Auto" Margin="22,16,22,4">
+    <Grid ColumnDefinitions="*,Auto" Margin="22,14,22,4">
       <StackPanel Orientation="Horizontal" Spacing="10">
-        <Image Source="/Assets/icon.png" Width="28" Height="28" />
+        <Image Source="/Assets/icon.png" Width="30" Height="30" RenderOptions.BitmapInterpolationMode="HighQuality" />
         <TextBlock Text="{l:T hub.title}" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" />
-        <TextBlock Text="{l:T hub.close_hint}" Classes="dim" FontSize="11" VerticalAlignment="Center" Margin="12,2,0,0" />
+        <Border Background="#1AE0A84A" CornerRadius="9" Padding="7,1" VerticalAlignment="Center">
+          <TextBlock Text="{Binding VersionText}" Foreground="#E0A84A" FontSize="10.5" FontWeight="SemiBold" />
+        </Border>
+        <TextBlock Text="{l:T hub.close_hint}" Classes="dim" FontSize="11" VerticalAlignment="Center" Margin="8,2,0,0" />
       </StackPanel>
       <!-- Update bereit -->
       <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
@@ -126,33 +134,40 @@
     </Grid>
 
     <!-- Hinweiskarten: Zustimmung, Absturz, Was ist neu, Nachrichten an alle, Spiel-Update -->
-    <ScrollViewer Grid.Row="1" MaxHeight="240" HorizontalScrollBarVisibility="Disabled" Margin="22,6,22,0">
+    <ScrollViewer Grid.Row="1" MaxHeight="230" HorizontalScrollBarVisibility="Disabled" Margin="22,8,22,0">
     <ItemsControl ItemsSource="{Binding Notices}">
       <ItemsControl.ItemTemplate>
         <DataTemplate x:DataType="vm:HubNotice">
-          <Border CornerRadius="8" Padding="16,12" Margin="0,0,0,8" BorderThickness="1"
+          <Border Classes="notice"
                   Background="{Binding IsWarning, Converter={x:Static l:BoolBrush.WarningElseCard}}"
                   BorderBrush="{Binding IsWarning, Converter={x:Static l:BoolBrush.WarningBorderElseCard}}">
-            <Grid ColumnDefinitions="*,Auto">
-              <StackPanel Spacing="6">
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                  <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{Binding Icon, Converter={x:Static l:Icons.ByName}}" Width="18" Height="18" />
-                  <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="14" TextWrapping="Wrap" VerticalAlignment="Center" />
-                </StackPanel>
-                <TextBlock Text="{Binding Text}" Classes="dim" TextWrapping="Wrap" />
+            <StackPanel Spacing="4">
+              <!-- Titelzeile: Klick klappt auf/zu -->
+              <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{Binding Icon, Converter={x:Static l:Icons.ByName}}" Width="16" Height="16" Margin="2,0,0,0" />
+                <Button Grid.Column="1" Classes="plain" Command="{Binding ToggleCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="8,3">
+                  <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="13" TextTrimming="CharacterEllipsis" />
+                </Button>
+                <Button Grid.Column="2" Classes="plain" Command="{Binding ToggleCommand}" ToolTip.Tip="{Binding IsExpanded, Converter={x:Static vm:NoticeConv.CollapseElseExpandTip}}">
+                  <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{Binding IsExpanded, Converter={x:Static vm:NoticeConv.ChevronUpElseDown}}" Width="12" Height="12" />
+                </Button>
+                <Button Grid.Column="3" Classes="plain" Command="{Binding Close}" IsVisible="{Binding CanClose}">
+                  <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon close, Size=11}" Width="11" Height="11" />
+                </Button>
+              </Grid>
+              <StackPanel Spacing="8" Margin="26,0,6,4" IsVisible="{Binding IsExpanded}">
+                <ScrollViewer MaxHeight="150" HorizontalScrollBarVisibility="Disabled">
+                  <TextBlock Text="{Binding Text}" Classes="dim" FontSize="12.5" TextWrapping="Wrap" />
+                </ScrollViewer>
                 <Border IsVisible="{Binding HasDetail}" Background="#0E1117" CornerRadius="4" Padding="10,6">
                   <SelectableTextBlock Text="{Binding Detail}" FontFamily="Consolas,monospace" FontSize="12" Foreground="#C8CDD6" TextWrapping="Wrap" />
                 </Border>
-                <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,2,0,0">
+                <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding HasPrimary}">
                   <Button Classes="primary" Content="{Binding PrimaryText}" Command="{Binding Primary}" IsVisible="{Binding HasPrimary}" />
                   <Button Classes="secondary" Content="{Binding SecondaryText}" Command="{Binding Secondary}" IsVisible="{Binding HasSecondary}" />
                 </StackPanel>
               </StackPanel>
-              <Button Grid.Column="1" Command="{Binding Close}" IsVisible="{Binding CanClose}"
-                      VerticalAlignment="Top" Background="Transparent" Padding="8,4">
-                <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon close, Size=12}" Width="12" Height="12" />
-              </Button>
-            </Grid>
+            </StackPanel>
           </Border>
         </DataTemplate>
       </ItemsControl.ItemTemplate>
@@ -180,12 +195,18 @@
                   <TextBlock Text="{Binding ModeText}" Classes="dim" TextWrapping="Wrap" />
                   <TextBlock Text="{Binding RiftInfo}" Foreground="#E0A84A" FontSize="12" TextWrapping="Wrap" Margin="0,4,0,0" />
                   <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,8,0,0">
-                    <Button Classes="secondary" Command="{Binding LaunchGameCommand}" IsEnabled="{Binding !GameRunning}">
+                    <Button Classes="secondary" Command="{Binding LaunchGameCommand}" IsVisible="{Binding !GameRunning}">
                       <StackPanel Orientation="Horizontal" Spacing="7">
                         <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon play, Size=13}" Width="13" Height="13" />
                         <TextBlock Text="{Binding LaunchText}" VerticalAlignment="Center" />
                       </StackPanel>
                     </Button>
+                    <Border IsVisible="{Binding GameRunning}" CornerRadius="6" Background="#1A5CC26A" BorderBrush="#335CC26A" BorderThickness="1" Padding="12,0" Height="34">
+                      <StackPanel Orientation="Horizontal" Spacing="7" VerticalAlignment="Center">
+                        <Ellipse Width="8" Height="8" Fill="#5CC26A" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding LaunchText}" Foreground="#9BDCA4" FontSize="12.5" VerticalAlignment="Center" />
+                      </StackPanel>
+                    </Border>
                     <TextBlock Text="{l:T hub.launch_hint}" Classes="dim" FontSize="11" TextWrapping="Wrap" VerticalAlignment="Center" MaxWidth="380" />
                   </StackPanel>
                 </StackPanel>

@@ -49,6 +49,9 @@ public sealed partial class HubViewModel : ObservableObject
     [ObservableProperty] private string updateBanner = "";
     [ObservableProperty] private string? discordUrl;
 
+    /// <summary>Versionsplakette im Kopf, z. B. v0.8.1.</summary>
+    public string VersionText => "v" + (typeof(HubViewModel).Assembly.GetName().Version is { } v ? $"{v.Major}.{v.Minor}.{Math.Max(0, v.Build)}" : "?");
+
     /// <summary>Hinweiskarten oben (Zustimmung, Absturz, Was ist neu, Nachrichten, Spiel-Update).</summary>
     public ObservableCollection<HubNotice> Notices { get; } = [];
 

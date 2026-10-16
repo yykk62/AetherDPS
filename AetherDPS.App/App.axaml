@@ -3,12 +3,11 @@
              xmlns:l="using:AetherDPS.App.Services"
              x:Class="AetherDPS.App.App"
              RequestedThemeVariant="Dark">
+
   <Application.Styles>
     <FluentTheme />
-    <!-- Eigene Icons (Assets/icons): werden aus der doppelten Auflösung herunterskaliert, deshalb hochwertig filtern -->
-    <Style Selector="Image.ic">
-      <Setter Property="VerticalAlignment" Value="Center" />
-    </Style>
+    <!-- Farben, Karten, Knöpfe: Theme.axaml (auch in den UI-Tests eingebunden) -->
+    <StyleInclude Source="avares://AetherDPS/Theme.axaml" />
   </Application.Styles>
 
   <TrayIcon.Icons>

@@ -104,6 +104,13 @@ public sealed partial class ProfileViewModel : ObservableObject
     [ObservableProperty] private bool isLoading;
     [ObservableProperty] private string status = "";
     [ObservableProperty] private bool hasProfile;
+    /// <summary>Letzte Suche fehlgeschlagen (nicht gefunden, keine Verbindung): Statuszeile rot mit Warnsymbol.</summary>
+    [ObservableProperty] private bool loadFailed;
+
+    /// <summary>Leerer Zustand: kein Profil geladen und keine Suche unterwegs.</summary>
+    public bool ShowEmpty => !HasProfile && !IsLoading;
+    partial void OnHasProfileChanged(bool value) => OnPropertyChanged(nameof(ShowEmpty));
+    partial void OnIsLoadingChanged(bool value) => OnPropertyChanged(nameof(ShowEmpty));
 
     [ObservableProperty] private Bitmap? portrait;
     [ObservableProperty] private string name = "";
@@ -189,11 +196,13 @@ public sealed partial class ProfileViewModel : ObservableObject
     {
         if (IsLoading) return;
         IsLoading = true;
+        LoadFailed = false;
         Status = Loc.T("armory.loading", characterName);
         var loaded = await armory.LoadAsync(characterName, serverId);
         IsLoading = false;
         if (loaded is null)
         {
+            LoadFailed = true;
             Status = Loc.T("armory.not_found", characterName);
             return;
         }
