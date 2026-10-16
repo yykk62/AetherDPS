@@ -169,7 +169,8 @@ public sealed class RunArchive
                 sb.AppendLine($"{(b.Killed ? "✔" : "✘")} {Cut(b.Name, 28),-28} {Fmt(b.Duration)}");
         }
         sb.AppendLine("```");
-        sb.Append("_AetherDPS_");
+        // Kleine Zeile mit Link (ohne Vorschau-Kasten), damit Mitlesende den Meter finden
+        sb.Append("-# 📊 AetherDPS · <https://aetherdps.com>");
         return sb.ToString();
 
         static string Cut(string s, int n) => s.Length <= n ? s : s[..(n - 1)] + "…";

@@ -2,15 +2,17 @@
 // Aufruf: npm run preview -- <profil.json> > vorschau.json
 import { readFileSync } from "node:fs";
 import { render } from "../src/character";
+import { promo } from "../src/discord";
 import { serverChoices } from "../src/character";
 import { checklist, events, fieldBoss, help, pet, petChoices, bossChoices } from "../src/info";
 
-const env: any = { EMOJIS: {}, ROLES: { class: {} } };
+const env: any = { EMOJIS: {}, ROLES: { class: {} }, GUILD_ID: "home" };
 const profile = JSON.parse(readFileSync(process.argv[2], "utf8"));
 const body = async (r: Response) => (await r.json() as any).data;
 
 const out: Record<string, unknown> = {};
 for (const v of ["main", "gear", "stats", "skills", "daeva"] as const) out[`charakter_${v}`] = render(env, profile, v);
+out.charakter_gear_fremder_server = promo(env, { guild_id: "anderer" }, render(env, profile, "gear"));
 out.events = await body(events());
 out.checkliste = await body(checklist());
 out.hilfe = await body(help(env));

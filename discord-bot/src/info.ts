@@ -149,7 +149,7 @@ export async function patchnotes(env: Env, ctx: ExecutionContext, i: any) {
   ctx.waitUntil((async () => {
     const [up, notes] = await Promise.all([boardArticles("update_de", true), boardArticles("notice_de", false)]);
     const line = (a: { title: string; url: string; at: number }) => `[${cut(a.title, 90)}](${a.url}) · ${ts(a.at)}`;
-    await finish(env, i.token, {
+    await finish(env, i, {
       embeds: [{
         color: GOLD,
         title: "📰 AION 2 · Offizielle News",
@@ -176,7 +176,7 @@ export async function aetherdps(env: Env, ctx: ExecutionContext, i: any) {
         date = Date.parse(j.published_at);
       }
     } catch { /* ohne Version */ }
-    await finish(env, i.token, {
+    await finish(env, i, {
       embeds: [{
         color: GOLD,
         title: "📊 AetherDPS",

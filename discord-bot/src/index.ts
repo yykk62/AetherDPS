@@ -13,7 +13,14 @@ import { bossChoices, aetherdps, checklist, events, fieldBoss, help, patchnotes,
 import { character, compare, me, serverChoices, switchView, userContext } from "./character";
 import { isRoleButton, roleButton } from "./roles";
 import { postNews, postReleases } from "./feeds";
-import { Env, options, whisper } from "./discord";
+import { Env, options, promo, whisper } from "./discord";
+
+/** Sofort-Antwort um die Knopfzeile ergänzen (außerhalb des AetherDPS-Servers, siehe promo). */
+async function promoted(env: Env, i: any, res: Response): Promise<Response> {
+  const j = await res.json<any>();
+  if (j.type === 4) j.data = promo(env, i, j.data);
+  return Response.json(j);
+}
 
 const hexToBytes = (hex: string) => new Uint8Array(hex.match(/../g)!.map((b) => parseInt(b, 16)));
 
@@ -57,9 +64,9 @@ async function interaction(req: Request, env: Env, ctx: ExecutionContext): Promi
       case "charakter": return character(env, ctx, i, user, opts);
       case "vergleich": return compare(env, ctx, i, user, opts);
       case "ich": return me(env, ctx, i, user, sub, opts);
-      case "pet": return pet(opts);
-      case "feldboss": return fieldBoss(opts, user);
-      case "events": return events();
+      case "pet": return promoted(env, i, pet(opts));
+      case "feldboss": return promoted(env, i, fieldBoss(opts, user));
+      case "events": return promoted(env, i, events());
       case "checkliste": return checklist();
       case "patchnotes": return patchnotes(env, ctx, i);
       case "aetherdps": return aetherdps(env, ctx, i);

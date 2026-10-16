@@ -76,12 +76,29 @@ export const deferred = (ephemeral = false) => Response.json({ type: 5, data: ep
 export const deferredUpdate = () => Response.json({ type: 6 });
 
 /** Ersetzt die (verzögerte) Antwort einer Interaktion. */
-export async function finish(env: Env, token: string, data: Message): Promise<void> {
-  await fetch(`${API}/webhooks/${env.APP_ID}/${token}/messages/@original`, {
+export async function finish(env: Env, i: any, data: Message): Promise<void> {
+  await fetch(`${API}/webhooks/${env.APP_ID}/${i.token}/messages/@original`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ allowed_mentions: quiet, ...data }),
+    body: JSON.stringify({ allowed_mentions: quiet, ...promo(env, i, data) }),
   });
+}
+
+export const INSTALL = "https://discord.com/oauth2/authorize?client_id=1560475211114090566";
+
+/**
+ * Außerhalb des AetherDPS-Servers (andere Server, DMs, „App hinzufügen“) bekommt jede Antwort mit Embed
+ * eine Knopfzeile zum Bot und zum Meter – so wirbt jede Nutzung für sich selbst. Nicht bei nur-für-dich-Antworten.
+ */
+export function promo(env: Env, i: any, data: Message): Message {
+  if (i.guild_id === env.GUILD_ID || !data.embeds?.length || (data.flags ?? 0) & EPHEMERAL || (i.message?.flags ?? 0) & EPHEMERAL) return data;
+  const row = { type: 1, components: [
+    { type: 2, style: 5, label: "AetherDPS-Bot holen", emoji: { name: "➕" }, url: INSTALL },
+    { type: 2, style: 5, label: "DPS-Meter für AION 2", emoji: { name: "📊" }, url: WEB },
+  ] };
+  const rows = (data.components ?? []) as any[];
+  if (rows.some((r) => r.components?.some((c: any) => c.url === INSTALL))) return data;
+  return rows.length < 5 ? { ...data, components: [...rows, row] } : data;
 }
 
 /** Kurztext mit „…“ an Wortgrenze. */

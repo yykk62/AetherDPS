@@ -84,6 +84,11 @@
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>
+            <!-- Steht mit im geteilten Bild: wer es in Discord sieht, weiß, womit es erfasst wurde -->
+            <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right" Opacity="0.75">
+              <Image Source="/Assets/icon.png" Width="14" Height="14" VerticalAlignment="Center" />
+              <TextBlock Text="AetherDPS · aetherdps.com" FontSize="11" Classes="dim" VerticalAlignment="Center" />
+            </StackPanel>
           </StackPanel>
         </Border>
 

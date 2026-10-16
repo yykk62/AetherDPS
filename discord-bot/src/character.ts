@@ -50,6 +50,41 @@ const slotName = (s: string) => SLOTS[s] ?? (/^Arcana(\d+)$/.exec(s) ? `Arkanum 
 const plus = (i: { enchant: number; exceed?: number }) =>
   i.enchant || i.exceed ? ` **+${i.enchant}**${i.exceed ? ` (+${i.exceed})` : ""}` : "";
 
+const GRADE_ORDER = ["Unique", "Legend", "Epic", "Special", "Rare"];
+const gradeRank = (g: string) => (GRADE_ORDER.includes(g) ? GRADE_ORDER.indexOf(g) : GRADE_ORDER.length);
+
+/** „🟨 **+10**  Schultern · Füße“: Teile gleicher Seltenheit und Stufe in einer Zeile, doppelte Slots als „Ring ×2“. */
+function grouped(items: Item[]): string {
+  const groups = new Map<string, Item[]>();
+  for (const i of items) {
+    const key = `${i.grade}|${i.enchant}|${i.exceed}`;
+    groups.set(key, [...(groups.get(key) ?? []), i]);
+  }
+  return [...groups.values()]
+    .sort((a, b) => gradeRank(a[0].grade) - gradeRank(b[0].grade) || b[0].enchant + b[0].exceed - (a[0].enchant + a[0].exceed))
+    .map((list) => {
+      const names = new Map<string, number>();
+      for (const i of list) {
+        const n = slotName(i.slot).replace(/ \d+$/, "");
+        names.set(n, (names.get(n) ?? 0) + 1);
+      }
+      const level = `+${list[0].enchant}${list[0].exceed ? ` (+${list[0].exceed})` : ""}`;
+      return `${grade(list[0].grade)} **${level}**  ${[...names].map(([n, c]) => (c > 1 ? `${n} ×${c}` : n)).join(" · ")}`;
+    })
+    .join("\n");
+}
+
+/** Sets erkennen: gleicher Zusatz („… des Pilgers“) oder gleicher Besitzer („Bakarmas …“) bei mindestens zwei Teilen. */
+function setsOf(items: Item[]): string {
+  const count = new Map<string, number>();
+  for (const i of items) {
+    if (i.slot.startsWith("Rune")) continue; // zwei gleiche Runen sind kein Set
+    const key = /\s((?:des|der|von)\s\S+)$/.exec(i.name)?.[1] ?? /^(\p{Lu}\p{Ll}+s)\s/u.exec(i.name)?.[1];
+    if (key) count.set(key, (count.get(key) ?? 0) + 1);
+  }
+  return [...count].filter(([, n]) => n >= 2).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k} ×${n}`).join(" · ");
+}
+
 const averageEnchant = (p: Profile) => {
   const gear = p.equipment.filter((i) => ARMOR.includes(i.slot));
   return gear.length ? gear.reduce((s, i) => s + i.enchant + i.exceed, 0) / gear.length : 0;
@@ -148,14 +183,22 @@ export function render(env: Env, p: Profile, view: View): Message {
       { name: "📚 Skills", value: `**${p.skills.length}**`, inline: true },
     ];
   } else if (view === "gear") {
-    const row = (i: Item) => `${grade(i.grade)} ${slotName(i.slot)} · ${i.name}${plus(i)}`;
-    const armor = p.equipment.filter((i) => ARMOR.includes(i.slot));
+    // Kompakt wie man im Spiel denkt: Waffen mit Namen, der Rest gruppiert nach Seltenheit und Stufe
+    const weapons = p.equipment.filter((i) => i.slot === "MainHand" || i.slot === "SubHand");
+    const armor = p.equipment.filter((i) => ARMOR.includes(i.slot) && !weapons.includes(i));
     const rest = p.equipment.filter((i) => !ARMOR.includes(i.slot));
+    const counts = GRADE_ORDER.map((g) => [g, p.equipment.filter((i) => i.grade === g).length] as const)
+      .filter(([, n]) => n).map(([g, n]) => `${grade(g)} ${n}`).join("  ");
+    const sets = setsOf(p.equipment);
+    e.description = [
+      `Ø Verzauberung **+${averageEnchant(p).toFixed(1).replace(".", ",")}**  ·  Itemstufe **${nf.format(p.itemLevel)}**  ·  ${counts}`,
+      sets ? `🧩 ${sets}` : "",
+    ].filter(Boolean).join("\n");
     e.fields = [
-      { name: "🛡️ Waffe und Rüstung", value: cut(armor.map(row).join("\n") || "–", 1024) },
-      { name: "💍 Schmuck und Weiteres", value: cut(rest.map(row).join("\n") || "–", 1024) },
+      { name: "🗡️ Waffen", value: cut(weapons.map((i) => `${grade(i.grade)} ${i.name}${plus(i)}`).join("\n") || "–", 1024) },
+      { name: "🛡️ Rüstung", value: cut(grouped(armor) || "–", 1024) },
+      { name: "💍 Schmuck und Runen", value: cut(grouped(rest) || "–", 1024) },
     ];
-    e.description = `Ø Verzauberung (Waffe + Rüstung): **+${averageEnchant(p).toFixed(1).replace(".", ",")}** · Itemstufe **${nf.format(p.itemLevel)}**`;
   } else if (view === "stats") {
     // Volle Breite statt schmaler Spalten: nichts bricht mitten im Namen um
     const base = p.stats.filter((s) => !s.name.includes("["));
@@ -235,7 +278,7 @@ async function show(env: Env, ctx: ExecutionContext, i: any, user: string, who: 
   if (!(await allowed(env, user))) return whisper(ERRORS.rate);
   ctx.waitUntil((async () => {
     const p = await load(env, who);
-    await finish(env, i.token, typeof p === "string" ? { content: p, embeds: [] } : render(env, p, "main"));
+    await finish(env, i, typeof p === "string" ? { content: p, embeds: [] } : render(env, p, "main"));
   })());
   return deferred(ephemeral);
 }
@@ -247,7 +290,7 @@ export async function switchView(env: Env, ctx: ExecutionContext, i: any, user: 
   if (!(await allowed(env, user))) return whisper(ERRORS.rate);
   ctx.waitUntil((async () => {
     const p = await load(env, who);
-    if (typeof p !== "string") await finish(env, i.token, render(env, p, view as View));
+    if (typeof p !== "string") await finish(env, i, render(env, p, view as View));
   })());
   return Response.json({ type: 6 });
 }
@@ -262,7 +305,7 @@ export async function compare(env: Env, ctx: ExecutionContext, i: any, user: str
     const pa = await load(env, a);
     const pb = await load(env, b);
     if (typeof pa === "string" || typeof pb === "string") {
-      await finish(env, i.token, { content: typeof pa === "string" ? `**${a.name}:** ${pa}` : `**${b.name}:** ${pb}` });
+      await finish(env, i, { content: typeof pa === "string" ? `**${a.name}:** ${pa}` : `**${b.name}:** ${pb}` });
       return;
     }
     const rows: [string, (p: Profile) => number, (v: number) => string][] = [
@@ -282,7 +325,7 @@ export async function compare(env: Env, ctx: ExecutionContext, i: any, user: str
       return `${k && env.EMOJIS[k] ? env.EMOJIS[k] + " " : ""}${p.className} · ${p.server}`;
     };
     const diff = pa.combatPower - pb.combatPower;
-    await finish(env, i.token, {
+    await finish(env, i, {
       embeds: [{
         color: GOLD,
         title: `⚔️ ${pa.name} vs. ${pb.name}`,
@@ -316,7 +359,7 @@ export async function me(env: Env, ctx: ExecutionContext, i: any, user: string, 
   ctx.waitUntil((async () => {
     const p = await load(env, who);
     if (typeof p === "string") {
-      await finish(env, i.token, { content: p });
+      await finish(env, i, { content: p });
       return;
     }
     await env.LINKS.put(`u:${user}`, JSON.stringify({ name: p.name, server: p.serverId }));
@@ -326,7 +369,7 @@ export async function me(env: Env, ctx: ExecutionContext, i: any, user: string, 
       if (key && (await setClassRole(env, user, i.member?.roles ?? [], key))) role = `\n🎭 Deine Klassen-Rolle ist jetzt <@&${env.ROLES.class[key]}>.`;
     }
     const msg = render(env, p, "main");
-    await finish(env, i.token, {
+    await finish(env, i, {
       ...msg,
       content: `✅ **${p.name}** (${serverName(p.serverId)}) ist jetzt mit dir verknüpft.\n` +
         `\`/charakter\` ohne Angaben zeigt ihn, und andere sehen ihn per Rechtsklick auf dich → Apps → **AION-Charakter**.${role}\n` +
