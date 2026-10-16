@@ -1,0 +1,29 @@
+{
+  "$schema": "../server/node_modules/wrangler/config-schema.json",
+  "name": "aetherdps-discord",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": false,
+  "preview_urls": false,
+  "send_metrics": false,
+
+  // Nichts protokollieren (wie aetherdps-api).
+  "observability": { "enabled": false },
+  "logpush": false,
+
+  // Discord schickt Knopf-Klicks hierhin (Interactions Endpoint URL der App).
+  "routes": [{ "pattern": "bot.aetherdps.com", "custom_domain": true }],
+
+  // Alle 15 Minuten: offizielle AION-2-News (aion2.plaync.com, Deutsch) und AetherDPS-Releases (GitHub) posten.
+  "triggers": { "crons": ["*/15 * * * *"] },
+
+  // Kein Geheimnis: IDs des Servers, der Kanäle und Rollen.
+  "vars": {
+    "GUILD_ID": "1560474565916762253",
+    "NEWS_CHANNEL": "1560477906365321218",
+    "ANNOUNCE_CHANNEL": "1560477905174265906",
+    "ROLES": {"update": "1560477445004599386", "news": "1560477446694772897", "tester": "1560477443435790418", "class": {"gladiator": "1560477447399411825", "templar": "1560477449140310046", "assassin": "1560477451472343140", "ranger": "1560477452562727042", "sorcerer": "1560477454202576896", "elementalist": "1560477455398084678", "cleric": "1560477456555843595", "chanter": "1560477457751220244", "brawler": "1560477458736750612"}}
+  }
+
+  // Secrets (nicht hier eintragen!): DISCORD_BOT_TOKEN, DISCORD_PUBLIC_KEY  ->  `wrangler secret put …`
+}
