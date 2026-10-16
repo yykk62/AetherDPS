@@ -56,6 +56,17 @@ Schaltest du unter Einstellungen → Datenschutz „Im Discord-Profil anzeigen�
 ### g) Empfänger
 Nutzungszahl und Fehlerberichte verarbeitet ein Server bei Cloudflare, Inc. als Auftragsverarbeiter. Die IP-Adresse wird nicht gespeichert; gegen Spam merkt sich der Server bis Tagesende nur einen gekürzten Hash mit täglich neuem Zufallswert. Der Quellcode des Servers ist öffentlich: <https://github.com/yykk62/AetherDPS/tree/main/server>
 
+## 3a. Discord-Server und Discord-Bot
+
+Unser Discord-Server und der Bot „AetherDPS“ laufen über Discord (Discord Inc., USA); dort gilt zusätzlich die Datenschutzerklärung von Discord: <https://discord.com/privacy>. Der Bot ist ein Programm auf unserem Server bei Cloudflare und bekommt von Discord nur die Befehle, die du selbst auslöst (mit deiner Discord-Nutzer-ID, deinen Rollen auf unserem Server und den Angaben im Befehl).
+
+- **Rollen-Knöpfe:** Der Bot gibt oder nimmt dir die gewählte Rolle auf unserem Server. Gespeichert wird dabei nichts außerhalb von Discord.
+- **/charakter, /vergleich, Rechtsklick „AION-Charakter“:** Wie bei „Mein Charakter“ (siehe oben) gehen Charaktername und Server an NCSOFT, das Ergebnis liegt höchstens eine Stunde im Cache. Je Discord-Nutzer sind höchstens 6 Abfragen pro Minute möglich; die Nutzer-ID dient dafür nur kurz im Arbeitsspeicher als Schlüssel.
+- **/ich verknüpfen:** Wir speichern deine Discord-Nutzer-ID zusammen mit Charaktername und Server, damit `/charakter` ohne Angaben funktioniert und andere deinen Charakter per Rechtsklick auf dich sehen können. Auf unserem Server setzt der Bot dabei deine Klassen-Rolle. `/ich lösen` löscht die Verknüpfung sofort. Rechtsgrundlage: Einwilligung (Art. 6 Abs. 1 lit. a DSGVO).
+- **Automatische Beiträge:** Alle 15 Minuten liest der Bot die öffentlichen Neuigkeiten von aion2.plaync.com und die Versionen auf GitHub und postet neue Beiträge. Dabei werden keine Daten von dir übertragen.
+
+Protokolliert wird nichts. Der Quellcode des Bots ist öffentlich: <https://github.com/yykk62/AetherDPS/tree/main/discord-bot>
+
 ## 4. Deine Rechte
 
 Auskunft, Berichtigung, Löschung, Einschränkung, Widerspruch, Datenübertragbarkeit und Widerruf einer Einwilligung (Art. 15–21, Art. 7 Abs. 3 DSGVO) sowie Beschwerde bei einer Datenschutz-Aufsichtsbehörde.
