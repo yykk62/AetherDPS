@@ -14,6 +14,7 @@
   <a href="https://github.com/yykk62/AetherDPS/releases"><img src="https://img.shields.io/github/downloads/yykk62/AetherDPS/total?label=Downloads&color=3d8bd4&style=flat-square" alt="Downloads" /></a>
   <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-2b3240?style=flat-square" alt="Windows 10 | 11" />
   <a href="LICENSE"><img src="https://img.shields.io/github/license/yykk62/AetherDPS?color=2b3240&style=flat-square" alt="Lizenz" /></a>
+  <a href="https://discord.gg/xExgsyDEP2"><img src="https://img.shields.io/badge/Discord-beitreten-5865F2?style=flat-square&logo=discord&logoColor=white" alt="Discord" /></a>
 </p>
 
 <p align="center">
@@ -24,6 +25,8 @@
   <a href="#bedienung">Bedienung</a>
   ·
   <a href="#häufige-fragen">Häufige Fragen</a>
+  ·
+  <a href="https://discord.gg/xExgsyDEP2">💬 Discord</a>
   ·
   <a href="#in-english">English</a>
 </p>

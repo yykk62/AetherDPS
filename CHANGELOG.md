@@ -2,6 +2,13 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
+## 0.7.11
+
+- **Stagger nur noch, wo es zählt:** Die Warnung mitten im Bild und die Einblendung „Stagger geschafft/verfehlt“ kommen nur noch bei Bossen mit Wipe-Mechanik (Stagger-Phase mit Zeitlimit). Schild-Gegner mit Dauer-Leiste zählen keine falsche Restzeit mehr herunter, ihre Leiste steht nur auf der Boss-Karte
+- **Schlankere Stagger-Warnung:** eine Zeile mit Punkten und Restzeit über einer dünnen Leiste statt des großen Kastens
+- **Im Discord-Profil zeigen, was du machst** (Einstellungen → Datenschutz, standardmäßig aus): „AION 2 · Dungeon: …“, „Bosskampf: …“ oder „In Bereitschaft“ mit Laufzeit. Läuft nur lokal über dein Discord, nie mit Charakternamen, Dungeon- und Bossnamen abschaltbar
+- **Neu: der AetherDPS-Discord** mit offiziellen AION-2-Patchnotes, Ideen-Forum und Bot-Befehlen wie `/charakter` und `/events`: https://discord.gg/xExgsyDEP2
+
 ## 0.7.10
 
 - Pet-Radar startet nach dem Update einmal mittig über der Spielkarte (statt an der alten Stelle am Rand, wo es in der neuen Größe aus dem Bild ragte) und bleibt immer ganz auf dem Bildschirm

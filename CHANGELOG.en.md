@@ -2,6 +2,13 @@
 
 Newest versions first.
 
+## 0.7.11
+
+- **Stagger only where it matters:** the warning in the middle of the screen and the "Stagger succeeded/failed" pop-up now only appear for bosses with a wipe mechanic (Stagger phase with a time limit). Shielded enemies with a permanent bar no longer count down a wrong timer, their bar stays on the boss card
+- **Slimmer Stagger warning:** one line with points and time left above a thin bar instead of the big box
+- **Show what you're doing in your Discord profile** (Settings → Privacy, off by default): "AION 2 · Dungeon: …", "Boss fight: …" or "Standby" with elapsed time. Runs locally through your Discord only, never with character names, dungeon and boss names can be hidden
+- **New: the AetherDPS Discord** with official AION 2 patch notes, an idea forum and bot commands like `/charakter` and `/events`: https://discord.gg/xExgsyDEP2
+
 ## 0.7.10
 
 - After the update the pet radar opens once centred over the game map (instead of at its old spot at the edge, where the new size stuck out of the screen) and always stays fully on screen
