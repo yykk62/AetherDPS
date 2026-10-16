@@ -49,7 +49,10 @@
     <!-- ===== Sprache ===== -->
     <Border Classes="card">
       <StackPanel Spacing="8">
-        <TextBlock Classes="section" Text="{l:T settings.section.language}" />
+        <StackPanel Orientation="Horizontal" Spacing="9">
+          <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon globe, Size=18}" Width="18" Height="18" />
+          <TextBlock Classes="section" Text="{l:T settings.section.language}" VerticalAlignment="Center" />
+        </StackPanel>
         <ComboBox ItemsSource="{Binding Languages}" SelectedItem="{Binding SelectedLanguage}" MinWidth="240" />
         <TextBlock Classes="dim" Text="{l:T settings.language_hint}" />
         <StackPanel Orientation="Horizontal" Spacing="10" IsVisible="{Binding LanguageChanged}">
@@ -62,7 +65,10 @@
     <!-- ===== Bedienung ===== -->
     <Border Classes="card">
       <StackPanel Spacing="16">
-        <TextBlock Classes="section" Text="{l:T settings.section.controls}" />
+        <StackPanel Orientation="Horizontal" Spacing="9">
+          <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon keyboard, Size=18}" Width="18" Height="18" />
+          <TextBlock Classes="section" Text="{l:T settings.section.controls}" VerticalAlignment="Center" />
+        </StackPanel>
 
         <StackPanel Spacing="6">
           <TextBlock Classes="label" Text="{l:T settings.hotkey}" />
@@ -93,7 +99,10 @@
     <!-- ===== Erfassung ===== -->
     <Border Classes="card">
       <StackPanel Spacing="14">
-        <TextBlock Classes="section" Text="{l:T settings.section.tracking}" />
+        <StackPanel Orientation="Horizontal" Spacing="9">
+          <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon eye, Size=18}" Width="18" Height="18" />
+          <TextBlock Classes="section" Text="{l:T settings.section.tracking}" VerticalAlignment="Center" />
+        </StackPanel>
         <StackPanel Spacing="4">
           <CheckBox IsChecked="{Binding AutoTrack}">
             <TextBlock Classes="label" Text="{l:T settings.auto_track}" />
@@ -115,7 +124,10 @@
     <!-- ===== Anzeige ===== -->
     <Border Classes="card">
       <StackPanel Spacing="14">
-        <TextBlock Classes="section" Text="{l:T settings.section.display}" />
+        <StackPanel Orientation="Horizontal" Spacing="9">
+          <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon monitor, Size=18}" Width="18" Height="18" />
+          <TextBlock Classes="section" Text="{l:T settings.section.display}" VerticalAlignment="Center" />
+        </StackPanel>
         <StackPanel Spacing="4">
           <Grid ColumnDefinitions="*,Auto">
             <TextBlock Classes="label" Text="{l:T settings.opacity}" />
@@ -141,7 +153,10 @@
     <!-- ===== Discord ===== -->
     <Border Classes="card">
       <StackPanel Spacing="8">
-        <TextBlock Classes="section" Text="{l:T settings.section.discord}" />
+        <StackPanel Orientation="Horizontal" Spacing="9">
+          <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon chat, Size=18}" Width="18" Height="18" />
+          <TextBlock Classes="section" Text="{l:T settings.section.discord}" VerticalAlignment="Center" />
+        </StackPanel>
         <TextBlock Classes="label" Text="{l:T settings.webhook}" />
         <Grid ColumnDefinitions="*,Auto">
           <TextBox Text="{Binding DiscordWebhook}" Watermark="https://discord.com/api/webhooks/…" />
@@ -155,7 +170,10 @@
     <!-- ===== Start ===== -->
     <Border Classes="card">
       <StackPanel Spacing="14">
-        <TextBlock Classes="section" Text="{l:T settings.section.start}" />
+        <StackPanel Orientation="Horizontal" Spacing="9">
+          <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon play, Size=18}" Width="18" Height="18" />
+          <TextBlock Classes="section" Text="{l:T settings.section.start}" VerticalAlignment="Center" />
+        </StackPanel>
         <StackPanel Spacing="4">
           <CheckBox IsChecked="{Binding LaunchGameWithMeter}">
             <TextBlock Classes="label" Text="{l:T settings.launch_game}" />
@@ -169,7 +187,10 @@
     <Border Classes="card">
       <StackPanel Spacing="10">
         <Grid ColumnDefinitions="*,Auto">
-          <TextBlock Classes="section" Text="{l:T update.heading}" />
+          <StackPanel Orientation="Horizontal" Spacing="9">
+          <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon refresh, Size=18}" Width="18" Height="18" />
+          <TextBlock Classes="section" Text="{l:T update.heading}" VerticalAlignment="Center" />
+        </StackPanel>
           <TextBlock Grid.Column="1" Classes="dim" Text="{Binding VersionText}" VerticalAlignment="Center" />
         </Grid>
         <StackPanel Spacing="4">
@@ -191,7 +212,10 @@
     <!-- ===== Datenschutz ===== -->
     <Border Classes="card">
       <StackPanel Spacing="10">
-        <TextBlock Classes="section" Text="{l:T settings.section.privacy}" />
+        <StackPanel Orientation="Horizontal" Spacing="9">
+          <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon shield-check, Size=18}" Width="18" Height="18" />
+          <TextBlock Classes="section" Text="{l:T settings.section.privacy}" VerticalAlignment="Center" />
+        </StackPanel>
         <StackPanel Spacing="4">
           <CheckBox IsChecked="{Binding UsageStats}">
             <TextBlock Classes="label" Text="{l:T settings.usage_stats}" />

@@ -2,7 +2,11 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
-## 0.7.12
+## 0.8.0
+
+- **Neues Aussehen:** eigenes Icon-Set im Aether-Stil (Gold mit violettem Schein) statt Text und Symbolen. Reiter, Knöpfe im Overlay und im Pet-Radar, Timer-Pills, Hinweiskarten und Einstellungen haben jetzt echte Icons, scharf bei 100 % und 150 % Skalierung
+- **Hauptfenster** mit Daeva-Flügeln als dunklem Wasserzeichen
+- Webseite und README im selben Stil: Feature-Embleme, Abschnitts-Hintergründe, Banner und Zierleiste (alles lokal, nichts von fremden Servern)
 
 - **Seltenheit in den richtigen Farben:** „Legend“-Teile sind jetzt blau wie im Spiel (vorher orange), Einzigartig bleibt gold. Betrifft Profil und „Neu in der Gruppe“
 - **Geteilte Läufe zeigen, womit sie erfasst wurden:** kleine Zeile „AetherDPS · aetherdps.com“ im Bild und ein Link im Text, damit Mitlesende den Meter finden

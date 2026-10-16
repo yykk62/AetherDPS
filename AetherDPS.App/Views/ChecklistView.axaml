@@ -8,7 +8,7 @@
     <DataTemplate x:DataType="vm:ChecklistRow">
       <Grid ColumnDefinitions="*,Auto" Margin="0,1">
         <CheckBox IsChecked="{Binding IsDone}" Content="{Binding Text}" />
-        <Button Grid.Column="1" Classes="secondary" Content="✕" Padding="8,2" Command="{Binding RemoveCommand}" ToolTip.Tip="{l:T check.remove}" />
+        <Button Grid.Column="1" Classes="secondary" Padding="8,5" Command="{Binding RemoveCommand}" ToolTip.Tip="{l:T check.remove}"><Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon close, Size=10}" Width="10" Height="10" /></Button>
       </Grid>
     </DataTemplate>
   </UserControl.DataTemplates>

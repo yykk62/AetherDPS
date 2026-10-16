@@ -1,0 +1,44 @@
+{
+ "image": "ui-1.png",
+ "grid": [
+  5,
+  5
+ ],
+ "key": "black",
+ "set": "ui",
+ "sizes": [
+  16,
+  20,
+  24,
+  32,
+  48,
+  64
+ ],
+ "icons": [
+  "close",
+  "reset",
+  "menu",
+  "lock-open",
+  "sword",
+  "drag",
+  "chevron-down",
+  "chevron-up",
+  "chevron-right",
+  "chevron-left",
+  "center",
+  "star",
+  "star-outline",
+  "check",
+  "cross",
+  "info",
+  "warning",
+  "stopwatch",
+  "bell",
+  "search",
+  "folder",
+  "camera",
+  "trash",
+  "plus",
+  "minus"
+ ]
+}

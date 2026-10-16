@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import Icon from '../components/Icon.astro';
 import { t, type Key } from '../i18n';
 
 interface Props {
@@ -46,7 +47,7 @@ const DOWNLOAD = 'https://github.com/yykk62/AetherDPS/releases/latest';
             <a href={href} aria-current={active(href) ? 'page' : undefined}>{t(key)}</a>
           ))}
         </nav>
-        <a class="btn small header-cta" href={DOWNLOAD}>⬇ {t('nav.download')}</a>
+        <a class="btn small header-cta" href={DOWNLOAD}><Icon name="download" size={20} /> {t('nav.download')}</a>
       </div>
     </header>
     <main>

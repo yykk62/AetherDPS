@@ -87,6 +87,13 @@ Die exe entpackt Sprachdateien und Spieldaten beim ersten Start nach `%TEMP%\.ne
 
 **Umbenennung (0.6.0):** Bis 0.5.0 hieß alles „Aion2Meter“. Alte Versionen suchten im Release nach `Aion2Meter.exe`; die Pipeline hat dieselbe Datei deshalb bis 0.7.10 zusätzlich unter diesem Namen hochgeladen. Seit 15.10.2026 nicht mehr: Nutzungszahlen und Downloads zeigten keine Installation ≤ 0.5.0 mehr (`Aion2Meter.exe` seit 0.6.0 nie geladen). Der alte Datenordner zieht beim ersten Start um (`LegacyMigration`). GitHub leitet `yykk62/Aion2Meter` auf `yykk62/AetherDPS` um.
 
+## Grafik- und Icon-Set
+
+Alles Eigene liegt in `assets/brand/` (Übersicht und Anleitung: `assets/brand/README.md`): UI-Icons (Relief-Stil, App), Embleme (Webseite, README),
+Banner und Hintergründe. Quelle sind Higgsfield-Sheets (4k, lokal; im Repo nur die 2k-WebP-Kopie und die Manifeste).
+Nachziehen: `python tools/icons/slice.py` (zerlegen, freistellen, Übersichten) → `python tools/icons/sync.py` (nach `docs/media/brand`; die App bindet `assets/brand/icons/ui` direkt ein) → `python tools/icons/art.py` (Banner mit Text, Hintergründe, Zierleiste). In XAML: `{l:Icon name, Size=12}` (`Services/Icons.cs`),
+auf der Webseite `<Icon name="…" />`. Keine NCSOFT-Grafiken darin.
+
 ## Feldbosse
 
 - Daten: `AetherDPS.Engine/GameData/field_bosses.json`, neu bauen mit `python tools/build-field-bosses.py` (Bosse und Koordinaten von SkeeveAN, MIT; Slots nach eigener Regel, Respawn-Minuten selbst gemessen – der Meter lernt sie zusätzlich bei jedem beobachteten Kill). Namen kommen per NPC-Code aus `GameData/<sprache>/npcs.json`.

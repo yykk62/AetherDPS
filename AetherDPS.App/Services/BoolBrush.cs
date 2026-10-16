@@ -27,6 +27,10 @@ public static class BoolBrush
     public static readonly IValueConverter ErrorRedElseText =
         new FuncValueConverter<bool, IBrush>(error => error ? Red : Text);
 
+    /// <summary>Kachel hinter dem Icon der Kampfkarte: Boss rötlich, normales Ziel goldbraun.</summary>
+    public static readonly IValueConverter BossRedElseGoldTile =
+        new FuncValueConverter<bool, IBrush>(boss => boss ? new SolidColorBrush(Color.Parse("#3A1F24")) : new SolidColorBrush(Color.Parse("#2A2416")));
+
     /// <summary>Hinweiskarten im Hauptfenster: Warnung bernsteinfarben getönt, sonst normale Karte.</summary>
     public static readonly IValueConverter WarningElseCard =
         new FuncValueConverter<bool, IBrush>(warning => new SolidColorBrush(Color.Parse(warning ? "#2A2418" : "#191E28")));
@@ -60,10 +64,4 @@ public sealed class StepBrush : IValueConverter
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
         throw new NotSupportedException();
-}
-
-public static class BoolText
-{
-    public static readonly Avalonia.Data.Converters.IValueConverter StarFilledElseEmpty =
-        new Avalonia.Data.Converters.FuncValueConverter<bool, string>(star => star ? "★" : "☆");
 }

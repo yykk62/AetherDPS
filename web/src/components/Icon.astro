@@ -1,0 +1,12 @@
+---
+// Icon aus dem eigenen Emblem-Set (assets/brand/icons/emblem, nach public/gen/brand kopiert).
+// Lädt die nächstgrößere Datei (64/96/128 px) für scharfe Darstellung auf HiDPI-Bildschirmen.
+interface Props { name: string; size?: number; class?: string; alt?: string }
+const { name, size = 32, class: cls, alt = '' } = Astro.props;
+const px = size <= 32 ? 64 : size <= 48 ? 96 : 128;
+---
+<img class:list={['ic', cls]} src={`/gen/brand/${px}/${name}.png`} width={size} height={size} alt={alt} loading="lazy" decoding="async" />
+
+<style>
+  .ic { display: inline-block; vertical-align: middle; flex: none; }
+</style>

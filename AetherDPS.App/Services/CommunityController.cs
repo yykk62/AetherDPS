@@ -56,6 +56,7 @@ public sealed partial class CommunityController(
     internal void ShowConsent() => hub?.ShowNotice(new HubNotice
     {
         Id = "consent",
+        Icon = "shield-check",
         Title = Loc.T("consent.title"),
         Text = Loc.T("consent.text"),
         Detail = Loc.T("consent.example", community.PingExample()),
@@ -78,6 +79,7 @@ public sealed partial class CommunityController(
     internal void ShowPresenceOffer() => hub?.ShowNotice(new HubNotice
     {
         Id = "presence",
+        Icon = "chat",
         Title = Loc.T("presence_offer.title"),
         Text = Loc.T("presence_offer.text"),
         PrimaryText = Loc.T("presence_offer.yes"),
@@ -102,6 +104,7 @@ public sealed partial class CommunityController(
         hub?.ShowNotice(new HubNotice
         {
             Id = "crash",
+            Icon = "bug",
             Title = Loc.T("crash.title"),
             Text = Loc.T("crash.text"),
             IsWarning = true,
@@ -119,6 +122,7 @@ public sealed partial class CommunityController(
         hub?.ShowNotice(new HubNotice
         {
             Id = "crash",
+            Icon = id is null ? "warning" : "check",
             Title = Loc.T("crash.title"),
             Text = id is null ? Loc.T("report.failed") : Loc.T("report.sent", id),
             IsWarning = id is null,
@@ -136,7 +140,7 @@ public sealed partial class CommunityController(
         // Erster Start überhaupt: nichts „Neues“ zeigen
         if (last is null || !Version.TryParse(last, out var lastVersion) || lastVersion >= Version.Parse(current)) return;
         if (ChangelogSection(current) is not { } text) return;
-        hub?.ShowNotice(new HubNotice { Id = "whatsnew", Title = Loc.T("whatsnew.title", current), Text = text });
+        hub?.ShowNotice(new HubNotice { Id = "whatsnew", Icon = "scroll", Title = Loc.T("whatsnew.title", current), Text = text });
     }
 
     /// <summary>Abschnitt „## 0.6.0“ aus dem eingebetteten CHANGELOG (Englisch für alle außer Deutsch).</summary>
@@ -168,7 +172,7 @@ public sealed partial class CommunityController(
         {
             bool warn = m.Level is "warn" or "warning";
             if (hub.Notices.All(n => n.Id != "msg:" + m.Id))
-                hub.ShowNotice(new HubNotice { Id = "msg:" + m.Id, Title = Loc.T(warn ? "msg.title_warn" : "msg.title"), Text = m.Text, IsWarning = warn });
+                hub.ShowNotice(new HubNotice { Id = "msg:" + m.Id, Icon = warn ? "warning" : "megaphone", Title = Loc.T(warn ? "msg.title_warn" : "msg.title"), Text = m.Text, IsWarning = warn });
             if (!settings.SeenMessages.Contains(m.Id))
             {
                 settings.SeenMessages.Add(m.Id);
@@ -189,7 +193,7 @@ public sealed partial class CommunityController(
             return;
         }
         Serilog.Log.Warning("Patch-Erkennung: viele Pakete, aber keins der Grundpakete – Spiel-Update?");
-        hub?.ShowNotice(new HubNotice { Id = "patch", Title = Loc.T("patch.title"), Text = Loc.T("patch.text"), IsWarning = true });
+        hub?.ShowNotice(new HubNotice { Id = "patch", Icon = "tools", Title = Loc.T("patch.title"), Text = Loc.T("patch.text"), IsWarning = true });
         toast?.Invoke(Loc.T("patch.title"), Loc.T("patch.toast"));
     }
 }

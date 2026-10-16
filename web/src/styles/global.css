@@ -95,8 +95,38 @@ a.card { color: var(--text); display: block; transition: border-color 0.15s, tra
 a.card:hover { border-color: var(--gold); text-decoration: none; transform: translateY(-1px); }
 .card h3 { margin-bottom: 6px; }
 .card p { color: var(--muted); margin: 0; font-size: 0.95rem; }
-.card .icon { font-size: 1.5rem; margin-bottom: 8px; }
+.card .icon { margin-bottom: 10px; filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.55)); }
+.card.feature { position: relative; overflow: hidden; background: linear-gradient(160deg, var(--panel) 0%, var(--bg-2) 100%); }
+.card.feature::after {
+  content: ''; position: absolute; inset: auto -40px -40px auto; width: 140px; height: 140px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(201, 168, 242, 0.14), transparent 70%); pointer-events: none;
+}
+a.card.feature:hover { box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45); }
+h3.with-icon, h2.with-icon { display: flex; align-items: center; gap: 10px; }
+.btn img { width: 22px; height: 22px; margin: -4px 0; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5)); }
 .section { margin: 32px 0; }
+/* Abschnitte mit Hintergrundgrafik: volle Breite, Inhalt bleibt auf der Linie von .wrap */
+.section.art {
+  margin: 32px 0 0; padding: 48px 0 40px;
+  background-color: var(--bg); background-size: cover; background-position: center; background-repeat: no-repeat;
+}
+.section.art > .wrap > h2:first-child { margin-top: 0; }
+.art-aether {
+  background-image:
+    linear-gradient(0deg, var(--bg) 0%, rgba(16, 19, 26, 0.2) 25%, rgba(16, 19, 26, 0.2) 75%, var(--bg) 100%),
+    url(/img/bg-aether.webp);
+}
+.art-wings {
+  background-image:
+    linear-gradient(0deg, var(--bg) 0%, rgba(16, 19, 26, 0.35) 30%, rgba(16, 19, 26, 0.35) 70%, var(--bg) 100%),
+    url(/img/bg-wings.webp);
+}
+.art-stars {
+  background-image:
+    linear-gradient(0deg, var(--bg) 0%, rgba(16, 19, 26, 0.3) 40%, var(--bg) 100%),
+    url(/img/bg-stars.webp);
+}
+.section.art .card { background: rgba(25, 30, 40, 0.88); backdrop-filter: blur(2px); }
 
 .tag {
   display: inline-block; padding: 2px 8px; border-radius: 999px; font: 600 0.72rem/1.5 var(--mono);

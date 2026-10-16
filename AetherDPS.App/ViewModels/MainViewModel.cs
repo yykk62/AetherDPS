@@ -97,7 +97,7 @@ public sealed partial class MainViewModel : ObservableObject
     private long? selectedPlayerId;
     private readonly InstanceTimer limit;
 
-    /// <summary>Zeitlimit des Dungeons („⏱ 42:13“), rot in der letzten Minute.</summary>
+    /// <summary>Zeitlimit des Dungeons („42:13“, mit Stoppuhr-Icon), rot in der letzten Minute.</summary>
     private void UpdateLimit()
     {
         if (limit.Current() is not { } t)
@@ -107,7 +107,7 @@ public sealed partial class MainViewModel : ObservableObject
             return;
         }
         var left = t.End - DateTime.Now;
-        LimitText = "⏱ " + (left.TotalHours >= 1 ? left.ToString(@"h\:mm\:ss") : left.ToString(@"mm\:ss"));
+        LimitText = (left.TotalHours >= 1 ? left.ToString(@"h\:mm\:ss") : left.ToString(@"mm\:ss"));
         LimitUrgent = left <= TimeSpan.FromMinutes(1);
     }
 
@@ -391,7 +391,7 @@ public sealed partial class MainViewModel : ObservableObject
             row.BarPercent = top > 0 ? (double)p.TotalDamage / top * 100 : 0;
             row.SortKey = p.TotalDamage;
             row.CombatPower = roster.Members.FirstOrDefault(m => m.Name == p.PlayerName) is { CombatPower: > 0 } member
-                ? "⚔ " + Format.Compact(member.CombatPower) : "";
+                ? Format.Compact(member.CombatPower) : "";
             row.IsSelected = selectedPlayerId == p.PlayerId;
         }
 

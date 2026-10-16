@@ -10,9 +10,9 @@ public static class TimerIcons
 {
     public static string For(TimerItem item) => item.Kind switch
     {
-        TimerKind.Boss or TimerKind.FieldBoss => "☠",
-        TimerKind.Custom => "⏱",
-        _ => item.Category switch { "Riss" => "◈", "Weltboss" => "♛", _ => "★" },
+        TimerKind.Boss or TimerKind.FieldBoss => "skull",
+        TimerKind.Custom => "stopwatch",
+        _ => item.Category switch { "Riss" => "portal", "Weltboss" => "crown", _ => "star" },
     };
 }
 

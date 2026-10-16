@@ -58,6 +58,29 @@
     <Style Selector="TabItem:selected /template/ Border#PART_SelectedPipe">
       <Setter Property="Background" Value="#E0A84A" />
     </Style>
+    <!-- Reiter: Icon + Text, inaktiv gedämpft -->
+    <Style Selector="TabItem StackPanel.tab">
+      <Setter Property="Orientation" Value="Horizontal" />
+      <Setter Property="Spacing" Value="10" />
+    </Style>
+    <Style Selector="TabItem Image.tab">
+      <Setter Property="Width" Value="18" />
+      <Setter Property="Height" Value="18" />
+      <Setter Property="Opacity" Value="0.5" />
+    </Style>
+    <Style Selector="TabItem:selected Image.tab">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="TabItem TextBlock.tab">
+      <Setter Property="Foreground" Value="#8E96A3" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="TabItem:selected TextBlock.tab">
+      <Setter Property="Foreground" Value="#E6E8EC" />
+    </Style>
+    <Style Selector="TabItem:pointerover TextBlock.tab">
+      <Setter Property="Foreground" Value="#C9CED6" />
+    </Style>
     <Style Selector="Border.tile">
       <Setter Property="Background" Value="#191E28" />
       <Setter Property="CornerRadius" Value="8" />
@@ -68,6 +91,10 @@
     </Style>
   </Window.Styles>
 
+  <Panel>
+  <!-- Flügel als dunkles Wasserzeichen unten rechts, Karten liegen darüber -->
+  <Image Source="/Assets/art/hub-bg.jpg" Stretch="UniformToFill" Opacity="0.7" IsHitTestVisible="False"
+         HorizontalAlignment="Stretch" VerticalAlignment="Bottom" RenderOptions.BitmapInterpolationMode="HighQuality" />
   <Grid RowDefinitions="Auto,Auto,*">
     <!-- Kopf -->
     <Grid ColumnDefinitions="*,Auto" Margin="22,16,22,4">
@@ -81,10 +108,20 @@
         <StackPanel Orientation="Horizontal" Spacing="8"
                     IsVisible="{Binding UpdateBanner, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
           <TextBlock Text="{Binding UpdateBanner}" Foreground="#E0A84A" FontSize="12" VerticalAlignment="Center" />
-          <Button Classes="primary" Content="{l:T update.restart_short}" Command="{Binding RestartForUpdateCommand}" />
+          <Button Classes="primary" Command="{Binding RestartForUpdateCommand}">
+            <StackPanel Orientation="Horizontal" Spacing="7">
+              <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon download, Size=14}" Width="14" Height="14" />
+              <TextBlock Text="{l:T update.restart_short}" VerticalAlignment="Center" />
+            </StackPanel>
+          </Button>
         </StackPanel>
-        <Button Classes="secondary" Content="{l:T hub.discord}" Command="{Binding OpenDiscordCommand}"
-                IsVisible="{Binding DiscordUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        <Button Classes="secondary" Command="{Binding OpenDiscordCommand}"
+                IsVisible="{Binding DiscordUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+          <StackPanel Orientation="Horizontal" Spacing="7">
+            <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon chat, Size=14}" Width="14" Height="14" />
+            <TextBlock Text="{l:T hub.discord}" VerticalAlignment="Center" />
+          </StackPanel>
+        </Button>
       </StackPanel>
     </Grid>
 
@@ -98,7 +135,10 @@
                   BorderBrush="{Binding IsWarning, Converter={x:Static l:BoolBrush.WarningBorderElseCard}}">
             <Grid ColumnDefinitions="*,Auto">
               <StackPanel Spacing="6">
-                <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="14" TextWrapping="Wrap" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{Binding Icon, Converter={x:Static l:Icons.ByName}}" Width="18" Height="18" />
+                  <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="14" TextWrapping="Wrap" VerticalAlignment="Center" />
+                </StackPanel>
                 <TextBlock Text="{Binding Text}" Classes="dim" TextWrapping="Wrap" />
                 <Border IsVisible="{Binding HasDetail}" Background="#0E1117" CornerRadius="4" Padding="10,6">
                   <SelectableTextBlock Text="{Binding Detail}" FontFamily="Consolas,monospace" FontSize="12" Foreground="#C8CDD6" TextWrapping="Wrap" />
@@ -108,8 +148,10 @@
                   <Button Classes="secondary" Content="{Binding SecondaryText}" Command="{Binding Secondary}" IsVisible="{Binding HasSecondary}" />
                 </StackPanel>
               </StackPanel>
-              <Button Grid.Column="1" Content="✕" Command="{Binding Close}" IsVisible="{Binding CanClose}"
-                      VerticalAlignment="Top" Background="Transparent" Padding="8,2" />
+              <Button Grid.Column="1" Command="{Binding Close}" IsVisible="{Binding CanClose}"
+                      VerticalAlignment="Top" Background="Transparent" Padding="8,4">
+                <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon close, Size=12}" Width="12" Height="12" />
+              </Button>
             </Grid>
           </Border>
         </DataTemplate>
@@ -120,7 +162,13 @@
     <TabControl Grid.Row="2" TabStripPlacement="Left" SelectedIndex="{Binding SelectedTab}" Margin="10,6,0,0">
 
       <!-- DPS-Meter -->
-      <TabItem Header="{l:T hub.tab.dps}">
+      <TabItem>
+        <TabItem.Header>
+          <StackPanel Classes="tab">
+            <Image Classes="ic tab" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon swords, Size=18}" />
+            <TextBlock Classes="tab" Text="{l:T hub.tab.dps}" />
+          </StackPanel>
+        </TabItem.Header>
         <ScrollViewer HorizontalScrollBarVisibility="Disabled">
           <StackPanel Spacing="14" Margin="12,4,22,22">
             <Border Classes="card">
@@ -132,7 +180,12 @@
                   <TextBlock Text="{Binding ModeText}" Classes="dim" TextWrapping="Wrap" />
                   <TextBlock Text="{Binding RiftInfo}" Foreground="#E0A84A" FontSize="12" TextWrapping="Wrap" Margin="0,4,0,0" />
                   <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,8,0,0">
-                    <Button Classes="secondary" Content="{Binding LaunchText}" Command="{Binding LaunchGameCommand}" IsEnabled="{Binding !GameRunning}" />
+                    <Button Classes="secondary" Command="{Binding LaunchGameCommand}" IsEnabled="{Binding !GameRunning}">
+                      <StackPanel Orientation="Horizontal" Spacing="7">
+                        <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon play, Size=13}" Width="13" Height="13" />
+                        <TextBlock Text="{Binding LaunchText}" VerticalAlignment="Center" />
+                      </StackPanel>
+                    </Button>
                     <TextBlock Text="{l:T hub.launch_hint}" Classes="dim" FontSize="11" TextWrapping="Wrap" VerticalAlignment="Center" MaxWidth="380" />
                   </StackPanel>
                 </StackPanel>
@@ -175,40 +228,92 @@
               <Ellipse Width="8" Height="8" VerticalAlignment="Center" Margin="2,0,8,0"
                        Fill="{Binding Overlay.IsConnected, Converter={x:Static l:BoolBrush.ConnectedGreenElseAmber}}" />
               <TextBlock Grid.Column="1" Text="{Binding Overlay.StatusText}" Classes="dim" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-              <Button Grid.Column="2" Classes="secondary" Content="{l:T hub.report}" Command="{Binding ReportProblemCommand}" Margin="8,0,0,0" />
-              <Button Grid.Column="3" Classes="secondary" Content="{l:T hub.folder}" Command="{Binding OpenDataFolderCommand}" Margin="8,0,0,0" />
+              <Button Grid.Column="2" Classes="secondary" Command="{Binding ReportProblemCommand}" Margin="8,0,0,0">
+          <StackPanel Orientation="Horizontal" Spacing="7">
+            <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon megaphone, Size=14}" Width="14" Height="14" />
+            <TextBlock Text="{l:T hub.report}" VerticalAlignment="Center" />
+          </StackPanel>
+        </Button>
+              <Button Grid.Column="3" Classes="secondary" Command="{Binding OpenDataFolderCommand}" Margin="8,0,0,0">
+          <StackPanel Orientation="Horizontal" Spacing="7">
+            <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon folder, Size=14}" Width="14" Height="14" />
+            <TextBlock Text="{l:T hub.folder}" VerticalAlignment="Center" />
+          </StackPanel>
+        </Button>
             </Grid>
 
           </StackPanel>
         </ScrollViewer>
       </TabItem>
 
-      <TabItem Header="{l:T hub.tab.runs}">
+      <TabItem>
+        <TabItem.Header>
+          <StackPanel Classes="tab">
+            <Image Classes="ic tab" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon trophy, Size=18}" />
+            <TextBlock Classes="tab" Text="{l:T hub.tab.runs}" />
+          </StackPanel>
+        </TabItem.Header>
         <views:RunsView DataContext="{Binding Runs}" />
       </TabItem>
 
-      <TabItem Header="{l:T hub.tab.party}">
+      <TabItem>
+        <TabItem.Header>
+          <StackPanel Classes="tab">
+            <Image Classes="ic tab" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon group, Size=18}" />
+            <TextBlock Classes="tab" Text="{l:T hub.tab.party}" />
+          </StackPanel>
+        </TabItem.Header>
         <views:PartyView DataContext="{Binding Party}" />
       </TabItem>
 
-      <TabItem Header="{l:T hub.tab.profile}">
+      <TabItem>
+        <TabItem.Header>
+          <StackPanel Classes="tab">
+            <Image Classes="ic tab" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon helmet, Size=18}" />
+            <TextBlock Classes="tab" Text="{l:T hub.tab.profile}" />
+          </StackPanel>
+        </TabItem.Header>
         <views:ProfileView DataContext="{Binding Profile}" />
       </TabItem>
 
-      <TabItem Header="{l:T hub.tab.pets}">
+      <TabItem>
+        <TabItem.Header>
+          <StackPanel Classes="tab">
+            <Image Classes="ic tab" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon paw, Size=18}" />
+            <TextBlock Classes="tab" Text="{l:T hub.tab.pets}" />
+          </StackPanel>
+        </TabItem.Header>
         <views:PetsView DataContext="{Binding Pets}" />
       </TabItem>
 
-      <TabItem Header="{l:T hub.tab.timers}">
+      <TabItem>
+        <TabItem.Header>
+          <StackPanel Classes="tab">
+            <Image Classes="ic tab" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon hourglass, Size=18}" />
+            <TextBlock Classes="tab" Text="{l:T hub.tab.timers}" />
+          </StackPanel>
+        </TabItem.Header>
         <views:TimersView DataContext="{Binding Timers}" />
       </TabItem>
 
-      <TabItem Header="{l:T hub.tab.checklist}">
+      <TabItem>
+        <TabItem.Header>
+          <StackPanel Classes="tab">
+            <Image Classes="ic tab" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon checklist, Size=18}" />
+            <TextBlock Classes="tab" Text="{l:T hub.tab.checklist}" />
+          </StackPanel>
+        </TabItem.Header>
         <views:ChecklistView DataContext="{Binding Checklist}" />
       </TabItem>
 
       <!-- Verbindung -->
-      <TabItem Header="{l:T hub.tab.connection}">
+      <TabItem>
+        <TabItem.Header>
+          <StackPanel Classes="tab">
+            <Image Classes="ic tab" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon signal, Size=18}" />
+            <TextBlock Classes="tab" Text="{l:T hub.tab.connection}" />
+          </StackPanel>
+        </TabItem.Header>
         <ScrollViewer HorizontalScrollBarVisibility="Disabled">
           <StackPanel Spacing="14" Margin="12,4,22,22">
             <Grid ColumnDefinitions="*,*,*,*,*">
@@ -259,11 +364,18 @@
       </TabItem>
 
       <!-- Einstellungen -->
-      <TabItem Header="{l:T hub.tab.settings}">
+      <TabItem>
+        <TabItem.Header>
+          <StackPanel Classes="tab">
+            <Image Classes="ic tab" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon gear, Size=18}" />
+            <TextBlock Classes="tab" Text="{l:T hub.tab.settings}" />
+          </StackPanel>
+        </TabItem.Header>
         <ScrollViewer HorizontalScrollBarVisibility="Disabled">
           <views:SettingsView DataContext="{Binding Settings}" Margin="12,4,22,22" />
         </ScrollViewer>
       </TabItem>
     </TabControl>
   </Grid>
+  </Panel>
 </Window>

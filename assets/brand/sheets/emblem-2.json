@@ -1,0 +1,35 @@
+{
+ "image": "emblem-2.png",
+ "grid": [
+  4,
+  4
+ ],
+ "key": "magenta",
+ "set": "emblem",
+ "sizes": [
+  24,
+  32,
+  48,
+  64,
+  96,
+  128
+ ],
+ "icons": [
+  "lantern",
+  "abyss",
+  "siege",
+  "sun",
+  "weekly",
+  "main",
+  "twink",
+  "energy",
+  "coins",
+  "levelup",
+  "levelcap",
+  "manastone",
+  "wings",
+  "crafting",
+  "chest",
+  "flame"
+ ]
+}

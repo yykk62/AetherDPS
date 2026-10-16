@@ -1,0 +1,7 @@
+{
+  "image": "ui-0.png", "grid": [4, 4], "key": "black", "set": "ui", "sizes": [16, 20, 24, 32, 48, 64],
+  "icons": ["swords", "trophy", "paw", "hourglass",
+            "checklist", "signal", "gear", "group",
+            "helmet", "skull", "crown", "portal",
+            "lock", "shield", "book", "dragon"]
+}

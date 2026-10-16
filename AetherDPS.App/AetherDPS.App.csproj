@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <AssemblyName>AetherDPS</AssemblyName>
     <RootNamespace>AetherDPS.App</RootNamespace>
-    <Version>0.7.12</Version>
+    <Version>0.8.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
@@ -38,6 +38,12 @@
 
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
+    <!-- Eigenes Icon-Set direkt aus assets/brand (eine Quelle, keine Kopie): avares://AetherDPS/Assets/icons/<px>/<name>.png -->
+    <AvaloniaResource Include="..\assets\brand\icons\ui\16\*.png" Link="Assets\icons\16\%(Filename)%(Extension)" />
+    <AvaloniaResource Include="..\assets\brand\icons\ui\24\*.png" Link="Assets\icons\24\%(Filename)%(Extension)" />
+    <AvaloniaResource Include="..\assets\brand\icons\ui\32\*.png" Link="Assets\icons\32\%(Filename)%(Extension)" />
+    <AvaloniaResource Include="..\assets\brand\icons\ui\48\*.png" Link="Assets\icons\48\%(Filename)%(Extension)" />
+    <AvaloniaResource Include="..\assets\brand\icons\ui\64\*.png" Link="Assets\icons\64\%(Filename)%(Extension)" />
     <None Update="Lang\*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

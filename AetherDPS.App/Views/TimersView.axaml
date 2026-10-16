@@ -46,7 +46,7 @@
                 <Border CornerRadius="4" Background="#14FFFFFF" Padding="10,6" Margin="0,0,0,4">
                   <StackPanel Spacing="6">
                     <Grid ColumnDefinitions="26,*,Auto,Auto,Auto">
-                      <TextBlock Text="{Binding Icon}" FontSize="15" Foreground="#E0A84A" VerticalAlignment="Center" />
+                      <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{Binding Icon, Converter={x:Static l:Icons.ByName}}" Width="16" Height="16" HorizontalAlignment="Left" />
                       <StackPanel Grid.Column="1" VerticalAlignment="Center">
                         <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
                         <TextBlock Text="{Binding Detail}" Classes="dim" FontSize="11" />
@@ -56,8 +56,8 @@
                                  Foreground="{Binding IsDue, Converter={x:Static l:BoolBrush.DueGreenElseText}}" />
                       <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
                         <Button Classes="secondary" Content="{l:T timers.start}" Command="{Binding StartCommand}" IsVisible="{Binding IsCustom}" />
-                        <Button Classes="secondary" Content="✕" Command="{Binding RemoveCommand}" IsVisible="{Binding IsCustom}" ToolTip.Tip="{l:T timers.remove}" />
-                        <Button Classes="secondary" Content="✕" Command="{Binding RemoveCommand}" IsVisible="{Binding IsBoss}" ToolTip.Tip="{l:T timers.remove}" />
+                        <Button Classes="secondary" Command="{Binding RemoveCommand}" IsVisible="{Binding IsCustom}" ToolTip.Tip="{l:T timers.remove}"><Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon close, Size=11}" Width="11" Height="11" /></Button>
+                        <Button Classes="secondary" Command="{Binding RemoveCommand}" IsVisible="{Binding IsBoss}" ToolTip.Tip="{l:T timers.remove}"><Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon close, Size=11}" Width="11" Height="11" /></Button>
                       </StackPanel>
                     </Grid>
                     <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding NeedsRespawn}" Margin="26,0,0,0">
@@ -89,8 +89,9 @@
                     <ItemsControl.ItemTemplate>
                       <DataTemplate x:DataType="vm:FieldBossRow">
                         <Grid ColumnDefinitions="30,*,Auto,Auto" Margin="0,1">
-                          <Button Content="{Binding IsFavorite, Converter={x:Static l:BoolText.StarFilledElseEmpty}}" Command="{Binding ToggleFavoriteCommand}"
-                                  Background="Transparent" Foreground="#E0A84A" Padding="2,0" FontSize="15" ToolTip.Tip="{l:T fb.star_tip}" />
+                          <Button Command="{Binding ToggleFavoriteCommand}" Background="Transparent" Padding="4,3" ToolTip.Tip="{l:T fb.star_tip}">
+                            <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{Binding IsFavorite, Converter={x:Static l:Icons.StarFilledElseOutline}}" Width="15" Height="15" />
+                          </Button>
                           <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
                           <TextBlock Grid.Column="2" Text="{Binding At}" Classes="dim" FontSize="12" VerticalAlignment="Center" Margin="12,0,0,0" />
                           <TextBlock Grid.Column="3" Text="{Binding State}" MinWidth="110" TextAlignment="Right" FontWeight="SemiBold" VerticalAlignment="Center" Margin="12,0,0,0"

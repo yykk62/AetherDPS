@@ -1,0 +1,35 @@
+{
+ "image": "emblem-1.png",
+ "grid": [
+  4,
+  4
+ ],
+ "key": "magenta",
+ "set": "emblem",
+ "sizes": [
+  24,
+  32,
+  48,
+  64,
+  96,
+  128
+ ],
+ "icons": [
+  "cheatsheet",
+  "castle",
+  "globe",
+  "map",
+  "compass",
+  "stagger",
+  "lag",
+  "patch",
+  "download",
+  "chat",
+  "camera",
+  "refresh",
+  "gem",
+  "search",
+  "bell",
+  "done"
+ ]
+}

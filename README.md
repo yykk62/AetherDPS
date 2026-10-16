@@ -1,8 +1,6 @@
 <p align="center">
-  <img src="AetherDPS.App/Assets/icon.png" width="72" alt="" />
+  <img src="docs/media/brand/hero.webp" width="100%" alt="AetherDPS: der DPS-Meter und Begleiter für AION 2 (EU)" />
 </p>
-
-<h1 align="center">AetherDPS</h1>
 
 <p align="center">
   <b>Der kostenlose DPS-Meter und Begleiter für AION 2, für die EU-Server gebaut.</b><br />
@@ -18,7 +16,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/yykk62/AetherDPS/releases/latest"><b>⬇ AetherDPS.exe herunterladen</b></a>
+  <a href="https://github.com/yykk62/AetherDPS/releases/latest"><img src="docs/media/brand/icons/download.png" width="18" align="absmiddle" alt="" /> <b>AetherDPS.exe herunterladen</b></a>
   ·
   <a href="#funktionen">Funktionen</a>
   ·
@@ -26,7 +24,7 @@
   ·
   <a href="#häufige-fragen">Häufige Fragen</a>
   ·
-  <a href="https://discord.gg/xExgsyDEP2">💬 Discord</a>
+  <a href="https://discord.gg/xExgsyDEP2"><img src="docs/media/brand/icons/chat.png" width="18" align="absmiddle" alt="" /> Discord</a>
   ·
   <a href="#in-english">English</a>
 </p>
@@ -35,37 +33,38 @@
   <img src="docs/media/hero.png" width="100%" alt="AetherDPS: Hauptfenster mit Pet-Finder, Live-Meter im Bosskampf und Timer-Pills" />
 </p>
 
-<p align="center"><sub>🌍 Deutsch · English · Français · Español · Português · Русский · 日本語 · 한국어 · 简体中文 · 繁體中文</sub></p>
+<p align="center"><sub><img src="docs/media/brand/icons/globe.png" width="16" align="absmiddle" alt="" /> Deutsch · English · Français · Español · Português · Русский · 日本語 · 한국어 · 简体中文 · 繁體中文</sub></p>
 
 ## Auf einen Blick
 
 | | |
 |---|---|
-| ⚔ **[Live-DPS-Meter](#-live-dps-meter)** | Boss mit Lebens- und Stagger-Balken, Schaden, DPS und Anteil deiner Gruppe, Skill-Details per Klick |
-| 🏆 **[Läufe-Archiv](#-läufe-archiv)** | Jeder Dungeon mit Boss-Zeiten, Bestzeit und Kampfanalyse, als Bild oder Text für Discord |
-| 🧙 **[Profil](#-profil)** | Dein Charakter (oder jeder auf einem EU-Server) ohne laufendes Spiel: Ausrüstung, Werte, Daevanion, Skills |
-| 👥 **[Neu in der Gruppe](#-neu-in-der-gruppe)** | Tritt jemand bei, siehst du sofort Kampfkraft, Itemstufe, Verzauberung und Waffe |
-| 🐾 **[Pet-Finder & Radar](#-pet-finder--pet-radar)** | Alle Pets mit deiner Stufe, ihre Spawnpunkte auf der Karte und ein Radar zu den fehlenden in deiner Nähe |
-| ⏱ **[Timer & Feldbosse](#-timer--feldbosse)** | Echte Respawn-Zeiten vom Server, Risse, Belagerung, eigene Timer als frei verschiebbare Pills |
-| 📶 **[Verbindung](#-verbindung--mehr)** | Ping-Verlauf, Lag-Spitzen und die Antwort, ob es an dir, am Anbieter oder am Spielserver liegt |
-| ✅ **Checkliste** | Tägliches und Wöchentliches mit automatischem Reset und Erinnerung |
-| 🖼 **Screenshot** | STRG+S zeigt das Spielbild sofort auf deinem zweiten Monitor |
-| 🌍 **10 Sprachen** | Oberfläche, Skills, Monster, Klassen, Dungeons und Servernamen in deiner Sprache |
-| 🔄 **Updates** | Kommen von selbst, geprüft per Prüfsumme. Nach einem Spiel-Patch sagt dir der Meter Bescheid |
-| 💬 **Discord-Profil** | Auf Wunsch sehen Freunde in Discord „AION 2 · Dungeon: …“ oder „Bosskampf: …“ mit Laufzeit, ohne Charakternamen |
+| <img src="docs/media/brand/icons/swords.png" width="22" align="absmiddle" alt="" /> **[Live-DPS-Meter](#live-dps-meter)** | Boss mit Lebens- und Stagger-Balken, Schaden, DPS und Anteil deiner Gruppe, Skill-Details per Klick |
+| <img src="docs/media/brand/icons/trophy.png" width="22" align="absmiddle" alt="" /> **[Läufe-Archiv](#laeufe-archiv)** | Jeder Dungeon mit Boss-Zeiten, Bestzeit und Kampfanalyse, als Bild oder Text für Discord |
+| <img src="docs/media/brand/icons/helmet.png" width="22" align="absmiddle" alt="" /> **[Profil](#profil)** | Dein Charakter (oder jeder auf einem EU-Server) ohne laufendes Spiel: Ausrüstung, Werte, Daevanion, Skills |
+| <img src="docs/media/brand/icons/group.png" width="22" align="absmiddle" alt="" /> **[Neu in der Gruppe](#neu-in-der-gruppe)** | Tritt jemand bei, siehst du sofort Kampfkraft, Itemstufe, Verzauberung und Waffe |
+| <img src="docs/media/brand/icons/paw.png" width="22" align="absmiddle" alt="" /> **[Pet-Finder & Radar](#pet-finder-und-pet-radar)** | Alle Pets mit deiner Stufe, ihre Spawnpunkte auf der Karte und ein Radar zu den fehlenden in deiner Nähe |
+| <img src="docs/media/brand/icons/hourglass.png" width="22" align="absmiddle" alt="" /> **[Timer & Feldbosse](#timer-und-feldbosse)** | Echte Respawn-Zeiten vom Server, Risse, Belagerung, eigene Timer als frei verschiebbare Pills |
+| <img src="docs/media/brand/icons/signal.png" width="22" align="absmiddle" alt="" /> **[Verbindung](#verbindung-und-mehr)** | Ping-Verlauf, Lag-Spitzen und die Antwort, ob es an dir, am Anbieter oder am Spielserver liegt |
+| <img src="docs/media/brand/icons/checklist.png" width="22" align="absmiddle" alt="" /> **[Checkliste](#checkliste)** | Tägliches und Wöchentliches mit automatischem Reset und Erinnerung |
+| <img src="docs/media/brand/icons/camera.png" width="22" align="absmiddle" alt="" /> **Screenshot** | STRG+S zeigt das Spielbild sofort auf deinem zweiten Monitor |
+| <img src="docs/media/brand/icons/globe.png" width="22" align="absmiddle" alt="" /> **10 Sprachen** | Oberfläche, Skills, Monster, Klassen, Dungeons und Servernamen in deiner Sprache |
+| <img src="docs/media/brand/icons/refresh.png" width="22" align="absmiddle" alt="" /> **Updates** | Kommen von selbst, geprüft per Prüfsumme. Nach einem Spiel-Patch sagt dir der Meter Bescheid |
+| <img src="docs/media/brand/icons/chat.png" width="22" align="absmiddle" alt="" /> **Discord-Profil** | Auf Wunsch sehen Freunde in Discord „AION 2 · Dungeon: …“ oder „Bosskampf: …“ mit Laufzeit, ohne Charakternamen |
 
 ## Warum AetherDPS?
 
-- 🐾 **Das Pet-Radar ersetzt deine Karte.** Öffnest du im Spiel die Karte, liegt es genau darüber, folgt dir live (auch im Flug) und zeigt die fehlenden Pets mit Entfernung, Richtung und dem Monster, das die Seele droppt. Kein Extra-Knopf, kein Hotkey.
-- 💥 **Stagger je Spieler:** Nach jeder Stagger-Phase siehst du, ob sie geklappt hat und wer wie viel beigetragen hat.
-- 📶 **Warum laggt es?** Die Verbindungsprüfung sagt, ob es am Heimnetz, am Internetanbieter oder am Spielserver liegt.
-- 👥 **Neu in der Gruppe:** Kampfkraft, Itemstufe, Verzauberung und Waffe erscheinen, sobald jemand beitritt.
-- 🩹 **Ehrlich nach Patches:** Versteht der Meter das Spiel nicht mehr, sagt er es, statt leere oder falsche Zahlen zu zeigen.
-- 🔒 **Deine Daten bleiben bei dir:** keine Uploads, keine Bestenlisten, kein Konto.
+- <img src="docs/media/brand/icons/compass.png" width="20" align="absmiddle" alt="" /> **Das Pet-Radar ersetzt deine Karte.** Öffnest du im Spiel die Karte, liegt es genau darüber, folgt dir live (auch im Flug) und zeigt die fehlenden Pets mit Entfernung, Richtung und dem Monster, das die Seele droppt. Kein Extra-Knopf, kein Hotkey.
+- <img src="docs/media/brand/icons/stagger.png" width="20" align="absmiddle" alt="" /> **Stagger je Spieler:** Nach jeder Stagger-Phase siehst du, ob sie geklappt hat und wer wie viel beigetragen hat.
+- <img src="docs/media/brand/icons/lag.png" width="20" align="absmiddle" alt="" /> **Warum laggt es?** Die Verbindungsprüfung sagt, ob es am Heimnetz, am Internetanbieter oder am Spielserver liegt.
+- <img src="docs/media/brand/icons/group.png" width="20" align="absmiddle" alt="" /> **Neu in der Gruppe:** Kampfkraft, Itemstufe, Verzauberung und Waffe erscheinen, sobald jemand beitritt.
+- <img src="docs/media/brand/icons/patch.png" width="20" align="absmiddle" alt="" /> **Ehrlich nach Patches:** Versteht der Meter das Spiel nicht mehr, sagt er es, statt leere oder falsche Zahlen zu zeigen.
+- <img src="docs/media/brand/icons/lock.png" width="20" align="absmiddle" alt="" /> **Deine Daten bleiben bei dir:** keine Uploads, keine Bestenlisten, kein Konto.
 
 ## Funktionen
 
-### ⚔ Live-DPS-Meter
+<a name="live-dps-meter"></a>
+<p align="center"><img src="docs/media/brand/banner-meter.webp" width="100%" alt="Live-DPS-Meter" /></p>
 
 <table>
   <tr>
@@ -87,7 +86,7 @@ Das Overlay liegt über dem Spiel und zeigt **nur deine Gruppe**: Fremde in der 
     <td><img src="docs/media/overlay-skills.png" width="100%" alt="Skill-Details eines Spielers im Overlay" /></td>
     <td>
 
-**☰ oder Klick auf einen Spieler** zeigt seine Skills mit Schaden, Treffern und Krit-Quote, direkt im Overlay.
+**<img src="docs/media/brand/ui/menu.png" width="16" align="absmiddle" alt="" /> oder Klick auf einen Spieler** zeigt seine Skills mit Schaden, Treffern und Krit-Quote, direkt im Overlay.
 
 Nach deinem Tod zeigt der Meter, **woran du gestorben bist**, und läuft ein langer Buff aus, sagt er Bescheid.
 
@@ -95,13 +94,15 @@ Nach deinem Tod zeigt der Meter, **woran du gestorben bist**, und läuft ein lan
   </tr>
 </table>
 
-### 🏆 Läufe-Archiv
+<a name="laeufe-archiv"></a>
+<p align="center"><img src="docs/media/brand/banner-runs.webp" width="100%" alt="Läufe-Archiv" /></p>
 
-Jeder Lauf wird nach dem Dungeon benannt und mit Boss-Zeiten gespeichert. 🏆 markiert deine **Bestzeit**, daneben steht der Vergleich mit deinem Durchschnitt. Die **Kampfanalyse** zeigt pro Spieler Aktivität, Tode, erlittenen Schaden, Schaden nach Skill und Buff-Laufzeit. **Als Bild kopieren**, als Text oder per Klick in deinen eigenen Discord-Kanal.
+Jeder Lauf wird nach dem Dungeon benannt und mit Boss-Zeiten gespeichert. <img src="docs/media/brand/ui/trophy.png" width="16" align="absmiddle" alt="" /> markiert deine **Bestzeit**, daneben steht der Vergleich mit deinem Durchschnitt. Die **Kampfanalyse** zeigt pro Spieler Aktivität, Tode, erlittenen Schaden, Schaden nach Skill und Buff-Laufzeit. **Als Bild kopieren**, als Text oder per Klick in deinen eigenen Discord-Kanal.
 
 <p align="center"><img src="docs/media/runs.png" width="100%" alt="Läufe-Archiv mit Bestzeiten und Kampfanalyse" /></p>
 
-### 🧙 Profil
+<a name="profil"></a>
+<p align="center"><img src="docs/media/brand/banner-profile.webp" width="100%" alt="Profil" /></p>
 
 Dein Charakter auf einen Blick, **auch ohne laufendes Spiel**: Kampfkraft, Itemstufe, mittlere Verzauberung, die komplette Ausrüstung, alle Werte mit ihren Wirkungen, Daevanion-Fortschritt je Brett, Titel, Pet, Flügel, Skills und Stigma-Skills. Jeden anderen Charakter auf einem EU-Server findest du per Name. Die Daten sind dieselben öffentlichen wie auf aion2.plaync.com.
 
@@ -119,19 +120,21 @@ Dein Charakter auf einen Blick, **auch ohne laufendes Spiel**: Kampfkraft, Items
 <p align="center"><img src="docs/media/profile-skills.png" width="100%" alt="Daevanion-Bretter, Titel, Skills und Stigma-Skills" /></p>
 </details>
 
-### 👥 Neu in der Gruppe
+<a name="neu-in-der-gruppe"></a>
+<p align="center"><img src="docs/media/brand/banner-party.webp" width="100%" alt="Neu in der Gruppe" /></p>
 
 Tritt jemand deiner Gruppe bei, erscheint am Bildschirmrand seine Karte mit **Kampfkraft, Itemstufe, Verzauberung, Daevanion und Waffe**. Ein Klick öffnet das ganze Profil. Abschaltbar im Reiter Gruppe. Verfehlt die Gruppe einen Stagger, zeigt der Meter, wer wie viel beigetragen hat.
 
 <p align="center"><img src="docs/media/popups.png" width="100%" alt="Karte „Neu in der Gruppe“ und Stagger-Auswertung" /></p>
 
-### 🐾 Pet-Finder & Pet-Radar
+<a name="pet-finder-und-pet-radar"></a>
+<p align="center"><img src="docs/media/brand/banner-pets.webp" width="100%" alt="Pet-Finder & Pet-Radar" /></p>
 
 Alle Pets von Verteron, Altgard und der Abyss mit **deiner Stufe und deinem Fortschritt** (liest der Meter beim Einloggen mit), mit Bild und einer Karte aller Spawnpunkte ihrer Monster, samt Gebieten und deiner Position. Filter nach Gattung und Status, Suche nach Pet oder Monster. Jede Gattung hat ihre Farbe: Cognia blau, Fera orange, Natura grün, Varia lila, Specia gelb.
 
 <p align="center"><img src="docs/media/pets.png" width="100%" alt="Pet-Finder mit Liste und Spawnkarte" /></p>
 
-Das **Pet-Radar** erscheint, sobald du im Spiel die Karte öffnest, genau darüber und so groß wie sie, oder bleibt auf Wunsch dauerhaft stehen. Es ist eine **Minimap wie im Spiel**: Du bist immer in der Mitte, sie folgt dir (auch im Flug) und merkt sich deinen Zoom. Darauf die fehlenden Pets in deiner Nähe mit **Entfernung, Richtung und dem Monster, das die Seele droppt**. Klick auf ein Pet zeigt seine Fundorte; liegt keiner im Bild, zoomt die Karte nur so weit heraus, dass der nächste zu sehen ist. Alle Knöpfe liegen klein auf der Karte; ☰ blendet die Liste aus, ▾ klappt das Radar zu einer kleinen Leiste ein, die Ecke unten rechts ändert die Größe.
+Das **Pet-Radar** erscheint, sobald du im Spiel die Karte öffnest, genau darüber und so groß wie sie, oder bleibt auf Wunsch dauerhaft stehen. Es ist eine **Minimap wie im Spiel**: Du bist immer in der Mitte, sie folgt dir (auch im Flug) und merkt sich deinen Zoom. Darauf die fehlenden Pets in deiner Nähe mit **Entfernung, Richtung und dem Monster, das die Seele droppt**. Klick auf ein Pet zeigt seine Fundorte; liegt keiner im Bild, zoomt die Karte nur so weit heraus, dass der nächste zu sehen ist. Alle Knöpfe liegen klein auf der Karte; <img src="docs/media/brand/ui/menu.png" width="16" align="absmiddle" alt="" /> blendet die Liste aus, <img src="docs/media/brand/ui/chevron-down.png" width="16" align="absmiddle" alt="" /> klappt das Radar zu einer kleinen Leiste ein, die Ecke unten rechts ändert die Größe.
 
 <table>
   <tr>
@@ -148,7 +151,8 @@ Ein Klick auf ein Pet zeigt nur noch seine Fundorte, nochmal klicken bringt das 
 
 <p align="center"><img src="docs/media/pet-radar.png" width="100%" alt="Pet-Radar: je Gattung, eine Gattung gewählt, ein Pet angeklickt" /></p>
 
-### ⏱ Timer & Feldbosse
+<a name="timer-und-feldbosse"></a>
+<p align="center"><img src="docs/media/brand/banner-timers.webp" width="100%" alt="Timer & Feldbosse" /></p>
 
 Öffnest du im Spiel die Karte, schickt der Server die Feldbosse mit ihren **genauen Respawn-Zeiten**, und der Meter merkt sie sich. Dazu Raumzeit-Risse, Artefakt-Belagerung und eigene Countdowns, alle mit Erinnerung. Im Dungeon läuft das Zeitlimit mit.
 
@@ -169,7 +173,8 @@ Jeder Timer ist eine eigene **Pill** über dem Spiel:
   </tr>
 </table>
 
-### 📶 Verbindung & mehr
+<a name="verbindung-und-mehr"></a>
+<p align="center"><img src="docs/media/brand/banner-connection.webp" width="100%" alt="Verbindung & mehr" /></p>
 
 Der Reiter Verbindung zeigt deinen Spiel-Ping als Verlauf mit Lag-Spitzen und neu gesendeten Paketen. **Verbindung prüfen** sagt dir, ob ein Problem im Heimnetz, beim Internetanbieter oder auf dem Weg zum Spielserver liegt.
 
@@ -221,12 +226,12 @@ Die Einstellungen, die Kampf-Historie, die Logs und die Mitschnitte liegen unter
 
 **Reiter im Hauptfenster:**
 - **DPS-Meter:** Status und aktueller Lauf
-- **Läufe:** Archiv aller Läufe mit Boss-Zeiten, Bestzeit 🏆, Vergleich mit deinem Durchschnitt, Kampfanalyse pro Spieler sowie „Als Bild/Text kopieren“ für Discord
+- **Läufe:** Archiv aller Läufe mit Boss-Zeiten, Bestzeit <img src="docs/media/brand/ui/trophy.png" width="16" align="absmiddle" alt="" />, Vergleich mit deinem Durchschnitt, Kampfanalyse pro Spieler sowie „Als Bild/Text kopieren“ für Discord
 - **Gruppe:** Mitglieder mit Server, Stufe und Kampfkraft (nur für dich sichtbar), Klick öffnet das Profil. Hier lässt sich „Neu in der Gruppe“ abschalten
 - **Profil:** dein Charakter oder jeder andere auf einem EU-Server
 - **Pets:** Pet-Finder mit Karte und die Einstellung fürs Pet-Radar (solange die Spielkarte offen ist, immer oder aus)
-- **Timer:** Feldbosse (★ = als Pill anzeigen und erinnern), Risse, Artefakt-Belagerung, eigene Countdowns, Timer-Pills an/aus und entsperren
-- **Checkliste:** Tägliches und Wöchentliches mit automatischem Reset und Erinnerung
+- **Timer:** Feldbosse (<img src="docs/media/brand/ui/star.png" width="16" align="absmiddle" alt="" /> = als Pill anzeigen und erinnern), Risse, Artefakt-Belagerung, eigene Countdowns, Timer-Pills an/aus und entsperren
+- <a name="checkliste"></a>**Checkliste:** Tägliches und Wöchentliches mit automatischem Reset und Erinnerung
 - **Verbindung** und **Einstellungen**
 
 Wer das Hauptfenster schließt, lässt den Meter im Tray weiterlaufen.
@@ -239,13 +244,13 @@ Wer das Hauptfenster schließt, lässt den Meter im Tray weiterlaufen.
 | Verschieben | Boss-Karte oder Leiste ziehen |
 | Breite ändern | rechten Rand ziehen. Die Höhe passt sich der Gruppe an |
 | Gesamt / Ziel | Knopf oben. **Gesamt** = aller Schaden seit STRG+W, zum Beispiel ein ganzer Dungeon. **Ziel** = nur der aktuelle Gegner |
-| Zurücksetzen | ⟲ |
-| Ausblenden (Bereitschaft) | ✕. Ganz beenden über das Tray-Symbol → „Beenden“ |
-| Skill-Details | ☰ oder auf einen Spieler klicken |
-| Sperren (Mausklicks gehen ins Spiel) | Schloss-Symbol. Zum Entsperren wieder aufs Schloss klicken, es bleibt immer klickbar |
+| Zurücksetzen | <img src="docs/media/brand/ui/reset.png" width="16" align="absmiddle" alt="" /> |
+| Ausblenden (Bereitschaft) | <img src="docs/media/brand/ui/close.png" width="16" align="absmiddle" alt="" />. Ganz beenden über das Tray-Symbol → „Beenden“ |
+| Skill-Details | <img src="docs/media/brand/ui/menu.png" width="16" align="absmiddle" alt="" /> oder auf einen Spieler klicken |
+| Sperren (Mausklicks gehen ins Spiel) | <img src="docs/media/brand/ui/lock.png" width="16" align="absmiddle" alt="" /> Schloss-Symbol. Zum Entsperren wieder aufs Schloss klicken, es bleibt immer klickbar |
 | Timer-Pills | ziehen; Rechtsklick → Gruppieren, Lösen, Entfernen, Sperren. Entsperren im Reiter Timer |
-| Pet-Radar | erscheint mit der Spielkarte (Reiter Pets: auch „Immer“). Mausrad zoomt (wird gemerkt), Ziehen schaut kurz woanders hin, nach 5 s ist die Karte wieder bei dir. Knöpfe auf der Karte: ⠿ verschieben, ▾ einklappen, ✕ bis zum nächsten Öffnen ausblenden, ☰ Liste ein/aus, ⌖ zu dir. Größe über die Ecke unten rechts |
-| Einstellungen | ⚙ oder Tray-Symbol: Hotkey ändern, Deckkraft, nur meine Gruppe (Standard: an), „Du“ statt Name |
+| Pet-Radar | erscheint mit der Spielkarte (Reiter Pets: auch „Immer“). Mausrad zoomt (wird gemerkt), Ziehen schaut kurz woanders hin, nach 5 s ist die Karte wieder bei dir. Knöpfe auf der Karte: <img src="docs/media/brand/ui/drag.png" width="16" align="absmiddle" alt="" /> verschieben, <img src="docs/media/brand/ui/chevron-down.png" width="16" align="absmiddle" alt="" /> einklappen, <img src="docs/media/brand/ui/close.png" width="16" align="absmiddle" alt="" /> bis zum nächsten Öffnen ausblenden, <img src="docs/media/brand/ui/menu.png" width="16" align="absmiddle" alt="" /> Liste ein/aus, <img src="docs/media/brand/ui/center.png" width="16" align="absmiddle" alt="" /> zu dir. Größe über die Ecke unten rechts |
+| Einstellungen | <img src="docs/media/brand/ui/gear.png" width="16" align="absmiddle" alt="" /> oder Tray-Symbol: Hotkey ändern, Deckkraft, nur meine Gruppe (Standard: an), „Du“ statt Name |
 | Screenshot auf den Zweitbildschirm | **STRG+S** im Spiel (änderbar). Der Spiel-Bildschirm erscheint im Vollbild auf dem anderen Monitor, jeder neue ersetzt das alte Bild. Klick oder ESC blendet aus |
 | AION 2 starten | Knopf im Hauptfenster oder Einstellung „AION 2 mit dem Meter starten“ (Steam). Läuft der Meter beim Login schon, kennt er deinen Charakter sofort |
 | Fehler melden | Hauptfenster oder Tray-Symbol → „Problem melden“ |

@@ -10,7 +10,7 @@
           Padding="16,4,16,5" Cursor="SizeAll" ToolTip.Tip="{Binding At}">
     <StackPanel VerticalAlignment="Center">
       <StackPanel Orientation="Horizontal" Spacing="4">
-        <TextBlock Text="{Binding Icon}" Foreground="#E0A84A" FontSize="10" VerticalAlignment="Center" />
+        <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{Binding Icon, Converter={x:Static l:Icons.ByName}}" Width="11" Height="11" />
         <TextBlock Text="{Binding Name}" Foreground="#8E96A3" FontSize="10.5" FontWeight="SemiBold" MaxWidth="100" TextTrimming="CharacterEllipsis" />
       </StackPanel>
       <TextBlock Text="{Binding Remaining}" FontSize="15" FontWeight="Bold" Margin="0,-1,0,0"

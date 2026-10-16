@@ -86,8 +86,8 @@
         </StackPanel>
         <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
           <StackPanel Orientation="Horizontal" IsVisible="{Binding #Root.IsPointerOver}">
-            <Button Classes="icon" Content="⚙" Command="{Binding OpenSettingsCommand}" ToolTip.Tip="{l:T header.settings}" />
-            <Button Classes="icon" Content="✕" Click="OnCloseClicked" ToolTip.Tip="{l:T header.close}" />
+            <Button Classes="icon" Command="{Binding OpenSettingsCommand}" ToolTip.Tip="{l:T header.settings}"><Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon gear, Size=13}" Width="13" Height="13" /></Button>
+            <Button Classes="icon" Click="OnCloseClicked" ToolTip.Tip="{l:T header.close}"><Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon close, Size=11}" Width="11" Height="11" /></Button>
           </StackPanel>
           <Border Width="24" />
         </StackPanel>
@@ -96,13 +96,11 @@
       <!-- ============ Kampfkarte: Boss / Ziel ============ -->
       <Border Classes="card" Name="Header" Padding="8,6" IsVisible="{Binding !IsCompact}">
         <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto">
-          <Border Grid.RowSpan="3" Width="32" Height="32" CornerRadius="5" Background="#3A1F24" VerticalAlignment="Top" Margin="0,1,8,0">
-            <!-- Material Design Icons (Apache-2.0): skull / sword-cross -->
+          <Border Grid.RowSpan="3" Width="32" Height="32" CornerRadius="5" VerticalAlignment="Top" Margin="0,1,8,0"
+                  Background="{Binding IsBoss, Converter={x:Static l:BoolBrush.BossRedElseGoldTile}}">
             <Panel>
-              <PathIcon Width="18" Height="18" Foreground="#E0605A" IsVisible="{Binding IsBoss}"
-                        Data="M12,2A9,9 0 0,0 3,11C3,14.03 4.53,16.82 7,18.47V22H9V19H11V22H13V19H15V22H17V18.46C19.47,16.81 21,14 21,11A9,9 0 0,0 12,2M8,11A2,2 0 0,1 10,13A2,2 0 0,1 8,15A2,2 0 0,1 6,13A2,2 0 0,1 8,11M16,11A2,2 0 0,1 18,13A2,2 0 0,1 16,15A2,2 0 0,1 14,13A2,2 0 0,1 16,11M12,14L13.5,17H10.5L12,14Z" />
-              <PathIcon Width="17" Height="17" Foreground="#E0A84A" IsVisible="{Binding !IsBoss}"
-                        Data="M6.2,2.44L18.1,14.34L20.22,12.22L21.63,13.63L19.16,16.1L22.34,19.28C22.73,19.67 22.73,20.3 22.34,20.69L21.63,21.4C21.24,21.79 20.61,21.79 20.22,21.4L17,18.23L14.56,20.7L13.15,19.29L15.27,17.17L3.37,5.27V2.44H6.2M15.89,10L20.63,5.26V2.44H17.8L13.06,7.18L15.89,10M10.94,15L8.11,12.13L5.9,14.34L3.78,12.22L2.37,13.63L4.84,16.1L1.66,19.29C1.27,19.68 1.27,20.31 1.66,20.7L2.37,21.41C2.76,21.8 3.39,21.8 3.78,21.41L7,18.23L9.42,20.7L10.83,19.29L8.71,17.17L10.94,15Z" />
+              <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon skull, Size=22}" Width="22" Height="22" IsVisible="{Binding IsBoss}" />
+              <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon swords, Size=22}" Width="22" Height="22" IsVisible="{Binding !IsBoss}" />
             </Panel>
           </Border>
 
@@ -112,17 +110,20 @@
               <TextBlock Text="{Binding CardLabel}" FontSize="11" Classes="dim" />
               <TextBlock Text="{Binding Duration}" FontSize="11" FontWeight="SemiBold" Foreground="#C9CED6" />
               <TextBlock Text="{Binding DeathsText}" FontSize="11" Foreground="#E0605A" IsVisible="{Binding HasDeaths}" />
-              <TextBlock Text="{Binding LimitText}" FontSize="11" ToolTip.Tip="{l:T card.limit_tip}"
-                         Foreground="{Binding LimitUrgent, Converter={x:Static l:BoolBrush.ErrorRedElseText}}"
-                         IsVisible="{Binding LimitText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+              <StackPanel Orientation="Horizontal" Spacing="4" ToolTip.Tip="{l:T card.limit_tip}"
+                          IsVisible="{Binding LimitText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon stopwatch, Size=11}" Width="11" Height="11" />
+                <TextBlock Text="{Binding LimitText}" FontSize="11" VerticalAlignment="Center"
+                           Foreground="{Binding LimitUrgent, Converter={x:Static l:BoolBrush.ErrorRedElseText}}" />
+              </StackPanel>
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,-3,-4,-3">
               <StackPanel Orientation="Horizontal" IsVisible="{Binding #Root.IsPointerOver}">
                 <Button Classes="icon" Content="{Binding ViewLabel}" Command="{Binding ToggleViewCommand}" ToolTip.Tip="{l:T view.tooltip}" FontSize="10" />
-                <Button Classes="icon" Content="⟲" Command="{Binding ResetCommand}" ToolTip.Tip="{l:T header.reset}" />
-                <ToggleButton Classes="icon" Content="☰" IsChecked="{Binding ShowDetails}" Command="{Binding ToggleDetailsCommand}" ToolTip.Tip="{l:T header.details}" />
-                <Button Classes="icon" Content="⚙" Command="{Binding OpenSettingsCommand}" ToolTip.Tip="{l:T header.settings}" />
-                <Button Classes="icon" Content="✕" Click="OnCloseClicked" ToolTip.Tip="{l:T header.close}" />
+                <Button Classes="icon" Command="{Binding ResetCommand}" ToolTip.Tip="{l:T header.reset}"><Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon reset, Size=13}" Width="13" Height="13" /></Button>
+                <ToggleButton Classes="icon" IsChecked="{Binding ShowDetails}" Command="{Binding ToggleDetailsCommand}" ToolTip.Tip="{l:T header.details}"><Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon menu, Size=13}" Width="13" Height="13" /></ToggleButton>
+                <Button Classes="icon" Command="{Binding OpenSettingsCommand}" ToolTip.Tip="{l:T header.settings}"><Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon gear, Size=13}" Width="13" Height="13" /></Button>
+                <Button Classes="icon" Click="OnCloseClicked" ToolTip.Tip="{l:T header.close}"><Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon close, Size=11}" Width="11" Height="11" /></Button>
               </StackPanel>
               <Border Width="22" />
             </StackPanel>
@@ -164,9 +165,11 @@
                     </Border>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="7" Margin="8,0,0,0" VerticalAlignment="Center">
                       <TextBlock Text="{Binding Name}" Classes="num" FontSize="13" TextTrimming="CharacterEllipsis" MaxWidth="140" />
-                      <TextBlock Text="{Binding CombatPower}" FontSize="10" Foreground="#B8C0CC" VerticalAlignment="Center"
-                                 IsVisible="{Binding CombatPower, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                                 ToolTip.Tip="{l:T row.combat_power}" />
+                      <StackPanel Orientation="Horizontal" Spacing="3" ToolTip.Tip="{l:T row.combat_power}"
+                                  IsVisible="{Binding CombatPower, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                        <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon bolt, Size=10}" Width="10" Height="10" Opacity="0.85" />
+                        <TextBlock Text="{Binding CombatPower}" FontSize="10" Foreground="#B8C0CC" VerticalAlignment="Center" />
+                      </StackPanel>
                     </StackPanel>
                     <TextBlock Grid.Column="2" Text="{Binding Dps}" Classes="num" FontSize="13" Margin="8,0,8,0" VerticalAlignment="Center" TextAlignment="Right"
                                ToolTip.Tip="{Binding Total}" />
@@ -221,11 +224,8 @@
     <ToggleButton Classes="icon" Name="ClickThroughButton" ToolTip.Tip="{l:T header.clickthrough}" AutomationProperties.Name="Sperren"
                   HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,4,4,0">
       <Panel>
-        <!-- Material Design Icons (Apache-2.0): lock-open / lock -->
-        <PathIcon Width="12" Height="12" IsVisible="{Binding !IsClickThrough}" Foreground="#8E96A3"
-                  Data="M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V10A2,2 0 0,1 6,8H15V6A3,3 0 0,0 12,3A3,3 0 0,0 9,6H7A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,17A2,2 0 0,0 14,15A2,2 0 0,0 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17Z" />
-        <PathIcon Width="12" Height="12" IsVisible="{Binding IsClickThrough}" Foreground="#E0A84A"
-                  Data="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z" />
+        <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon lock-open, Size=13}" Width="13" Height="13" Opacity="0.55" IsVisible="{Binding !IsClickThrough}" />
+        <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon lock, Size=13}" Width="13" Height="13" IsVisible="{Binding IsClickThrough}" />
       </Panel>
     </ToggleButton>
     </Panel>

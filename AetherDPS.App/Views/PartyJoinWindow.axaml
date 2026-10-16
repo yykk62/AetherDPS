@@ -24,7 +24,7 @@
     <StackPanel Spacing="8">
       <Grid ColumnDefinitions="*,Auto">
         <TextBlock Text="{l:T party.popup_title}" FontWeight="SemiBold" Foreground="#E0A84A" VerticalAlignment="Center" />
-        <Button Grid.Column="1" Content="✕" Padding="6,0" Background="Transparent" Command="{Binding CloseCommand}" />
+        <Button Grid.Column="1" Padding="6,4" Background="Transparent" Command="{Binding CloseCommand}"><Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon close, Size=11}" Width="11" Height="11" /></Button>
       </Grid>
       <ItemsControl ItemsSource="{Binding Cards}">
         <ItemsControl.ItemTemplate>

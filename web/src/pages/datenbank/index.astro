@@ -1,13 +1,14 @@
 ---
 import Base from '../../layouts/Base.astro';
 import PageHead from '../../components/PageHead.astro';
+import Icon from '../../components/Icon.astro';
 import { t } from '../../i18n';
 
 const entries = [
-  ['🐉', t('db.fieldbosses'), t('db.fieldbossesText'), '/datenbank/feldbosse'],
-  ['🐾', t('db.pets'), t('db.petsText'), '/datenbank/pets'],
-  ['🏰', t('db.dungeons'), t('db.dungeonsText'), ''],
-  ['🌍', t('db.terms'), t('db.termsText'), ''],
+  ['dragon', t('db.fieldbosses'), t('db.fieldbossesText'), '/datenbank/feldbosse'],
+  ['paw', t('db.pets'), t('db.petsText'), '/datenbank/pets'],
+  ['castle', t('db.dungeons'), t('db.dungeonsText'), ''],
+  ['globe', t('db.terms'), t('db.termsText'), ''],
 ];
 ---
 <Base title={t('db.title')}>
@@ -16,9 +17,9 @@ const entries = [
     <div class="grid">
       {entries.map(([icon, title, text, href]) =>
         href ? (
-          <a class="card" href={href}><div class="icon">{icon}</div><h3>{title}</h3><p>{text}</p></a>
+          <a class="card feature" href={href}><Icon name={icon} size={56} class="icon" /><h3>{title}</h3><p>{text}</p></a>
         ) : (
-          <div class="card soon"><div class="icon">{icon}</div><h3>{title} <span class="tag">{t('common.soon')}</span></h3><p>{text}</p></div>
+          <div class="card feature soon"><Icon name={icon} size={56} class="icon" /><h3>{title} <span class="tag">{t('common.soon')}</span></h3><p>{text}</p></div>
         ),
       )}
     </div>

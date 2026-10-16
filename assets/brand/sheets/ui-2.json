@@ -1,0 +1,44 @@
+{
+ "image": "ui-2.png",
+ "grid": [
+  5,
+  5
+ ],
+ "key": "black",
+ "set": "ui",
+ "sizes": [
+  16,
+  20,
+  24,
+  32,
+  48,
+  64
+ ],
+ "icons": [
+  "download",
+  "bug",
+  "tools",
+  "chat",
+  "globe",
+  "keyboard",
+  "eye",
+  "monitor",
+  "play",
+  "power",
+  "refresh",
+  "shield-check",
+  "bolt",
+  "clock",
+  "pulse",
+  "pin",
+  "compass",
+  "heart",
+  "stagger",
+  "tower",
+  "flame",
+  "potion",
+  "scroll",
+  "wings",
+  "bars"
+ ]
+}

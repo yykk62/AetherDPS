@@ -1,0 +1,44 @@
+{
+ "image": "ui-3.png",
+ "grid": [
+  5,
+  5
+ ],
+ "key": "black",
+ "set": "ui",
+ "sizes": [
+  16,
+  20,
+  24,
+  32,
+  48,
+  64
+ ],
+ "icons": [
+  "copy",
+  "image",
+  "document",
+  "send",
+  "thumbtack",
+  "move",
+  "resize",
+  "link",
+  "megaphone",
+  "mail",
+  "calendar",
+  "sun",
+  "moon",
+  "coins",
+  "gem",
+  "arrow-up",
+  "key",
+  "exit",
+  "external",
+  "pause",
+  "filter",
+  "grid",
+  "help",
+  "hammer",
+  "radar"
+ ]
+}

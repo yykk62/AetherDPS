@@ -2,7 +2,11 @@
 
 Newest versions first.
 
-## 0.7.12
+## 0.8.0
+
+- **New look:** an own icon set in the Aether style (gold with a violet glow) replaces text and symbols. Tabs, the overlay and pet-radar buttons, timer pills, notices and settings now have real icons, crisp at 100 % and 150 % scaling
+- **Main window** with Daeva wings as a dark watermark
+- Website and README in the same style: feature emblems, section backgrounds, banners and an ornament (all local, nothing loaded from third-party servers)
 
 - **Rarity in the right colours:** "Legend" items are now blue like in the game (previously orange), Unique stays gold. Affects the profile and "New in the group"
 - **Shared runs show what recorded them:** a small "AetherDPS · aetherdps.com" line in the image and a link in the text, so readers can find the meter

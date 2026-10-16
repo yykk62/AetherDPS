@@ -1,34 +1,37 @@
 ---
 import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import Divider from '../components/Divider.astro';
 import { t } from '../i18n';
 
 const DOWNLOAD = 'https://github.com/yykk62/AetherDPS/releases/latest';
 
+// Icons: eigenes Emblem-Set (assets/brand, public/gen/brand)
 const web = [
-  ['⏱', t('nav.timer'), 'Risse, Weltbosse, Shugofesta und Abyss live in deiner Ortszeit.', '/timer'],
-  ['✅', t('nav.checklist'), 'Tägliches und Wöchentliches für Main und Twinks, setzt sich selbst zurück.', '/checkliste'],
-  ['📜', t('nav.cheatsheet'), 'Leveling, Level 45, Währungen und Abyss auf einen Blick.', '/cheat-sheet'],
-  ['🐉', t('db.fieldbosses'), 'Alle Feldbosse je Gebiet mit Respawn und festen Zeiten.', '/datenbank/feldbosse'],
-  ['🐾', t('db.pets'), 'Alle Pets mit Gattung, Gebiet und dem Monster, das die Seele droppt.', '/datenbank/pets'],
-  ['📖', t('nav.guides'), 'Anleitungen rund um AION 2 und AetherDPS.', '/guides'],
+  ['hourglass', t('nav.timer'), 'Risse, Weltbosse, Shugofesta und Abyss live in deiner Ortszeit.', '/timer'],
+  ['checklist', t('nav.checklist'), 'Tägliches und Wöchentliches für Main und Twinks, setzt sich selbst zurück.', '/checkliste'],
+  ['cheatsheet', t('nav.cheatsheet'), 'Leveling, Level 45, Währungen und Abyss auf einen Blick.', '/cheat-sheet'],
+  ['dragon', t('db.fieldbosses'), 'Alle Feldbosse je Gebiet mit Respawn und festen Zeiten.', '/datenbank/feldbosse'],
+  ['paw', t('db.pets'), 'Alle Pets mit Gattung, Gebiet und dem Monster, das die Seele droppt.', '/datenbank/pets'],
+  ['book', t('nav.guides'), 'Anleitungen rund um AION 2 und AetherDPS.', '/guides'],
 ];
 
 const app = [
-  ['⚔', 'Live-DPS-Meter', 'Boss mit Lebens- und Stagger-Balken, Schaden, DPS und Anteil deiner Gruppe.'],
-  ['🏆', 'Läufe-Archiv', 'Jeder Dungeon mit Boss-Zeiten, Bestzeit und Kampfanalyse, als Bild für Discord.'],
-  ['🧙', 'Profil', 'Ausrüstung, Werte, Daevanion und Skills, auch ohne laufendes Spiel.'],
-  ['👥', 'Neu in der Gruppe', 'Tritt jemand bei, siehst du sofort Kampfkraft, Itemstufe und Waffe.'],
-  ['🐾', 'Pet-Radar', 'Die fehlenden Pets in deiner Nähe als Minimap mit Entfernung und Richtung.'],
-  ['⏱', 'Timer-Pills', 'Echte Respawn-Zeiten der Feldbosse direkt vom Server, frei über dem Spiel platziert.'],
+  ['swords', 'Live-DPS-Meter', 'Boss mit Lebens- und Stagger-Balken, Schaden, DPS und Anteil deiner Gruppe.'],
+  ['trophy', 'Läufe-Archiv', 'Jeder Dungeon mit Boss-Zeiten, Bestzeit und Kampfanalyse, als Bild für Discord.'],
+  ['helmet', 'Profil', 'Ausrüstung, Werte, Daevanion und Skills, auch ohne laufendes Spiel.'],
+  ['group', 'Neu in der Gruppe', 'Tritt jemand bei, siehst du sofort Kampfkraft, Itemstufe und Waffe.'],
+  ['compass', 'Pet-Radar', 'Die fehlenden Pets in deiner Nähe als Minimap mit Entfernung und Richtung.'],
+  ['bell', 'Timer-Pills', 'Echte Respawn-Zeiten der Feldbosse direkt vom Server, frei über dem Spiel platziert.'],
 ];
 
 // Was AetherDPS von anderen Metern abhebt (Abgleich mit ~30 Tools am 15.10.2026). Bewusst ohne „als einziger“.
 const why = [
-  ['💥', 'Stagger je Spieler', 'Nach jeder Stagger-Phase siehst du, ob sie geklappt hat und wer wie viel dazu beigetragen hat. Schluss mit „wer hat nicht gestaggert?“.'],
-  ['📶', 'Warum laggt es?', 'Verbindung prüfen sagt dir, ob es an deinem Heimnetz, deinem Internetanbieter oder am Spielserver liegt.'],
-  ['👥', 'Neu in der Gruppe', 'Tritt jemand bei, erscheinen sofort Kampfkraft, Itemstufe, Verzauberung und Waffe. Ein Klick öffnet das ganze Profil.'],
-  ['🩹', 'Ehrlich nach Patches', 'Versteht der Meter das Spiel nach einem Patch nicht mehr, sagt er es dir, statt still falsche oder leere Zahlen zu zeigen.'],
-  ['🔒', 'Deine Daten bleiben bei dir', 'Keine Uploads, keine Bestenlisten, kein Konto. Deine Kämpfe und die Namen deiner Mitspieler verlassen nie deinen PC.'],
+  ['stagger', 'Stagger je Spieler', 'Nach jeder Stagger-Phase siehst du, ob sie geklappt hat und wer wie viel dazu beigetragen hat. Schluss mit „wer hat nicht gestaggert?“.'],
+  ['lag', 'Warum laggt es?', 'Verbindung prüfen sagt dir, ob es an deinem Heimnetz, deinem Internetanbieter oder am Spielserver liegt.'],
+  ['group', 'Neu in der Gruppe', 'Tritt jemand bei, erscheinen sofort Kampfkraft, Itemstufe, Verzauberung und Waffe. Ein Klick öffnet das ganze Profil.'],
+  ['patch', 'Ehrlich nach Patches', 'Versteht der Meter das Spiel nach einem Patch nicht mehr, sagt er es dir, statt still falsche oder leere Zahlen zu zeigen.'],
+  ['lock', 'Deine Daten bleiben bei dir', 'Keine Uploads, keine Bestenlisten, kein Konto. Deine Kämpfe und die Namen deiner Mitspieler verlassen nie deinen PC.'],
 ];
 
 const faq = [
@@ -46,23 +49,23 @@ const faq = [
         <h1>{t('site.tagline')}</h1>
         <p class="lead">Live-DPS über dem Spiel, Timer, Pets und Checkliste. Deine Kampfdaten bleiben auf deinem PC.</p>
         <div class="cta">
-          <a class="btn" href={DOWNLOAD}>⬇ {t('home.download')}</a>
+          <a class="btn" href={DOWNLOAD}><Icon name="download" size={22} /> {t('home.download')}</a>
           <a class="btn ghost" href="/timer">{t('nav.timer')} ansehen</a>
-          <a class="btn ghost" href="https://discord.gg/xExgsyDEP2">💬 {t('home.discord')}</a>
+          <a class="btn ghost" href="https://discord.gg/xExgsyDEP2"><Icon name="chat" size={22} /> {t('home.discord')}</a>
         </div>
         <p class="muted small">{t('home.free')}</p>
       </div>
     </div>
   </section>
 
-  <div class="wrap">
-    <section class="section">
+  <section class="section art art-aether">
+    <div class="wrap">
       <div class="eyebrow">Warum AetherDPS?</div>
       <h2 class="why-title">Was AetherDPS besonders macht</h2>
       <div class="radar">
         <img src="/gen/media/radar.gif" alt="Pet-Radar unterwegs: die Minimap folgt dir, Entfernungen laufen mit" loading="lazy" />
         <div>
-          <h3>🐾 Das Pet-Radar ersetzt deine Karte</h3>
+          <h3 class="with-icon"><Icon name="compass" size={36} /> Das Pet-Radar ersetzt deine Karte</h3>
           <p>Öffnest du im Spiel die Karte, liegt das Radar genau darüber, so groß wie sie. Es folgt dir live, auch im Flug, und zeigt die Pets, die dir noch fehlen, mit <strong>Entfernung, Richtung und dem Monster, das die Seele droppt</strong>.</p>
           <p>Kein Extra-Knopf, kein Hotkey, kein Umschalten: Karte auf, Pets finden. Auf Wunsch bleibt es auch dauerhaft als Minimap stehen.</p>
         </div>
@@ -70,28 +73,34 @@ const faq = [
       <div class="grid why">
         {why.map(([icon, title, text]) => (
           <div class="card">
-            <h3>{icon} {title}</h3>
+            <h3 class="with-icon"><Icon name={icon} size={30} /> {title}</h3>
             <p>{text}</p>
           </div>
         ))}
       </div>
-    </section>
+    </div>
+  </section>
 
+  <div class="wrap">
+    <Divider />
     <section class="section">
       <h2>{t('home.webTitle')}</h2>
       <p class="muted">{t('home.webText')}</p>
       <div class="grid">
         {web.map(([icon, title, text, href]) => (
-          <a class="card" href={href}>
-            <div class="icon">{icon}</div>
+          <a class="card feature" href={href}>
+            <Icon name={icon} size={56} class="icon" />
             <h3>{title}</h3>
             <p>{text}</p>
           </a>
         ))}
       </div>
     </section>
+    <Divider />
+  </div>
 
-    <section class="section">
+  <section class="section art art-wings">
+    <div class="wrap">
       <h2>{t('home.appTitle')}</h2>
       <img class="app-shot" src="/gen/media/hero.png" alt="AetherDPS: Hauptfenster mit Pet-Finder, Live-Meter und Timer" loading="lazy" />
       <div class="showcase">
@@ -99,16 +108,18 @@ const faq = [
         <div class="grid compact">
           {app.map(([icon, title, text]) => (
             <div class="card">
-              <h3>{icon} {title}</h3>
+              <h3 class="with-icon"><Icon name={icon} size={30} /> {title}</h3>
               <p>{text}</p>
             </div>
           ))}
         </div>
       </div>
-      <p><a class="btn" href={DOWNLOAD}>⬇ {t('home.download')}</a></p>
-    </section>
+      <p><a class="btn" href={DOWNLOAD}><Icon name="download" size={22} /> {t('home.download')}</a></p>
+    </div>
+  </section>
 
-    <section class="section">
+  <section class="section art art-stars">
+    <div class="wrap">
       <h2>{t('home.faqTitle')}</h2>
       {faq.map(([q, a]) => (
         <details class="faq">
@@ -116,8 +127,8 @@ const faq = [
           <p>{a}</p>
         </details>
       ))}
-    </section>
-  </div>
+    </div>
+  </section>
 </Base>
 
 <style>
@@ -137,7 +148,9 @@ const faq = [
   .grid.why { grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); }
   .radar {
     display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center;
-    background: var(--panel); border: 1px solid var(--gold); border-radius: var(--radius); padding: 20px; margin-bottom: 16px;
+    background: linear-gradient(135deg, rgba(25, 30, 40, 0.92), rgba(25, 30, 40, 0.75));
+    border: 1px solid var(--gold); border-radius: var(--radius); padding: 20px; margin-bottom: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
   }
   .radar img { border-radius: 10px; }
   .radar h3 { font-size: 1.3rem; color: var(--gold-2); }
@@ -157,7 +170,7 @@ const faq = [
   .showcase > img { border-radius: 12px; border: 1px solid var(--line); }
   .grid.compact { grid-template-columns: 1fr 1fr; gap: 12px; }
   .grid.compact .card { padding: 14px; }
-  .faq { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 8px; }
+  .faq { background: rgba(25, 30, 40, 0.85); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 8px; }
   .faq summary { cursor: pointer; font-weight: 600; }
   .faq p { margin: 10px 0 0; color: var(--soft); }
   @media (max-width: 860px) {

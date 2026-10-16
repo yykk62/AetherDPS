@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import PageHead from '../components/PageHead.astro';
+import Icon from '../components/Icon.astro';
 import { t } from '../i18n';
 import { euServers } from '../lib/gamedata';
 
@@ -33,9 +34,9 @@ const servers = euServers();
     <div id="profile"></div>
 
     <div class="grid section" id="intro">
-      <div class="card"><div class="icon">🧙</div><h3>{t('char.step1')}</h3><p>{t('char.step1Text')}</p></div>
-      <div class="card"><div class="icon">🔄</div><h3>{t('char.step2')}</h3><p>{t('char.step2Text')}</p></div>
-      <div class="card"><div class="icon">✅</div><h3>{t('char.step3')}</h3><p>{t('char.step3Text')}</p></div>
+      <div class="card feature"><Icon name="helmet" size={56} class="icon" /><h3>{t('char.step1')}</h3><p>{t('char.step1Text')}</p></div>
+      <div class="card feature"><Icon name="refresh" size={56} class="icon" /><h3>{t('char.step2')}</h3><p>{t('char.step2Text')}</p></div>
+      <div class="card feature"><Icon name="done" size={56} class="icon" /><h3>{t('char.step3')}</h3><p>{t('char.step3Text')}</p></div>
     </div>
 
     <p class="muted small">{t('char.privacy')} <a href="/datenschutz">{t('footer.privacy')}</a></p>

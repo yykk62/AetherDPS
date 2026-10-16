@@ -48,7 +48,7 @@
     <Border Classes="card" Padding="14,10" Margin="0,0,0,12" ToolTip.Tip="{l:T radar.enable_hint}">
       <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
         <Border Width="34" Height="34" CornerRadius="17" Background="#2A2416" VerticalAlignment="Center">
-          <TextBlock Text="⌖" FontSize="18" Foreground="#E0A84A" HorizontalAlignment="Center" VerticalAlignment="Center" />
+          <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon center, Size=20}" Width="20" Height="20" HorizontalAlignment="Center" />
         </Border>
         <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
           <TextBlock Text="{l:T radar.settings_title}" FontWeight="SemiBold" />
@@ -169,8 +169,8 @@
           <Border Grid.Row="2" CornerRadius="6" ClipToBounds="True" BorderBrush="#232A36" BorderThickness="1" MinHeight="220">
             <Panel>
               <views:PetMapView Name="FinderMap" AutoFit="False" DotBrush="{Binding DotBrush}" Map="{Binding Map}" Spawns="{Binding Spawns}" Self="{Binding Self}" />
-              <Button Content="⌖" Click="OnCenter" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="8" Padding="8,3"
-                      FontSize="16" Background="#CC141820" Foreground="#E6E8EC" ToolTip.Tip="{l:T radar.center}" />
+              <Button Click="OnCenter" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="8" Padding="8,6"
+                      Background="#CC141820" ToolTip.Tip="{l:T radar.center}"><Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon center, Size=16}" Width="16" Height="16" /></Button>
             </Panel>
           </Border>
 

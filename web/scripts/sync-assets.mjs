@@ -12,6 +12,10 @@ const copies = [
   ['AetherDPS.App/Assets/Classes', 'classes'],
   ['AetherDPS.App/Assets/icon.png', 'icon.png'],
   ['docs/media', 'media'],
+  // Eigenes Icon-Set (Emblem-Stil) und Übersicht, Quelle: assets/brand (tools/icons/slice.py)
+  ['assets/brand/icons/emblem/64', 'brand/64'],
+  ['assets/brand/icons/emblem/96', 'brand/96'],
+  ['assets/brand/icons/emblem/128', 'brand/128'],
 ];
 
 fs.rmSync(out, { recursive: true, force: true });
