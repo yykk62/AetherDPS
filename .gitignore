@@ -372,3 +372,6 @@ discord-bot/dist/
 # Higgsfield-Sheets in 4k (20 MB je Stück) bleiben lokal; im Repo liegt je Sheet eine 2k-WebP-Kopie
 assets/brand/sheets/*.png
 assets/brand/art/raw-*
+
+# Interne Notizen (Wettbewerb, Ideen, Monetarisierung) – bleiben lokal
+docs/intern/
