@@ -10,8 +10,9 @@ public sealed record StaggerSkill(string Skill, int Points, int Count);
 public sealed record StaggerShare(string Name, bool IsUser, int Points, IReadOnlyList<StaggerSkill> Skills);
 
 /// <summary>Eine Stagger-Phase eines Bosses: Leiste von <see cref="Max"/> auf 0 bringen, bevor die Zeit abläuft.</summary>
+/// <param name="Timed">Phase mit Zeitlimit (Wipe-Mechanik) – Dauer-Leisten von Schild-Gegnern sind es nicht.</param>
 public sealed record StaggerPhase(int BossId, string BossName, int Max, int Remaining, bool Success,
-    DateTime Start, DateTime End, IReadOnlyList<StaggerShare> Shares)
+    DateTime Start, DateTime End, IReadOnlyList<StaggerShare> Shares, bool Timed = true)
 {
     public TimeSpan Duration => End - Start;
 }
@@ -245,7 +246,7 @@ public sealed class StaggerTracker
         // Verfehlt = die Zeit ist abgelaufen → so lang dauert eine Phase bei diesem Boss
         if (!success && now - p.Start is var length && length > TimeSpan.FromSeconds(5) && length < TimeSpan.FromSeconds(60))
             durations[p.Boss] = length;
-        return new StaggerPhase(p.Boss, BossName(p.Boss), p.Max, success ? 0 : p.Current, success, p.Start, now, shares);
+        return new StaggerPhase(p.Boss, BossName(p.Boss), p.Max, success ? 0 : p.Current, success, p.Start, now, shares, timed.Contains(p.Boss));
     }
 
     private string BossName(int id) =>

@@ -332,7 +332,7 @@ public partial class App : Application
     private StaggerPhase? lastStagger;
     private StaggerWarningWindow? staggerWarning;
 
-    /// <summary>Große Stagger-Warnung (Einstellung, Standard aus) – nur solange eine Phase läuft.</summary>
+    /// <summary>Stagger-Warnung (Einstellung, Standard aus) – nur solange eine Phase mit Zeitlimit läuft.</summary>
     private void UpdateStaggerWarning(MeterSettings settings)
     {
         var vm = Services.GetRequiredService<StaggerWarningViewModel>();
@@ -355,7 +355,8 @@ public partial class App : Application
         {
             lastStagger = phase;
             Serilog.Log.Information("Stagger {Result} {Boss}: Rest {Rest}/{Max}", phase.Success ? "geschafft" : "verfehlt", phase.BossName, phase.Remaining, phase.Max);
-            if (settings.CombatHints) ShowToast(Loc.T(phase.Success ? "hint.stagger_ok" : "hint.stagger_fail"), StaggerSummary(phase));
+            // Dauer-Leisten von Schild-Gegnern brechen alle paar Sekunden – nur Phasen mit Zeitlimit melden
+            if (settings.CombatHints && phase.Timed) ShowToast(Loc.T(phase.Success ? "hint.stagger_ok" : "hint.stagger_fail"), StaggerSummary(phase));
         });
         Services.GetRequiredService<DeathRecap>().Died += report => Dispatcher.UIThread.Post(() =>
         {

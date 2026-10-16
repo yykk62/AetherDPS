@@ -319,11 +319,19 @@ public sealed class UiTests : IDisposable
     {
         Start();
         BossFight();
+        var vm = provider!.GetRequiredService<StaggerWarningViewModel>();
+        // Dauer-Leiste (Schild-Gegner, nur Zustand 2): keine Warnung
+        Feed(SyntheticPackets.Stagger(Boss, 317, 200, 2));
+        vm.Refresh();
+        Assert.False(vm.IsActive);
+        Feed(SyntheticPackets.StaggerBroken(Boss));
+        // Phase mit Zeitlimit (angekündigt): Warnung mit Restzeit
+        Feed(SyntheticPackets.Stagger(Boss, 317, 317, 3));
         Feed(SyntheticPackets.Stagger(Boss, 317, 317, 2));
         Feed(SyntheticPackets.Stagger(Boss, 317, 120, 2));
-        var vm = provider!.GetRequiredService<StaggerWarningViewModel>();
         vm.Refresh();
         Assert.True(vm.IsActive);
+        Assert.NotEmpty(vm.TimeLeft);
         Shot(new StaggerWarningWindow(vm), "stagger_warnung");
     }
 
