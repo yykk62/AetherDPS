@@ -50,11 +50,14 @@ Die App fragt bei NCSOFT (api-search.plaync.com, aion2.plaync.com) Charaktername
 ### e) Discord-Webhook (nur auf Klick)
 Teilst du einen Lauf in deinen Discord-Kanal, geht der Bericht an die von dir eingetragene Webhook-Adresse.
 
-### f) Empfänger
+### f) Discord-Profil (nur mit Einwilligung)
+Schaltest du unter Einstellungen → Datenschutz „Im Discord-Profil anzeigen“ ein, teilt die App dem Discord-Programm auf deinem PC über dessen lokale Schnittstelle mit, was du gerade machst (z. B. „AION 2 · Dungeon: Draupnir“, „Bosskampf: …“ oder „In Bereitschaft“, mit Startzeit). Die App selbst sendet dabei nichts ins Internet und nichts an uns. Discord (Discord Inc., USA) zeigt diese Angaben in deinem Profil, so wie bei jedem Spiel, nach deinen Discord-Einstellungen und der Datenschutzerklärung von Discord: <https://discord.com/privacy>. Spieler- und Charakternamen werden nie übermittelt, Dungeon- und Bossnamen lassen sich ausblenden. Rechtsgrundlage: Einwilligung (Art. 6 Abs. 1 lit. a DSGVO), standardmäßig aus und jederzeit abschaltbar.
+
+### g) Empfänger
 Nutzungszahl und Fehlerberichte verarbeitet ein Server bei Cloudflare, Inc. als Auftragsverarbeiter. Die IP-Adresse wird nicht gespeichert; gegen Spam merkt sich der Server bis Tagesende nur einen gekürzten Hash mit täglich neuem Zufallswert. Der Quellcode des Servers ist öffentlich: <https://github.com/yykk62/AetherDPS/tree/main/server>
 
 ## 4. Deine Rechte
 
 Auskunft, Berichtigung, Löschung, Einschränkung, Widerspruch, Datenübertragbarkeit und Widerruf einer Einwilligung (Art. 15–21, Art. 7 Abs. 3 DSGVO) sowie Beschwerde bei einer Datenschutz-Aufsichtsbehörde.
 
-Stand: 15.10.2026
+Stand: 16.10.2026

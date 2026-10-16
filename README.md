@@ -49,6 +49,7 @@
 | 🖼 **Screenshot** | STRG+S zeigt das Spielbild sofort auf deinem zweiten Monitor |
 | 🌍 **10 Sprachen** | Oberfläche, Skills, Monster, Klassen, Dungeons und Servernamen in deiner Sprache |
 | 🔄 **Updates** | Kommen von selbst, geprüft per Prüfsumme. Nach einem Spiel-Patch sagt dir der Meter Bescheid |
+| 💬 **Discord-Profil** | Auf Wunsch sehen Freunde in Discord „AION 2 · Dungeon: …“ oder „Bosskampf: …“ mit Laufzeit, ohne Charakternamen |
 
 ## Warum AetherDPS?
 
@@ -169,6 +170,8 @@ Jeder Timer ist eine eigene **Pill** über dem Spiel:
 
 Der Reiter Verbindung zeigt deinen Spiel-Ping als Verlauf mit Lag-Spitzen und neu gesendeten Paketen. **Verbindung prüfen** sagt dir, ob ein Problem im Heimnetz, beim Internetanbieter oder auf dem Weg zum Spielserver liegt.
 
+**Im Discord-Profil anzeigen** (Einstellungen → Datenschutz, standardmäßig aus): Freunde und deine Gilde sehen in Discord, was du gerade machst, z. B. „AION 2 · Dungeon: Draupnir“, „Bosskampf: …“ oder „In Bereitschaft“, mit Laufzeit und Knöpfen zum Herunterladen und zu unserem Discord. Dungeon- und Bossnamen lassen sich ausblenden, Spieler- und Charakternamen erscheinen nie.
+
 <p align="center"><img src="docs/media/connection.png" width="100%" alt="Ping-Verlauf mit Lag-Spitze" /></p>
 
 ## Häufige Fragen
@@ -182,6 +185,7 @@ Der Reiter Verbindung zeigt deinen Spiel-Ping als Verlauf mit Lag-Spitzen und ne
 - eine **anonyme Nutzungszahl**, nur wenn du beim ersten Start zustimmst: einmal am Tag `{"v":"0.7.4","lang":"de","new":false}`, also Version, Sprache und ob es die erste Nutzung ist. Keine Namen, kein Server, keine Kennung. Jederzeit abschaltbar unter Einstellungen → Datenschutz,
 - **Fehlerberichte**, nur wenn du selbst auf „Senden“ klickst. Namen von Spielern werden vorher entfernt, und du siehst vorher, was rausgeht.
 - **Charakter-Profile** von NCSOFT (dieselben öffentlichen Daten wie auf aion2.plaync.com): wenn du den Reiter Profil öffnest (dein Charakter), auf jemanden klickst oder sucht, und – abschaltbar im Reiter Gruppe – wenn jemand deiner Gruppe beitritt. Dabei gehen nur Name und Server an NCSOFT.
+- **Discord-Profil**, nur wenn du es unter Einstellungen → Datenschutz einschaltest: Der Meter sagt dem Discord auf deinem PC (lokal, nicht über das Internet und nicht über uns), was du gerade machst, z. B. „AION 2 · Dungeon: Draupnir“. Discord zeigt das dann wie bei jedem Spiel in deinem Profil. Keine Spieler- oder Charakternamen, keine Kampfdaten; Dungeon- und Bossnamen lassen sich ausblenden.
 
 Der Server dafür ist offen einsehbar im Ordner [`server/`](server/) und speichert keine IP-Adressen. Gegen Spam zählt er je Absender höchstens einen Ping und fünf Berichte pro Tag; dafür merkt er sich bis Tagesende nur einen Hash mit täglich neuem Zufallswert, der danach gelöscht wird.
 
@@ -281,11 +285,12 @@ Alles mit Lizenzen steht in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). Kl
 - **Party join cards:** when someone joins, their combat power, item level, enchant level and weapon pop up
 - **Pet finder:** every pet with your level and a map of where its monsters spawn, plus your position. The **pet radar** opens with the in-game map (or stays on) and shows the missing pets around you with distance and direction, colour-coded by species
 - **Field bosses with the server's real respawn times** (just open the map in game), rifts, Artifact Siege, dungeon time limit, custom timers as **draggable pills** you can group with a right-click
+- **Discord profile** (opt-in): friends see “AION 2 · Dungeon: …” or “Boss fight: …” with elapsed time in your Discord profile, never character names
 - **Checklist**, **connection monitor**, **second-screen screenshot**, **automatic updates**, a warning after game patches, and **Report a problem** straight from the app
 
 **Download:** [AetherDPS.exe](https://github.com/yykk62/AetherDPS/releases/latest), a single file with no installation needed (Windows 10/11, 64-bit). On first start it sets up Npcap with one click.
 
-**Privacy:** your combat data never leaves your PC. The only outgoing data is the update check, an optional anonymous daily usage count (version and language only, opt-in), problem reports you send yourself and character profile lookups at NCSOFT (name and server only: when you open the Profile tab, look someone up, or – switchable – when someone joins your party). The server code is in [`server/`](server/); it stores no IP addresses and counts at most one ping per sender per day.
+**Privacy:** your combat data never leaves your PC. The only outgoing data is the update check, an optional anonymous daily usage count (version and language only, opt-in), problem reports you send yourself and character profile lookups at NCSOFT (name and server only: when you open the Profile tab, look someone up, or – switchable – when someone joins your party). If you turn on the Discord profile, the meter tells the Discord app on your PC (locally, not through us) what you are doing, without player or character names. The server code is in [`server/`](server/); it stores no IP addresses and counts at most one ping per sender per day.
 
 **Is it allowed?** The meter only reads network traffic passively. It does not modify the game, read game memory or send anything to the game. It is an unofficial fan project, not affiliated with NCSOFT. Use at your own risk.
 

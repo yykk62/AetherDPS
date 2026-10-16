@@ -97,6 +97,12 @@ public sealed class MeterSettings
     /// <summary>Discord-Webhook für „An Discord senden“ bei Läufen (leer = aus).</summary>
     public string? DiscordWebhook { get; set; }
 
+    /// <summary>Im Discord-Profil zeigen, was du machst (Rich Presence, nur lokal über den Discord-Client). Standard: aus.</summary>
+    public bool DiscordPresence { get; set; }
+
+    /// <summary>Rich Presence: Dungeon- und Bossnamen mit anzeigen (sonst nur „Im Dungeon“/„Bosskampf“).</summary>
+    public bool DiscordPresenceNames { get; set; } = true;
+
     /// <summary>Schon angezeigte Nachrichten an alle (Ids aus status.json).</summary>
     public List<string> SeenMessages { get; set; } = [];
 

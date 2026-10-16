@@ -12,4 +12,9 @@
     <ProjectReference Include="..\AetherDPS.Engine\AetherDPS.Engine.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Texte, z. B. für „presence“ (Rich Presence ohne Fenster prüfen) -->
+    <None Include="..\AetherDPS.App\Lang\*.json" Link="Lang\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

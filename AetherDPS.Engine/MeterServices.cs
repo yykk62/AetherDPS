@@ -79,6 +79,8 @@ public static class MeterServices
         services.AddSingleton<LiveTimers>();
         services.AddSingleton(_ => MeterSettings.Load(options.DataDir));
         services.AddSingleton<TrackingMode>();
+        services.AddSingleton<Community.PresenceTracker>();
+        services.AddSingleton<Community.DiscordPresence>();
         return services;
     }
 }

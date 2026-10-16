@@ -48,6 +48,7 @@ public partial class App : Application
             {
                 if (hub is not null) hub.AllowClose = true;
                 Persist();
+                presence?.Dispose();   // Anzeige in Discord sofort entfernen
             };
 
             Instance?.ListenForShow(() => Dispatcher.UIThread.Post(() =>
@@ -158,6 +159,7 @@ public partial class App : Application
             var hubVm = Services.GetRequiredService<HubViewModel>();
             hubVm.ReportRequested += (_, _) => ShowReport();
             bool replay = Services.GetRequiredService<MeterOptions>().ReplayFile is not null;
+            StartDiscordPresence(replay);
             if (!replay)
             {
                 Services.GetRequiredService<CommunityController>().Start(hubVm, ShowToast, askConsent: AppUpdate.CanSelfUpdate);
@@ -193,6 +195,29 @@ public partial class App : Application
         // Start in Bereitschaft: Overlay bleibt aus (im Auto-Modus: Mini-Leiste), das Hauptfenster erklärt den Hotkey.
         UpdateOverlay();
         ShowHub(HubTabDps);
+    }
+
+    private Engine.Community.DiscordPresence? presence;
+
+    /// <summary>Rich Presence (nur mit Zustimmung, nur an den lokalen Discord-Client). Wiedergaben gelten als „Spiel läuft“.</summary>
+    private void StartDiscordPresence(bool replay)
+    {
+        if (!replay)
+        {
+            bool running = false;
+            DateTime checkedAt = DateTime.MinValue;
+            Services.GetRequiredService<Engine.Community.PresenceTracker>().GameRunning = () =>
+            {
+                if (DateTime.Now - checkedAt > TimeSpan.FromSeconds(10))
+                {
+                    running = GameLauncher.IsRunning;
+                    checkedAt = DateTime.Now;
+                }
+                return running;
+            };
+        }
+        presence = Services.GetRequiredService<Engine.Community.DiscordPresence>();
+        presence.Start();
     }
 
     /// <summary>Im Auto-Modus per Hotkey oder ✕ ausgeblendet.</summary>

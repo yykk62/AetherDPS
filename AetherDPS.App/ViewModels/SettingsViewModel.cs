@@ -41,6 +41,9 @@ public sealed partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private bool usageStats;
     [ObservableProperty] private string discordWebhook = "";
     [ObservableProperty] private string webhookStatus = "";
+    [ObservableProperty] private bool discordPresence;
+    [ObservableProperty] private bool discordPresenceNames;
+    [ObservableProperty] private string presenceStatus = "";
 
     public IReadOnlyList<LanguageOption> Languages { get; } =
     [
@@ -56,9 +59,17 @@ public sealed partial class SettingsViewModel : ObservableObject
     public string VersionText { get; }
     public bool CanSelfUpdate { get; } = AppUpdate.CanSelfUpdate;
 
-    public SettingsViewModel(MeterSettings meter, IAppSettingsService upstream, UpdateService updates, Engine.Community.CommunityService community)
+    private readonly Engine.Community.DiscordPresence presence;
+
+    public SettingsViewModel(MeterSettings meter, IAppSettingsService upstream, UpdateService updates, Engine.Community.CommunityService community,
+        Engine.Community.DiscordPresence presence)
     {
         this.meter = meter;
+        this.presence = presence;
+        discordPresence = meter.DiscordPresence;
+        discordPresenceNames = meter.DiscordPresenceNames;
+        presence.StatusChanged += (_, _) => Avalonia.Threading.Dispatcher.UIThread.Post(RefreshPresence);
+        RefreshPresence();
         selectedLanguage = Languages.FirstOrDefault(l => l.Code == meter.Language) ?? Languages[0];
         usageStats = meter.UsageStats == true;
         discordWebhook = meter.DiscordWebhook ?? "";
@@ -122,6 +133,24 @@ public sealed partial class SettingsViewModel : ObservableObject
         meter.UsageStats = value;
         meter.Save();
     }
+
+    partial void OnDiscordPresenceChanged(bool value)
+    {
+        if (meter.DiscordPresence == value) return;
+        meter.DiscordPresence = value;
+        meter.Save();
+        RefreshPresence();
+    }
+
+    partial void OnDiscordPresenceNamesChanged(bool value)
+    {
+        if (meter.DiscordPresenceNames == value) return;
+        meter.DiscordPresenceNames = value;
+        meter.Save();
+    }
+
+    private void RefreshPresence() => PresenceStatus = !meter.DiscordPresence ? ""
+        : Loc.T(presence.Connected ? "settings.discord_presence_connected" : "settings.discord_presence_waiting");
 
     /// <summary>Neue Sprache gilt nach einem Neustart.</summary>
     [RelayCommand]

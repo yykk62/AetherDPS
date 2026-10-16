@@ -421,6 +421,30 @@ public sealed class UiTests : IDisposable
     }
 
     [AvaloniaFact]
+    public void Discord_Profil_Einstellung()
+    {
+        Start();
+        var meter = provider!.GetRequiredService<MeterSettings>();
+        var hub = provider!.GetRequiredService<HubViewModel>();
+        var settings = hub.Settings;
+        Assert.False(meter.DiscordPresence);   // opt-in
+        Assert.False(settings.DiscordPresence);
+        Assert.True(settings.DiscordPresenceNames);
+        Assert.Equal("", settings.PresenceStatus);
+
+        settings.DiscordPresence = true;
+        settings.DiscordPresenceNames = false;
+        Assert.True(MeterSettings.Load(dataDir).DiscordPresence);
+        Assert.False(MeterSettings.Load(dataDir).DiscordPresenceNames);
+        Assert.Equal(Loc.T("settings.discord_presence_waiting"), settings.PresenceStatus);   // hier läuft kein Discord-Dienst
+
+        // Die Karte Datenschutz steht ganz unten – ein hohes Fenster zeigt alles
+        Shot(new Window { Width = 720, Height = 3200, Content = new SettingsView { DataContext = settings } }, "einstellungen_discord");
+        settings.DiscordPresence = false;
+        Assert.Equal("", settings.PresenceStatus);
+    }
+
+    [AvaloniaFact]
     public void Pet_Finder_mit_Karte()
     {
         Start();

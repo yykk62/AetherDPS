@@ -50,7 +50,10 @@ sein Profil kurz eingeblendet). Icons und Porträts kommen von assets.playnccdn.
 Gespeichert wird nur kurz im Arbeitsspeicher (15 Minuten). Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (Anzeige
 öffentlich abrufbarer Spieldaten für Gruppe und Spieler; abschaltbar).
 
-### e) Empfänger
+### e) Discord-Profil (nur mit Einwilligung)
+Schaltest du unter Einstellungen → Datenschutz „Im Discord-Profil anzeigen“ ein, teilt die App dem Discord-Programm auf deinem PC über dessen lokale Schnittstelle mit, was du gerade machst (z. B. „AION 2 · Dungeon: Draupnir“, „Bosskampf: …“ oder „In Bereitschaft“, mit Startzeit). Die App selbst sendet dabei nichts ins Internet und nichts an uns. Discord (Discord Inc., USA) zeigt diese Angaben in deinem Profil, so wie bei jedem Spiel, nach deinen Discord-Einstellungen und der Datenschutzerklärung von Discord: <https://discord.com/privacy>. Spieler- und Charakternamen werden nie übermittelt, Dungeon- und Bossnamen lassen sich ausblenden. Rechtsgrundlage: Einwilligung (Art. 6 Abs. 1 lit. a DSGVO), standardmäßig aus und jederzeit abschaltbar.
+
+### f) Empfänger
 Nutzungszahl und Fehlerberichte verarbeitet ein Server bei Cloudflare, Inc. (Cloudflare Workers und D1) als
 Auftragsverarbeiter. Cloudflare erhält technisch bedingt deine IP-Adresse, um die Anfrage zuzustellen, und begrenzt
 damit Anfragen (höchstens 5 Fehlerberichte bzw. 3 Signale pro Minute, dafür nur kurzzeitig im Arbeitsspeicher). Damit

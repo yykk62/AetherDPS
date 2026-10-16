@@ -36,6 +36,7 @@
 - [ ] Kampfanalyse nach dem Kampf (Rotation, Uptime der Buffs)
 - [ ] Mitlesen ohne Npcap über das in Windows eingebaute pktmon (Idee von a2kit)
 - [ ] Spendenlink (Ko-fi)
+- [x] Discord Rich Presence (16.10.): opt-in unter Einstellungen → Datenschutz, nur lokal über die Discord-IPC-Pipe, Knöpfe „Herunterladen“/„Discord beitreten“. Offen im Developer Portal: Bild-Asset `logo` hochladen, App-Name „AetherFPS“ → „AetherDPS“
 
 ## Offen: braucht Testdaten vom Nutzer (Aufnahme heute Abend, Stand 14.10.2026)
 Gefunden in der Recherche (Korea/Taiwan/Global, nur offene Lizenzen), aber noch nicht an EU-Daten bestätigt.

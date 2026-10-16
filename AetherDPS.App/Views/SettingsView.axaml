@@ -201,6 +201,17 @@
             <SelectableTextBlock Text="{Binding UsageStatsExample}" FontFamily="Consolas,monospace" FontSize="11" Foreground="#C8CDD6" TextWrapping="Wrap" />
           </Border>
         </StackPanel>
+        <StackPanel Spacing="4">
+          <CheckBox IsChecked="{Binding DiscordPresence}">
+            <TextBlock Classes="label" Text="{l:T settings.discord_presence}" />
+          </CheckBox>
+          <TextBlock Classes="hint" Text="{l:T settings.discord_presence_hint}" />
+          <CheckBox IsChecked="{Binding DiscordPresenceNames}" IsEnabled="{Binding DiscordPresence}" Margin="28,2,0,0">
+            <TextBlock Classes="label" Text="{l:T settings.discord_presence_names}" />
+          </CheckBox>
+          <TextBlock Classes="dim" Text="{Binding PresenceStatus}" Margin="28,0,0,0"
+                     IsVisible="{Binding PresenceStatus, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        </StackPanel>
         <TextBlock Classes="dim" Text="{l:T settings.privacy_hint}" />
       </StackPanel>
     </Border>

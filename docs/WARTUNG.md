@@ -100,6 +100,7 @@ Die exe entpackt Sprachdateien und Spieldaten beim ersten Start nach `%TEMP%\.ne
 - `ReportText`: Absturz merken (`absturz.txt` im Datenordner), Log lesen, Namen entfernen.
 - `PatchDetector`: 3000 Pakete ohne ein Grundpaket (Zeit, Spawn, Leben, Schaden, Karte) = Spiel-Update vermutet.
 - In der App: `CommunityController` (Hinweiskarten, Schleife alle 15 Min.), `ReportViewModel`/`ReportWindow`.
+- `DiscordPresence` + `PresenceTracker`/`PresenceText` (`Presence.cs`): Rich Presence, nur mit Zustimmung (`MeterSettings.DiscordPresence`), nur lokal über `\\.\pipe\discord-ipc-0..9` (Handshake op 0, `SET_ACTIVITY` op 1). Ohne Discord alle 30 s neuer Versuch, Aktualisierung höchstens alle 15 s. Client-ID 1560475211114090566 (App „AetherDPS“ im Developer Portal), großes Bild = Asset `logo` (Rich Presence → Art Assets). Ohne Fenster gegen das echte Discord prüfen: `aetherdps-cli presence demo` (oder mit einem Mitschnitt statt `demo`).
 
 Kosten: ein Worker-Aufruf pro Nutzer und Tag plus Fehlerberichte; `status.json` kommt von GitHub und kostet nichts.
 

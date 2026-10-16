@@ -6,6 +6,7 @@ using AetherDPS.Engine.Testing;
 // Werkzeug für Wartung ohne Spiel:
 //   aetherdps-cli replay <mitschnitt.txt>   – Mitschnitt auswerten, Tabelle ausgeben
 //   aetherdps-cli demo <ziel.txt>           – künstlichen Kampf erzeugen (für UI-Tests)
+//   aetherdps-cli presence <mitschnitt.txt|demo> – Discord Rich Presence ohne Fenster prüfen (braucht laufendes Discord)
 
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 var de = CultureInfo.GetCultureInfo("de-DE");
@@ -28,6 +29,8 @@ switch (args[0])
         return Dump(file, args.Length > 2 ? args[2] : null);
     case "live":
         return Live(file, args.Length > 2 ? int.Parse(args[2]) : 120);
+    case "presence":
+        return Presence(args[1]);
     case "demo":
         WriteDemo(file);
         Console.WriteLine($"Demo-Mitschnitt geschrieben: {file}");
@@ -116,6 +119,64 @@ int Analyze(string path)
     Console.WriteLine($"Abklingzeit-Ereignisse: {cds}");
     foreach (var (name, n) in cdNames.OrderByDescending(x => x.Value).Take(10))
         Console.WriteLine($"  {name,-45} {n,4}×");
+    return 0;
+}
+
+// Rich Presence an das lokale Discord schicken: Mitschnitt in Echtzeit abspielen oder („demo“)
+// Bereitschaft → Dungeon → Bosskampf → offene Welt durchspielen. Öffnet kein Fenster.
+static int Presence(string source)
+{
+    var dataDir = Path.Combine(Path.GetTempPath(), "aetherdps-cli-presence");
+    bool demo = source == "demo";
+    using var host = new MeterHost(new MeterOptions { DataDir = dataDir, ReplayFile = demo ? null : Path.GetFullPath(source) });
+    var settings = host.Get<MeterSettings>();
+    settings.PartyOnly = false;
+    settings.DiscordPresence = true;
+    var presence = host.Get<AetherDPS.Engine.Community.DiscordPresence>();
+    presence.Sent += a => Console.WriteLine($"{DateTime.Now:HH:mm:ss} → Discord: {(a is null ? "(entfernt)" : $"{a.Details} | {a.State} | seit {a.Since:HH:mm:ss}")}");
+    presence.Response += r => Console.WriteLine($"{DateTime.Now:HH:mm:ss} ← {r["evt"] ?? r["cmd"]}: {r["data"]?.ToJsonString()}");
+    var mode = host.Mode;
+    presence.Start();
+
+    if (!demo)
+    {
+        mode.Activate();
+        host.Pipeline.Start();
+        var device = (ReplayCaptureDevice)host.Capture;
+        while (!device.IsFinished) Thread.Sleep(1000);
+        Thread.Sleep(TimeSpan.FromSeconds(20));
+    }
+    else
+    {
+        const int boss = 7001, ruthilis = 2300708;
+        long t = 1_000;
+        void Feed(byte[] p) => host.Feed(p, t += 100);
+        void Wait(int s) { for (int i = 0; i < s; i++) { Feed(SyntheticPackets.Heartbeat()); Thread.Sleep(1000); } }
+        Feed(SyntheticPackets.Heartbeat());
+        Console.WriteLine("Bereitschaft …");
+        Wait(18);
+        Console.WriteLine("Dungeon betreten …");
+        Feed(SyntheticPackets.MapLoad(600032, 2));
+        Wait(18);
+        Console.WriteLine("Bosskampf …");
+        mode.Activate();
+        Feed(SyntheticPackets.MobInfo(boss, ruthilis, 10_000_000));
+        for (int i = 0; i < 18; i++)
+        {
+            Feed(SyntheticPackets.Damage(boss, 101, 11000001, 40_000));
+            Thread.Sleep(1000);
+        }
+        Console.WriteLine("Kampfpause (nach 30 s wieder Dungeon) …");
+        Wait(35);
+        Console.WriteLine("Offene Welt …");
+        Feed(SyntheticPackets.MapLoad(1010, 3));
+        Wait(18);
+        Console.WriteLine("Namen ausblenden …");
+        Feed(SyntheticPackets.MapLoad(600032, 4));
+        settings.DiscordPresenceNames = false;
+        Wait(18);
+    }
+    presence.Dispose();
     return 0;
 }
 
