@@ -38,6 +38,12 @@ msg('willkommen','w_intro',{'embeds':[{
     f'📖 {ch("anleitung")}  Download, Einrichtung, Tasten, FAQ\n'
     f'💡 {ch("forum")}  Ideen, Wünsche und Fehler, mit Abstimmung\n'
     f'💬 {ch("allgemein")}  quatschen über AION 2 und den Meter')},
+  {'name':'🤖 Der AetherDPS-Bot','value':(
+    'Tippe in ' + ch("allgemein") + ' einfach **/** und wähle:\n'
+    '`/charakter` Profil mit Kampfkraft, Ausrüstung, Skills, Daevanion · `/vergleich` zwei Chars nebeneinander\n'
+    '`/events` nächste Events und Resets als Countdown · `/feldboss` Respawn-Countdown · `/pet` Fundorte\n'
+    '`/ich verknüpfen` dein Charakter: Klassen-Rolle automatisch, Rechtsklick auf dich zeigt ihn\n'
+    '-# Über das Profil des Bots → **App hinzufügen** gehen die Befehle in jedem Server und in DMs.')},
  ],
  'footer':{'text':'🇬🇧 English speakers welcome! Feel free to post in English anywhere.'},
 }],'components':[links]})
@@ -68,7 +74,8 @@ msg('willkommen','ro_text',{'embeds':[{
    f'🔔 <@&{R["🔔 Update-Ping"]}> bei jeder neuen AetherDPS-Version\n'
    f'📰 <@&{R["📰 AION-News-Ping"]}> bei neuen AION-2-Patchnotes\n'
    f'🧪 <@&{R["🧪 Tester"]}> Testversionen vorab ausprobieren und Feedback geben\n\n'
-   '*Nochmal klicken nimmt die Rolle wieder weg. Die Antwort siehst nur du.*'),
+   '*Nochmal klicken nimmt die Rolle wieder weg. Die Antwort siehst nur du.*\n'
+   '💡 **Noch einfacher:** `/ich verknüpfen` mit deinem Charakter, dann setzt der Bot deine Klasse automatisch.'),
 }],'components':[
  {'type':1,'components':[{'type':3,'custom_id':'class','placeholder':'⚔️ Klasse wählen …','min_values':0,'max_values':3,
    'options':[{'label':de,'value':k,'emoji':{'id':E[de],'name':'k_'+k}} for k,de in classes]}]},

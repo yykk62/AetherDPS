@@ -17,13 +17,24 @@
   // Alle 15 Minuten: offizielle AION-2-News (aion2.plaync.com, Deutsch) und AetherDPS-Releases (GitHub) posten.
   "triggers": { "crons": ["*/15 * * * *"] },
 
-  // Kein Geheimnis: IDs des Servers, der Kanäle und Rollen.
+  // Charakterprofile über den Worker aetherdps-api (eine gemeinsame Grenze zu NCSOFT, 1 Std. Cache).
+  "services": [{ "binding": "API", "service": "aetherdps-api" }],
+
+  // Einzige gespeicherte Daten: Discord-Nutzer → verknüpfter Charakter (/ich verknüpfen, /ich lösen löscht).
+  "kv_namespaces": [{ "binding": "LINKS", "id": "f3fdc8459a2246faa8f3d4995facee32" }],
+
+  // Höchstens 6 Charakter-Abfragen pro Minute je Discord-Nutzer (nur im Speicher).
+  "ratelimits": [{ "name": "USER_LIMIT", "namespace_id": "2001", "simple": { "limit": 6, "period": 60 } }],
+
+  // Kein Geheimnis: IDs der App, des Servers, der Kanäle, Rollen und App-Emojis.
   "vars": {
+    "APP_ID": "1560475211114090566",
+    "EMOJIS": {"gladiator": "<:c_gladiator:1560484989613776906>", "templar": "<:c_templar:1560484990729322506>", "assassin": "<:c_assassin:1560484991568191511>", "ranger": "<:c_ranger:1560484992558178401>", "sorcerer": "<:c_sorcerer:1560484994978152530>", "elementalist": "<:c_elementalist:1560484996236705923>", "cleric": "<:c_cleric:1560484997444534302>", "chanter": "<:c_chanter:1560484998253903885>", "brawler": "<:c_brawler:1560484999692685472>"},
     "GUILD_ID": "1560474565916762253",
     "NEWS_CHANNEL": "1560477906365321218",
     "ANNOUNCE_CHANNEL": "1560477905174265906",
     "ROLES": {"update": "1560477445004599386", "news": "1560477446694772897", "tester": "1560477443435790418", "class": {"gladiator": "1560477447399411825", "templar": "1560477449140310046", "assassin": "1560477451472343140", "ranger": "1560477452562727042", "sorcerer": "1560477454202576896", "elementalist": "1560477455398084678", "cleric": "1560477456555843595", "chanter": "1560477457751220244", "brawler": "1560477458736750612"}}
   }
 
-  // Secrets (nicht hier eintragen!): DISCORD_BOT_TOKEN, DISCORD_PUBLIC_KEY  ->  `wrangler secret put …`
+  // Secrets (nicht hier eintragen!): DISCORD_BOT_TOKEN, DISCORD_PUBLIC_KEY, BOT_KEY (gleich wie in aetherdps-api)  ->  `wrangler secret put …`
 }

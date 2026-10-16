@@ -8,6 +8,7 @@
 // - Ergebnisse liegen eine Stunde im Cache (Cache API, sonst kurz im Arbeitsspeicher); dann keine Anfrage an NCSOFT.
 // - Zu NCSOFT höchstens 1 Anfrage pro Sekunde: innerhalb eines Abrufs mit Pause, über alle Abrufe per Rate Limiter.
 // - Je IP höchstens 10 Abrufe pro Minute; die IP ist nur ein flüchtiger Schlüssel und wird nirgends gespeichert.
+// - Der Discord-Bot (/charakter) fragt über ein Service Binding mit BOT_KEY und begrenzt selbst je Discord-Nutzer.
 // - Gespeichert wird nichts über den Cache hinaus, protokolliert wird nichts.
 
 interface RateLimiter {
@@ -17,6 +18,8 @@ interface RateLimiter {
 export interface CharacterEnv {
   CHARACTER_LIMIT: RateLimiter;
   NCSOFT_LIMIT: RateLimiter;
+  /** Gemeinsamer Schlüssel mit dem Discord-Bot (Worker aetherdps-discord, per Service Binding). */
+  BOT_KEY?: string;
 }
 
 const SEARCH_URL = "https://api-search.plaync.com/aion2global/search/v2/character";
@@ -242,7 +245,11 @@ export async function character(req: Request, env: CharacterEnv, ctx: ExecutionC
   if (!NAME_RE.test(name) || !isEuServer(server)) return error(req, 400, "input");
 
   // Die IP dient nur als flüchtiger Schlüssel für die Begrenzung und wird nirgends gespeichert.
-  const { success } = await env.CHARACTER_LIMIT.limit({ key: req.headers.get("CF-Connecting-IP") ?? "unknown" });
+  // Der Discord-Bot begrenzt selbst je Discord-Nutzer; die Grenze zu NCSOFT (NCSOFT_LIMIT) gilt auch für ihn.
+  const fromBot = !!env.BOT_KEY && req.headers.get("X-AetherDPS-Bot") === env.BOT_KEY;
+  const { success } = fromBot
+    ? { success: true }
+    : await env.CHARACTER_LIMIT.limit({ key: req.headers.get("CF-Connecting-IP") ?? "unknown" });
   if (!success) return error(req, 429, "rate", { "Retry-After": "60" });
 
   const profileKey = cacheKey("profile", server, name);

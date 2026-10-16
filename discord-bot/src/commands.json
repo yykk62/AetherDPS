@@ -1,0 +1,305 @@
+[
+  {
+    "name": "charakter",
+    "name_localizations": {
+      "en-US": "character",
+      "en-GB": "character"
+    },
+    "description": "AION-2-Charakter ansehen: Kampfkraft, Ausrüstung, Werte, Skills, Daevanion",
+    "description_localizations": {
+      "en-US": "Look up an AION 2 character: combat power, gear, stats, skills, Daevanion",
+      "en-GB": "Look up an AION 2 character: combat power, gear, stats, skills, Daevanion"
+    },
+    "options": [
+      {
+        "type": 3,
+        "name": "name",
+        "description": "Charaktername (leer = dein verknüpfter Charakter)",
+        "description_localizations": {
+          "en-US": "Character name (empty = your linked character)",
+          "en-GB": "Character name (empty = your linked character)"
+        },
+        "required": false,
+        "min_length": 2,
+        "max_length": 24
+      },
+      {
+        "type": 3,
+        "name": "server",
+        "description": "EU-Server",
+        "description_localizations": {
+          "en-US": "EU server",
+          "en-GB": "EU server"
+        },
+        "required": false,
+        "autocomplete": true
+      }
+    ]
+  },
+  {
+    "name": "vergleich",
+    "name_localizations": {
+      "en-US": "compare",
+      "en-GB": "compare"
+    },
+    "description": "Zwei Charaktere nebeneinander: Kampfkraft, Itemstufe, Verzauberung, Daevanion",
+    "description_localizations": {
+      "en-US": "Two characters side by side: combat power, item level, enchant, Daevanion",
+      "en-GB": "Two characters side by side: combat power, item level, enchant, Daevanion"
+    },
+    "options": [
+      {
+        "type": 3,
+        "name": "name1",
+        "description": "Erster Charakter",
+        "description_localizations": {
+          "en-US": "First character",
+          "en-GB": "First character"
+        },
+        "required": true,
+        "min_length": 2,
+        "max_length": 24
+      },
+      {
+        "type": 3,
+        "name": "server1",
+        "description": "Server des ersten Charakters",
+        "description_localizations": {
+          "en-US": "Server of the first character",
+          "en-GB": "Server of the first character"
+        },
+        "required": true,
+        "autocomplete": true
+      },
+      {
+        "type": 3,
+        "name": "name2",
+        "description": "Zweiter Charakter (leer = deiner)",
+        "description_localizations": {
+          "en-US": "Second character (empty = yours)",
+          "en-GB": "Second character (empty = yours)"
+        },
+        "required": false,
+        "min_length": 2,
+        "max_length": 24
+      },
+      {
+        "type": 3,
+        "name": "server2",
+        "description": "Server des zweiten Charakters",
+        "description_localizations": {
+          "en-US": "Server of the second character",
+          "en-GB": "Server of the second character"
+        },
+        "required": false,
+        "autocomplete": true
+      }
+    ]
+  },
+  {
+    "name": "ich",
+    "name_localizations": {
+      "en-US": "me",
+      "en-GB": "me"
+    },
+    "description": "Deinen AION-2-Charakter mit Discord verknüpfen",
+    "description_localizations": {
+      "en-US": "Link your AION 2 character to Discord",
+      "en-GB": "Link your AION 2 character to Discord"
+    },
+    "options": [
+      {
+        "type": 1,
+        "name": "verknüpfen",
+        "name_localizations": {
+          "en-US": "link",
+          "en-GB": "link"
+        },
+        "description": "Charakter verknüpfen (dann reicht /charakter ohne Angaben, und andere sehen ihn per Rechtsklick)",
+        "description_localizations": {
+          "en-US": "Link a character (then /character works without input and others see it via right-click)",
+          "en-GB": "Link a character (then /character works without input and others see it via right-click)"
+        },
+        "options": [
+          {
+            "type": 3,
+            "name": "name",
+            "description": "Charaktername",
+            "description_localizations": {
+              "en-US": "Character name",
+              "en-GB": "Character name"
+            },
+            "required": true,
+            "min_length": 2,
+            "max_length": 24
+          },
+          {
+            "type": 3,
+            "name": "server",
+            "description": "EU-Server",
+            "description_localizations": {
+              "en-US": "EU server",
+              "en-GB": "EU server"
+            },
+            "required": true,
+            "autocomplete": true
+          }
+        ]
+      },
+      {
+        "type": 1,
+        "name": "anzeigen",
+        "name_localizations": {
+          "en-US": "show",
+          "en-GB": "show"
+        },
+        "description": "Deinen verknüpften Charakter zeigen",
+        "description_localizations": {
+          "en-US": "Show your linked character",
+          "en-GB": "Show your linked character"
+        }
+      },
+      {
+        "type": 1,
+        "name": "lösen",
+        "name_localizations": {
+          "en-US": "unlink",
+          "en-GB": "unlink"
+        },
+        "description": "Verknüpfung löschen",
+        "description_localizations": {
+          "en-US": "Delete the link",
+          "en-GB": "Delete the link"
+        }
+      }
+    ]
+  },
+  {
+    "name": "pet",
+    "description": "Pet suchen: Fundorte, Gattung und welches Monster die Seele droppt",
+    "description_localizations": {
+      "en-US": "Find a pet: locations, family and which monster drops its soul",
+      "en-GB": "Find a pet: locations, family and which monster drops its soul"
+    },
+    "options": [
+      {
+        "type": 3,
+        "name": "name",
+        "description": "Name des Pets",
+        "description_localizations": {
+          "en-US": "Pet name",
+          "en-GB": "Pet name"
+        },
+        "required": true,
+        "autocomplete": true
+      }
+    ]
+  },
+  {
+    "name": "feldboss",
+    "name_localizations": {
+      "en-US": "fieldboss",
+      "en-GB": "fieldboss"
+    },
+    "description": "Feldboss: Gebiet und Respawn. Mit „getötet“ startet ein Countdown für alle",
+    "description_localizations": {
+      "en-US": "Field boss: zone and respawn. With 'killed' a countdown for everyone starts",
+      "en-GB": "Field boss: zone and respawn. With 'killed' a countdown for everyone starts"
+    },
+    "options": [
+      {
+        "type": 3,
+        "name": "name",
+        "description": "Name des Feldbosses",
+        "description_localizations": {
+          "en-US": "Field boss name",
+          "en-GB": "Field boss name"
+        },
+        "required": true,
+        "autocomplete": true
+      },
+      {
+        "type": 5,
+        "name": "getötet",
+        "name_localizations": {
+          "en-US": "killed",
+          "en-GB": "killed"
+        },
+        "description": "Gerade getötet? Dann zeigt der Bot den Respawn als Countdown",
+        "description_localizations": {
+          "en-US": "Just killed? Then the bot posts the respawn as a countdown",
+          "en-GB": "Just killed? Then the bot posts the respawn as a countdown"
+        },
+        "required": false
+      },
+      {
+        "type": 4,
+        "name": "respawn",
+        "description": "Respawn in Minuten, falls der Bot ihn nicht kennt (mit „getötet“)",
+        "description_localizations": {
+          "en-US": "Respawn in minutes if the bot doesn't know it (with 'killed')",
+          "en-GB": "Respawn in minutes if the bot doesn't know it (with 'killed')"
+        },
+        "required": false,
+        "min_value": 1,
+        "max_value": 1440
+      }
+    ]
+  },
+  {
+    "name": "events",
+    "description": "Nächste Events (Riss, Abyss-Eroberung, Belagerung …) und Resets als Countdown",
+    "description_localizations": {
+      "en-US": "Upcoming events (rift, siege …) and resets as a countdown",
+      "en-GB": "Upcoming events (rift, siege …) and resets as a countdown"
+    }
+  },
+  {
+    "name": "checkliste",
+    "name_localizations": {
+      "en-US": "checklist",
+      "en-GB": "checklist"
+    },
+    "description": "Was täglich und wöchentlich zu tun ist, mit Reset-Countdown",
+    "description_localizations": {
+      "en-US": "Daily and weekly to-dos with reset countdown",
+      "en-GB": "Daily and weekly to-dos with reset countdown"
+    }
+  },
+  {
+    "name": "patchnotes",
+    "description": "Die neuesten offiziellen AION-2-Patchnotes und Ankündigungen",
+    "description_localizations": {
+      "en-US": "Latest official AION 2 patch notes and announcements",
+      "en-GB": "Latest official AION 2 patch notes and announcements"
+    }
+  },
+  {
+    "name": "aetherdps",
+    "description": "Der kostenlose DPS-Meter: neueste Version, Download und Funktionen",
+    "description_localizations": {
+      "en-US": "The free DPS meter: latest version, download and features",
+      "en-GB": "The free DPS meter: latest version, download and features"
+    }
+  },
+  {
+    "name": "hilfe",
+    "name_localizations": {
+      "en-US": "help",
+      "en-GB": "help"
+    },
+    "description": "Alle Befehle des AetherDPS-Bots",
+    "description_localizations": {
+      "en-US": "All commands of the AetherDPS bot",
+      "en-GB": "All commands of the AetherDPS bot"
+    }
+  },
+  {
+    "type": 2,
+    "name": "AION-Charakter",
+    "name_localizations": {
+      "en-US": "AION character",
+      "en-GB": "AION character"
+    }
+  }
+]

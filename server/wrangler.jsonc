@@ -31,5 +31,5 @@
     { "name": "NCSOFT_LIMIT", "namespace_id": "1004", "simple": { "limit": 10, "period": 10 } }
   ]
 
-  // Secret (nicht hier eintragen!): ADMIN_KEY  ->  `wrangler secret put ADMIN_KEY`
+  // Secrets (nicht hier eintragen!): ADMIN_KEY, BOT_KEY (gleicher Wert wie im Worker aetherdps-discord)  ->  `wrangler secret put …`
 }

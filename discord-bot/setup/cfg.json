@@ -69,5 +69,16 @@
   "forum_guide": "1560479522095243335",
   "chat_hello": "1560479527115948155"
  },
- "invite": "https://discord.gg/xExgsyDEP2"
+ "invite": "https://discord.gg/xExgsyDEP2",
+ "app_emojis": {
+  "gladiator": "<:c_gladiator:1560484989613776906>",
+  "templar": "<:c_templar:1560484990729322506>",
+  "assassin": "<:c_assassin:1560484991568191511>",
+  "ranger": "<:c_ranger:1560484992558178401>",
+  "sorcerer": "<:c_sorcerer:1560484994978152530>",
+  "elementalist": "<:c_elementalist:1560484996236705923>",
+  "cleric": "<:c_cleric:1560484997444534302>",
+  "chanter": "<:c_chanter:1560484998253903885>",
+  "brawler": "<:c_brawler:1560484999692685472>"
+ }
 }

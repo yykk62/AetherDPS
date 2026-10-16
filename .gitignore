@@ -367,3 +367,4 @@ PacketLogs/
 
 # Wrangler-Build- und Dev-Dateien
 .wrangler/
+discord-bot/dist/
