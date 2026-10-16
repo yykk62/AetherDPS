@@ -308,6 +308,7 @@ public sealed class PipelineTests : IDisposable
         host.Feed(SyntheticPackets.Stagger(Boss, 100, 100, 2), t += 100);
         host.Feed(SyntheticPackets.Damage(Boss, Gladiator, 14010243, 26_000), t += 100);   // Zielpfeil
         host.Feed(SyntheticPackets.Stagger(Boss, 100, 84, 2), t);
+        Assert.NotNull(stagger.Current?.ExpectedEnd);   // Phase mit Zeitlimit → Restzeit
         stagger.Tick();
         Thread.Sleep(80);
         host.Feed(SyntheticPackets.Damage(Boss, Cleric, 18220010, 1_300), t += 100);      // Flammenauslöschung
@@ -338,6 +339,33 @@ public sealed class PipelineTests : IDisposable
     }
 
     [Fact]
+    public void Dauer_Leiste_ohne_Zeitlimit_zeigt_keine_Restzeit()
+    {
+        // Schild-Gegner (16.10.): nur Zustand 2, nach dem Bruch sofort wieder voll – kein Zeitlimit, keine Ankündigung
+        const int Boss = 17156;
+        using var host = NewHost();
+        var stagger = host.Get<StaggerTracker>();
+        var announced = new List<string>();
+        var phases = new List<StaggerPhase>();
+        stagger.Announced += announced.Add;
+        stagger.Finished += phases.Add;
+
+        long t = 1_000;
+        host.Feed(SyntheticPackets.Heartbeat(), t);
+        host.Feed(SyntheticPackets.Stagger(Boss, 150, 150, 2), t += 100);
+        host.Feed(SyntheticPackets.Stagger(Boss, 150, 80, 2), t += 100);
+        var current = Assert.NotNull(stagger.Current);
+        Assert.Equal(80, current.Current);
+        Assert.Null(current.ExpectedEnd);
+        host.Feed(SyntheticPackets.StaggerBroken(Boss), t += 100);
+        host.Feed(SyntheticPackets.Stagger(Boss, 150, 150, 2), t += 100);
+        Assert.Null(stagger.Current?.ExpectedEnd);
+
+        Assert.Empty(announced);
+        Assert.True(Assert.Single(phases).Success);
+    }
+
+        [Fact]
     public void Dungeon_wird_am_Serverwechsel_erkannt()
     {
         using var host = NewHost();

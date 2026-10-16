@@ -21,6 +21,8 @@ public sealed record StaggerPhase(int BossId, string BossName, int Max, int Rema
 /// <c>[Boss] 03 01 [Max u32] [Aktuell u32] [Zustand]</c>, Zustand 3 = Phase angekündigt, 2 = läuft,
 /// 0/1 = vorbei. <c>[Boss] 00 03 …</c> = Leiste gebrochen (geschafft). Jeder Skill senkt die Leiste
 /// um einen festen Wert – daraus wird berechnet, wer wie viel beigetragen hat.
+/// Zwei Sorten: Phasen mit Zeitlimit (Bakarma, mit Zustand 3/0/1 dazwischen) und Dauer-Leisten
+/// (nur Zustand 2, füllen sich nach dem Bruch nach ~5 s wieder, z. B. Schild-Gegner) – die haben kein Zeitlimit.
 /// </summary>
 public sealed class StaggerTracker
 {
@@ -50,6 +52,7 @@ public sealed class StaggerTracker
     private Running? phase;
     private DateTime lastAnnounced = DateTime.MinValue;
     private (int Boss, DateTime At) lastEnded;
+    private readonly HashSet<int> timed = [];   // Bosse mit Zeitlimit-Phasen (Zustand 3/0/1 gesehen)
 
     private sealed class Running(int boss, int max, DateTime start)
     {
@@ -86,14 +89,16 @@ public sealed class StaggerTracker
     /// <summary>
     /// Aktuelle Phase (Boss, Leiste aktuell/max, Start, erwartetes Ende), null = keine.
     /// Das Ende ist geschätzt: Dauer der letzten verfehlten Phase dieses Bosses, sonst 18 s (Aufnahme 14.10.).
+    /// Dauer-Leisten haben kein Ende (null).
     /// </summary>
-    public (string Boss, int Current, int Max, DateTime Start, DateTime ExpectedEnd)? Current
+    public (string Boss, int Current, int Max, DateTime Start, DateTime? ExpectedEnd)? Current
     {
         get
         {
             lock (gate)
                 return phase is { } p
-                    ? (BossName(p.Boss), p.Current, p.Max, p.Start, p.Start + durations.GetValueOrDefault(p.Boss, DefaultDuration))
+                    ? (BossName(p.Boss), p.Current, p.Max, p.Start,
+                        timed.Contains(p.Boss) ? p.Start + durations.GetValueOrDefault(p.Boss, DefaultDuration) : null)
                     : null;
         }
     }
@@ -148,9 +153,10 @@ public sealed class StaggerTracker
     private void HandleGauge(int boss, int max, int current, int state, DateTime now, ref string? announce, ref StaggerPhase? finished)
     {
         {
-            // Ankündigung: Zustand 3 oder – falls der fehlt (Phase 2 am 14.10.) – die volle Leiste beim Start
-            // (nicht direkt nach einem Bruch – manche Bosse füllen die Leiste sofort wieder auf)
-            if ((state == 3 || (state == 2 && phase is null && current >= max)) && now - lastAnnounced > TimeSpan.FromSeconds(30)
+            if (state != 2) timed.Add(boss);
+            // Ankündigung: Zustand 3 oder – falls der fehlt (Phase 2 am 14.10.) – die volle Leiste beim Start,
+            // nur bei Bossen mit Zeitlimit (Dauer-Leisten füllen sich nach jedem Bruch wieder voll)
+            if ((state == 3 || (state == 2 && phase is null && current >= max && timed.Contains(boss))) && now - lastAnnounced > TimeSpan.FromSeconds(30)
                 && !(lastEnded.Boss == boss && now - lastEnded.At < TimeSpan.FromSeconds(30)))
             {
                 announce = BossName(boss);
