@@ -2,6 +2,12 @@
 
 Newest versions first.
 
+## 0.7.12
+
+- **Rarity in the right colours:** "Legend" items are now blue like in the game (previously orange), Unique stays gold. Affects the profile and "New in the group"
+- **Shared runs show what recorded them:** a small "AetherDPS · aetherdps.com" line in the image and a link in the text, so readers can find the meter
+- **One-time question in the main window** whether your Discord profile should show what you're playing. Stays off by default, "No" never asks again
+
 ## 0.7.11
 
 - **Stagger only where it matters:** the warning in the middle of the screen and the "Stagger succeeded/failed" pop-up now only appear for bosses with a wipe mechanic (Stagger phase with a time limit). Shielded enemies with a permanent bar no longer count down a wrong timer, their bar stays on the boss card

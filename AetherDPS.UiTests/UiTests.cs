@@ -348,6 +348,18 @@ public sealed class UiTests : IDisposable
         hub.DiscordUrl = "https://discord.gg/beispiel";
         Shot(new HubWindow(hub), "hub_hinweise");
 
+        // Einmaliger Vorschlag fürs Discord-Profil: „Ja“ schaltet ein und fragt nie wieder
+        hub.RemoveNotice("consent");
+        hub.RemoveNotice("patch");
+        community.ShowPresenceOffer();
+        var offer = Assert.Single(hub.Notices);
+        Shot(new HubWindow(hub), "hub_discord_vorschlag");
+        var settings = provider!.GetRequiredService<MeterSettings>();
+        offer.Primary!.Execute(null);
+        Assert.True(settings.DiscordPresence);
+        Assert.True(settings.DiscordPresenceOffered);
+        Assert.Empty(hub.Notices);
+
         Assert.NotNull(CommunityController.ChangelogSection("0.6.0"));
         Shot(new ReportWindow(provider!.GetRequiredService<ReportViewModel>()), "melden");
     }

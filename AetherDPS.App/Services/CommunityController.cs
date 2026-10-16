@@ -32,6 +32,8 @@ public sealed partial class CommunityController(
         ShowWhatsNew();
         ShowCrash();
         if (askConsent && settings.UsageStats is null) ShowConsent();
+        // Erst beim nächsten Start nach der Zustimmungsfrage, damit nicht zwei Fragen auf einmal kommen
+        else if (askConsent && !settings.DiscordPresence && !settings.DiscordPresenceOffered) ShowPresenceOffer();
 
         patch.Changed += broken => Dispatcher.UIThread.Post(() => OnPatchChanged(broken));
         _ = Task.Run(async () =>
@@ -69,6 +71,27 @@ public sealed partial class CommunityController(
         settings.Save();
         hub?.RemoveNotice("consent");
         if (yes) _ = Task.Run(() => community.PingIfDueAsync());
+    }
+
+    // ---------- Discord-Profil (einmal fragen) ----------
+
+    internal void ShowPresenceOffer() => hub?.ShowNotice(new HubNotice
+    {
+        Id = "presence",
+        Title = Loc.T("presence_offer.title"),
+        Text = Loc.T("presence_offer.text"),
+        PrimaryText = Loc.T("presence_offer.yes"),
+        Primary = new RelayCommand(() => AnswerPresence(true)),
+        SecondaryText = Loc.T("presence_offer.no"),
+        Secondary = new RelayCommand(() => AnswerPresence(false)),
+    });
+
+    private void AnswerPresence(bool yes)
+    {
+        settings.DiscordPresenceOffered = true;
+        if (yes) settings.DiscordPresence = true;
+        settings.Save();
+        hub?.RemoveNotice("presence");
     }
 
     // ---------- Absturz ----------

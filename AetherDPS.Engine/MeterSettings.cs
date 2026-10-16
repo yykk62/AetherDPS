@@ -103,6 +103,9 @@ public sealed class MeterSettings
     /// <summary>Rich Presence: Dungeon- und Bossnamen mit anzeigen (sonst nur „Im Dungeon“/„Bosskampf“).</summary>
     public bool DiscordPresenceNames { get; set; } = true;
 
+    /// <summary>Einmal im Hauptfenster gefragt, ob die Rich Presence an soll (danach nie wieder).</summary>
+    public bool DiscordPresenceOffered { get; set; }
+
     /// <summary>Schon angezeigte Nachrichten an alle (Ids aus status.json).</summary>
     public List<string> SeenMessages { get; set; } = [];
 

@@ -2,6 +2,12 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
+## 0.7.12
+
+- **Seltenheit in den richtigen Farben:** „Legend“-Teile sind jetzt blau wie im Spiel (vorher orange), Einzigartig bleibt gold. Betrifft Profil und „Neu in der Gruppe“
+- **Geteilte Läufe zeigen, womit sie erfasst wurden:** kleine Zeile „AetherDPS · aetherdps.com“ im Bild und ein Link im Text, damit Mitlesende den Meter finden
+- **Einmalige Frage im Hauptfenster**, ob dein Discord-Profil zeigen soll, was du spielst. Standard bleibt aus, „Nein“ fragt nie wieder
+
 ## 0.7.11
 
 - **Stagger nur noch, wo es zählt:** Die Warnung mitten im Bild und die Einblendung „Stagger geschafft/verfehlt“ kommen nur noch bei Bossen mit Wipe-Mechanik (Stagger-Phase mit Zeitlimit). Schild-Gegner mit Dauer-Leiste zählen keine falsche Restzeit mehr herunter, ihre Leiste steht nur auf der Boss-Karte
