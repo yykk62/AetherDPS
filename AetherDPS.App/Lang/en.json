@@ -522,5 +522,22 @@
   "profile.loading_title": "Looking up character …",
   "profile.loading_text": "Fetching public character data from NCSOFT. This usually takes a few seconds.",
   "profile.empty_title": "No character loaded yet",
-  "card.deaths_tip": "Deaths in this fight"
+  "card.deaths_tip": "Deaths in this fight",
+  "nav.overview": "Overview",
+  "nav.group.start": "Start",
+  "nav.group.character": "Character",
+  "nav.group.world": "World",
+  "nav.group.system": "System",
+  "page.overview.sub": "Status, notices and your last run",
+  "page.runs.sub": "All runs with boss times and combat analysis",
+  "page.party.sub": "Who is playing with you right now",
+  "page.profile.sub": "Gear, stats and skills from NCSOFT",
+  "page.pets.sub": "Spawn points of all pets and the in-game radar",
+  "page.timers.sub": "Rifts, siege, field bosses and your own timers",
+  "page.checklist.sub": "Dailies and weeklies with automatic reset",
+  "page.connection.sub": "Ping history and lag analysis",
+  "page.settings.sub": "Language, hotkeys, meter, Discord, privacy",
+  "settings.nav.general": "General",
+  "settings.nav.meter": "Meter",
+  "settings.nav.privacy": "Discord & privacy"
 }

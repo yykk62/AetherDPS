@@ -2,6 +2,14 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
+## 0.8.2
+
+- Hauptfenster neu aufgebaut: Seitenleiste mit Gruppen Start, Charakter, Welt, System; Seitentitel oben; Start/Stopp auf jeder Seite erreichbar
+- Übersicht ersetzt den Reiter „DPS-Meter“: Status, Hinweise und letzter Lauf auf einer Seite; offene Hinweise als Zahl in der Seitenleiste
+- Einstellungen in vier Bereiche geteilt: Allgemein, Bedienung, Meter, Discord & Datenschutz
+- Verbindung und Spielstatus dauerhaft unten in der Seitenleiste
+- Discord-Bot und Server tragen das neue Logo
+
 ## 0.8.1
 
 - **Neues Logo:** goldener Aether-Kristall zwischen Daeva-Flügeln, als Fenster-, Tray- und Web-Icon (vorher drei Balken)

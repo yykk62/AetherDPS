@@ -522,5 +522,22 @@
   "profile.loading_title": "キャラクターを検索中…",
   "profile.loading_text": "NCSOFT の公開キャラクターデータを取得しています。通常は数秒かかります。",
   "profile.empty_title": "まだキャラクターが読み込まれていません",
-  "card.deaths_tip": "戦闘中の死亡数"
+  "card.deaths_tip": "戦闘中の死亡数",
+  "nav.overview": "概要",
+  "nav.group.start": "スタート",
+  "nav.group.character": "キャラクター",
+  "nav.group.world": "ワールド",
+  "nav.group.system": "システム",
+  "page.overview.sub": "状態、お知らせ、最後のラン",
+  "page.runs.sub": "ボスタイムと戦闘分析付きの全ラン",
+  "page.party.sub": "今一緒に遊んでいるメンバー",
+  "page.profile.sub": "NCSOFT の装備・ステータス・スキル",
+  "page.pets.sub": "全ペットの出現地点とゲーム内レーダー",
+  "page.timers.sub": "リフト、攻城戦、フィールドボス、自作タイマー",
+  "page.checklist.sub": "自動リセット付きのデイリーとウィークリー",
+  "page.connection.sub": "Ping 履歴とラグ分析",
+  "page.settings.sub": "言語、ホットキー、メーター、Discord、プライバシー",
+  "settings.nav.general": "一般",
+  "settings.nav.meter": "メーター",
+  "settings.nav.privacy": "Discord とプライバシー"
 }

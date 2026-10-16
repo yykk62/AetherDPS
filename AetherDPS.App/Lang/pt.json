@@ -522,5 +522,22 @@
   "profile.loading_title": "Procurando personagem …",
   "profile.loading_text": "Consultando os dados públicos do personagem na NCSOFT. Costuma levar alguns segundos.",
   "profile.empty_title": "Nenhum personagem carregado ainda",
-  "card.deaths_tip": "Mortes no combate"
+  "card.deaths_tip": "Mortes no combate",
+  "nav.overview": "Visão geral",
+  "nav.group.start": "Início",
+  "nav.group.character": "Personagem",
+  "nav.group.world": "Mundo",
+  "nav.group.system": "Sistema",
+  "page.overview.sub": "Status, avisos e sua última run",
+  "page.runs.sub": "Todas as runs com tempos de chefe e análise",
+  "page.party.sub": "Quem está jogando com você agora",
+  "page.profile.sub": "Equipamento, atributos e skills da NCSOFT",
+  "page.pets.sub": "Pontos de spawn de todos os pets e o radar no jogo",
+  "page.timers.sub": "Fendas, cerco, chefes de campo e timers próprios",
+  "page.checklist.sub": "Diárias e semanais com reset automático",
+  "page.connection.sub": "Histórico de ping e análise de lag",
+  "page.settings.sub": "Idioma, atalhos, medidor, Discord, privacidade",
+  "settings.nav.general": "Geral",
+  "settings.nav.meter": "Medidor",
+  "settings.nav.privacy": "Discord e privacidade"
 }

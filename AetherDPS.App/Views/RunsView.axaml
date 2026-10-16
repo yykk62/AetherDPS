@@ -13,10 +13,10 @@
           <ListBox.ItemTemplate>
             <DataTemplate x:DataType="vm:RunListItem">
               <StackPanel Spacing="1">
-                <StackPanel Orientation="Horizontal" Spacing="6">
-                  <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon trophy, Size=14}" Width="14" Height="14" IsVisible="{Binding IsBest}" />
-                  <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
-                </StackPanel>
+                <Grid ColumnDefinitions="Auto,*">
+                  <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon trophy, Size=14}" Width="14" Height="14" IsVisible="{Binding IsBest}" Margin="0,0,6,0" />
+                  <TextBlock Grid.Column="1" Text="{Binding Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Title}" />
+                </Grid>
                 <TextBlock Text="{Binding Subtitle}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
               </StackPanel>
             </DataTemplate>
@@ -107,7 +107,7 @@
         <Border Classes="card" IsVisible="{Binding HasPlayer}">
           <StackPanel Spacing="8">
             <TextBlock Classes="h2" Text="{Binding PlayerTitle}" />
-            <TextBlock Text="{Binding PlayerFacts}" Classes="dim" />
+            <TextBlock Text="{Binding PlayerFacts}" Classes="dim" TextWrapping="Wrap" />
             <TextBlock Text="{l:T runs.skills}" FontWeight="SemiBold" Margin="0,6,0,0" />
             <ItemsControl ItemsSource="{Binding Skills}">
               <ItemsControl.ItemTemplate>

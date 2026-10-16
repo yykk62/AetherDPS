@@ -2,6 +2,14 @@
 
 Newest versions first.
 
+## 0.8.2
+
+- Main window rebuilt: sidebar with the groups Start, Character, World, System; page title on top; start/stop reachable on every page
+- Overview replaces the "DPS Meter" tab: status, notices and last run on one page; open notices as a count in the sidebar
+- Settings split into four areas: General, Controls, Meter, Discord & privacy
+- Connection and game status always shown at the bottom of the sidebar
+- Discord bot and server carry the new logo
+
 ## 0.8.1
 
 - **New logo:** a golden aether crystal between Daeva wings, used as the window, tray and web icon (previously three bars)

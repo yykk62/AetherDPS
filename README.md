@@ -224,15 +224,15 @@ Die Einstellungen, die Kampf-Historie, die Logs und die Mitschnitte liegen unter
 
 ## Bedienung
 
-**Reiter im Hauptfenster:**
-- **DPS-Meter:** Status und aktueller Lauf
+**Seiten im Hauptfenster** (Seitenleiste links, Start/Stopp oben rechts auf jeder Seite):
+- **Übersicht:** Status, Hinweise und aktueller Lauf
 - **Läufe:** Archiv aller Läufe mit Boss-Zeiten, Bestzeit <img src="docs/media/brand/ui/trophy.png" width="16" align="absmiddle" alt="" />, Vergleich mit deinem Durchschnitt, Kampfanalyse pro Spieler sowie „Als Bild/Text kopieren“ für Discord
 - **Gruppe:** Mitglieder mit Server, Stufe und Kampfkraft (nur für dich sichtbar), Klick öffnet das Profil. Hier lässt sich „Neu in der Gruppe“ abschalten
 - **Profil:** dein Charakter oder jeder andere auf einem EU-Server
 - **Pets:** Pet-Finder mit Karte und die Einstellung fürs Pet-Radar (solange die Spielkarte offen ist, immer oder aus)
 - **Timer:** Feldbosse (<img src="docs/media/brand/ui/star.png" width="16" align="absmiddle" alt="" /> = als Pill anzeigen und erinnern), Risse, Artefakt-Belagerung, eigene Countdowns, Timer-Pills an/aus und entsperren
 - <a name="checkliste"></a>**Checkliste:** Tägliches und Wöchentliches mit automatischem Reset und Erinnerung
-- **Verbindung** und **Einstellungen**
+- **Verbindung** und **Einstellungen** (Allgemein, Bedienung, Meter, Discord & Datenschutz)
 
 Wer das Hauptfenster schließt, lässt den Meter im Tray weiterlaufen.
 

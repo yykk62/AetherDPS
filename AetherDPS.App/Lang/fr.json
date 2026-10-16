@@ -522,5 +522,22 @@
   "profile.loading_title": "Recherche du personnage …",
   "profile.loading_text": "Interroge les données publiques du personnage chez NCSOFT. Cela prend généralement quelques secondes.",
   "profile.empty_title": "Aucun personnage chargé",
-  "card.deaths_tip": "Morts dans le combat"
+  "card.deaths_tip": "Morts dans le combat",
+  "nav.overview": "Aperçu",
+  "nav.group.start": "Démarrer",
+  "nav.group.character": "Personnage",
+  "nav.group.world": "Monde",
+  "nav.group.system": "Système",
+  "page.overview.sub": "État, notifications et votre dernière run",
+  "page.runs.sub": "Toutes les runs avec temps des boss et analyse",
+  "page.party.sub": "Qui joue avec vous en ce moment",
+  "page.profile.sub": "Équipement, statistiques et compétences via NCSOFT",
+  "page.pets.sub": "Points d'apparition de tous les familiers et le radar",
+  "page.timers.sub": "Failles, siège, boss de zone et minuteurs personnels",
+  "page.checklist.sub": "Quotidiennes et hebdomadaires avec réinitialisation automatique",
+  "page.connection.sub": "Historique du ping et analyse du lag",
+  "page.settings.sub": "Langue, raccourcis, compteur, Discord, confidentialité",
+  "settings.nav.general": "Général",
+  "settings.nav.meter": "Compteur",
+  "settings.nav.privacy": "Discord et confidentialité"
 }

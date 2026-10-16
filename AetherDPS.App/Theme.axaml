@@ -142,6 +142,37 @@
     <Setter Property="Background" Value="#3A2328" />
     <Setter Property="Foreground" Value="#FFA8A2" />
   </Style>
+  <!-- Knopfleiste statt Dropdown: ein ListBox mit nebeneinander gleich breiten Feldern -->
+  <Style Selector="ListBox.seg">
+    <Setter Property="Background" Value="#14181F" />
+    <Setter Property="CornerRadius" Value="7" />
+    <Setter Property="Padding" Value="3" />
+    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+    <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
+    <Setter Property="ItemsPanel">
+      <ItemsPanelTemplate>
+        <UniformGrid Rows="1" />
+      </ItemsPanelTemplate>
+    </Setter>
+  </Style>
+  <Style Selector="ListBox.seg ListBoxItem">
+    <Setter Property="Padding" Value="10,6" />
+    <Setter Property="Margin" Value="1,0" />
+    <Setter Property="CornerRadius" Value="5" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="MinHeight" Value="0" />
+  </Style>
+  <Style Selector="ListBox.seg ListBoxItem:selected /template/ ContentPresenter">
+    <Setter Property="Background" Value="#3A3120" />
+  </Style>
+  <Style Selector="ListBox.seg TextBlock">
+    <Setter Property="TextWrapping" Value="NoWrap" />
+  </Style>
+  <Style Selector="ListBox.seg ListBoxItem:selected TextBlock">
+    <Setter Property="Foreground" Value="#E0A84A" />
+  </Style>
+
   <!-- Nur Icon, keine Fläche (Schließen, Aufklappen) -->
   <Style Selector="Button.plain">
     <Setter Property="Background" Value="Transparent" />

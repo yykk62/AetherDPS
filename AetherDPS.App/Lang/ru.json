@@ -522,5 +522,22 @@
   "profile.loading_title": "Поиск персонажа…",
   "profile.loading_text": "Запрашиваем открытые данные персонажа у NCSOFT. Обычно это занимает несколько секунд.",
   "profile.empty_title": "Персонаж ещё не загружен",
-  "card.deaths_tip": "Смерти в бою"
+  "card.deaths_tip": "Смерти в бою",
+  "nav.overview": "Обзор",
+  "nav.group.start": "Старт",
+  "nav.group.character": "Персонаж",
+  "nav.group.world": "Мир",
+  "nav.group.system": "Система",
+  "page.overview.sub": "Состояние, уведомления и последний забег",
+  "page.runs.sub": "Все забеги с таймингами боссов и анализом",
+  "page.party.sub": "Кто сейчас играет с тобой",
+  "page.profile.sub": "Экипировка, характеристики и навыки от NCSOFT",
+  "page.pets.sub": "Точки появления всех питомцев и радар в игре",
+  "page.timers.sub": "Разломы, осада, полевые боссы и свои таймеры",
+  "page.checklist.sub": "Ежедневные и еженедельные задачи с автосбросом",
+  "page.connection.sub": "История пинга и анализ лагов",
+  "page.settings.sub": "Язык, горячие клавиши, метр, Discord, конфиденциальность",
+  "settings.nav.general": "Общие",
+  "settings.nav.meter": "Метр",
+  "settings.nav.privacy": "Discord и конфиденциальность"
 }

@@ -522,5 +522,22 @@
   "profile.loading_title": "正在查找角色…",
   "profile.loading_text": "正在向 NCSOFT 获取公开角色数据，通常需要几秒钟。",
   "profile.empty_title": "尚未加载角色",
-  "card.deaths_tip": "战斗中死亡次数"
+  "card.deaths_tip": "战斗中死亡次数",
+  "nav.overview": "概览",
+  "nav.group.start": "开始",
+  "nav.group.character": "角色",
+  "nav.group.world": "世界",
+  "nav.group.system": "系统",
+  "page.overview.sub": "状态、提示与上次战斗记录",
+  "page.runs.sub": "所有记录，含首领时间与战斗分析",
+  "page.party.sub": "正在与你组队的玩家",
+  "page.profile.sub": "来自 NCSOFT 的装备、属性与技能",
+  "page.pets.sub": "所有宠物的刷新点与游戏内雷达",
+  "page.timers.sub": "裂隙、攻城、野外首领与自定义计时",
+  "page.checklist.sub": "自动重置的每日与每周事项",
+  "page.connection.sub": "延迟记录与卡顿分析",
+  "page.settings.sub": "语言、快捷键、统计、Discord、隐私",
+  "settings.nav.general": "常规",
+  "settings.nav.meter": "统计",
+  "settings.nav.privacy": "Discord 与隐私"
 }

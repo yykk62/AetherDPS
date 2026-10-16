@@ -522,5 +522,22 @@
   "profile.loading_title": "캐릭터 검색 중…",
   "profile.loading_text": "NCSOFT의 공개 캐릭터 정보를 불러오는 중입니다. 보통 몇 초 걸립니다.",
   "profile.empty_title": "아직 불러온 캐릭터가 없습니다",
-  "card.deaths_tip": "전투 중 사망"
+  "card.deaths_tip": "전투 중 사망",
+  "nav.overview": "개요",
+  "nav.group.start": "시작",
+  "nav.group.character": "캐릭터",
+  "nav.group.world": "월드",
+  "nav.group.system": "시스템",
+  "page.overview.sub": "상태, 알림, 마지막 런",
+  "page.runs.sub": "보스 시간과 전투 분석이 포함된 모든 런",
+  "page.party.sub": "지금 함께 플레이 중인 멤버",
+  "page.profile.sub": "NCSOFT의 장비, 능력치, 스킬",
+  "page.pets.sub": "모든 펫의 스폰 위치와 게임 내 레이더",
+  "page.timers.sub": "균열, 공성, 필드 보스, 직접 만든 타이머",
+  "page.checklist.sub": "자동 초기화되는 일일·주간 과제",
+  "page.connection.sub": "핑 기록과 랙 분석",
+  "page.settings.sub": "언어, 단축키, 미터, Discord, 개인정보",
+  "settings.nav.general": "일반",
+  "settings.nav.meter": "미터",
+  "settings.nav.privacy": "Discord 및 개인정보"
 }

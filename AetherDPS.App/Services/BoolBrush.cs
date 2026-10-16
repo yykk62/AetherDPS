@@ -47,6 +47,10 @@ public static class BoolBrush
     public static readonly IValueConverter SelectedBorder =
         new FuncValueConverter<bool, Avalonia.Thickness>(selected => new Avalonia.Thickness(selected ? 1 : 0));
 
+    /// <summary>Großer Status-Kreis auf der Übersicht: Meter läuft grün getönt, sonst goldbraun.</summary>
+    public static readonly IValueConverter ActiveGreenElseGoldTile =
+        new FuncValueConverter<bool, IBrush>(active => new SolidColorBrush(Color.Parse(active ? "#1F3A2A" : "#2A2416")));
+
     public static readonly IValueConverter WarningBorderElseCard =
         new FuncValueConverter<bool, IBrush>(warning => new SolidColorBrush(Color.Parse(warning ? "#7A5A22" : "#2E3746")));
 }
@@ -65,6 +69,18 @@ public sealed class StepBrush : IValueConverter
         int step = int.TryParse(parameter?.ToString(), out var s) ? s : 1;
         return step < active ? Done : step == active ? Active : Later;
     }
+
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
+        throw new NotSupportedException();
+}
+
+/// <summary>Navigation im Hauptfenster: IsVisible / Classes.active="{Binding SelectedTab, Converter={x:Static l:TabIs.Instance}, ConverterParameter=3}".</summary>
+public sealed class TabIs : IValueConverter
+{
+    public static readonly TabIs Instance = new();
+
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) =>
+        value is int tab && int.TryParse(parameter?.ToString(), out var wanted) && tab == wanted;
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
         throw new NotSupportedException();

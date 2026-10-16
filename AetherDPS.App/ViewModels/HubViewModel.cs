@@ -49,6 +49,32 @@ public sealed partial class HubViewModel : ObservableObject
     [ObservableProperty] private string updateBanner = "";
     [ObservableProperty] private string? discordUrl;
 
+    /// <summary>Kopfzeile der gewählten Seite.</summary>
+    [ObservableProperty] private string pageTitle = "";
+    [ObservableProperty] private string pageSubtitle = "";
+
+    /// <summary>Zahl auf „Übersicht“ in der Navigation, solange Hinweiskarten offen sind.</summary>
+    [ObservableProperty] private int noticeCount;
+    public bool HasNotices => NoticeCount > 0;
+    partial void OnNoticeCountChanged(int value) => OnPropertyChanged(nameof(HasNotices));
+
+    /// <summary>Start/Stopp in der Kopfzeile: auf allen Seiten außer der Übersicht (dort steht der große Knopf).</summary>
+    public bool ShowHeaderToggle => !IsAuto && SelectedTab != TabDps;
+    partial void OnIsAutoChanged(bool value) => OnPropertyChanged(nameof(ShowHeaderToggle));
+
+    private static readonly (string title, string sub)[] Pages =
+    [
+        ("nav.overview", "page.overview.sub"), ("hub.tab.runs", "page.runs.sub"), ("hub.tab.party", "page.party.sub"),
+        ("hub.tab.profile", "page.profile.sub"), ("hub.tab.pets", "page.pets.sub"), ("hub.tab.timers", "page.timers.sub"),
+        ("hub.tab.checklist", "page.checklist.sub"), ("hub.tab.connection", "page.connection.sub"), ("hub.tab.settings", "page.settings.sub"),
+    ];
+
+    [RelayCommand]
+    private void SelectTab(string? tab)
+    {
+        if (int.TryParse(tab, out var i) && i >= 0 && i < Pages.Length) SelectedTab = i;
+    }
+
     /// <summary>Versionsplakette im Kopf, z. B. v0.8.1.</summary>
     public string VersionText => "v" + (typeof(HubViewModel).Assembly.GetName().Version is { } v ? $"{v.Major}.{v.Minor}.{Math.Max(0, v.Build)}" : "?");
 
@@ -96,6 +122,8 @@ public sealed partial class HubViewModel : ObservableObject
         Timers = timers;
         Checklist = checklist;
         mode.Changed += (_, _) => Dispatcher.UIThread.Post(Refresh);
+        Notices.CollectionChanged += (_, _) => NoticeCount = Notices.Count;
+        UpdatePage();
         timer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, (_, _) => Refresh());
     }
 
@@ -183,7 +211,19 @@ public sealed partial class HubViewModel : ObservableObject
         ServerText = monitor.ServerAddress is { } ip ? Loc.T("conn.server", ip) : "";
     }
 
-    partial void OnSelectedTabChanged(int value) => Refresh();
+    partial void OnSelectedTabChanged(int value)
+    {
+        UpdatePage();
+        OnPropertyChanged(nameof(ShowHeaderToggle));
+        Refresh();
+    }
+
+    private void UpdatePage()
+    {
+        var (title, sub) = Pages[Math.Clamp(SelectedTab, 0, Pages.Length - 1)];
+        PageTitle = Loc.T(title);
+        PageSubtitle = Loc.T(sub);
+    }
 
     private static string FormatLeft(TimeSpan left) =>
         left.TotalHours >= 24 ? Loc.T("time.days_hours", (int)left.TotalDays, left.Hours) : left.TotalHours >= 1 ? left.ToString(@"h\:mm\:ss") : left.ToString(@"mm\:ss");

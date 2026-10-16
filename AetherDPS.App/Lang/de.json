@@ -522,5 +522,22 @@
   "profile.loading_title": "Charakter wird gesucht …",
   "profile.loading_text": "Fragt die öffentlichen Charakterdaten bei NCSOFT ab. Das dauert meist ein paar Sekunden.",
   "profile.empty_title": "Noch kein Charakter geladen",
-  "card.deaths_tip": "Tode im Kampf"
+  "card.deaths_tip": "Tode im Kampf",
+  "nav.overview": "Übersicht",
+  "nav.group.start": "Start",
+  "nav.group.character": "Charakter",
+  "nav.group.world": "Welt",
+  "nav.group.system": "System",
+  "page.overview.sub": "Status, Hinweise und dein letzter Lauf",
+  "page.runs.sub": "Alle Läufe mit Boss-Zeiten und Kampfanalyse",
+  "page.party.sub": "Wer gerade mit dir spielt",
+  "page.profile.sub": "Ausrüstung, Werte und Skills von NCSOFT",
+  "page.pets.sub": "Spawnpunkte aller Pets und das Radar im Spiel",
+  "page.timers.sub": "Risse, Belagerung, Feldbosse und eigene Timer",
+  "page.checklist.sub": "Tägliches und Wöchentliches mit automatischem Reset",
+  "page.connection.sub": "Ping-Verlauf und Lag-Analyse",
+  "page.settings.sub": "Sprache, Hotkeys, Meter, Discord, Datenschutz",
+  "settings.nav.general": "Allgemein",
+  "settings.nav.meter": "Meter",
+  "settings.nav.privacy": "Discord & Datenschutz"
 }

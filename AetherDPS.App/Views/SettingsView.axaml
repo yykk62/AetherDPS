@@ -31,9 +31,16 @@
     </Style>
   </UserControl.Styles>
 
-  <StackPanel Spacing="14" MaxWidth="620" HorizontalAlignment="Left">
+  <!-- Bereiche oben wählen, darunter nur die Karten des Bereichs -->
+  <Grid RowDefinitions="Auto,*" MaxWidth="720" HorizontalAlignment="Left">
+    <ListBox Name="SettingsNav" Classes="seg" SelectedIndex="0" Margin="0,0,0,14" MaxWidth="660" HorizontalAlignment="Left">
+      <ListBoxItem Content="{l:T settings.nav.general}" />
+      <ListBoxItem Content="{l:T settings.section.controls}" />
+      <ListBoxItem Content="{l:T settings.nav.meter}" />
+      <ListBoxItem Content="{l:T settings.nav.privacy}" />
+    </ListBox>
 
-    <!-- ===== Sprache ===== -->
+    <StackPanel Grid.Row="1" Spacing="14" IsVisible="{Binding #SettingsNav.SelectedIndex, Converter={x:Static l:TabIs.Instance}, ConverterParameter=0}">
     <Border Classes="card">
       <StackPanel Spacing="8">
         <StackPanel Orientation="Horizontal" Spacing="9">
@@ -49,7 +56,48 @@
       </StackPanel>
     </Border>
 
-    <!-- ===== Bedienung ===== -->
+    <Border Classes="card">
+      <StackPanel Spacing="14">
+        <StackPanel Orientation="Horizontal" Spacing="9">
+          <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon play, Size=18}" Width="18" Height="18" />
+          <TextBlock Classes="section" Text="{l:T settings.section.start}" VerticalAlignment="Center" />
+        </StackPanel>
+        <StackPanel Spacing="4">
+          <CheckBox IsChecked="{Binding LaunchGameWithMeter}">
+            <TextBlock Classes="label" Text="{l:T settings.launch_game}" />
+          </CheckBox>
+          <TextBlock Classes="hint" Text="{l:T settings.launch_game_hint}" />
+        </StackPanel>
+      </StackPanel>
+    </Border>
+
+    <Border Classes="card">
+      <StackPanel Spacing="10">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Orientation="Horizontal" Spacing="9">
+          <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon refresh, Size=18}" Width="18" Height="18" />
+          <TextBlock Classes="section" Text="{l:T update.heading}" VerticalAlignment="Center" />
+        </StackPanel>
+          <TextBlock Grid.Column="1" Classes="dim" Text="{Binding VersionText}" VerticalAlignment="Center" />
+        </Grid>
+        <StackPanel Spacing="4">
+          <CheckBox IsChecked="{Binding AutoUpdate}" IsEnabled="{Binding CanSelfUpdate}">
+            <TextBlock Classes="label" Text="{l:T update.auto}" />
+          </CheckBox>
+          <TextBlock Classes="hint" Text="{l:T update.auto_hint}" />
+        </StackPanel>
+        <WrapPanel>
+          <Button Content="{l:T update.check}" Command="{Binding CheckUpdatesCommand}" IsEnabled="{Binding CanSelfUpdate}" Margin="0,0,8,6" />
+          <Button Classes="primary" Content="{l:T update.restart}" Command="{Binding RestartForUpdateCommand}" IsVisible="{Binding UpdateReady}" Margin="0,0,8,6" />
+          <Button Content="{l:T update.releases}" Command="{Binding OpenReleasesCommand}" Margin="0,0,8,6" />
+        </WrapPanel>
+        <TextBlock Classes="dim" Text="{Binding UpdateStatus}"
+                   IsVisible="{Binding UpdateStatus, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+      </StackPanel>
+    </Border>
+    </StackPanel>
+
+    <StackPanel Grid.Row="1" Spacing="14" IsVisible="{Binding #SettingsNav.SelectedIndex, Converter={x:Static l:TabIs.Instance}, ConverterParameter=1}">
     <Border Classes="card">
       <StackPanel Spacing="16">
         <StackPanel Orientation="Horizontal" Spacing="9">
@@ -82,8 +130,9 @@
         </StackPanel>
       </StackPanel>
     </Border>
+    </StackPanel>
 
-    <!-- ===== Erfassung ===== -->
+    <StackPanel Grid.Row="1" Spacing="14" IsVisible="{Binding #SettingsNav.SelectedIndex, Converter={x:Static l:TabIs.Instance}, ConverterParameter=2}">
     <Border Classes="card">
       <StackPanel Spacing="14">
         <StackPanel Orientation="Horizontal" Spacing="9">
@@ -108,7 +157,6 @@
       </StackPanel>
     </Border>
 
-    <!-- ===== Anzeige ===== -->
     <Border Classes="card">
       <StackPanel Spacing="14">
         <StackPanel Orientation="Horizontal" Spacing="9">
@@ -136,8 +184,9 @@
         </StackPanel>
       </StackPanel>
     </Border>
+    </StackPanel>
 
-    <!-- ===== Discord ===== -->
+    <StackPanel Grid.Row="1" Spacing="14" IsVisible="{Binding #SettingsNav.SelectedIndex, Converter={x:Static l:TabIs.Instance}, ConverterParameter=3}">
     <Border Classes="card">
       <StackPanel Spacing="8">
         <StackPanel Orientation="Horizontal" Spacing="9">
@@ -154,49 +203,6 @@
       </StackPanel>
     </Border>
 
-    <!-- ===== Start ===== -->
-    <Border Classes="card">
-      <StackPanel Spacing="14">
-        <StackPanel Orientation="Horizontal" Spacing="9">
-          <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon play, Size=18}" Width="18" Height="18" />
-          <TextBlock Classes="section" Text="{l:T settings.section.start}" VerticalAlignment="Center" />
-        </StackPanel>
-        <StackPanel Spacing="4">
-          <CheckBox IsChecked="{Binding LaunchGameWithMeter}">
-            <TextBlock Classes="label" Text="{l:T settings.launch_game}" />
-          </CheckBox>
-          <TextBlock Classes="hint" Text="{l:T settings.launch_game_hint}" />
-        </StackPanel>
-      </StackPanel>
-    </Border>
-
-    <!-- ===== Updates ===== -->
-    <Border Classes="card">
-      <StackPanel Spacing="10">
-        <Grid ColumnDefinitions="*,Auto">
-          <StackPanel Orientation="Horizontal" Spacing="9">
-          <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon refresh, Size=18}" Width="18" Height="18" />
-          <TextBlock Classes="section" Text="{l:T update.heading}" VerticalAlignment="Center" />
-        </StackPanel>
-          <TextBlock Grid.Column="1" Classes="dim" Text="{Binding VersionText}" VerticalAlignment="Center" />
-        </Grid>
-        <StackPanel Spacing="4">
-          <CheckBox IsChecked="{Binding AutoUpdate}" IsEnabled="{Binding CanSelfUpdate}">
-            <TextBlock Classes="label" Text="{l:T update.auto}" />
-          </CheckBox>
-          <TextBlock Classes="hint" Text="{l:T update.auto_hint}" />
-        </StackPanel>
-        <WrapPanel>
-          <Button Content="{l:T update.check}" Command="{Binding CheckUpdatesCommand}" IsEnabled="{Binding CanSelfUpdate}" Margin="0,0,8,6" />
-          <Button Classes="primary" Content="{l:T update.restart}" Command="{Binding RestartForUpdateCommand}" IsVisible="{Binding UpdateReady}" Margin="0,0,8,6" />
-          <Button Content="{l:T update.releases}" Command="{Binding OpenReleasesCommand}" Margin="0,0,8,6" />
-        </WrapPanel>
-        <TextBlock Classes="dim" Text="{Binding UpdateStatus}"
-                   IsVisible="{Binding UpdateStatus, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-      </StackPanel>
-    </Border>
-
-    <!-- ===== Datenschutz ===== -->
     <Border Classes="card">
       <StackPanel Spacing="10">
         <StackPanel Orientation="Horizontal" Spacing="9">
@@ -226,6 +232,6 @@
         <TextBlock Classes="dim" Text="{l:T settings.privacy_hint}" />
       </StackPanel>
     </Border>
-
-  </StackPanel>
+    </StackPanel>
+  </Grid>
 </UserControl>
