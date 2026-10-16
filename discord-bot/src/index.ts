@@ -141,6 +141,9 @@ const clean = (s: string) =>
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/[​‌‍﻿]/g, "")
+    // Absätze fehlen in der Kurzfassung: „Daevas,Damit“ / „RuhmHallo“ wieder trennen
+    .replace(/([,.!?:;])(?=[A-ZÄÖÜ])/g, "$1 ")
+    .replace(/([a-zäöüß])(?=[A-ZÄÖÜ][a-zäöüß])/g, "$1 ")
     .replace(/\s+/g, " ")
     .trim();
 
@@ -230,6 +233,9 @@ export default {
     return Response.redirect("https://aetherdps.com/", 302);
   },
   async scheduled(_: ScheduledController, env: Env, ctx: ExecutionContext) {
-    ctx.waitUntil(Promise.allSettled([postNews(env), postReleases(env)]));
+    ctx.waitUntil(Promise.allSettled([postNews(env), postReleases(env)]).then((results) => {
+      // Nur im Live-Log (wrangler tail) sichtbar, gespeichert wird nichts
+      for (const r of results) if (r.status === "rejected") console.error(String(r.reason));
+    }));
   },
 };

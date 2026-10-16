@@ -364,3 +364,6 @@ FodyWeavers.xsd
 # AetherDPS: echte Mitschnitte enthalten Spielernamen – nie committen
 AetherDPS.Tests/Captures/
 PacketLogs/
+
+# Wrangler-Build- und Dev-Dateien
+.wrangler/
