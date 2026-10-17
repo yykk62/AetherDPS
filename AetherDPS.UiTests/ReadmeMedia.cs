@@ -79,6 +79,16 @@ public sealed class ReadmeMedia : IDisposable
     private const int SelfId = 201;
     private readonly Random rng = new(7);
 
+    private static void CopyDir(string from, string to)
+    {
+        foreach (var file in Directory.EnumerateFiles(from, "*", SearchOption.AllDirectories))
+        {
+            var target = Path.Combine(to, Path.GetRelativePath(from, file));
+            Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+            File.Copy(file, target, true);
+        }
+    }
+
     private ServiceProvider Start()
     {
         Loc.Load("de");
@@ -91,8 +101,13 @@ public sealed class ReadmeMedia : IDisposable
             if (!string.IsNullOrWhiteSpace(real.CharacterName)) selfName = real.CharacterName!;
             if (!string.IsNullOrWhiteSpace(real.CharacterServer)) selfServer = real.CharacterServer!;
             if (real.CharacterClassId is >= 11 and <= 18) selfClass = real.CharacterClassId;
-            foreach (var file in new[] { "pet_stufen.json" })
+            foreach (var file in new[] { "pet_stufen.json", "profil_verlauf.json" })
                 if (File.Exists(Path.Combine(From, file))) File.Copy(Path.Combine(From, file), Path.Combine(dataDir, file), true);
+            // Bild- und Profil-Zwischenspeicher mitnehmen, sonst fehlen Item-Bilder und Details im Profil-Bild
+            foreach (var dir in new[] { "Bilder", "Profile" })
+                if (Directory.Exists(Path.Combine(From, dir))) CopyDir(Path.Combine(From, dir), Path.Combine(dataDir, dir));
+            AetherDPS.App.Services.RemoteImages.CacheDir = Path.Combine(dataDir, "Bilder");
+            AetherDPS.App.Services.RemoteImages.Offline = false;   // echtes Profil: fehlende Bilder bei NCSOFT nachladen
         }
         var settings = MeterSettings.Load(dataDir);
         settings.PartyOnly = false;
@@ -278,6 +293,7 @@ public sealed class ReadmeMedia : IDisposable
         profileWindow.Show();
         var profile = hub.Profile;
         WaitFor(() => profile.HasProfile, 30);
+        WaitFor(() => string.IsNullOrEmpty(profile.PrefetchText), 60);   // alle Item-Details
         Settle(8);   // Bilder
         MarkSection(profileWindow, "profile_gear", "profile.gear");
         MarkSection(profileWindow, "profile_stats", "profile.stats");

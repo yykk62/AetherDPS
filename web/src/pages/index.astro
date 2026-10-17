@@ -17,19 +17,31 @@ const web = [
 ];
 
 const app = [
-  ['swords', 'Live-DPS-Meter', 'Boss mit Lebens- und Stagger-Balken, Schaden, DPS und Anteil deiner Gruppe.'],
-  ['trophy', 'Läufe-Archiv', 'Jeder Dungeon mit Boss-Zeiten, Bestzeit und Kampfanalyse, als Bild für Discord.'],
-  ['helmet', 'Profil', 'Ausrüstung, Werte, Daevanion und Skills, auch ohne laufendes Spiel.'],
-  ['group', 'Neu in der Gruppe', 'Tritt jemand bei, siehst du sofort Kampfkraft, Itemstufe und Waffe.'],
+  ['swords', 'Live-DPS-Meter', 'Boss mit Lebens- und Stagger-Balken, Schaden, DPS und Anteil deiner Gruppe, Skills mit echten Skill-Bildern.'],
+  ['trophy', 'Urteil nach dem Lauf', 'Neue Bestzeit? Mehr DPS als sonst? Verglichen mit deinen Läufen derselben Kategorie, dazu die Kampfanalyse je Spieler.'],
+  ['helmet', 'Profil mit Verlauf', 'Ausrüstung, Werte, Daevanion und Skills ohne laufendes Spiel, dazu der Verlauf deiner Kampfkraft.'],
+  ['group', 'Neu in der Gruppe', 'Tritt jemand bei, siehst du sofort Kampfkraft, Gear Score und Waffe.'],
   ['compass', 'Pet-Radar', 'Die fehlenden Pets in deiner Nähe als Minimap mit Entfernung und Richtung.'],
   ['bell', 'Timer-Pills', 'Echte Respawn-Zeiten der Feldbosse direkt vom Server, frei über dem Spiel platziert.'],
+  ['signal', 'Verbindung', 'Ping-Verlauf und Lag-Spitzen: liegt es an dir, am Anbieter oder am Spielserver?'],
+  ['globe', '10 Sprachen', 'Oberfläche, Skills, Monster und Dungeons in deiner Sprache. Updates kommen von selbst.'],
+];
+
+// Rundgang durch die App: Bilder aus docs/media (README-Bilder, tools/readme-media.py)
+const tour = [
+  ['jetzt', 'Jetzt', 'hero.png', 'Nach dem Lauf: das Urteil, deine DPS und Zeit auf einer Messlatte gegen deine früheren Läufe, daneben, was als Nächstes ansteht.'],
+  ['kaempfe', 'Kämpfe', 'runs.png', 'Alle Läufe nach Tagen mit Bestzeit, Boss-Zeiten und Kampfanalyse. Als Bild oder Text für Discord kopieren.'],
+  ['profil', 'Profil', 'profile.png', 'Dein Charakter oder jeder andere auf einem EU-Server: Ausrüstung, Werte und der Verlauf deiner Kampfkraft.'],
+  ['pets', 'Pets', 'pets.png', 'Alle Pets mit deiner Stufe und ihren Spawnpunkten auf der Karte.'],
+  ['timer', 'Timer', 'timers.png', 'Feldbosse mit echten Respawn-Zeiten vom Server, Risse, Belagerung und eigene Countdowns.'],
+  ['verbindung', 'Verbindung', 'connection.png', 'Ping-Verlauf mit Lag-Spitzen und der Antwort, woran es liegt.'],
 ];
 
 // Was AetherDPS von anderen Metern abhebt (Abgleich mit ~30 Tools am 15.10.2026). Bewusst ohne „als einziger“.
 const why = [
   ['stagger', 'Stagger je Spieler', 'Nach jeder Stagger-Phase siehst du, ob sie geklappt hat und wer wie viel dazu beigetragen hat. Schluss mit „wer hat nicht gestaggert?“.'],
   ['lag', 'Warum laggt es?', 'Verbindung prüfen sagt dir, ob es an deinem Heimnetz, deinem Internetanbieter oder am Spielserver liegt.'],
-  ['group', 'Neu in der Gruppe', 'Tritt jemand bei, erscheinen sofort Kampfkraft, Itemstufe, Verzauberung und Waffe. Ein Klick öffnet das ganze Profil.'],
+  ['group', 'Neu in der Gruppe', 'Tritt jemand bei, erscheinen sofort Kampfkraft, Gear Score, Verzauberung und Waffe. Ein Klick öffnet das ganze Profil.'],
   ['patch', 'Ehrlich nach Patches', 'Versteht der Meter das Spiel nach einem Patch nicht mehr, sagt er es dir, statt still falsche oder leere Zahlen zu zeigen.'],
   ['lock', 'Deine Daten bleiben bei dir', 'Keine Uploads, keine Bestenlisten, kein Konto. Deine Kämpfe und die Namen deiner Mitspieler verlassen nie deinen PC.'],
 ];
@@ -102,7 +114,18 @@ const faq = [
   <section class="section art art-wings">
     <div class="wrap">
       <h2>{t('home.appTitle')}</h2>
-      <img class="app-shot" src="/gen/media/hero.png" alt="AetherDPS: Hauptfenster auf „Jetzt“ nach einem Lauf, Live-Meter und Timer" loading="lazy" />
+      <div class="tour">
+        {tour.map(([id, , , ], i) => <input type="radio" name="tour" id={`tour-${id}`} checked={i === 0} />)}
+        <div class="tour-tabs" role="tablist">
+          {tour.map(([id, label]) => <label for={`tour-${id}`}>{label}</label>)}
+        </div>
+        {tour.map(([id, label, img, text], i) => (
+          <figure class={`tour-shot tour-${id}`}>
+            <img src={`/gen/media/${img}`} alt={`AetherDPS: ${label}. ${text}`} loading={i === 0 ? 'eager' : 'lazy'} />
+            <figcaption>{text}</figcaption>
+          </figure>
+        ))}
+      </div>
       <div class="showcase">
         <img src="/gen/media/overlay.gif" alt="Live-Meter im Bosskampf" loading="lazy" />
         <div class="grid compact">
@@ -157,7 +180,33 @@ const faq = [
   .radar p { color: var(--soft); }
   .radar p:last-child { margin: 0; }
   @media (max-width: 760px) { .radar { grid-template-columns: 1fr; } }
-  .app-shot { border-radius: 12px; border: 1px solid var(--line); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); margin-bottom: 20px; }
+  .tour { margin-bottom: 24px; }
+  .tour > input { position: absolute; opacity: 0; pointer-events: none; }
+  .tour-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .tour-tabs label {
+    cursor: pointer; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line);
+    background: rgba(25, 30, 40, 0.85); color: var(--soft); font-weight: 600; font-size: 0.95rem;
+  }
+  .tour-tabs label:hover { color: var(--gold-2); border-color: var(--gold); }
+  .tour-shot { display: none; margin: 0; }
+  .tour-shot img {
+    display: block; width: 100%; height: auto; max-height: 78vh; object-fit: cover; object-position: top;
+    border-radius: 12px; border: 1px solid var(--line); background: #0d0f15; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  }
+  .tour-shot figcaption { color: var(--soft); margin-top: 10px; }
+  #tour-jetzt:checked ~ .tour-jetzt { display: block; }
+  #tour-jetzt:checked ~ .tour-tabs label[for=tour-jetzt] { color: var(--bg); background: var(--gold); border-color: var(--gold); }
+  #tour-kaempfe:checked ~ .tour-kaempfe { display: block; }
+  #tour-kaempfe:checked ~ .tour-tabs label[for=tour-kaempfe] { color: var(--bg); background: var(--gold); border-color: var(--gold); }
+  #tour-profil:checked ~ .tour-profil { display: block; }
+  #tour-profil:checked ~ .tour-tabs label[for=tour-profil] { color: var(--bg); background: var(--gold); border-color: var(--gold); }
+  #tour-pets:checked ~ .tour-pets { display: block; }
+  #tour-pets:checked ~ .tour-tabs label[for=tour-pets] { color: var(--bg); background: var(--gold); border-color: var(--gold); }
+  #tour-timer:checked ~ .tour-timer { display: block; }
+  #tour-timer:checked ~ .tour-tabs label[for=tour-timer] { color: var(--bg); background: var(--gold); border-color: var(--gold); }
+  #tour-verbindung:checked ~ .tour-verbindung { display: block; }
+  #tour-verbindung:checked ~ .tour-tabs label[for=tour-verbindung] { color: var(--bg); background: var(--gold); border-color: var(--gold); }
+  .tour > input:focus-visible ~ .tour-tabs { outline: 2px solid var(--gold); outline-offset: 4px; border-radius: 999px; }
   @media (max-width: 760px) {
     .hero {
       align-items: flex-end; padding-top: 220px;
