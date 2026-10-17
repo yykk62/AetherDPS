@@ -109,7 +109,7 @@ public partial class App : Application
             });
             window.CloseRequested += (_, _) =>
             {
-                if (mode.AutoMode)
+                if (mode.AutoMode || (Situation() is not null && !mode.IsActive))
                 {
                     overlayHiddenByUser = true;
                     UpdateOverlay();
@@ -120,11 +120,19 @@ public partial class App : Application
             new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, (_, _) => mode.Tick(DateTime.Now)).Start();
             hotkey.ScreenshotPressed += (_, foreground) => TakeScreenshot(foreground);
 
+            // Platzierungsmodus: alle Overlays zugleich mit Beispieldaten, Esc/Enter legt fest
+            placement = new OverlayPlacement(PlaceableOverlays);
+            placement.Ended += (_, _) => ApplyOverlayRules();
+            hotkey.PlacementPressed += (_, _) => Dispatcher.UIThread.Post(() => placement.Toggle());
+            hotkey.PlacementDonePressed += (_, _) => Dispatcher.UIThread.Post(() => placement.End());
+            window.PlacementRequested += (_, _) => placement.Begin();
+            Services.GetRequiredService<SettingsViewModel>().PlacementRequested += (_, _) => placement.Begin();
+
             // Erinnerungen (Timer, Checkliste)
             var timerService = Services.GetRequiredService<TimerService>();
             Services.GetRequiredService<Pets>();   // Pet-Liste kommt beim Login – vorher schon mithören
             if (Services.GetRequiredService<MeterOptions>().ReplayFile is null)
-                petRadar = new PetRadarWindow(Services.GetRequiredService<PetRadarViewModel>(), Services.GetRequiredService<MeterSettings>());
+                petRadar = CreatePetRadar();
             var checklist = Services.GetRequiredService<ChecklistService>();
             timerService.Reminder += (title, text) => Dispatcher.UIThread.Post(() => ShowToast(title, text));
             checklist.Reminder += (title, text) => Dispatcher.UIThread.Post(() => ShowToast(title, text));
@@ -138,6 +146,7 @@ public partial class App : Application
                     Services.GetRequiredService<TimerOverlayViewModel>().Tick();
                     UpdateTimerOverlay();
                 }
+                CheckSituation();
                 Services.GetRequiredService<BuffWatcher>().Tick(DateTime.Now);
             }).Start();
             new DispatcherTimer(TimeSpan.FromMilliseconds(200), DispatcherPriority.Background, (_, _) =>
@@ -150,6 +159,8 @@ public partial class App : Application
             timersVm = Services.GetRequiredService<TimersViewModel>();
             var timerOverlayVm = Services.GetRequiredService<TimerOverlayViewModel>();
             timerOverlay = new TimerPills(timerOverlayVm, timerService);
+            timerOverlay.PlacementRequested += (_, _) => placement.Begin();
+            timerOverlay.WindowsChanged += placement.Refresh;
             timerOverlayVm.EditRequested += (_, _) => ShowHub(HubViewModel.TabTimers);
             timerOverlayVm.HideRequested += (_, _) => timersVm.HideOverlay();
             timersVm.OverlayVisibilityChanged += (_, _) => UpdateTimerOverlay();
@@ -225,8 +236,11 @@ public partial class App : Application
 
     private void UpdateOverlay()
     {
-        if (window is null || mode is null) return;
+        if (window is null || mode is null || placement?.IsActive == true) return;
         bool show = mode.AutoMode ? !overlayHiddenByUser : mode.IsActive;
+        // Nach Lage: im Dungeon und im Bosskampf von selbst; ein laufender Meter bleibt auch in der Stadt sichtbar
+        if (Situation() is { } situation)
+            show = !overlayHiddenByUser && (mode.IsActive || OverlayRules.ShowCombat(situation));
         if (show && !window.IsVisible) window.Show();
         else if (!show && window.IsVisible) window.Hide();
     }
@@ -265,7 +279,7 @@ public partial class App : Application
 
     private void UpdateTimerOverlay()
     {
-        if (timerOverlay is null || timersVm is null) return;
+        if (timerOverlay is null || timersVm is null || placement?.IsActive == true) return;
         // „Nur kurz vorher“: zeigen, sobald ein Termin in den nächsten Minuten ansteht
         bool show = timersVm.OverlayMode switch
         {
@@ -273,8 +287,59 @@ public partial class App : Application
             "soon" => timerOverlay.HasContent,
             _ => false,
         };
+        if (Situation() is { } situation && !OverlayRules.ShowTimers(situation)) show = false;
         if (show) timerOverlay.ShowAll();
         else timerOverlay.HideAll();
+    }
+
+    private OverlayPlacement? placement;
+
+    /// <summary>Alles, was der Platzierungsmodus zeigt – Radar und Stagger-Warnung werden dafür notfalls erst gebaut.</summary>
+    private IEnumerable<IPlaceableOverlay> PlaceableOverlays()
+    {
+        if (window is not null) yield return window;
+        if (timerOverlay is not null) yield return timerOverlay;
+        yield return petRadar ??= CreatePetRadar();
+        yield return StaggerWindow();
+    }
+
+    private PetRadarWindow CreatePetRadar()
+    {
+        var radar = new PetRadarWindow(Services.GetRequiredService<PetRadarViewModel>(), Services.GetRequiredService<MeterSettings>());
+        radar.PlacementRequested += (_, _) => placement?.Begin();
+        return radar;
+    }
+
+    private StaggerWarningWindow StaggerWindow() =>
+        staggerWarning ??= new StaggerWarningWindow(Services.GetRequiredService<StaggerWarningViewModel>(), Services.GetRequiredService<MeterSettings>());
+
+    /// <summary>Normale Sichtbarkeit aller Overlays (nach dem Platzieren und wenn sich die Lage ändert).</summary>
+    private void ApplyOverlayRules()
+    {
+        UpdateOverlay();
+        UpdateTimerOverlay();
+        UpdateStaggerWarning(Services.GetRequiredService<MeterSettings>());
+    }
+
+    /// <summary>„Overlays nach Lage“: Stadt, Dungeon oder Bosskampf – null, wenn die Einstellung aus ist.</summary>
+    private OverlaySituation? Situation()
+    {
+        if (!Services.GetRequiredService<MeterSettings>().OverlaysBySituation) return null;
+        return OverlayRules.Of(Services.GetRequiredService<ZoneTracker>().InInstance, viewModel?.IsBoss == true);
+    }
+
+    private OverlaySituation? lastSituation;
+    private bool situationChecked;
+
+    /// <summary>Jede Sekunde: Hat sich die Lage geändert (oder die Einstellung), Overlays neu verteilen.</summary>
+    private void CheckSituation()
+    {
+        var now = Situation();
+        if (situationChecked && now == lastSituation) return;
+        situationChecked = true;
+        lastSituation = now;
+        if (now is not null) Serilog.Log.Information("Lage: {Lage}", now);
+        ApplyOverlayRules();
     }
 
     private void OnToggleTimerOverlay(object? sender, EventArgs e)
@@ -360,13 +425,15 @@ public partial class App : Application
     /// <summary>Stagger-Warnung (Einstellung, Standard aus) – nur solange eine Phase mit Zeitlimit läuft.</summary>
     private void UpdateStaggerWarning(MeterSettings settings)
     {
+        if (placement?.IsActive == true) return;
         var vm = Services.GetRequiredService<StaggerWarningViewModel>();
         vm.Refresh();
-        bool show = settings.StaggerWarning && vm.IsActive;
+        bool wanted = settings.StaggerWarning || Situation() is { } situation && OverlayRules.ShowStagger(situation);
+        bool show = wanted && vm.IsActive;
         if (show)
         {
-            staggerWarning ??= new StaggerWarningWindow(vm);
-            if (!staggerWarning.IsVisible) staggerWarning.Show();
+            var warning = StaggerWindow();
+            if (!warning.IsVisible) warning.Show();
         }
         else if (staggerWarning?.IsVisible == true) staggerWarning.Hide();
     }
@@ -502,6 +569,7 @@ public partial class App : Application
     {
         if (persisted) return;
         persisted = true;
+        placement?.End();   // mitten im Platzieren beendet: Stellen trotzdem speichern
         hotkey?.Dispose();
         window?.SaveBounds();
         timerOverlay?.SaveBounds();
@@ -529,6 +597,8 @@ public partial class App : Application
         }
         else mode?.Toggle();
     }
+
+    private void OnPlaceOverlays(object? sender, EventArgs e) => placement?.Begin();
 
     private void OnToggleClickThrough(object? sender, EventArgs e) =>
         window?.SetClickThrough(!window.IsClickThrough);

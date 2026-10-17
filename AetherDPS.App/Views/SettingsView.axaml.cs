@@ -12,6 +12,7 @@ public partial class SettingsView : UserControl
         InitializeComponent();
         WireHotkeyBox(HotkeyBox, HotkeySlot.Meter);
         WireHotkeyBox(ScreenshotBox, HotkeySlot.Screenshot);
+        WireHotkeyBox(PlacementBox, HotkeySlot.Placement);
         DetachedFromVisualTree += (_, _) => (DataContext as SettingsViewModel)?.CancelCapture();
     }
 

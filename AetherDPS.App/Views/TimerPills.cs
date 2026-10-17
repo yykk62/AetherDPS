@@ -35,6 +35,7 @@ public sealed class TimerGroupWindow : Window
         Content = canvas;
         Position = new PixelPoint((int)group.X, (int)group.Y);
         PositionChanged += (_, _) => Moved?.Invoke(this);
+        ClickThrough.NeverActivate(this);
     }
 
     public IReadOnlyList<TimerPill> Pills => canvas.Children.OfType<TimerPill>().ToList();
@@ -82,14 +83,23 @@ public sealed class TimerGroupWindow : Window
 /// <summary>
 /// Steuert alle Timer-Pills: jede sichtbare Pill gehört zu genau einer Gruppe (sonst bekommt sie eine eigene),
 /// Rechtsklick: gruppieren (Raster aus der Lage, siehe <see cref="PillLayout"/>), lösen, Spalten, entfernen, sperren.
+/// Verschoben wird im gemeinsamen Platzierungsmodus (<see cref="OverlayPlacement"/>); dort stehen alle Pills des
+/// Overlays, auch die, die im Modus „nur kurz vorher“ gerade ausgeblendet sind.
 /// </summary>
-public sealed class TimerPills
+public sealed class TimerPills : IPlaceableOverlay
 {
     private readonly TimerOverlayViewModel vm;
     private readonly TimerService service;
     private readonly Dictionary<TimerGroup, TimerGroupWindow> windows = [];
     private readonly DispatcherTimer saveTimer;
     private bool shown;
+    private bool placing, shownBeforePlacement;
+
+    /// <summary>Fenster gebaut oder geschlossen (z. B. beim Gruppieren im Platzierungsmodus).</summary>
+    public event Action? WindowsChanged;
+
+    /// <summary>Aus dem Menü einer Pill: „Overlays platzieren“.</summary>
+    public event EventHandler? PlacementRequested;
 
     public TimerPills(TimerOverlayViewModel vm, TimerService service)
     {
@@ -98,7 +108,7 @@ public sealed class TimerPills
         vm.LayoutChanged += (_, _) => Sync();
         vm.RowsReplaced += (_, _) =>
         {
-            foreach (var w in windows.Values) w.Rebind(vm.Row);
+            foreach (var w in windows.Values) w.Rebind(RowOf);
         };
         vm.LockChanged += (_, _) => ApplyLock();
         saveTimer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, (_, _) =>
@@ -125,6 +135,31 @@ public sealed class TimerPills
 
     public void SaveBounds() => service.SaveQuiet();
 
+    public string? PlacementLabel => null;
+
+    public IEnumerable<Window> PlacementWindows => windows.Values.Where(w => w.IsVisible);
+
+    public void BeginPlacement()
+    {
+        shownBeforePlacement = shown;
+        placing = true;
+        shown = true;
+        Sync();
+        foreach (var w in windows.Values) w.SetClickThrough(false);
+    }
+
+    public void EndPlacement()
+    {
+        placing = false;
+        shown = shownBeforePlacement;
+        foreach (var w in windows.Values.Where(w => w.IsVisible)) OnMoved(w);
+        service.SaveQuiet();
+        Sync();
+    }
+
+    /// <summary>Name → Zeile: was gerade im Overlay steht, im Platzierungsmodus auch die ausgeblendeten Pills.</summary>
+    private TimerRow? RowOf(string name) => placing ? vm.PlacementRow(name) : vm.Row(name);
+
     private List<TimerGroup> Groups => service.Settings.Groups;
 
     /// <summary>Gruppen an die sichtbaren Timer anpassen und Fenster bauen/verstecken.</summary>
@@ -132,6 +167,7 @@ public sealed class TimerPills
     {
         Migrate();
         var visible = vm.Rows.Select(r => r.Item.Name).ToHashSet();
+        if (placing) visible.UnionWith(Groups.SelectMany(g => g.Cells).Select(c => c.Name).Where(n => vm.PlacementRow(n) is not null));
         bool changed = false;
         foreach (var name in visible.Where(n => !Groups.Any(g => g.Cells.Any(c => c.Name == n))).ToList())
         {
@@ -148,7 +184,7 @@ public sealed class TimerPills
         }
         foreach (var group in Groups)
         {
-            var pills = group.Cells.Where(c => visible.Contains(c.Name)).Select(c => (c, vm.Row(c.Name)!)).ToList();
+            var pills = group.Cells.Where(c => visible.Contains(c.Name)).Select(c => (c, RowOf(c.Name)!)).ToList();
             if (!windows.TryGetValue(group, out var window))
             {
                 window = new TimerGroupWindow(group);
@@ -159,10 +195,11 @@ public sealed class TimerPills
             if (shown && pills.Count > 0)
             {
                 if (!window.IsVisible) window.Show();
-                window.SetClickThrough(vm.IsLocked);
+                window.SetClickThrough(vm.IsLocked && !placing);
             }
             else if (window.IsVisible) window.Hide();
         }
+        WindowsChanged?.Invoke();
     }
 
     /// <summary>Alte Anordnung (Gruppe + gelöste Leisten, bis 0.7.0) einmalig in Pills übernehmen.</summary>
@@ -205,9 +242,9 @@ public sealed class TimerPills
         saveTimer.Start();
     }
 
+    /// <summary>Linksklick auf eine Pill tut nichts mehr: Verschieben läuft über den Platzierungsmodus.</summary>
     private void OnPressed(TimerGroupWindow window, PointerPressedEventArgs e)
     {
-        if (e.GetCurrentPoint(window).Properties.IsLeftButtonPressed) window.BeginMoveDrag(e);
     }
 
     private ContextMenu Menu(TimerPill pill)
@@ -248,6 +285,7 @@ public sealed class TimerPills
             if (vm.Row(pill.Key) is { } row) vm.RemoveTimer(row);
         }));
         items.Add(new Separator());
+        if (!placing) items.Add(Item(Loc.T("placement.title"), () => PlacementRequested?.Invoke(this, EventArgs.Empty)));
         items.Add(Item(Loc.T("timer_pill.lock"), () => vm.IsLocked = true));
         items.Add(Item(Loc.T("timer_pill.hide_all"), () => vm.HideCommand.Execute(null)));
         menu.ItemsSource = items;
@@ -348,6 +386,6 @@ public sealed class TimerPills
 
     private void ApplyLock()
     {
-        foreach (var w in windows.Values) w.SetClickThrough(vm.IsLocked);
+        foreach (var w in windows.Values) w.SetClickThrough(vm.IsLocked && !placing);
     }
 }

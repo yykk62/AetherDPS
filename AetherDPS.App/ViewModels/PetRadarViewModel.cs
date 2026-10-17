@@ -134,6 +134,7 @@ public sealed partial class PetRadarViewModel : ObservableObject
     /// <summary>Zeigen oder verstecken je nach Modus (jede Sekunde und bei neuen Daten).</summary>
     public void Update()
     {
+        if (sample) return;
         var current = Current;
         if (current != lastMap)
         {
@@ -183,17 +184,51 @@ public sealed partial class PetRadarViewModel : ObservableObject
             _ => level < Pets.TopLevel,
         });
 
+    private bool sample;
+
+    /// <summary>
+    /// Platzierungsmodus: Radar mit Beispieldaten – die Karte, auf der du stehst (sonst die erste mit Pets), du mitten
+    /// zwischen Fundorten, die Liste dazu. Aus = wieder die echte Lage.
+    /// </summary>
+    public void ShowSample(bool on)
+    {
+        if (sample == on) return;
+        sample = on;
+        if (!on)
+        {
+            Refresh();
+            Update();
+            return;
+        }
+        var map = Current ?? pets.Maps.FirstOrDefault(m => pets.All.Any(p => pets.Spawns(p, m).Count > 0));
+        if (map is null) return;
+        var spawn = pets.All.SelectMany(p => pets.Spawns(p, map)).FirstOrDefault();
+        Refresh(map, spawn is null ? new Point(0, 0) : new Point(spawn.X + 4_000, spawn.Y + 3_000));
+    }
+
     public void Refresh()
     {
-        var current = Current;
+        if (sample) return;
+        Refresh(null, null);
+    }
+
+    private void Refresh(PetMap? sampleMap, Point? sampleSelf)
+    {
+        var current = sampleMap ?? Current;
         Map = current;
         Rows.Clear();
-        if (current is null) return;
+        if (current is null)
+        {
+            Self = null;   // auch nach den Beispieldaten des Platzierungsmodus
+            Spawns = null;
+            return;
+        }
         var selected = SelectedPet is int id ? pets.Get(id) : null;
-        bool here = pets.Position is { } pos && pets.CurrentMap == current;
-        Self = here ? new Point(pets.Position!.Value.X, pets.Position.Value.Y) : null;
+        Point? at = sampleSelf ?? (pets.Position is { } pos && pets.CurrentMap == current ? new Point(pos.X, pos.Y) : null);
+        bool here = at is not null;
+        Self = at;
         Hint = here ? "" : Loc.T(pets.KnowsSelf ? "radar.no_position" : "radar.no_self");
-        if (here) shownAt = (pets.Position!.Value.X, pets.Position.Value.Y);
+        if (here && sampleSelf is null) shownAt = (at!.Value.X, at.Value.Y);
 
         // Liste: die nächsten gewünschten Pets (ohne Position: nach Name), scrollbar
         var list = here
@@ -238,14 +273,14 @@ public sealed partial class PetRadarViewModel : ObservableObject
     /// <summary>Jede neue Position: der Punkt (und mit ihm die Minimap) wandert sofort mit.</summary>
     private void FollowSelf()
     {
-        if (!IsOpen || Map is null || pets.Position is not { } pos || pets.CurrentMap != Map) return;
+        if (sample || !IsOpen || Map is null || pets.Position is not { } pos || pets.CurrentMap != Map) return;
         Self = new Point(pos.X, pos.Y);
     }
 
     /// <summary>Neue Position: Liste neu, sobald man sich ein Stück bewegt hat.</summary>
     private void Moved()
     {
-        if (!IsOpen || pets.Position is not { } pos) return;
+        if (sample || !IsOpen || pets.Position is not { } pos) return;
         if (shownAt is { } at && Math.Abs(at.X - pos.X) + Math.Abs(at.Y - pos.Y) < 1500) return;   // unter 15 m
         Refresh();
     }

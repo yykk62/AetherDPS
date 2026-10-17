@@ -89,7 +89,7 @@ Drei Stufen in `AetherDPS.App/Tokens.axaml`. Views verwenden **nur** die semanti
 | `Danger400` | `#F2735F` | Tod, Fehler, Löschen |
 | `Ember400` | `#F09A4E` | Warnung |
 
-**Semantisch** (Auswahl): `Surface.Frame`, `Surface.Bar`, `Surface.WellEngraved`, `Surface.WellDeep`, `Surface.Raised`, `Surface.Self`, `Line.Frame`, `Line.Well`, `Line.Tick`, `Line.Bevel`, `Text.Primary`, `Text.Secondary`, `Text.Muted`, `Text.OnAction`, `Action.Primary`, `Accent.Self`, `Accent.Phase`, `Signal.Good`, `Signal.Bad`, `Signal.Warn`, `Focus.Ring`, `Font.Ui`, `Font.Display`.
+**Semantisch** (Auswahl): `Surface.Frame`, `Surface.Bar`, `Surface.WellEngraved`, `Surface.WellDeep`, `Surface.Raised`, `Surface.Self`, `Line.Frame`, `Line.Well`, `Line.Tick`, `Line.Bevel`, `Text.Primary`, `Text.Secondary`, `Text.Muted`, `Text.OnAction`, `Action.Primary`, `Surface.Placing`, `Accent.Self`, `Accent.Phase`, `Signal.Good`, `Signal.Bad`, `Signal.Warn`, `Focus.Ring`, `Font.Ui`, `Font.Display`.
 
 Bausteine in `AetherDPS.App/Instrument.axaml` (gelten nur unter der Klasse `ins`, damit alte Fenster bis zu ihrem Umbau unverändert bleiben): `well`, `rule`, `framerule`, `place`, `cta`, `quiet`, `icon`, `keycap`, `selftag`, `trace` sowie die Textrollen `display`, `title`, `section`, `lead`, `small`, `muted`, `secondary`, `self`, `num`, `reading`.
 
@@ -120,7 +120,9 @@ Du-Form, kurze Verben, Satzanfang groß, keine Füllwörter. Eine Aktion heißt 
 
 Umgesetzt: Tokens und Bausteine, Hauptfenster `ShellWindow` mit allen vier Orten (Jetzt, Kämpfe, Welt, Daevas), Verbindung und Einstellungen als Blätter, Hinweise als Zeilen, die Kampfanzeige (Overlay) und alle Nebenfenster auf den Tokens. Jede Runde von einem unabhängigen Kritik-Agenten geprüft, der nur Bilder und Zweck kennt.
 
-Offen: gemeinsamer Platzierungsmodus für alle Overlays (statt Schloss je Fenster), Overlays nach Lage, Variante mit hohem Kontrast, README-Bilder neu erzeugen.
+Platzierungsmodus (`Views/OverlayPlacement.cs`, Einrasten in `Engine/OverlaySnap.cs`): STRG+P (belegbar), der Griff am Meter und am Radar, das Tray-Menü oder „Jetzt platzieren“ in den Einstellungen zeigen Kampfanzeige, Timer-Pills, Pet-Radar und Stagger-Warnung mit Beispieldaten in echter Größe. Jedes Overlay trägt einen Rahmen in Äther-Violett (`Surface.Placing`) mit seinem Namen, oben mittig steht eine Zeile mit Esc, Enter und „Fertig“. Ziehen rastet am Bildschirmrand und an Nachbarn ein (bündig mit 6 px Abstand oder Kante an Kante), Festlegen speichert alle Stellen. Esc und Enter laufen über `RegisterHotKey`, solange der Modus läuft, denn kein Overlay nimmt den Fokus (`WS_EX_NOACTIVATE`). Das Schloss je Fenster bleibt nur als Klick-durch. „Overlays nach Lage“ ist eine Einstellung (Standard aus).
+
+Offen: Ruhezonen für Minimap und Skillleiste im Platzierungsmodus, Variante mit hohem Kontrast, README-Bilder neu erzeugen.
 
 ## Nach dem Abgleich
 

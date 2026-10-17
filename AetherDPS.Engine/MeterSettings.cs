@@ -24,6 +24,14 @@ public sealed class MeterSettings
     public uint ScreenshotKey { get; set; } = 0x53;
     public string ScreenshotText { get; set; } = "STRG+S";
 
+    /// <summary>Platzierungsmodus: alle Overlays mit Beispieldaten zeigen und verschieben. Standard: STRG+P.</summary>
+    public uint PlacementModifiers { get; set; } = ModControl;
+    public uint PlacementKey { get; set; } = 0x50;
+    public string PlacementText { get; set; } = "STRG+P";
+
+    /// <summary>Overlays nach Lage: Stadt Timer, Dungeon Kampfanzeige, Bosskampf zusätzlich Stagger. Standard: aus.</summary>
+    public bool OverlaysBySituation { get; set; }
+
 
     /// <summary>Zuletzt erkannter eigener Charakter – damit der Name auch ohne Teleport stimmt.</summary>
     public string? CharacterName { get; set; }
@@ -79,6 +87,10 @@ public sealed class MeterSettings
     /// <summary>Große, halbtransparente Stagger-Warnung mitten im Bild (Restzeit + Leiste). Standard: aus.</summary>
     public bool StaggerWarning { get; set; }
 
+    /// <summary>Stelle der Stagger-Warnung in Bildschirm-Pixeln (null = oben mittig).</summary>
+    public double? StaggerLeft { get; set; }
+    public double? StaggerTop { get; set; }
+
     /// <summary>Neue Versionen von GitHub laden (geprüft per SHA-256) und beim nächsten Start installieren.</summary>
     public bool AutoUpdate { get; set; } = true;
 
@@ -131,6 +143,7 @@ public sealed class MeterSettings
         // Tastennamen in der Sprache der Oberfläche („STRG+W“ ↔ „CTRL+W“)
         settings.HotkeyText = LocalizeKeys(settings.HotkeyText);
         settings.ScreenshotText = LocalizeKeys(settings.ScreenshotText);
+        settings.PlacementText = LocalizeKeys(settings.PlacementText);
         return settings;
     }
 

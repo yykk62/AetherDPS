@@ -41,6 +41,8 @@
   <SolidColorBrush x:Key="Surface.Hover" Color="#0FFFFFFF" />
   <SolidColorBrush x:Key="Surface.Boss" Color="#3D2027" />
   <SolidColorBrush x:Key="Surface.Scrim" Color="#8C0B0A10" />
+  <!-- Platzierungsmodus: Hauch von Äther über einem Overlay, das gerade verschoben werden kann -->
+  <SolidColorBrush x:Key="Surface.Placing" Color="#1FA898FF" />
   <SolidColorBrush x:Key="Surface.Sheet" Color="{StaticResource Stone800}" />
   <SolidColorBrush x:Key="Surface.Notice" Color="{StaticResource Stone900}" />
   <SolidColorBrush x:Key="Surface.NoticeWarn" Color="#33F09A4E" />
