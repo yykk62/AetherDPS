@@ -89,7 +89,10 @@ public sealed partial class Armory
     public static bool IsArmorSlot(string slot) => ArmorSlots.Contains(slot);
 
     private readonly HttpClient http;
-    private readonly SemaphoreSlim gate = new(1, 1);
+    private readonly SemaphoreSlim gate = new(1, 1);              // Profile: Suche → Info → Ausrüstung nacheinander
+    private readonly SemaphoreSlim itemGate = new(3, 3);          // Item-Details: bis zu 3 gleichzeitig unterwegs …
+    private readonly SemaphoreSlim backgroundGate = new(2, 2);    // … davon höchstens 2 fürs Vorladen, einer bleibt für Klicks frei
+    private readonly Lock rate = new();
     private readonly Dictionary<(int, string), ArmoryProfile> cache = [];
     private readonly Dictionary<(string, long, int), ArmoryItemDetail> itemCache = [];
     private DateTime lastRequest;
@@ -108,6 +111,12 @@ public sealed partial class Armory
     };
 
     /// <summary>„#1317“ oder „1317“ → 1317.</summary>
+    /// <summary>Ordner für Item-Details auf der Platte (Datenordner\Profile); null = nur im Speicher.</summary>
+    public string? CacheDir { get; set; }
+
+    /// <summary>So lange gelten Item-Details aus dem Ordner (Manasteine/Götterstein können sich ändern).</summary>
+    public static readonly TimeSpan ItemCacheTime = TimeSpan.FromHours(6);
+
     public static int? ServerId(string? server) =>
         server is not null && int.TryParse(server.TrimStart('#'), out var id) && id > 1000 ? id : null;
 
@@ -132,8 +141,11 @@ public sealed partial class Armory
             var id = await FindAsync(name, serverId, ct);
             if (id is null) return null;
             var query = $"lang={Lang}&region=eu&serverId={serverId}&characterId={id}";
-            using var info = await GetAsync($"{SiteUrl}/info?{query}", ct);
-            using var equipment = await GetAsync($"{SiteUrl}/equipment?{query}", ct);
+            // Info und Ausrüstung gleichzeitig (gestaffelt gestartet), spart eine Antwortzeit
+            var infoTask = GetAsync($"{SiteUrl}/info?{query}", ct);
+            var equipmentTask = GetAsync($"{SiteUrl}/equipment?{query}", ct);
+            using var info = await infoTask;
+            using var equipment = await equipmentTask;
             if (info is null) return null;
             var profile = Parse(info.RootElement, equipment?.RootElement) with { CharacterId = id };
             lock (cache) cache[(serverId, name)] = profile;
@@ -149,26 +161,45 @@ public sealed partial class Armory
         }
     }
 
-    /// <summary>Details eines Items aus dem Profil (Werte, Manasteine, Götterstein).</summary>
-    public async Task<ArmoryItemDetail?> LoadItemAsync(ArmoryProfile profile, ArmoryItem item, CancellationToken ct = default)
+    /// <summary>
+    /// Details eines Items aus dem Profil (Werte, Manasteine, Götterstein). Aus dem Speicher, sonst aus dem Ordner
+    /// (<see cref="ItemCacheTime"/>), sonst von NCSOFT. Bis zu drei Anfragen laufen gleichzeitig, gestartet wird
+    /// höchstens alle 0,5 s; <paramref name="background"/> (Vorladen) nutzt nur zwei der drei Plätze.
+    /// </summary>
+    public async Task<ArmoryItemDetail?> LoadItemAsync(ArmoryProfile profile, ArmoryItem item, CancellationToken ct = default, bool background = false)
     {
         if (item.Id == 0 || string.IsNullOrEmpty(profile.CharacterId)) return null;
         var key = (profile.CharacterId, item.Id, item.SlotPos);
         lock (itemCache)
             if (itemCache.TryGetValue(key, out var hit)) return hit;
+        var file = CacheFile(profile, item);
+        if (ReadCached(file) is { } stored)
+        {
+            lock (itemCache) itemCache[key] = stored;
+            return stored;
+        }
 
-        await gate.WaitAsync(ct);
+        if (background) await backgroundGate.WaitAsync(ct);
         try
         {
-            lock (itemCache)
-                if (itemCache.TryGetValue(key, out var again)) return again;   // kam während des Wartens (Vorladen)
-            var query = $"id={item.Id}&enchantLevel={item.Enchant}&slotPos={item.SlotPos}"
-                        + $"&lang={Lang}&region=eu&serverId={profile.ServerId}&characterId={profile.CharacterId}";
-            using var doc = await GetAsync($"{SiteUrl}/equipment/item?{query}", ct);
-            if (doc is null) return null;
-            var detail = ParseItem(doc.RootElement);
-            lock (itemCache) itemCache[key] = detail;
-            return detail;
+            await itemGate.WaitAsync(ct);
+            try
+            {
+                lock (itemCache)
+                    if (itemCache.TryGetValue(key, out var again)) return again;   // kam während des Wartens
+                var query = $"id={item.Id}&enchantLevel={item.Enchant}&slotPos={item.SlotPos}"
+                            + $"&lang={Lang}&region=eu&serverId={profile.ServerId}&characterId={profile.CharacterId}";
+                using var doc = await GetAsync($"{SiteUrl}/equipment/item?{query}", ct);
+                if (doc is null) return null;
+                var detail = ParseItem(doc.RootElement);
+                lock (itemCache) itemCache[key] = detail;
+                WriteCached(file, doc.RootElement.GetRawText());
+                return detail;
+            }
+            finally
+            {
+                itemGate.Release();
+            }
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException or KeyNotFoundException or InvalidOperationException)
         {
@@ -176,8 +207,38 @@ public sealed partial class Armory
         }
         finally
         {
-            gate.Release();
+            if (background) backgroundGate.Release();
         }
+    }
+
+    private string? CacheFile(ArmoryProfile profile, ArmoryItem item)
+    {
+        if (CacheDir is null) return null;
+        var name = string.Concat($"{profile.ServerId}_{profile.CharacterId}_{item.Id}_{item.Enchant}_{item.SlotPos}_{Lang}"
+            .Select(c => char.IsLetterOrDigit(c) || c is '_' or '-' ? c : '_'));
+        return Path.Combine(CacheDir, name + ".json");
+    }
+
+    private static ArmoryItemDetail? ReadCached(string? file)
+    {
+        try
+        {
+            if (file is null || !File.Exists(file) || DateTime.Now - File.GetLastWriteTime(file) > ItemCacheTime) return null;
+            using var doc = JsonDocument.Parse(File.ReadAllText(file));
+            return ParseItem(doc.RootElement);
+        }
+        catch (Exception ex) when (ex is IOException or JsonException or UnauthorizedAccessException or InvalidOperationException) { return null; }
+    }
+
+    private static void WriteCached(string? file, string json)
+    {
+        try
+        {
+            if (file is null) return;
+            Directory.CreateDirectory(Path.GetDirectoryName(file)!);
+            File.WriteAllText(file, json);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
     }
 
     private async Task<string?> FindAsync(string name, int serverId, CancellationToken ct)
@@ -196,10 +257,15 @@ public sealed partial class Armory
 
     private async Task<JsonDocument?> GetAsync(string url, CancellationToken ct)
     {
-        // höflich bleiben: höchstens ~2 Anfragen pro Sekunde
-        var wait = lastRequest.AddMilliseconds(500) - DateTime.Now;
+        // höflich bleiben: höchstens 2 Anfragen pro Sekunde starten (auch wenn mehrere gleichzeitig laufen)
+        TimeSpan wait;
+        lock (rate)
+        {
+            var start = lastRequest.AddMilliseconds(500) is var next && next > DateTime.Now ? next : DateTime.Now;
+            lastRequest = start;
+            wait = start - DateTime.Now;
+        }
         if (wait > TimeSpan.Zero) await Task.Delay(wait, ct);
-        lastRequest = DateTime.Now;
         using var response = await http.GetAsync(url, ct);
         if (!response.IsSuccessStatusCode) return null;
         return JsonDocument.Parse(await response.Content.ReadAsStringAsync(ct));

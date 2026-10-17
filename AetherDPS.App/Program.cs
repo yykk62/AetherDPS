@@ -172,7 +172,7 @@ public static class AppServices
         services.AddSingleton(sp => new CommunityService(sp.GetRequiredService<MeterSettings>(),
             typeof(Program).Assembly.GetName().Version ?? new Version(0, 0, 0)));
         services.AddSingleton<ReportViewModel>();
-        services.AddSingleton<Armory>();
+        services.AddSingleton(sp => new Armory { CacheDir = Path.Combine(sp.GetRequiredService<MeterOptions>().DataDir, "Profile") });
         services.AddSingleton<ProfileWatcher>();
         services.AddSingleton<CommunityController>();
         return services;

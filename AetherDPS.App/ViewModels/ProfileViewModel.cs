@@ -279,7 +279,6 @@ public sealed partial class ProfileViewModel : ObservableObject
     }
 
     private CancellationTokenSource? prefetch;
-    private int userWaiting;
 
     /// <summary>
     /// Nach dem Profil die Details aller Teile im Hintergrund nachladen (eins nach dem anderen, höflich
@@ -291,25 +290,22 @@ public sealed partial class ProfileViewModel : ObservableObject
         var cts = prefetch = new CancellationTokenSource();
         var items = Armor.Concat(Jewelry).Select(r => r.Item).Where(i => i.Id != 0).ToList();
         if (items.Count == 0) { PrefetchText = ""; return; }
+        PrefetchText = Loc.T("profile.prefetch", 0, items.Count);
+        int done = 0;
         _ = Task.Run(async () =>
         {
-            int done = 0;
-            foreach (var item in items)
+            // alle anstoßen: Armory lässt höchstens zwei Vorlade-Anfragen gleichzeitig laufen, ein Platz bleibt für Klicks
+            var tasks = items.Select(async item =>
             {
-                if (cts.IsCancellationRequested) return;
-                while (Volatile.Read(ref userWaiting) > 0) await Task.Delay(100, cts.Token);
+                try { await armory.LoadItemAsync(p, item, cts.Token, background: true); }
+                catch (OperationCanceledException) { return; }
+                int now = Interlocked.Increment(ref done);
                 Avalonia.Threading.Dispatcher.UIThread.Post(() =>
                 {
-                    if (ReferenceEquals(profile, p)) PrefetchText = Loc.T("profile.prefetch", done, items.Count);
+                    if (ReferenceEquals(profile, p)) PrefetchText = now >= items.Count ? "" : Loc.T("profile.prefetch", now, items.Count);
                 });
-                try { await armory.LoadItemAsync(p, item, cts.Token); }
-                catch (OperationCanceledException) { return; }
-                done++;
-            }
-            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
-            {
-                if (ReferenceEquals(profile, p)) PrefetchText = "";
             });
+            await Task.WhenAll(tasks);
         });
     }
 
@@ -325,10 +321,7 @@ public sealed partial class ProfileViewModel : ObservableObject
         DetailFacts = "";
         DetailGods = "";
         DetailStats.Clear();
-        Interlocked.Increment(ref userWaiting);
-        ArmoryItemDetail? detail;
-        try { detail = await armory.LoadItemAsync(profile, row.Item); }
-        finally { Interlocked.Decrement(ref userWaiting); }
+        var detail = await armory.LoadItemAsync(profile, row.Item);
         if (!row.IsSelected) return;   // inzwischen ein anderes Teil gewählt
         DetailLoading = false;
         if (detail is null)

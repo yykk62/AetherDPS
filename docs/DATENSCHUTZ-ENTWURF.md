@@ -51,7 +51,8 @@ solange sie läuft, dein eigenes Profil ab (Name und Server aus den Einstellunge
 Verlauf auf deinem PC fest (Datei profil_verlauf.json im Datenordner; nichts davon geht an uns). Icons und Porträts kommen
 von assets.playnccdn.com und profileimg.plaync.com; Skill- und Item-Bilder werden einmal geladen und im Datenordner aufbewahrt
 (auch für die Kampfanalyse), dabei erhält NCSOFT technisch bedingt deine IP-Adresse.
-Profildaten anderer Spieler liegen nur kurz im Arbeitsspeicher (15 Minuten). Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (Anzeige
+Profildaten anderer Spieler liegen nur kurz im Arbeitsspeicher (15 Minuten); die Werte einzelner Ausrüstungsteile
+bewahrt die App bis zu 6 Stunden im Datenordner auf (Ordner Profile), damit ein erneuter Klick sofort antwortet. Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (Anzeige
 öffentlich abrufbarer Spieldaten für Gruppe und Spieler; abschaltbar).
 
 ### e) Discord-Profil (nur mit Einwilligung)
