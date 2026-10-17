@@ -4,6 +4,8 @@ Betrifft nur Befehle, die Claude ausführt – nicht die App und nicht die Spiel
 1. Kein Fenster der App öffnen, solange AION2.exe läuft (Wiedergaben mit --replay sind erlaubt).
 2. Mitschnitte (Spielernamen), Impressum-Daten und Geheimnisse nie committen.
 3. Alles, was online geht (push, deploy, Release), immer erst nachfragen.
+   Ausnahme (vom Nutzer am 17.10.2026 freigegeben): ein einzelnes `git push privat …` ins private Repo
+   yykk62/AetherDPS-dev, ohne Tags (Tags starten die Release-Pipeline).
 """
 import json
 import re
@@ -20,6 +22,10 @@ APP_START = [
     re.compile(r"Start-Process\b[^;|&\n]*AetherDPS", re.IGNORECASE),
     re.compile(r"(^|[;&|\n(]|&\s)\s*(start\s+(\"\"\s+)?)?[\"']?[^\s\"';|&]*AetherDPS(\.App)?\.exe[\"']?(\s|$)", re.IGNORECASE),
 ]
+
+# Nur ein einzelner Befehl, Ziel ausdrücklich „privat“, keine Tags
+PRIVAT_PUSH = re.compile(r"^\s*git\s+push\s+(-u\s+|--set-upstream\s+)?privat(\s+[\w./:-]+)*\s*$")
+TAG_REF = re.compile(r"(^|\s|:)(v\d+\.\d+|refs/tags/)|--tags|--follow-tags|--mirror")
 
 ONLINE = [
     (re.compile(r"\bgit\b.*\bpush\b"), "git push lädt Änderungen auf GitHub hoch"),
@@ -87,7 +93,9 @@ def main():
             antwort("deny", "Im Commit liegen geschützte Dateien: " + ", ".join(treffer[:5])
                             + ". Erst mit git restore --staged entfernen.")
 
-    # 3. Online nur nach Rückfrage
+    # 3. Online nur nach Rückfrage – außer Pushes ins private Repo
+    if PRIVAT_PUSH.match(befehl) and not TAG_REF.search(befehl):
+        antwort("allow", "Push ins private Repo yykk62/AetherDPS-dev ist vom Nutzer freigegeben.")
     for muster, grund in ONLINE:
         if muster.search(befehl):
             antwort("ask", grund + " – nur nach Rückfrage beim Nutzer.")
