@@ -44,7 +44,7 @@
 | <img src="docs/media/brand/icons/helmet.png" width="22" align="absmiddle" alt="" /> **[Profil](#profil)** | Dein Charakter (oder jeder auf einem EU-Server) ohne laufendes Spiel: Ausrüstung, Werte, Daevanion, Skills |
 | <img src="docs/media/brand/icons/group.png" width="22" align="absmiddle" alt="" /> **[Neu in der Gruppe](#neu-in-der-gruppe)** | Tritt jemand bei, siehst du sofort Kampfkraft, Itemstufe, Verzauberung und Waffe |
 | <img src="docs/media/brand/icons/paw.png" width="22" align="absmiddle" alt="" /> **[Pet-Finder & Radar](#pet-finder-und-pet-radar)** | Alle Pets mit deiner Stufe, ihre Spawnpunkte auf der Karte und ein Radar zu den fehlenden in deiner Nähe |
-| <img src="docs/media/brand/icons/hourglass.png" width="22" align="absmiddle" alt="" /> **[Timer & Feldbosse](#timer-und-feldbosse)** | Echte Respawn-Zeiten vom Server, Risse, Belagerung, eigene Timer als frei verschiebbare Pills |
+| <img src="docs/media/brand/icons/hourglass.png" width="22" align="absmiddle" alt="" /> **[Timer & Feldbosse](#timer-und-feldbosse)** | Echte Respawn-Zeiten vom Server, Risse, Belagerung, eigene Timer als Pills über dem Spiel |
 | <img src="docs/media/brand/icons/signal.png" width="22" align="absmiddle" alt="" /> **[Verbindung](#verbindung-und-mehr)** | Ping-Verlauf, Lag-Spitzen und die Antwort, ob es an dir, am Anbieter oder am Spielserver liegt |
 | <img src="docs/media/brand/icons/checklist.png" width="22" align="absmiddle" alt="" /> **[Checkliste](#checkliste)** | Tägliches und Wöchentliches mit automatischem Reset und Erinnerung |
 | <img src="docs/media/brand/icons/camera.png" width="22" align="absmiddle" alt="" /> **Screenshot** | STRG+S zeigt das Spielbild sofort auf deinem zweiten Monitor |
@@ -78,6 +78,7 @@ Das Overlay liegt über dem Spiel und zeigt **nur deine Gruppe**: Fremde in der 
 - **Gesamt** (ganzer Dungeon seit STRG+W) oder nur das **aktuelle Ziel**
 - **Auto-Modus:** klappt bei jedem Boss von selbst auf
 - **Sperren:** Klicks gehen ins Spiel, nichts wird versehentlich angeklickt
+- **Platzieren:** STRG+P zeigt alle Overlays mit Beispieldaten in echter Größe, sie rasten am Rand und aneinander ein
 - Der Dungeon wird erkannt (mit Schwierigkeit)
 
 </td>
@@ -163,7 +164,7 @@ Ein Klick auf ein Pet zeigt nur noch seine Fundorte, nochmal klicken bringt das 
 
 Jeder Timer ist eine eigene **Pill** über dem Spiel:
 
-- frei ziehen, grob **nebeneinander, untereinander oder als Block** hinlegen
+- im Platzierungsmodus (**STRG+P**) grob **nebeneinander, untereinander oder als Block** hinlegen
 - Rechtsklick → **Gruppieren**: Die Anordnung wird übernommen (1×3, 3×1, 2×2 …)
 - Rechtsklick auch zum **Lösen**, **Entfernen** oder **Sperren**, ohne die App zu öffnen
 
@@ -238,15 +239,16 @@ Wer das Hauptfenster schließt, lässt den Meter im Tray weiterlaufen.
 | Meter starten / ausblenden | **STRG+W** im Spiel (in den Einstellungen änderbar). Ohne STRG+W ist der Meter in Bereitschaft und zeichnet keine Kämpfe auf |
 | Automatisch erfassen | Einstellungen → „Automatisch erfassen“. Der Meter bleibt als schmale Leiste mit Name und Server stehen und klappt bei jedem Bosskampf von selbst auf. STRG+W blendet ihn dann nur ein und aus |
 | Knöpfe | erscheinen, sobald die Maus über dem Meter ist |
-| Verschieben | Boss-Karte oder Leiste ziehen |
+| Overlays platzieren | **STRG+P** im Spiel (änderbar), <img src="docs/media/brand/ui/drag.png" width="16" align="absmiddle" alt="" /> am Meter oder Tray-Symbol. Kampfanzeige, Timer, Pet-Radar und Stagger-Warnung erscheinen zugleich mit Beispieldaten; ziehen, sie rasten am Bildschirmrand und aneinander ein. **Esc** oder **Enter** legt sie fest. Die Overlays nehmen dabei nie den Fokus |
+| Overlays nach Lage | Einstellungen → Meter: außerhalb von Dungeons die Timer, im Dungeon die Kampfanzeige, im Bosskampf zusätzlich die Stagger-Warnung |
 | Breite ändern | rechten Rand ziehen. Die Höhe passt sich der Gruppe an |
 | Gesamt / Ziel | Knopf oben. **Gesamt** = aller Schaden seit STRG+W, zum Beispiel ein ganzer Dungeon. **Ziel** = nur der aktuelle Gegner |
 | Zurücksetzen | <img src="docs/media/brand/ui/reset.png" width="16" align="absmiddle" alt="" /> |
 | Ausblenden (Bereitschaft) | <img src="docs/media/brand/ui/close.png" width="16" align="absmiddle" alt="" />. Ganz beenden über das Tray-Symbol → „Beenden“ |
 | Skill-Details | <img src="docs/media/brand/ui/menu.png" width="16" align="absmiddle" alt="" /> oder auf einen Spieler klicken |
 | Sperren (Mausklicks gehen ins Spiel) | <img src="docs/media/brand/ui/lock.png" width="16" align="absmiddle" alt="" /> Schloss-Symbol. Zum Entsperren wieder aufs Schloss klicken, es bleibt immer klickbar |
-| Timer-Pills | ziehen; Rechtsklick → Gruppieren, Lösen, Entfernen, Sperren. Entsperren im Reiter Timer |
-| Pet-Radar | erscheint mit der Spielkarte (Reiter Pets: auch „Immer“). Mausrad zoomt (wird gemerkt), Ziehen schaut kurz woanders hin, nach 5 s ist die Karte wieder bei dir. Knöpfe auf der Karte: <img src="docs/media/brand/ui/drag.png" width="16" align="absmiddle" alt="" /> verschieben, <img src="docs/media/brand/ui/chevron-down.png" width="16" align="absmiddle" alt="" /> einklappen, <img src="docs/media/brand/ui/close.png" width="16" align="absmiddle" alt="" /> bis zum nächsten Öffnen ausblenden, <img src="docs/media/brand/ui/menu.png" width="16" align="absmiddle" alt="" /> Liste ein/aus, <img src="docs/media/brand/ui/center.png" width="16" align="absmiddle" alt="" /> zu dir. Größe über die Ecke unten rechts |
+| Timer-Pills | verschieben im Platzierungsmodus; Rechtsklick → Gruppieren, Lösen, Entfernen, Sperren. Entsperren im Reiter Timer |
+| Pet-Radar | erscheint mit der Spielkarte (Reiter Pets: auch „Immer“). Mausrad zoomt (wird gemerkt), Ziehen schaut kurz woanders hin, nach 5 s ist die Karte wieder bei dir. Knöpfe auf der Karte: <img src="docs/media/brand/ui/drag.png" width="16" align="absmiddle" alt="" /> Overlays platzieren, <img src="docs/media/brand/ui/chevron-down.png" width="16" align="absmiddle" alt="" /> einklappen, <img src="docs/media/brand/ui/close.png" width="16" align="absmiddle" alt="" /> bis zum nächsten Öffnen ausblenden, <img src="docs/media/brand/ui/menu.png" width="16" align="absmiddle" alt="" /> Liste ein/aus, <img src="docs/media/brand/ui/center.png" width="16" align="absmiddle" alt="" /> zu dir. Größe über die Ecke unten rechts |
 | Einstellungen | <img src="docs/media/brand/ui/gear.png" width="16" align="absmiddle" alt="" /> oder Tray-Symbol: Hotkey ändern, Deckkraft, nur meine Gruppe (Standard: an), „Du“ statt Name |
 | Screenshot auf den Zweitbildschirm | **STRG+S** im Spiel (änderbar). Der Spiel-Bildschirm erscheint im Vollbild auf dem anderen Monitor, jeder neue ersetzt das alte Bild. Klick oder ESC blendet aus |
 | AION 2 starten | Knopf im Hauptfenster oder Einstellung „AION 2 mit dem Meter starten“ (Steam). Läuft der Meter beim Login schon, kennt er deinen Charakter sofort |

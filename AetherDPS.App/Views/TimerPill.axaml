@@ -7,7 +7,7 @@
              Width="150" Height="46">
   <!-- Eine Pill: alle gleich groß, Name oben klein, Restzeit groß -->
   <Border Name="Root" Background="{DynamicResource Surface.WellDeep}" CornerRadius="23" BorderBrush="{DynamicResource Line.Frame}" BorderThickness="1"
-          Padding="16,4,16,5" Cursor="SizeAll" ToolTip.Tip="{Binding At}">
+          Padding="16,4,16,5" ToolTip.Tip="{Binding At}">
     <StackPanel VerticalAlignment="Center">
       <StackPanel Orientation="Horizontal" Spacing="4">
         <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{Binding Icon, Converter={x:Static l:Icons.ByName}}" Width="11" Height="11" />

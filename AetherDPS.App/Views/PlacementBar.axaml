@@ -1,0 +1,26 @@
+<Window Classes="ins" FontFamily="{DynamicResource Font.Ui}" xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:l="using:AetherDPS.App.Services"
+        x:Class="AetherDPS.App.Views.PlacementBar"
+        Title="{l:T placement.title}"
+        SystemDecorations="None" ShowActivated="False" Topmost="True" ShowInTaskbar="False"
+        CanResize="False" SizeToContent="WidthAndHeight"
+        TransparencyLevelHint="Transparent" Background="Transparent" Icon="/Assets/icon.ico">
+
+  <!-- Platzierungsmodus: eine Zeile oben mittig, was zu tun ist und wie man fertig wird -->
+  <Border Background="{DynamicResource Surface.WellDeep}" BorderBrush="{DynamicResource Accent.Phase}" BorderThickness="1"
+          CornerRadius="{DynamicResource Radius.Well}" Padding="16,10,10,10">
+    <StackPanel Orientation="Horizontal" Spacing="16">
+      <Image Source="{l:Icon drag, Size=20}" Width="20" Height="20" VerticalAlignment="Center" RenderOptions.BitmapInterpolationMode="HighQuality" />
+      <StackPanel VerticalAlignment="Center" Spacing="1">
+        <TextBlock Text="{l:T placement.title}" FontSize="{DynamicResource Size.Body}" FontWeight="SemiBold" />
+        <TextBlock Classes="small muted" Text="{l:T placement.hint}" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+        <Border Classes="keycap"><TextBlock Text="{l:T key.esc}" /></Border>
+        <Border Classes="keycap"><TextBlock Text="{l:T key.enter}" /></Border>
+      </StackPanel>
+      <Button Classes="cta" Content="{l:T placement.done}" Click="OnDone" VerticalAlignment="Center" />
+    </StackPanel>
+  </Border>
+</Window>

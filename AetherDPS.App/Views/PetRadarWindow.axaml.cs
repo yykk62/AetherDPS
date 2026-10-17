@@ -1,3 +1,4 @@
+using AetherDPS.App.Services;
 using AetherDPS.App.ViewModels;
 using AetherDPS.Engine;
 using Avalonia;
@@ -9,11 +10,11 @@ namespace AetherDPS.App.Views;
 
 /// <summary>
 /// Pet-Radar über dem Spiel. Beim ersten Mal mittig und so groß wie die Spielkarte (es kann sie ersetzen).
-/// Alle Knöpfe liegen klein auf der Karte: ⠿ (oder der Rand) verschiebt, die Ecke unten rechts ändert die Größe,
-/// ▾ klappt es zu einer kleinen Leiste ein, ☰ blendet die Liste ein/aus.
+/// Alle Knöpfe liegen klein auf der Karte: ⠿ startet den Platzierungsmodus (dort wird verschoben), die Ecke unten
+/// rechts ändert die Größe, ▾ klappt es zu einer kleinen Leiste ein, ☰ blendet die Liste ein/aus.
 /// Position, Größe und Zustand werden gemerkt.
 /// </summary>
-public partial class PetRadarWindow : Window
+public partial class PetRadarWindow : Window, IPlaceableOverlay
 {
     private const double SmallestWidth = 240, SmallestMap = 160;
     private readonly MeterSettings? settings;
@@ -41,6 +42,11 @@ public partial class PetRadarWindow : Window
         };
         EventHandler hide = (_, _) =>
         {
+            if (placing)
+            {
+                visibleBeforePlacement = false;   // nach dem Platzieren zu
+                return;
+            }
             Remember();
             Hide();
         };
@@ -52,7 +58,8 @@ public partial class PetRadarWindow : Window
             vm.HideRequested -= hide;
         };
         Root.PointerPressed += OnRootPressed;
-        MoveHandle.PointerPressed += OnRootPressed;   // auf der Karte selbst verschiebt Ziehen den Ausschnitt
+        MoveHandle.PointerPressed += OnMoveHandlePressed;   // auf der Karte selbst verschiebt Ziehen den Ausschnitt
+        ClickThrough.NeverActivate(this);
         Grip.PointerPressed += OnGripPressed;
         Grip.PointerMoved += OnGripMoved;
         Grip.PointerReleased += (_, e) => EndResize(e.Pointer);
@@ -129,18 +136,58 @@ public partial class PetRadarWindow : Window
         settings.Save();
     }
 
-    /// <summary>Ziehen verschiebt; eingeklappt ist ein Klick ohne Bewegung „aufklappen“.</summary>
+    /// <summary>Eingeklappt ist ein Klick „aufklappen“. Verschoben wird im Platzierungsmodus.</summary>
     private void OnRootPressed(object? sender, PointerPressedEventArgs e)
     {
         if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed || resizeFrom is not null) return;
-        var before = Position;
-        BeginMoveDrag(e);   // unter Windows kehrt das erst nach dem Loslassen zurück
-        if (IsCollapsed && Position == before)
+        if (IsCollapsed) SetCollapsed(false);
+    }
+
+    /// <summary>⠿: alle Overlays platzieren (statt nur dieses Fenster zu ziehen).</summary>
+    private void OnMoveHandlePressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
+        e.Handled = true;
+        PlacementRequested?.Invoke(this, EventArgs.Empty);
+    }
+
+    public event EventHandler? PlacementRequested;
+
+    private bool placing, visibleBeforePlacement;
+
+    public string? PlacementLabel => Loc.T("radar.title");
+
+    public IEnumerable<Window> PlacementWindows => [this];
+
+    /// <summary>In der gemerkten (bzw. Start-)Größe zeigen – so groß, wie es im Spiel steht.</summary>
+    public void BeginPlacement()
+    {
+        placing = true;
+        visibleBeforePlacement = IsVisible;
+        if (!IsVisible)
         {
-            SetCollapsed(false);
-            return;
+            (DataContext as PetRadarViewModel)?.ShowSample(true);   // offen bleiben die echten Daten
+            Place();
+            Show();
         }
-        Remember();
+    }
+
+    public void EndPlacement()
+    {
+        placing = false;
+        if (settings is not null)
+        {
+            settings.PetRadarLeft = Position.X;
+            settings.PetRadarTop = Position.Y;
+            if (!IsCollapsed)
+            {
+                settings.PetRadarWidth ??= Math.Round(Width);
+                settings.PetRadarMapHeight ??= Math.Round(RadarMap.Height);
+            }
+            settings.Save();
+        }
+        (DataContext as PetRadarViewModel)?.ShowSample(false);
+        if (!visibleBeforePlacement) Hide();
     }
 
     private void OnCollapse(object? sender, RoutedEventArgs e) => SetCollapsed(true);

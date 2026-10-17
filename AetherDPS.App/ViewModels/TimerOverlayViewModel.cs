@@ -50,6 +50,16 @@ public sealed partial class TimerOverlayViewModel : ObservableObject
 
     public TimerRow? Row(string name) => Rows.FirstOrDefault(r => r.Item.Name == name);
 
+    /// <summary>Platzierungsmodus: jede Pill des Overlays, auch wenn sie gerade ausgeblendet ist („nur kurz vorher“).</summary>
+    public TimerRow? PlacementRow(string name)
+    {
+        if (Row(name) is { } row) return row;
+        if (timers.Service.Items().FirstOrDefault(i => i.Name == name && i.ShowInOverlay) is not { } item) return null;
+        var placed = new TimerRow(timers, item);
+        placed.Update(DateTime.Now);
+        return placed;
+    }
+
     private bool Visible(TimerItem item, DateTime now)
     {
         if (!item.ShowInOverlay) return false;

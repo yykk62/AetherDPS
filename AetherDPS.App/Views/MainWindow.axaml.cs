@@ -10,7 +10,7 @@ using Avalonia.Threading;
 
 namespace AetherDPS.App.Views;
 
-public partial class MainWindow : Window
+public partial class MainWindow : Window, IPlaceableOverlay
 {
     private readonly IAppSettingsService? settings;
 
@@ -24,9 +24,8 @@ public partial class MainWindow : Window
         ApplyOpacity();
         settings.SettingsChanged += (_, _) => Dispatcher.UIThread.Post(ApplyOpacity);
 
-        // Kampfkarte und Mini-Leiste sind die Griffe zum Verschieben
-        Header.PointerPressed += OnDragAreaPressed;
-        CompactBar.PointerPressed += OnDragAreaPressed;
+        // Verschieben läuft über den Platzierungsmodus (alle Overlays zusammen), das Schloss ist nur noch Klick-durch
+        ClickThrough.NeverActivate(this);
         ClickThroughButton.IsCheckedChanged += (_, _) => SetClickThrough(ClickThroughButton.IsChecked == true);
         lockTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(60), DispatcherPriority.Input, (_, _) => UpdateLockHover());
         Closing += (_, _) => SaveBounds();
@@ -64,9 +63,34 @@ public partial class MainWindow : Window
     private void OnCloseClicked(object? sender, Avalonia.Interactivity.RoutedEventArgs e) =>
         CloseRequested?.Invoke(this, EventArgs.Empty);
 
-    private void OnDragAreaPressed(object? sender, PointerPressedEventArgs e)
+    /// <summary>Knopf „Overlays platzieren“ (nur unter der Maus sichtbar).</summary>
+    public event EventHandler? PlacementRequested;
+
+    private void OnPlaceClicked(object? sender, Avalonia.Interactivity.RoutedEventArgs e) =>
+        PlacementRequested?.Invoke(this, EventArgs.Empty);
+
+    private bool visibleBeforePlacement;
+
+    public string? PlacementLabel => Loc.T("placement.combat");
+
+    public IEnumerable<Window> PlacementWindows => [this];
+
+    /// <summary>Beispielkampf in echter Größe, klickbar (auch wenn gesperrt), sichtbar.</summary>
+    public void BeginPlacement()
     {
-        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) BeginMoveDrag(e);
+        visibleBeforePlacement = IsVisible;
+        ViewModel.ShowSample(true);
+        lockTimer?.Stop();
+        if (!IsVisible) Show();
+        ClickThrough.Set(this, false);
+    }
+
+    public void EndPlacement()
+    {
+        SaveBounds();
+        ViewModel.ShowSample(false);
+        SetClickThrough(IsClickThrough);
+        if (!visibleBeforePlacement) Hide();
     }
 
     private void OnRowPressed(object? sender, PointerPressedEventArgs e)

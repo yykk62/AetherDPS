@@ -17,6 +17,7 @@ using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Markup.Xaml.Styling;
+using Avalonia.Media.Imaging;
 using Avalonia.Styling;
 using Avalonia.Themes.Fluent;
 using Avalonia.Threading;
@@ -573,6 +574,147 @@ public sealed class UiTests : IDisposable
         foreach (var category in new[] { "Riss", "Weltboss", "Event", "Sonstiges" })
             if (Loc.T("timer.cat." + category) == "timer.cat." + category) missing.Add("timer.cat." + category);
         Assert.Empty(missing);
+    }
+
+    /// <summary>
+    /// Platzierungsmodus: alle Overlays zugleich mit Beispieldaten in echter Größe, Ziehen rastet ein, Festlegen speichert
+    /// die Stellen und stellt die Sichtbarkeit wieder her. Bilder: jedes Overlay mit Rahmen und eine Gesamtansicht.
+    /// </summary>
+    [AvaloniaFact]
+    public void Platzierungsmodus_zeigt_alle_Overlays_und_speichert()
+    {
+        Start();
+        var service = provider!.GetRequiredService<TimerService>();
+        foreach (var (name, min) in new[] { ("Gildenboss", 42), ("Pause", 15) })
+        {
+            service.AddCustom(name, min);
+            service.StartCustom(name);
+        }
+        Dispatcher.UIThread.RunJobs();
+        var settings = provider!.GetRequiredService<MeterSettings>();
+        var upstream = provider!.GetRequiredService<IAppSettingsService>();
+        var meter = provider!.GetRequiredService<MainViewModel>();
+        meter.Refresh();
+        var pills = new TimerPills(provider!.GetRequiredService<TimerOverlayViewModel>(), service);
+        pills.Sync();   // Gruppen anlegen, Overlay selbst aus
+        var overlay = Overlay();
+        var radar = new PetRadarWindow(provider!.GetRequiredService<PetRadarViewModel>(), settings);
+        var staggerVm = provider!.GetRequiredService<StaggerWarningViewModel>();
+        var stagger = new StaggerWarningWindow(staggerVm, settings);
+        var placement = new OverlayPlacement(() => [overlay, pills, radar, stagger]);
+        pills.WindowsChanged += placement.Refresh;
+        Assert.False(overlay.IsVisible || radar.IsVisible || stagger.IsVisible);
+
+        placement.Begin();
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(placement.IsActive);
+        Assert.True(overlay.IsVisible && radar.IsVisible && stagger.IsVisible);
+        int pillWindows = pills.Windows.Count(w => w.IsVisible);
+        Assert.True(pillWindows >= 2, pillWindows.ToString());   // die beiden eigenen Timer (dazu feste Termine)
+        Assert.Equal(3 + pillWindows, placement.Windows.Count);   // Kampfanzeige, Pills, Radar, Stagger
+        // Beispieldaten in echter Größe
+        Assert.False(meter.IsCompact);
+        Assert.Equal(4, meter.Players.Count);
+        Assert.Single(meter.Players, p => p.IsUser);
+        Assert.True(staggerVm.IsActive);
+        var radarVm = provider!.GetRequiredService<PetRadarViewModel>();
+        Assert.NotNull(radarVm.Map);
+        Assert.NotNull(radarVm.Self);
+        Assert.NotEmpty(radarVm.Rows);
+        meter.Refresh();   // der 200-ms-Takt überschreibt die Beispieldaten nicht
+        Assert.Equal(4, meter.Players.Count);
+        staggerVm.Refresh();
+        Assert.True(staggerVm.IsActive);
+
+        // Kampfanzeige links oben, Stagger knapp rechts daneben → rastet bündig ein
+        overlay.Position = new PixelPoint(200, 200);
+        Dispatcher.UIThread.RunJobs();
+        var size = PixelSize.FromSize(overlay.ClientSize, overlay.RenderScaling);
+        placement.MoveTo(stagger, new PixelPoint(200 + size.Width + 11, 205));
+        Assert.Equal(new PixelPoint(200 + size.Width + (int)TimerPill.Gap, 200), stagger.Position);
+        // eine Pill knapp unter die Kampfanzeige: linke Kanten in einer Linie
+        var pill = pills.Windows.First(w => w.IsVisible);
+        placement.MoveTo(pill, new PixelPoint(195, 200 + size.Height + 9));
+        Assert.Equal(new PixelPoint(200, 200 + size.Height + (int)TimerPill.Gap), pill.Position);
+        radar.Position = new PixelPoint(900, 150);
+
+        // Ziehen mit der Maus verschiebt nur – die Knöpfe darunter bekommen nichts
+        var before = radar.Position;
+        radar.MouseDown(new Point(60, 60), Avalonia.Input.MouseButton.Left);
+        radar.MouseMove(new Point(100, 90));
+        radar.MouseUp(new Point(100, 90), Avalonia.Input.MouseButton.Left);
+        Dispatcher.UIThread.RunJobs();
+        var moved = radar.Position - before;   // um den Weg der Maus, höchstens ums Einrasten daneben
+        Assert.InRange(moved.X, 40 - 12, 40 + 12);
+        Assert.InRange(moved.Y, 30 - 12, 30 + 12);
+
+        var frames = new List<(PixelPoint At, Bitmap Frame)>();
+        foreach (var (window, name) in new (Window, string)[] { (overlay, "kampfanzeige"), (pill, "timer"), (radar, "radar"), (stagger, "stagger"), (placement.Bar!, "leiste") })
+            frames.Add((window.Position, Frame(window, "platzieren_" + name)));
+        foreach (var other in pills.Windows.Where(w => w.IsVisible && w != pill))
+            frames.Add((other.Position, Frame(other, "platzieren_timer2")));
+        Overview(frames, "platzieren_gesamt");
+
+        placement.End();
+        Dispatcher.UIThread.RunJobs();
+        Assert.False(placement.IsActive);
+        // Stellen gespeichert
+        Assert.Equal(stagger.Position.X, settings.StaggerLeft);
+        Assert.Equal(stagger.Position.Y, settings.StaggerTop);
+        Assert.Equal(overlay.Position.X, upstream.WindowLeft);
+        Assert.Equal(overlay.Position.Y, upstream.WindowTop);
+        Assert.Equal(radar.Position.X, settings.PetRadarLeft);
+        Assert.Equal(radar.Position.Y, settings.PetRadarTop);
+        var group = service.Settings.Groups.Single(g => g.Cells.Any(c => c.Name == pill.Group.Cells[0].Name));
+        Assert.Equal(pill.Position.X, group.X);
+        Assert.Equal(pill.Position.Y, group.Y);
+        // vorher unsichtbar → wieder unsichtbar, echte Daten zurück
+        Assert.False(overlay.IsVisible || radar.IsVisible || stagger.IsVisible);
+        Assert.DoesNotContain(pills.Windows, w => w.IsVisible);
+        Assert.True(meter.IsCompact);
+        Assert.False(staggerVm.IsActive);
+        Assert.Null(radarVm.Self);   // ohne Spieldaten wieder ohne Position
+        Assert.Empty(placement.Windows);
+
+        // gespeicherte Stelle gilt beim nächsten Öffnen der Stagger-Warnung
+        var again = new StaggerWarningWindow(staggerVm, settings);
+        again.Show();
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(stagger.Position, again.Position);
+        again.Close();
+        foreach (var w in new Window[] { overlay, radar, stagger }) w.Close();
+    }
+
+    /// <summary>Bild eines offenen Fensters (bleibt offen), mit AETHERDPS_SHOTS gespeichert.</summary>
+    private static Bitmap Frame(Window window, string name)
+    {
+        Dispatcher.UIThread.RunJobs();
+        AvaloniaHeadlessPlatform.ForceRenderTimerTick();
+        var frame = window.CaptureRenderedFrame();
+        Assert.NotNull(frame);
+        if (Environment.GetEnvironmentVariable("AETHERDPS_SHOTS") is { Length: > 0 } dir)
+        {
+            Directory.CreateDirectory(dir);
+            frame.Save(Path.Combine(dir, name + ".png"));
+        }
+        return frame;
+    }
+
+    /// <summary>Alle Overlays an ihren Stellen auf einer dunklen Fläche – so sieht der Platzierungsmodus über dem Spiel aus.</summary>
+    private static void Overview(List<(PixelPoint At, Bitmap Frame)> frames, string name)
+    {
+        int left = frames.Min(f => f.At.X) - 40, top = frames.Min(f => f.At.Y) - 40;
+        var canvas = new Canvas { Background = TokenBrush.Get("Surface.Frame") };
+        foreach (var (at, frame) in frames)
+        {
+            var image = new Image { Source = frame, Width = frame.Size.Width, Height = frame.Size.Height };
+            Canvas.SetLeft(image, at.X - left);
+            Canvas.SetTop(image, at.Y - top);
+            canvas.Children.Add(image);
+        }
+        double width = frames.Max(f => f.At.X - left + f.Frame.Size.Width) + 40;
+        double height = frames.Max(f => f.At.Y - top + f.Frame.Size.Height) + 40;
+        Shot(new Window { Width = width, Height = height, Content = canvas }, name);
     }
 
     public void Dispose()

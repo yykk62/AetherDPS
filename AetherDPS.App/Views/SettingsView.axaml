@@ -131,6 +131,17 @@
           </Grid>
           <TextBlock Classes="dim" Text="{l:T settings.screenshot_hint}" />
         </StackPanel>
+
+        <StackPanel Spacing="6">
+          <TextBlock Classes="label" Text="{l:T settings.placement}" />
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBox Name="PlacementBox" Text="{Binding PlacementText}" IsReadOnly="True" FontSize="14" FontWeight="SemiBold"
+                     HorizontalContentAlignment="Center" Cursor="Hand" />
+            <Button Grid.Column="1" Content="{l:T settings.placement_reset}" Command="{Binding ResetPlacementHotkeyCommand}" Margin="8,0,0,0" MinWidth="160" HorizontalContentAlignment="Center" />
+          </Grid>
+          <TextBlock Classes="dim" Text="{l:T settings.placement_hint}" />
+          <Button Content="{l:T settings.placement_now}" Command="{Binding PlaceOverlaysCommand}" HorizontalAlignment="Left" />
+        </StackPanel>
       </StackPanel>
     </Border>
     </StackPanel>
@@ -184,6 +195,12 @@
             <TextBlock Classes="label" Text="{l:T settings.stagger_warning}" />
           </CheckBox>
           <TextBlock Classes="hint" Text="{l:T settings.stagger_warning_hint}" />
+        </StackPanel>
+        <StackPanel Spacing="4">
+          <CheckBox IsChecked="{Binding OverlaysBySituation}">
+            <TextBlock Classes="label" Text="{l:T settings.by_situation}" />
+          </CheckBox>
+          <TextBlock Classes="hint" Text="{l:T settings.by_situation_hint}" />
         </StackPanel>
       </StackPanel>
     </Border>

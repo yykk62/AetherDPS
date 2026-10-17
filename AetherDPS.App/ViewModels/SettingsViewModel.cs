@@ -8,7 +8,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace AetherDPS.App.ViewModels;
 
-public enum HotkeySlot { Meter, Screenshot }
+public enum HotkeySlot { Meter, Screenshot, Placement }
 
 public sealed record LanguageOption(string Code, string Name)
 {
@@ -23,6 +23,8 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     [ObservableProperty] private string hotkeyText;
     [ObservableProperty] private string screenshotText;
+    [ObservableProperty] private string placementText;
+    [ObservableProperty] private bool overlaysBySituation;
     [ObservableProperty] private bool isCapturingHotkey;
     [ObservableProperty] private string hotkeyError = "";
     [ObservableProperty] private double opacityPercent;
@@ -86,6 +88,8 @@ public sealed partial class SettingsViewModel : ObservableObject
         RefreshUpdate();
         hotkeyText = meter.HotkeyText;
         screenshotText = meter.ScreenshotText;
+        placementText = meter.PlacementText;
+        overlaysBySituation = meter.OverlaysBySituation;
         opacityPercent = Math.Round(upstream.WindowOpacity * 100);
         partyOnly = meter.PartyOnly;
         hideName = upstream.IsNicknameHidden;
@@ -173,6 +177,18 @@ public sealed partial class SettingsViewModel : ObservableObject
         meter.LaunchGameWithMeter = value;
         meter.Save();
     }
+
+    partial void OnOverlaysBySituationChanged(bool value)
+    {
+        meter.OverlaysBySituation = value;
+        meter.Save();
+    }
+
+    /// <summary>„Jetzt platzieren“: Platzierungsmodus für alle Overlays starten.</summary>
+    public event EventHandler? PlacementRequested;
+
+    [RelayCommand]
+    private void PlaceOverlays() => PlacementRequested?.Invoke(this, EventArgs.Empty);
 
     partial void OnStaggerWarningChanged(bool value)
     {
@@ -267,10 +283,11 @@ public sealed partial class SettingsViewModel : ObservableObject
 
         parts.Add(keyName);
         var text = string.Join("+", parts);
-        var other = slot == HotkeySlot.Meter
-            ? (meter.ScreenshotModifiers, meter.ScreenshotKey)
-            : (meter.HotkeyModifiers, meter.HotkeyKey);
-        if (other == (mods, vk))
+        var others = new List<(uint, uint)>();
+        if (slot != HotkeySlot.Meter) others.Add((meter.HotkeyModifiers, meter.HotkeyKey));
+        if (slot != HotkeySlot.Screenshot) others.Add((meter.ScreenshotModifiers, meter.ScreenshotKey));
+        if (slot != HotkeySlot.Placement) others.Add((meter.PlacementModifiers, meter.PlacementKey));
+        if (others.Contains((mods, vk)))
         {
             HotkeyError = Loc.T("settings.hotkey_taken");
             return false;
@@ -284,7 +301,12 @@ public sealed partial class SettingsViewModel : ObservableObject
         if (capturing is not HotkeySlot slot) return;
         capturing = null;
         IsCapturingHotkey = false;
-        SetText(slot, slot == HotkeySlot.Meter ? meter.HotkeyText : meter.ScreenshotText);
+        SetText(slot, slot switch
+        {
+            HotkeySlot.Meter => meter.HotkeyText,
+            HotkeySlot.Screenshot => meter.ScreenshotText,
+            _ => meter.PlacementText,
+        });
     }
 
     [RelayCommand]
@@ -293,10 +315,14 @@ public sealed partial class SettingsViewModel : ObservableObject
     [RelayCommand]
     private void ResetScreenshotHotkey() => Apply(HotkeySlot.Screenshot, MeterSettings.ModControl, 0x53, Loc.T("key.ctrl") + "+S");
 
+    [RelayCommand]
+    private void ResetPlacementHotkey() => Apply(HotkeySlot.Placement, MeterSettings.ModControl, 0x50, Loc.T("key.ctrl") + "+P");
+
     private void SetText(HotkeySlot slot, string text)
     {
         if (slot == HotkeySlot.Meter) HotkeyText = text;
-        else ScreenshotText = text;
+        else if (slot == HotkeySlot.Screenshot) ScreenshotText = text;
+        else PlacementText = text;
     }
 
     private void Apply(HotkeySlot slot, uint mods, uint vk, string text)
@@ -307,11 +333,17 @@ public sealed partial class SettingsViewModel : ObservableObject
             meter.HotkeyKey = vk;
             meter.HotkeyText = text;
         }
-        else
+        else if (slot == HotkeySlot.Screenshot)
         {
             meter.ScreenshotModifiers = mods;
             meter.ScreenshotKey = vk;
             meter.ScreenshotText = text;
+        }
+        else
+        {
+            meter.PlacementModifiers = mods;
+            meter.PlacementKey = vk;
+            meter.PlacementText = text;
         }
         meter.Save();
         capturing = null;

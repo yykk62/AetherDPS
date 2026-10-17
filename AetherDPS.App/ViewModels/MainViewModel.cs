@@ -67,6 +67,7 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty] private bool showNameHint;
     [ObservableProperty] private bool showTargetView;
     [ObservableProperty] private string viewLabel = Loc.T("view.run");
+    [ObservableProperty] private string placementTip = "";
 
     // Mini-Leiste (kein Kampf) und Kampfkarte
     [ObservableProperty] private bool isCompact = true;
@@ -140,9 +141,11 @@ public sealed partial class MainViewModel : ObservableObject
         this.timers = timers;
         this.self = self;
         StandbyText = Loc.T("standby.text", meterSettings.HotkeyText);
+        PlacementTip = Loc.T("placement.tip", meterSettings.PlacementText);
         meterSettings.Changed += (_, _) => Dispatcher.UIThread.Post(() =>
         {
             StandbyText = Loc.T("standby.text", meterSettings.HotkeyText);
+            PlacementTip = Loc.T("placement.tip", meterSettings.PlacementText);
             Refresh();
         });
         mode.Changed += (_, _) => Dispatcher.UIThread.Post(() =>
@@ -189,6 +192,7 @@ public sealed partial class MainViewModel : ObservableObject
     internal void Refresh()
     {
         UpdateStatus();
+        if (sample) return;
 
         var now = DateTime.Now;
         var snapshot = run.Snapshot();
@@ -256,6 +260,68 @@ public sealed partial class MainViewModel : ObservableObject
         // Solange dein Charakter unbekannt ist, erklären, wie er erkannt wird.
         ShowNameHint = !userKnown && !IsCompact;
         if (ShowDetails) UpdateSkills();
+    }
+
+    private bool sample;
+
+    /// <summary>
+    /// Platzierungsmodus: Kampfanzeige mit Beispieldaten in echter Größe – Boss mit Leben und Stagger, vier Spieler
+    /// (Mitspieler mit Pseudonymen). Aus = wieder der echte Kampf.
+    /// </summary>
+    public void ShowSample(bool on)
+    {
+        sample = on;
+        rowsById.Clear();
+        Players.Clear();
+        Skills.Clear();
+        if (!on)
+        {
+            Refresh();
+            return;
+        }
+        UpdateSelf();
+        ShowDetails = false;
+        IsCompact = false;
+        ShowNameHint = false;
+        CardLabel = Loc.T("card.fight");
+        Duration = "03:42";
+        IsBoss = true;
+        HasDeaths = false;
+        LimitText = "";
+        TargetName = Loc.T("placement.sample_boss");
+        HasTarget = true;
+        TargetHpPercent = 58;
+        HpPercentText = Format.Percent(58);
+        HpText = Format.Compact(6_195_096) + " / " + Format.Compact(10_681_200);
+        ShowHpBar = true;
+        StaggerVisible = true;
+        StaggerOnly = false;
+        StaggerPercent = 62;
+        StaggerText = Loc.T("card.stagger", 196, 317);
+        int selfClass = meterSettings.CharacterClassId > 0 ? meterSettings.CharacterClassId : 14;
+        (string Name, int ClassId, double Dps, bool IsUser)[] party =
+        [
+            ("Aria", 11, 48_200, false),
+            (SelfName == Loc.T("compact.unknown") ? Loc.T("player.you") : SelfName, selfClass, 41_700, true),
+            ("Kael", 15, 35_900, false),
+            ("Mirela", 17, 12_400, false),
+        ];
+        double total = party.Sum(p => p.Dps);
+        foreach (var (name, classId, dps, isUser) in party)
+            Players.Add(new PlayerRow(Players.Count + 1)
+            {
+                Name = name,
+                IsUser = isUser,
+                ClassName = GameText.ClassName(classId, ""),
+                ClassBrush = ClassVisuals.Brush(classId),
+                ClassIcon = ClassVisuals.Icon(classId),
+                Dps = Format.Compact(dps) + "/s",
+                Total = Format.Compact(dps * 222),
+                Share = Format.Percent(dps / total * 100),
+                BarPercent = dps / party[0].Dps * 100,
+            });
+        HasPlayers = true;
+        PartyDps = Loc.T("footer.party", Format.Compact(total));
     }
 
     /// <summary>Auto-Modus: welcher Bosskampf gerade angezeigt wird.</summary>

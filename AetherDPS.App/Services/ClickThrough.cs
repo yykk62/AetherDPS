@@ -10,6 +10,7 @@ public static partial class ClickThrough
     private const int GwlExStyle = -20;
     private const long WsExTransparent = 0x20;
     private const long WsExLayered = 0x80000;
+    private const long WsExNoActivate = 0x8000000;
 
     public static void Set(Window window, bool enabled)
     {
@@ -21,6 +22,25 @@ public static partial class ClickThrough
         long wanted = enabled ? style | WsExTransparent | WsExLayered : style & ~WsExTransparent;
         if (wanted != style)
             SetWindowLongPtrW(handle, GwlExStyle, new IntPtr(wanted));
+    }
+
+    /// <summary>
+    /// Overlays nehmen nie den Fokus: Ein Klick darauf (Knöpfe, Ziehen im Platzierungsmodus) lässt das Spiel im
+    /// Vordergrund, die Tastatur bleibt beim Spiel. Einmal nach dem Öffnen aufrufen.
+    /// </summary>
+    public static void NeverActivate(Window window)
+    {
+        if (!OperatingSystem.IsWindows()) return;
+        void Apply()
+        {
+            var handle = window.TryGetPlatformHandle()?.Handle ?? IntPtr.Zero;
+            if (handle == IntPtr.Zero) return;
+            long style = GetWindowLongPtrW(handle, GwlExStyle).ToInt64();
+            if ((style & WsExNoActivate) == 0)
+                SetWindowLongPtrW(handle, GwlExStyle, new IntPtr(style | WsExNoActivate));
+        }
+        if (window.TryGetPlatformHandle() is not null) Apply();
+        window.Opened += (_, _) => Apply();
     }
 
     /// <summary>

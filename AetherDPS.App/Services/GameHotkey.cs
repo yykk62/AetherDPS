@@ -5,7 +5,7 @@ using AetherDPS.Engine;
 namespace AetherDPS.App.Services;
 
 /// <summary>
-/// Hotkeys (Meter: Standard STRG+W, Screenshot: Standard STRG+S; in den Einstellungen
+/// Hotkeys (Meter: Standard STRG+W, Screenshot: Standard STRG+S, Overlays platzieren: STRG+P; in den Einstellungen
 /// änderbar) – aber NUR solange AION 2 (oder unser Overlay/Hauptfenster) im Vordergrund ist.
 /// Sonst bleiben die Tasten frei (STRG+W schließt dann weiter Browser-Tabs, STRG+S speichert).
 /// Bewusst RegisterHotKey statt Tastatur-Hook: kein Mitlesen von Tastendrücken.
@@ -14,6 +14,7 @@ public sealed partial class GameHotkey : IDisposable
 {
     private const uint ModNoRepeat = 0x4000;
     private const uint WmHotkey = 0x0312, PmRemove = 0x0001;
+    private const uint VkEscape = 0x1B, VkReturn = 0x0D;
     private static readonly string[] GameProcessNames = ["AION2"];
 
     private sealed class Slot(int id, int debounceMs, Func<(uint Mods, uint Key)> combo, Action<IntPtr> fire)
@@ -41,6 +42,18 @@ public sealed partial class GameHotkey : IDisposable
     /// <summary>Screenshot. Argument = Fenster im Vordergrund beim Drücken (meist AION 2).</summary>
     public event EventHandler<IntPtr>? ScreenshotPressed;
 
+    /// <summary>Platzierungsmodus an/aus (Standard STRG+P).</summary>
+    public event EventHandler? PlacementPressed;
+
+    /// <summary>Esc oder Enter im Platzierungsmodus: Overlays festlegen.</summary>
+    public event EventHandler? PlacementDonePressed;
+
+    /// <summary>
+    /// Solange der Platzierungsmodus läuft, gehören Esc und Enter dem Meter – die Overlays nehmen nie den Fokus,
+    /// darum laufen auch diese Tasten über RegisterHotKey statt über das Fenster.
+    /// </summary>
+    public static volatile bool PlacementActive;
+
     public GameHotkey(MeterSettings settings)
     {
         slots =
@@ -50,6 +63,12 @@ public sealed partial class GameHotkey : IDisposable
                 _ => Pressed?.Invoke(this, EventArgs.Empty)),
             new Slot(0xA3, 300, () => settings.ScreenshotEnabled ? (settings.ScreenshotModifiers, settings.ScreenshotKey) : (0u, 0u),
                 fg => ScreenshotPressed?.Invoke(this, fg)),
+            new Slot(0xA4, 400, () => (settings.PlacementModifiers, settings.PlacementKey),
+                _ => PlacementPressed?.Invoke(this, EventArgs.Empty)),
+            new Slot(0xA5, 300, () => PlacementActive ? (0u, VkEscape) : (0u, 0u),
+                _ => PlacementDonePressed?.Invoke(this, EventArgs.Empty)),
+            new Slot(0xA6, 300, () => PlacementActive ? (0u, VkReturn) : (0u, 0u),
+                _ => PlacementDonePressed?.Invoke(this, EventArgs.Empty)),
         ];
         thread = new Thread(Loop) { IsBackground = true, Name = "GameHotkey" };
         thread.Start();

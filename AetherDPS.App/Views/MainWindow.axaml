@@ -84,6 +84,7 @@
         </StackPanel>
         <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
           <StackPanel Orientation="Horizontal" IsVisible="{Binding #Root.IsPointerOver}">
+            <Button Classes="ovl" Click="OnPlaceClicked" ToolTip.Tip="{Binding PlacementTip}"><Image Source="{l:Icon drag, Size=13}" Width="13" Height="13" /></Button>
             <Button Classes="ovl" Command="{Binding OpenSettingsCommand}" ToolTip.Tip="{l:T header.settings}"><Image Source="{l:Icon gear, Size=13}" Width="13" Height="13" /></Button>
             <Button Classes="ovl" Click="OnCloseClicked" ToolTip.Tip="{l:T header.close}"><Image Source="{l:Icon close, Size=11}" Width="11" Height="11" /></Button>
           </StackPanel>
@@ -118,6 +119,7 @@
                 <Button Classes="ovl" Content="{Binding ViewLabel}" Command="{Binding ToggleViewCommand}" ToolTip.Tip="{l:T view.tooltip}" FontSize="11" />
                 <Button Classes="ovl" Command="{Binding ResetCommand}" ToolTip.Tip="{l:T header.reset}"><Image Source="{l:Icon reset, Size=13}" Width="13" Height="13" /></Button>
                 <ToggleButton Classes="ovl" IsChecked="{Binding ShowDetails}" Command="{Binding ToggleDetailsCommand}" ToolTip.Tip="{l:T header.details}"><Image Source="{l:Icon menu, Size=13}" Width="13" Height="13" /></ToggleButton>
+                <Button Classes="ovl" Click="OnPlaceClicked" ToolTip.Tip="{Binding PlacementTip}"><Image Source="{l:Icon drag, Size=13}" Width="13" Height="13" /></Button>
                 <Button Classes="ovl" Command="{Binding OpenSettingsCommand}" ToolTip.Tip="{l:T header.settings}"><Image Source="{l:Icon gear, Size=13}" Width="13" Height="13" /></Button>
                 <Button Classes="ovl" Click="OnCloseClicked" ToolTip.Tip="{l:T header.close}"><Image Source="{l:Icon close, Size=11}" Width="11" Height="11" /></Button>
               </StackPanel>
@@ -213,7 +215,8 @@
       </Grid>
     </StackPanel>
 
-    <!-- Schloss: immer sichtbar und auch im gesperrten Zustand klickbar (Hover-Timer im Code) -->
+    <!-- Schloss: Klicks gehen ins Spiel. Immer sichtbar und auch im gesperrten Zustand klickbar (Hover-Timer im Code).
+         Verschoben wird über den Platzierungsmodus (Knopf mit dem Griff oder Kürzel). -->
     <ToggleButton Classes="ovl" Name="ClickThroughButton" ToolTip.Tip="{l:T header.clickthrough}" AutomationProperties.Name="Sperren"
                   HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,0,0">
       <Panel>
