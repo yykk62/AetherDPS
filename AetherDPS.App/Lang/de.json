@@ -668,8 +668,9 @@
   "runkind.unknown": "Ohne Dungeon",
   "now.verdict_not_comparable": "{0}, ohne Vergleich",
   "now.verdict_first_in": "Erster Lauf dieser Art",
-  "now.not_comparable_text": "{0} zählt nicht für Vergleiche und Bestzeiten. Verglichen werden nur Expeditionen, Transzendenz, tägliche Dungeons und Abyss.",
+  "now.not_comparable_text": "{0} zählt nicht für Vergleiche und Bestzeiten. Verglichen werden nur Expeditionen, Eroberung, Transzendenz, tägliche Dungeons und Abyss.",
   "now.one_earlier": "Bisher ein früherer Lauf dieser Art ({0}) mit {1}. Ab dem zweiten zeigt die Messlatte deinen Verlauf.",
   "now.first_run_in": "Dein erster Lauf dieser Art ({0}). Ab dem nächsten siehst du hier, ob du besser wirst.",
-  "now.scale_legend_in": "Striche: deine früheren Läufe ({0}), {1} Stück"
+  "now.scale_legend_in": "Striche: deine früheren Läufe ({0}), {1} Stück",
+  "runkind.conquest": "Eroberung"
 }

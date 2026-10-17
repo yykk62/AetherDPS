@@ -668,8 +668,9 @@
   "runkind.unknown": "던전 없음",
   "now.verdict_not_comparable": "{0}, 비교 없음",
   "now.verdict_first_in": "이 종류의 첫 회차",
-  "now.not_comparable_text": "{0}은(는) 비교와 최고 기록에 포함되지 않습니다. 원정, 초월, 일일 던전, 어비스만 비교합니다.",
+  "now.not_comparable_text": "{0}은(는) 비교와 최고 기록에 포함되지 않습니다. 원정, 정복, 초월, 일일 던전, 어비스만 비교합니다.",
   "now.one_earlier": "이 종류의 이전 회차는 1번 ({0}), {1}. 두 번째부터 눈금으로 변화를 볼 수 있습니다.",
   "now.first_run_in": "이 종류의 첫 회차입니다 ({0}). 다음부터 실력이 늘고 있는지 여기서 볼 수 있습니다.",
-  "now.scale_legend_in": "눈금: 이전 회차 ({0}), 총 {1}회"
+  "now.scale_legend_in": "눈금: 이전 회차 ({0}), 총 {1}회",
+  "runkind.conquest": "정복"
 }

@@ -668,8 +668,9 @@
   "runkind.unknown": "Sem masmorra",
   "now.verdict_not_comparable": "{0}, sem comparação",
   "now.verdict_first_in": "Primeira corrida deste tipo",
-  "now.not_comparable_text": "{0} não conta para comparações nem recordes. Só são comparadas expedições, transcendência, masmorras diárias e o Abismo.",
+  "now.not_comparable_text": "{0} não conta para comparações nem recordes. Só são comparadas expedições, conquista, transcendência, masmorras diárias e o Abismo.",
   "now.one_earlier": "Até agora uma corrida anterior deste tipo ({0}) com {1}. A partir da segunda, a escala mostra sua evolução.",
   "now.first_run_in": "Sua primeira corrida deste tipo ({0}). A partir da próxima, você verá aqui se está melhorando.",
-  "now.scale_legend_in": "Traços: suas corridas anteriores ({0}), {1} no total"
+  "now.scale_legend_in": "Traços: suas corridas anteriores ({0}), {1} no total",
+  "runkind.conquest": "Conquista"
 }

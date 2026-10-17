@@ -1,5 +1,5 @@
 {
- "source": "Eigene Zuordnung der bekannten Dungeons (dungeons.json) zu den Kategorien im Spiel. Unbekannte Instanzen (z. B. Quest- oder versiegelte Dungeons) und die offene Welt fließen in keine Vergleiche ein.",
+ "source": "Zuordnung der bekannten Dungeons (dungeons.json), geprüft am 17.10.2026 an aion2data.com, aion2.wiki.fextralife.com und namu.wiki: 11 Expeditionen (Erkundung; mit Schwierigkeit normal/hard = Eroberung), Transzendenz (Stufen). Tägliche Dungeons (Crobakhi's Secret Depository, Daeva Bio-Research Base, Odylium Repository) fehlen in dungeons.json, ihre Karten-Ids sind noch unbekannt. Unbekannte Instanzen (versiegelte Dungeons, Albtraum, Prüfungen) und die offene Welt fließen in keine Vergleiche ein.",
  "expedition": [
   600001,
   600002,

@@ -668,8 +668,9 @@
   "runkind.unknown": "无副本",
   "now.verdict_not_comparable": "{0}，不比较",
   "now.verdict_first_in": "此类首次记录",
-  "now.not_comparable_text": "{0} 不计入比较和最佳纪录。只比较远征、超越、每日副本和深渊。",
+  "now.not_comparable_text": "{0} 不计入比较和最佳纪录。只比较远征、征服、超越、每日副本和深渊。",
   "now.one_earlier": "此类此前有 1 次记录（{0}），{1}。从第二次起，刻度会显示你的变化。",
   "now.first_run_in": "这是此类的第一次记录（{0}）。从下一次起，这里会显示你是否在进步。",
-  "now.scale_legend_in": "刻度：之前的记录（{0}），共 {1} 次"
+  "now.scale_legend_in": "刻度：之前的记录（{0}），共 {1} 次",
+  "runkind.conquest": "征服"
 }

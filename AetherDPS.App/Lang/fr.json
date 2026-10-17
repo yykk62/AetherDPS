@@ -668,8 +668,9 @@
   "runkind.unknown": "Sans donjon",
   "now.verdict_not_comparable": "{0}, sans comparaison",
   "now.verdict_first_in": "Première session de ce type",
-  "now.not_comparable_text": "{0} ne compte ni pour les comparaisons ni pour les records. Seuls les expéditions, la transcendance, les donjons quotidiens et les Abysses sont comparés.",
+  "now.not_comparable_text": "{0} ne compte ni pour les comparaisons ni pour les records. Seuls les expéditions, la conquête, la transcendance, les donjons quotidiens et les Abysses sont comparés.",
   "now.one_earlier": "Pour l'instant une session précédente de ce type ({0}) avec {1}. Dès la deuxième, l'échelle montre ta progression.",
   "now.first_run_in": "Ta première session de ce type ({0}). Dès la prochaine, tu verras ici si tu progresses.",
-  "now.scale_legend_in": "Traits : tes sessions précédentes ({0}), {1} au total"
+  "now.scale_legend_in": "Traits : tes sessions précédentes ({0}), {1} au total",
+  "runkind.conquest": "Conquête"
 }

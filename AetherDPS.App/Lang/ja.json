@@ -668,8 +668,9 @@
   "runkind.unknown": "ダンジョンなし",
   "now.verdict_not_comparable": "{0}、比較なし",
   "now.verdict_first_in": "この種類で初めての周回",
-  "now.not_comparable_text": "{0} は比較や自己ベストに含まれません。比較するのは遠征、超越、デイリーダンジョン、アビスだけです。",
+  "now.not_comparable_text": "{0} は比較や自己ベストに含まれません。比較するのは遠征、征服、超越、デイリーダンジョン、アビスだけです。",
   "now.one_earlier": "この種類の過去の周回は1回 ({0})、{1}。2回目から目盛りで推移が見られます。",
   "now.first_run_in": "この種類で初めての周回です ({0})。次回から上達しているかがここに表示されます。",
-  "now.scale_legend_in": "目盛り: 過去の周回 ({0})、計 {1} 回"
+  "now.scale_legend_in": "目盛り: 過去の周回 ({0})、計 {1} 回",
+  "runkind.conquest": "征服"
 }

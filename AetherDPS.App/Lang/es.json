@@ -668,8 +668,9 @@
   "runkind.unknown": "Sin mazmorra",
   "now.verdict_not_comparable": "{0}, sin comparación",
   "now.verdict_first_in": "Primer recorrido de este tipo",
-  "now.not_comparable_text": "{0} no cuenta para comparaciones ni récords. Solo se comparan expediciones, trascendencia, mazmorras diarias y el Abismo.",
+  "now.not_comparable_text": "{0} no cuenta para comparaciones ni récords. Solo se comparan expediciones, conquista, trascendencia, mazmorras diarias y el Abismo.",
   "now.one_earlier": "Hasta ahora un recorrido anterior de este tipo ({0}) con {1}. A partir del segundo, la escala muestra tu evolución.",
   "now.first_run_in": "Tu primer recorrido de este tipo ({0}). A partir del siguiente verás aquí si mejoras.",
-  "now.scale_legend_in": "Marcas: tus recorridos anteriores ({0}), {1} en total"
+  "now.scale_legend_in": "Marcas: tus recorridos anteriores ({0}), {1} en total",
+  "runkind.conquest": "Conquista"
 }

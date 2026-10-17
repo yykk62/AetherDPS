@@ -668,8 +668,9 @@
   "runkind.unknown": "No dungeon",
   "now.verdict_not_comparable": "{0}, no comparison",
   "now.verdict_first_in": "First run of this kind",
-  "now.not_comparable_text": "{0} does not count for comparisons and best times. Only expeditions, transcendence, daily dungeons and the Abyss are compared.",
+  "now.not_comparable_text": "{0} does not count for comparisons and best times. Only expeditions, conquest, transcendence, daily dungeons and the Abyss are compared.",
   "now.one_earlier": "One earlier run of this kind so far ({0}) with {1}. From the second on, the scale shows your progress.",
   "now.first_run_in": "Your first run of this kind ({0}). From the next one on, you'll see here whether you're improving.",
-  "now.scale_legend_in": "Ticks: your earlier runs ({0}), {1} total"
+  "now.scale_legend_in": "Ticks: your earlier runs ({0}), {1} total",
+  "runkind.conquest": "Conquest"
 }

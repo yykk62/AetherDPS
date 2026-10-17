@@ -151,6 +151,9 @@ public static class GameText
 
     public static string? ServerName(int id) => servers.GetValueOrDefault(id);
 
+    /// <summary>Schwierigkeit einer Dungeon-Karte: exploration, normal, hard, level oder null.</summary>
+    public static string? DungeonDifficulty(int mapId) => dungeons.TryGetValue(mapId, out var d) ? d.Difficulty : null;
+
     /// <summary>Alle bekannten Dungeon-Karten (Ids aus dungeons.json).</summary>
     public static IEnumerable<int> DungeonIds => dungeons.Keys;
 
