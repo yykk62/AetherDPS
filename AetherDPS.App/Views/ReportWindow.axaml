@@ -1,4 +1,4 @@
-<Window xmlns="https://github.com/avaloniaui"
+<Window Classes="ins" FontFamily="{DynamicResource Font.Ui}" xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:AetherDPS.App.ViewModels"
         xmlns:l="using:AetherDPS.App.Services"
@@ -7,20 +7,20 @@
         Title="{l:T report.title}"
         Width="560" SizeToContent="Height" CanResize="False"
         WindowStartupLocation="CenterScreen"
-        Background="#141820" Icon="/Assets/icon.ico">
+        Background="{DynamicResource Surface.Frame}" Icon="/Assets/icon.ico">
 
   <Window.Styles>
     <Style Selector="TextBlock">
-      <Setter Property="Foreground" Value="#E6E8EC" />
+      <Setter Property="Foreground" Value="{DynamicResource Text.Primary}" />
       <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
     <Style Selector="TextBlock.dim">
-      <Setter Property="Foreground" Value="#8E96A3" />
+      <Setter Property="Foreground" Value="{DynamicResource Text.Muted}" />
       <Setter Property="FontSize" Value="12" />
     </Style>
     <Style Selector="Button.primary">
-      <Setter Property="Background" Value="#E0A84A" />
-      <Setter Property="Foreground" Value="#141820" />
+      <Setter Property="Background" Value="{DynamicResource Action.Primary}" />
+      <Setter Property="Foreground" Value="{DynamicResource Text.OnAction}" />
       <Setter Property="FontWeight" Value="SemiBold" />
       <Setter Property="Padding" Value="20,9" />
       <Setter Property="CornerRadius" Value="6" />

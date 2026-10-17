@@ -45,7 +45,7 @@ public sealed record PetMonsterRow(string Name, string Count, int Number = 0);
 /// </summary>
 public sealed partial class PetsViewModel : ObservableObject
 {
-    private static IBrush Missing => Services.TokenBrush.Get("Signal.Bad");
+    private static IBrush Missing => Services.TokenBrush.Get("Text.Muted");   // „fehlt“ ist der Normalfall, kein Alarm
     private static IBrush Partial => Services.TokenBrush.Get("Text.Primary");
     private static IBrush Max => Services.TokenBrush.Get("Signal.Good");
     private static IBrush Unknown => Services.TokenBrush.Get("Text.Muted");

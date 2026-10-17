@@ -232,7 +232,7 @@
   "settings.section.start": "Inicio",
   "hub.character": "Tu personaje: {0}",
   "hub.character_unknown": "Tu personaje aún no se ha reconocido. Se detecta al entrar o tras un teletransporte y luego se recuerda.",
-  "warning.title": "STAGGER",
+  "warning.title": "Stagger",
   "warning.points": "{0} / {1}",
   "warning.seconds": "{0} s",
   "settings.stagger_warning": "Aviso de Stagger en mecánicas de wipe",
@@ -539,7 +539,7 @@
   "page.settings.sub": "Idioma, atajos, medidor, Discord, privacidad",
   "settings.nav.general": "General",
   "settings.nav.meter": "Medidor",
-  "settings.nav.privacy": "Discord y privacidad",
+  "settings.nav.privacy": "Privacidad",
   "shell.place.now": "Ahora",
   "shell.place.fights": "Combates",
   "shell.place.world": "Mundo",
@@ -594,7 +594,6 @@
   "now.col_duration": "Duración",
   "now.col_group_dps": "DPS del grupo",
   "now.empty_preview": "Esto verás tras tu próximo recorrido: tu DPS comparado con tus recorridos anteriores.",
-  "now.preview_needle": "hoy",
   "now.preview_avg": "tu media",
   "now.legend_best": "mejor hasta ahora",
   "now.delta_avg": "frente a tu media",
@@ -632,5 +631,8 @@
   "pets.detail_missing": "Aún no conseguido",
   "pets.detail_stage": "Nivel {0}/{1}",
   "pets.detail_max": "Nivel máximo alcanzado",
-  "pets.detail_next": "faltan {0} almas para el nivel {1}"
+  "pets.detail_next": "faltan {0} almas para el nivel {1}",
+  "party.empty_title": "Sin grupo ahora mismo",
+  "conn.check_title": "¿Dónde está el problema?",
+  "fights.vs_best": "tu DPS comparado con tu mejor recorrido aquí"
 }

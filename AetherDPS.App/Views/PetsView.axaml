@@ -25,7 +25,7 @@
             <ListBox.ItemTemplate>
               <DataTemplate x:DataType="vm:SpeciesOption">
                 <Panel ToolTip.Tip="{Binding Name}" Height="30">
-                  <TextBlock Text="{l:T pets.filter_short.all}" FontSize="13" IsVisible="{Binding IsAll}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                  <TextBlock Text="{l:T pets.filter_short.all}" FontSize="12" IsVisible="{Binding IsAll}" VerticalAlignment="Center" HorizontalAlignment="Center" />
                   <Border Width="30" Height="30" CornerRadius="15" ClipToBounds="True" BorderBrush="{Binding Brush}" BorderThickness="2"
                           IsVisible="{Binding !IsAll}" Background="{DynamicResource Surface.WellDeep}">
                     <Image Source="{Binding Icon}" Stretch="UniformToFill" />

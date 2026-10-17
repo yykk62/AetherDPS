@@ -1,4 +1,4 @@
-<Window xmlns="https://github.com/avaloniaui"
+<Window Classes="ins" FontFamily="{DynamicResource Font.Ui}" xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:AetherDPS.App.ViewModels"
         xmlns:l="using:AetherDPS.App.Services"
@@ -10,16 +10,16 @@
         TransparencyLevelHint="Transparent" Background="Transparent" Icon="/Assets/icon.ico">
 
   <!-- Mitten im Bild, schlank und halbtransparent, Klicks gehen immer ins Spiel -->
-  <Border Background="#B3101318" BorderBrush="#40A970E8" BorderThickness="1" CornerRadius="8" Padding="12,8,12,10" Width="260">
+  <Border Background="{DynamicResource Surface.WellDeep}" BorderBrush="{DynamicResource Accent.PhaseDim}" BorderThickness="1" CornerRadius="8" Padding="12,8,12,10" Width="260">
     <StackPanel Spacing="6">
       <Grid ColumnDefinitions="Auto,*,Auto">
-        <TextBlock Text="{l:T warning.title}" Foreground="#C9A8F2" FontSize="11" FontWeight="Bold" LetterSpacing="1.5" VerticalAlignment="Center" />
-        <TextBlock Grid.Column="1" Text="{Binding Points}" Foreground="#99EEF0F3" FontSize="11" Margin="8,0,0,0" VerticalAlignment="Center" />
+        <TextBlock Text="{l:T warning.title}" Foreground="{DynamicResource Accent.Phase}" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" />
+        <TextBlock Grid.Column="1" Text="{Binding Points}" Foreground="{DynamicResource Text.Secondary}" FontSize="11" Margin="8,0,0,0" VerticalAlignment="Center" />
         <TextBlock Grid.Column="2" Text="{Binding TimeLeft}" FontSize="20" FontWeight="Bold" VerticalAlignment="Center"
                    Foreground="{Binding Hurry, Converter={x:Static l:BoolBrush.HurryRedElseText}}" />
       </Grid>
       <ProgressBar Height="6" MinHeight="0" CornerRadius="3" Maximum="100" Value="{Binding Percent}"
-                   Foreground="#A970E8" Background="#26FFFFFF" />
+                   Foreground="{DynamicResource Accent.Phase}" Background="{DynamicResource Surface.Well}" />
     </StackPanel>
   </Border>
 </Window>

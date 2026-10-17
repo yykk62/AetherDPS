@@ -5,35 +5,38 @@
         x:Class="AetherDPS.App.Views.SettingsView"
         x:DataType="vm:SettingsViewModel">
 
+  <!-- Einstellungen im Blatt: Bereiche oben wählen, darunter Abschnitte auf dem Rahmen.
+       Farben nur aus den Tokens (docs/DESIGN.md). -->
   <UserControl.Styles>
     <Style Selector="TextBlock">
-      <Setter Property="Foreground" Value="#E6E8EC" />
       <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
     <Style Selector="TextBlock.dim">
-      <Setter Property="Foreground" Value="#8E96A3" />
-      <Setter Property="FontSize" Value="11" />
+      <Setter Property="Foreground" Value="{DynamicResource Text.Muted}" />
+      <Setter Property="FontSize" Value="{DynamicResource Size.Small}" />
     </Style>
     <Style Selector="TextBlock.label">
-      <Setter Property="FontWeight" Value="SemiBold" />
-      <Setter Property="FontSize" Value="13" />
+      <Setter Property="FontWeight" Value="Medium" />
     </Style>
     <Style Selector="TextBlock.section">
-      <Setter Property="FontSize" Value="15" />
+      <Setter Property="FontSize" Value="16" />
       <Setter Property="FontWeight" Value="SemiBold" />
-      <Setter Property="Foreground" Value="#E0A84A" />
+      <Setter Property="Foreground" Value="{DynamicResource Text.Primary}" />
     </Style>
     <!-- Erklärung unter einer Checkbox, eingerückt auf Höhe des Texts -->
     <Style Selector="TextBlock.hint">
-      <Setter Property="Foreground" Value="#8E96A3" />
-      <Setter Property="FontSize" Value="11" />
+      <Setter Property="Foreground" Value="{DynamicResource Text.Muted}" />
+      <Setter Property="FontSize" Value="{DynamicResource Size.Small}" />
       <Setter Property="Margin" Value="28,0,0,0" />
+    </Style>
+    <Style Selector="TextBlock.warn">
+      <Setter Property="Foreground" Value="{DynamicResource Signal.Warn}" />
     </Style>
   </UserControl.Styles>
 
   <!-- Bereiche oben wählen, darunter nur die Karten des Bereichs -->
-  <Grid RowDefinitions="Auto,*" MaxWidth="720" HorizontalAlignment="Left">
-    <ListBox Name="SettingsNav" Classes="seg" SelectedIndex="0" Margin="0,0,0,14" MaxWidth="660" HorizontalAlignment="Left">
+  <Grid RowDefinitions="Auto,*">
+    <ListBox Name="SettingsNav" Classes="seg" SelectedIndex="0" Margin="0,0,0,6">
       <ListBoxItem Content="{l:T settings.nav.general}" />
       <ListBoxItem Content="{l:T settings.section.controls}" />
       <ListBoxItem Content="{l:T settings.nav.meter}" />
@@ -50,7 +53,7 @@
         <ComboBox ItemsSource="{Binding Languages}" SelectedItem="{Binding SelectedLanguage}" MinWidth="240" />
         <TextBlock Classes="dim" Text="{l:T settings.language_hint}" />
         <StackPanel Orientation="Horizontal" Spacing="10" IsVisible="{Binding LanguageChanged}">
-          <TextBlock Text="{l:T settings.language_restart_hint}" Foreground="#E0A84A" VerticalAlignment="Center" />
+          <TextBlock Text="{l:T settings.language_restart_hint}" Classes="warn" VerticalAlignment="Center" />
           <Button Classes="primary" Content="{l:T settings.language_restart}" Command="{Binding RestartCommand}" />
         </StackPanel>
       </StackPanel>
@@ -112,7 +115,7 @@
                      HorizontalContentAlignment="Center" Cursor="Hand" />
             <Button Grid.Column="1" Content="{l:T settings.hotkey_reset}" Command="{Binding ResetHotkeyCommand}" Margin="8,0,0,0" MinWidth="160" HorizontalContentAlignment="Center" />
           </Grid>
-          <TextBlock Classes="dim" Text="{Binding HotkeyError}" Foreground="#E86A6A"
+          <TextBlock Classes="dim" Text="{Binding HotkeyError}" Foreground="{DynamicResource Signal.Bad}"
                      IsVisible="{Binding HotkeyError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
           <TextBlock Classes="dim" Text="{l:T settings.hotkey_hint}" />
         </StackPanel>
@@ -214,8 +217,8 @@
             <TextBlock Classes="label" Text="{l:T settings.usage_stats}" />
           </CheckBox>
           <TextBlock Classes="hint" Text="{l:T settings.usage_stats_hint}" />
-          <Border Background="#0E1117" CornerRadius="4" Padding="10,6" Margin="28,4,0,0">
-            <SelectableTextBlock Text="{Binding UsageStatsExample}" FontFamily="Consolas,monospace" FontSize="11" Foreground="#C8CDD6" TextWrapping="Wrap" />
+          <Border Background="{DynamicResource Surface.WellDeep}" CornerRadius="{DynamicResource Radius.Control}" Padding="10,6" Margin="28,4,0,0">
+            <SelectableTextBlock Text="{Binding UsageStatsExample}" FontFamily="Consolas,monospace" FontSize="11" Foreground="{DynamicResource Text.Secondary}" TextWrapping="Wrap" />
           </Border>
         </StackPanel>
         <StackPanel Spacing="4">

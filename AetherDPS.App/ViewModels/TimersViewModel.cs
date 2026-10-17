@@ -31,6 +31,9 @@ public sealed partial class TimerRow(TimersViewModel owner, TimerItem item) : Ob
     [ObservableProperty] private string at = "";
     [ObservableProperty] private bool isDue;
     [ObservableProperty] private bool isSoon;
+    /// <summary>Countdown-Spur: füllt sich in der letzten Stunde vor dem Termin (0…100).</summary>
+    [ObservableProperty] private double urgency;
+    [ObservableProperty] private bool hasUrgency;
     [ObservableProperty] private string respawnMinutes = "";
 
     public void Update(DateTime now)
@@ -44,6 +47,8 @@ public sealed partial class TimerRow(TimersViewModel owner, TimerItem item) : Ob
         var left = due - now;
         IsDue = left <= TimeSpan.Zero;
         IsSoon = !IsDue && left <= TimeSpan.FromMinutes(10);
+        HasUrgency = left <= TimeSpan.FromHours(1);
+        Urgency = Math.Clamp(100 - left.TotalMinutes / 60 * 100, 0, 100);
         At = due.Date == now.Date ? Loc.T("timer.at", due) : due.ToString("ddd HH:mm", Loc.Culture);
         Remaining = IsDue ? Loc.T("timer.now") : left.TotalHours >= 24 ? Loc.T("time.days_hours", (int)left.TotalDays, left.Hours)
             : left.TotalHours >= 1 ? left.ToString(@"h\:mm\:ss") : left.ToString(@"mm\:ss");

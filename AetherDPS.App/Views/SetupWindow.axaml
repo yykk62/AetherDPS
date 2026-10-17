@@ -1,4 +1,4 @@
-<Window xmlns="https://github.com/avaloniaui"
+<Window Classes="ins" FontFamily="{DynamicResource Font.Ui}" xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:AetherDPS.App.ViewModels"
         xmlns:l="using:AetherDPS.App.Services"
@@ -7,15 +7,15 @@
         Title="{l:T setup.window_title}"
         Width="560" SizeToContent="Height" CanResize="False"
         WindowStartupLocation="CenterScreen"
-        Background="#141820" Icon="/Assets/icon.ico">
+        Background="{DynamicResource Surface.Frame}" Icon="/Assets/icon.ico">
 
   <Window.Styles>
     <Style Selector="TextBlock">
-      <Setter Property="Foreground" Value="#E6E8EC" />
+      <Setter Property="Foreground" Value="{DynamicResource Text.Primary}" />
       <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
     <Style Selector="TextBlock.dim">
-      <Setter Property="Foreground" Value="#8E96A3" />
+      <Setter Property="Foreground" Value="{DynamicResource Text.Muted}" />
     </Style>
     <Style Selector="Border.num">
       <Setter Property="Width" Value="26" />
@@ -27,11 +27,11 @@
       <Setter Property="HorizontalAlignment" Value="Center" />
       <Setter Property="VerticalAlignment" Value="Center" />
       <Setter Property="FontWeight" Value="Bold" />
-      <Setter Property="Foreground" Value="#141820" />
+      <Setter Property="Foreground" Value="{DynamicResource Text.OnAction}" />
     </Style>
     <Style Selector="Button.primary">
-      <Setter Property="Background" Value="#E0A84A" />
-      <Setter Property="Foreground" Value="#141820" />
+      <Setter Property="Background" Value="{DynamicResource Action.Primary}" />
+      <Setter Property="Foreground" Value="{DynamicResource Text.OnAction}" />
       <Setter Property="FontWeight" Value="SemiBold" />
       <Setter Property="FontSize" Value="15" />
       <Setter Property="Padding" Value="22,10" />
@@ -40,12 +40,12 @@
       <Setter Property="HorizontalContentAlignment" Value="Center" />
     </Style>
     <Style Selector="Button.primary:pointerover /template/ ContentPresenter">
-      <Setter Property="Background" Value="#F0BC62" />
-      <Setter Property="Foreground" Value="#141820" />
+      <Setter Property="Background" Value="{DynamicResource Action.PrimaryHover}" />
+      <Setter Property="Foreground" Value="{DynamicResource Text.OnAction}" />
     </Style>
     <Style Selector="Button.link">
       <Setter Property="Background" Value="Transparent" />
-      <Setter Property="Foreground" Value="#7FA8F5" />
+      <Setter Property="Foreground" Value="{DynamicResource Accent.Phase}" />
       <Setter Property="Padding" Value="0" />
       <Setter Property="HorizontalAlignment" Value="Center" />
     </Style>
@@ -88,7 +88,7 @@
               IsVisible="{Binding !IsDone}" IsEnabled="{Binding !IsBusy}" />
       <Button Classes="primary" Content="{l:T setup.start_meter}" Command="{Binding StartMeterCommand}"
               IsVisible="{Binding IsDone}" />
-      <ProgressBar Value="{Binding Progress}" Maximum="100" Height="6" Foreground="#E0A84A" IsVisible="{Binding IsBusy}" />
+      <ProgressBar Value="{Binding Progress}" Maximum="100" Height="6" Foreground="{DynamicResource Text.Primary}" IsVisible="{Binding IsBusy}" />
       <TextBlock Text="{Binding StateText}" FontSize="13" TextAlignment="Center"
                  Foreground="{Binding HasError, Converter={x:Static l:BoolBrush.ErrorRedElseText}}" />
     </StackPanel>

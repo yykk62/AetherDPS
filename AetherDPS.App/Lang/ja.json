@@ -539,7 +539,7 @@
   "page.settings.sub": "言語、ホットキー、メーター、Discord、プライバシー",
   "settings.nav.general": "一般",
   "settings.nav.meter": "メーター",
-  "settings.nav.privacy": "Discord とプライバシー",
+  "settings.nav.privacy": "プライバシー",
   "shell.place.now": "いま",
   "shell.place.fights": "戦闘",
   "shell.place.world": "ワールド",
@@ -594,7 +594,6 @@
   "now.col_duration": "所要時間",
   "now.col_group_dps": "パーティーDPS",
   "now.empty_preview": "次の周回のあとはこう表示されます: 過去の記録と比べたあなたのDPS。",
-  "now.preview_needle": "今回",
   "now.preview_avg": "あなたの平均",
   "now.legend_best": "これまでのベスト",
   "now.delta_avg": "平均との差",
@@ -632,5 +631,8 @@
   "pets.detail_missing": "まだ未収集",
   "pets.detail_stage": "レベル {0}/{1}",
   "pets.detail_max": "最大レベル到達",
-  "pets.detail_next": "レベル {1} まであと {0} 魂"
+  "pets.detail_next": "レベル {1} まであと {0} 魂",
+  "party.empty_title": "現在パーティーなし",
+  "conn.check_title": "どこで問題が起きている？",
+  "fights.vs_best": "ここでの自己ベストと比べたあなたのDPS"
 }

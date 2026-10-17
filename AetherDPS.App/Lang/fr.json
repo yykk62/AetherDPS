@@ -232,7 +232,7 @@
   "settings.section.start": "Démarrage",
   "hub.character": "Ton personnage : {0}",
   "hub.character_unknown": "Ton personnage n'est pas encore reconnu. Il sera détecté à la connexion ou après une téléportation, puis mémorisé.",
-  "warning.title": "STAGGER",
+  "warning.title": "Stagger",
   "warning.points": "{0} / {1}",
   "warning.seconds": "{0} s",
   "settings.stagger_warning": "Alerte de Stagger pour les mécaniques de wipe",
@@ -539,7 +539,7 @@
   "page.settings.sub": "Langue, raccourcis, compteur, Discord, confidentialité",
   "settings.nav.general": "Général",
   "settings.nav.meter": "Compteur",
-  "settings.nav.privacy": "Discord et confidentialité",
+  "settings.nav.privacy": "Confidentialité",
   "shell.place.now": "Maintenant",
   "shell.place.fights": "Combats",
   "shell.place.world": "Monde",
@@ -594,7 +594,6 @@
   "now.col_duration": "Durée",
   "now.col_group_dps": "DPS du groupe",
   "now.empty_preview": "Voici ce que tu verras après ta prochaine session : tes DPS comparés à tes sessions précédentes.",
-  "now.preview_needle": "aujourd'hui",
   "now.preview_avg": "ta moyenne",
   "now.legend_best": "meilleur jusqu'ici",
   "now.delta_avg": "par rapport à ta moyenne",
@@ -632,5 +631,8 @@
   "pets.detail_missing": "Pas encore obtenu",
   "pets.detail_stage": "Niveau {0}/{1}",
   "pets.detail_max": "Niveau maximal atteint",
-  "pets.detail_next": "encore {0} âmes jusqu'au niveau {1}"
+  "pets.detail_next": "encore {0} âmes jusqu'au niveau {1}",
+  "party.empty_title": "Pas de groupe en ce moment",
+  "conn.check_title": "Où ça coince ?",
+  "fights.vs_best": "tes DPS par rapport à ta meilleure session ici"
 }

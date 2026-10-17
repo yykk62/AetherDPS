@@ -39,11 +39,11 @@
                 <TextBlock Classes="reading muted" Text="± %" />
               </StackPanel>
               <views:Messlatte Grid.Column="1" History="{Binding PreviewHistory}" Current="98" Average="90" Best="93"
-                               NeedleText="{l:T now.preview_needle}" AverageText="{l:T now.preview_avg}"
+                               AverageText="{l:T now.preview_avg}"
                                WorseText="{l:T now.scale_less}" BetterText="{l:T now.scale_more}"
                                SlotBrush="{DynamicResource Surface.WellDeep}" TickBrush="{DynamicResource Line.Tick}"
-                               BestBrush="{DynamicResource Text.Secondary}"
-                               NeedleBrush="{DynamicResource Accent.Self}" AverageBrush="{DynamicResource Text.Secondary}"
+                               BestBrush="{DynamicResource Line.Tick}"
+                               NeedleBrush="{DynamicResource Text.Muted}" AverageBrush="{DynamicResource Text.Secondary}"
                                LabelBrush="{DynamicResource Text.Muted}" />
             </Grid>
           </StackPanel>

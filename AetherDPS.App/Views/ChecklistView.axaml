@@ -62,13 +62,13 @@
         </StackPanel>
         <StackPanel Grid.Column="2" Spacing="8">
           <TextBlock Classes="section" Text="{l:T check.resets}" />
-          <WrapPanel>
-            <TextBlock Classes="secondary" Text="{l:T check.daily_reset}" VerticalAlignment="Center" Margin="0,0,8,6" />
-            <ComboBox ItemsSource="{Binding Hours}" SelectedIndex="{Binding DailyHour}" Width="90" Margin="0,0,16,6" />
-            <TextBlock Classes="secondary" Text="{l:T check.weekly_reset}" VerticalAlignment="Center" Margin="0,0,8,6" />
-            <ComboBox ItemsSource="{Binding Days}" SelectedIndex="{Binding WeeklyDay}" Width="130" Margin="0,0,6,6" />
-            <ComboBox ItemsSource="{Binding Hours}" SelectedIndex="{Binding WeeklyHour}" Width="90" Margin="0,0,0,6" />
-          </WrapPanel>
+          <Grid ColumnDefinitions="Auto,12,Auto,8,Auto" RowDefinitions="Auto,8,Auto">
+            <TextBlock Classes="secondary" Text="{l:T check.daily_reset}" VerticalAlignment="Center" />
+            <ComboBox Grid.Column="2" ItemsSource="{Binding Hours}" SelectedIndex="{Binding DailyHour}" Width="90" />
+            <TextBlock Grid.Row="2" Classes="secondary" Text="{l:T check.weekly_reset}" VerticalAlignment="Center" />
+            <ComboBox Grid.Row="2" Grid.Column="2" ItemsSource="{Binding Days}" SelectedIndex="{Binding WeeklyDay}" Width="130" />
+            <ComboBox Grid.Row="2" Grid.Column="4" ItemsSource="{Binding Hours}" SelectedIndex="{Binding WeeklyHour}" Width="90" />
+          </Grid>
           <TextBlock Classes="small muted" Text="{l:T check.reset_note}" TextWrapping="Wrap" />
         </StackPanel>
       </Grid>

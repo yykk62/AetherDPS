@@ -118,7 +118,9 @@ Du-Form, kurze Verben, Satzanfang groß, keine Füllwörter. Eine Aktion heißt 
 
 ## Stand
 
-Fertig: Tokens, Bausteine, neues Hauptfenster `Views/ShellWindow` mit dem Ort „Jetzt“ (`NowView`, leer und nach einem Lauf), geprüft in zwei unabhängigen Kritikrunden. Bild: `docs/media/neu-jetzt.png`. Das alte Hauptfenster (`HubWindow`) bleibt Startfenster, bis Kämpfe, Welt, Daevas, Einstellungen und die Overlays umgebaut sind.
+Umgesetzt: Tokens und Bausteine, Hauptfenster `ShellWindow` mit allen vier Orten (Jetzt, Kämpfe, Welt, Daevas), Verbindung und Einstellungen als Blätter, Hinweise als Zeilen, die Kampfanzeige (Overlay) und alle Nebenfenster auf den Tokens. Jede Runde von einem unabhängigen Kritik-Agenten geprüft, der nur Bilder und Zweck kennt.
+
+Offen: gemeinsamer Platzierungsmodus für alle Overlays (statt Schloss je Fenster), Overlays nach Lage, Variante mit hohem Kontrast, README-Bilder neu erzeugen.
 
 ## Nach dem Abgleich
 

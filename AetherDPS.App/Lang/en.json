@@ -232,7 +232,7 @@
   "settings.section.start": "Startup",
   "hub.character": "Your character: {0}",
   "hub.character_unknown": "Your character hasn't been recognized yet. It's recognized at login or after a teleport and remembered after that.",
-  "warning.title": "STAGGER",
+  "warning.title": "Stagger",
   "warning.points": "{0} / {1}",
   "warning.seconds": "{0} s",
   "settings.stagger_warning": "Stagger warning for wipe mechanics",
@@ -539,7 +539,7 @@
   "page.settings.sub": "Language, hotkeys, meter, Discord, privacy",
   "settings.nav.general": "General",
   "settings.nav.meter": "Meter",
-  "settings.nav.privacy": "Discord & privacy",
+  "settings.nav.privacy": "Privacy",
   "shell.place.now": "Now",
   "shell.place.fights": "Fights",
   "shell.place.world": "World",
@@ -594,7 +594,6 @@
   "now.col_duration": "Duration",
   "now.col_group_dps": "Party DPS",
   "now.empty_preview": "This is what you'll see after your next run: your DPS compared to your earlier runs.",
-  "now.preview_needle": "today",
   "now.preview_avg": "your average",
   "now.legend_best": "best so far",
   "now.delta_avg": "vs. your average",
@@ -632,5 +631,8 @@
   "pets.detail_missing": "Not collected yet",
   "pets.detail_stage": "Level {0}/{1}",
   "pets.detail_max": "Max level reached",
-  "pets.detail_next": "{0} more souls to level {1}"
+  "pets.detail_next": "{0} more souls to level {1}",
+  "party.empty_title": "Not in a party",
+  "conn.check_title": "Where is the problem?",
+  "fights.vs_best": "your DPS compared to your best run here"
 }

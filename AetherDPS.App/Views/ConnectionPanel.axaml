@@ -12,7 +12,7 @@
     <Grid ColumnDefinitions="Auto,*">
       <StackPanel Spacing="0">
         <TextBlock Classes="small muted" Text="{l:T conn.graph}" />
-        <TextBlock Classes="reading" Text="{Binding PingNow}" />
+        <TextBlock Classes="reading" Text="{Binding PingNow}" IsVisible="{Binding HasPingData}" />
       </StackPanel>
       <TextBlock Grid.Column="1" Classes="secondary" Text="{Binding PingSummary}" TextWrapping="Wrap" VerticalAlignment="Bottom" Margin="20,0,0,6" />
     </Grid>
@@ -27,7 +27,7 @@
 
     <Border Classes="framerule" />
     <Grid ColumnDefinitions="*,Auto">
-      <TextBlock Classes="section" Text="{l:T conn.check}" VerticalAlignment="Center" />
+      <TextBlock Classes="section" Text="{l:T conn.check_title}" VerticalAlignment="Center" />
       <Button Grid.Column="1" Classes="quiet" Content="{l:T conn.check}" Command="{Binding DiagnoseCommand}" IsEnabled="{Binding !IsDiagnosing}" />
     </Grid>
     <ItemsControl ItemsSource="{Binding DiagnosisRows}">

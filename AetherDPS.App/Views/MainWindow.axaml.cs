@@ -79,7 +79,9 @@ public partial class MainWindow : Window
     {
         // Nur der Hintergrund wird durchsichtig – Text und Balken bleiben voll lesbar.
         byte alpha = (byte)Math.Round(Math.Clamp(settings?.WindowOpacity ?? 0.9, 0.2, 1.0) * 255);
-        Root.Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromArgb(alpha, 0x14, 0x18, 0x20));
+        var basis = Avalonia.Application.Current?.TryGetResource("Stone950", null, out var c) == true && c is Avalonia.Media.Color color
+            ? color : Avalonia.Media.Colors.Black;   // Token „tiefste Mulde“
+        Root.Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.FromArgb(alpha, basis.R, basis.G, basis.B));
     }
 
     private void RestoreBounds()

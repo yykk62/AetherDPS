@@ -1,4 +1,4 @@
-<Window xmlns="https://github.com/avaloniaui"
+<Window Classes="ins" FontFamily="{DynamicResource Font.Ui}" xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:AetherDPS.App.ViewModels"
         xmlns:views="using:AetherDPS.App.Views"
@@ -11,7 +11,7 @@
         TransparencyLevelHint="Transparent" Background="Transparent">
   <Window.Styles>
     <Style Selector="TextBlock">
-      <Setter Property="Foreground" Value="#E6E8EC" />
+      <Setter Property="Foreground" Value="{DynamicResource Text.Primary}" />
     </Style>
     <Style Selector="Button.row">
       <Setter Property="Padding" Value="4,2" />
@@ -28,21 +28,21 @@
       <Setter Property="FontSize" Value="12" />
       <Setter Property="CornerRadius" Value="5" />
       <Setter Property="HorizontalContentAlignment" Value="Center" />
-      <Setter Property="Background" Value="#CC141820" />
-      <Setter Property="Foreground" Value="#E6E8EC" />
+      <Setter Property="Background" Value="{DynamicResource Surface.WellDeep}" />
+      <Setter Property="Foreground" Value="{DynamicResource Text.Primary}" />
     </Style>
     <Style Selector="Border.ov">
       <Setter Property="Padding" Value="6,2" />
       <Setter Property="CornerRadius" Value="5" />
-      <Setter Property="Background" Value="#CC141820" />
+      <Setter Property="Background" Value="{DynamicResource Surface.WellDeep}" />
     </Style>
   </Window.Styles>
-  <Border Name="Root" Background="#EB141820" BorderBrush="#99E0A84A" BorderThickness="1" CornerRadius="8" Padding="5" Cursor="SizeAll">
+  <Border Name="Root" Background="{DynamicResource Surface.WellDeep}" BorderBrush="{DynamicResource Line.Frame}" BorderThickness="1" CornerRadius="8" Padding="5" Cursor="SizeAll">
     <Panel>
       <!-- Eingeklappt: nur eine kleine Leiste. Klick klappt auf, Ziehen verschiebt -->
       <StackPanel Name="MiniBar" Orientation="Horizontal" Spacing="6" IsVisible="False" Margin="2,0" ToolTip.Tip="{l:T radar.expand_tip}">
         <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon center, Size=14}" Width="14" Height="14" />
-        <TextBlock Text="{l:T radar.title}" Foreground="#E0A84A" FontWeight="SemiBold" VerticalAlignment="Center" />
+        <TextBlock Text="{l:T radar.title}" Foreground="{DynamicResource Text.Primary}" FontWeight="SemiBold" VerticalAlignment="Center" />
         <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon chevron-right, Size=10}" Width="10" Height="10" Opacity="0.7" />
       </StackPanel>
 
@@ -66,7 +66,7 @@
                     ToolTip.Tip="{l:T radar.center}"><Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon center, Size=13}" Width="13" Height="13" /></Button>
           </Panel>
         </Border>
-        <TextBlock Text="{Binding Hint}" Foreground="#8E96A3" FontSize="11" TextWrapping="Wrap"
+        <TextBlock Text="{Binding Hint}" Foreground="{DynamicResource Text.Muted}" FontSize="11" TextWrapping="Wrap"
                    IsVisible="{Binding Hint, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
         <!-- Fehlende Pets: zu = ganz weg (☰ auf der Karte holt sie zurück) -->
         <ScrollViewer MaxHeight="190" HorizontalScrollBarVisibility="Disabled" IsVisible="{Binding ListOpen}" Cursor="Arrow">
@@ -77,18 +77,18 @@
                         Background="{Binding IsSelected, Converter={x:Static l:BoolBrush.SelectedRow}}" ToolTip.Tip="{l:T radar.row_tip}">
                   <Grid ColumnDefinitions="Auto,*,Auto,Auto">
                     <Panel Margin="0,0,6,0" VerticalAlignment="Center">
-                      <Border Width="30" Height="30" CornerRadius="5" Background="#22000000" ClipToBounds="True">
+                      <Border Width="30" Height="30" CornerRadius="5" Background="{DynamicResource Surface.WellDeep}" ClipToBounds="True">
                         <Image Source="{Binding Icon}" />
                       </Border>
-                      <Ellipse Width="9" Height="9" Fill="{Binding Color}" Stroke="#141820" StrokeThickness="1.5" IsVisible="{Binding HasColor}"
+                      <Ellipse Width="9" Height="9" Fill="{Binding Color}" Stroke="{DynamicResource Surface.WellDeep}" StrokeThickness="1.5" IsVisible="{Binding HasColor}"
                                HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-2,-2" />
                     </Panel>
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                       <TextBlock Text="{Binding Name}" FontSize="12" TextTrimming="CharacterEllipsis" />
-                      <TextBlock Text="{Binding Monster}" FontSize="10" Foreground="#8E96A3" TextTrimming="CharacterEllipsis" IsVisible="{Binding HasMonster}" />
+                      <TextBlock Text="{Binding Monster}" FontSize="11" Foreground="{DynamicResource Text.Muted}" TextTrimming="CharacterEllipsis" IsVisible="{Binding HasMonster}" />
                     </StackPanel>
-                    <TextBlock Grid.Column="2" Text="{Binding Level}" FontSize="10.5" Foreground="#8E96A3" Margin="6,0" VerticalAlignment="Center" />
-                    <TextBlock Grid.Column="3" Text="{Binding Distance}" FontSize="12" FontWeight="SemiBold" Foreground="#E0A84A" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="2" Text="{Binding Level}" FontSize="11.5" Foreground="{DynamicResource Text.Muted}" Margin="6,0" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="3" Text="{Binding Distance}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Text.Primary}" VerticalAlignment="Center" />
                   </Grid>
                 </Button>
               </DataTemplate>
@@ -100,7 +100,7 @@
       <!-- Größe ändern -->
       <Border Name="Grip" Width="14" Height="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-6,-6"
               Background="Transparent" Cursor="BottomRightCorner" ToolTip.Tip="{l:T radar.resize_tip}">
-        <Path Data="M 12,2 L 2,12 M 12,6 L 6,12 M 12,10 L 10,12" Stroke="#668E96A3" StrokeThickness="1.2" />
+        <Path Data="M 12,2 L 2,12 M 12,6 L 6,12 M 12,10 L 10,12" Stroke="{DynamicResource Line.Tick}" StrokeThickness="1.2" />
       </Border>
     </Panel>
   </Border>

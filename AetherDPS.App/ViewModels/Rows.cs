@@ -61,7 +61,7 @@ public static class ClassVisuals
         [14] = ("#2BA88F", "ranger"),
         [15] = ("#A15CE0", "sorcerer"),
         [16] = ("#D65CC8", "elementalist"),
-        [17] = ("#E0B84A", "cleric"),
+        [17] = ("#EFE3B0", "cleric"),   // helles Elfenbein statt Gold (Gold heißt „du“)
         [18] = ("#E08A3C", "chanter"),
         [19] = ("#D64545", "brawler"),
     };

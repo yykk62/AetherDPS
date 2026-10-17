@@ -232,7 +232,7 @@
   "settings.section.start": "Запуск",
   "hub.character": "Твой персонаж: {0}",
   "hub.character_unknown": "Твой персонаж ещё не определён. Он определяется при входе в игру или после телепорта и затем запоминается.",
-  "warning.title": "ОШЕЛОМЛЕНИЕ",
+  "warning.title": "Ошеломление",
   "warning.points": "{0} / {1}",
   "warning.seconds": "{0} с",
   "settings.stagger_warning": "Предупреждение об ошеломлении при механике вайпа",
@@ -539,7 +539,7 @@
   "page.settings.sub": "Язык, горячие клавиши, метр, Discord, конфиденциальность",
   "settings.nav.general": "Общие",
   "settings.nav.meter": "Метр",
-  "settings.nav.privacy": "Discord и конфиденциальность",
+  "settings.nav.privacy": "Приватность",
   "shell.place.now": "Сейчас",
   "shell.place.fights": "Бои",
   "shell.place.world": "Мир",
@@ -594,7 +594,6 @@
   "now.col_duration": "Длительность",
   "now.col_group_dps": "DPS группы",
   "now.empty_preview": "Так это будет выглядеть после следующего забега: твой DPS в сравнении с прошлыми забегами.",
-  "now.preview_needle": "сегодня",
   "now.preview_avg": "твоё среднее",
   "now.legend_best": "лучший до сих пор",
   "now.delta_avg": "к твоему среднему",
@@ -632,5 +631,8 @@
   "pets.detail_missing": "Ещё не собран",
   "pets.detail_stage": "Уровень {0}/{1}",
   "pets.detail_max": "Максимальный уровень",
-  "pets.detail_next": "ещё {0} душ до уровня {1}"
+  "pets.detail_next": "ещё {0} душ до уровня {1}",
+  "party.empty_title": "Сейчас нет группы",
+  "conn.check_title": "Где проблема?",
+  "fights.vs_best": "твой DPS по сравнению с лучшим забегом здесь"
 }

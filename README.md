@@ -224,15 +224,12 @@ Die Einstellungen, die Kampf-Historie, die Logs und die Mitschnitte liegen unter
 
 ## Bedienung
 
-**Seiten im Hauptfenster** (Seitenleiste links, Start/Stopp oben rechts auf jeder Seite):
-- **Übersicht:** Status, Hinweise und aktueller Lauf
-- **Läufe:** Archiv aller Läufe mit Boss-Zeiten, Bestzeit <img src="docs/media/brand/ui/trophy.png" width="16" align="absmiddle" alt="" />, Vergleich mit deinem Durchschnitt, Kampfanalyse pro Spieler sowie „Als Bild/Text kopieren“ für Discord
-- **Gruppe:** Mitglieder mit Server, Stufe und Kampfkraft (nur für dich sichtbar), Klick öffnet das Profil. Hier lässt sich „Neu in der Gruppe“ abschalten
-- **Profil:** dein Charakter oder jeder andere auf einem EU-Server
-- **Pets:** Pet-Finder mit Karte und die Einstellung fürs Pet-Radar (solange die Spielkarte offen ist, immer oder aus)
-- **Timer:** Feldbosse (<img src="docs/media/brand/ui/star.png" width="16" align="absmiddle" alt="" /> = als Pill anzeigen und erinnern), Risse, Artefakt-Belagerung, eigene Countdowns, Timer-Pills an/aus und entsperren
-- <a name="checkliste"></a>**Checkliste:** Tägliches und Wöchentliches mit automatischem Reset und Erinnerung
-- **Verbindung** und **Einstellungen** (Allgemein, Bedienung, Meter, Discord & Datenschutz)
+**Orte im Hauptfenster** (oben, auch mit STRG+1 bis STRG+4; der Meter-Schalter steht rechts und zeigt, ob er aufzeichnet):
+- **Jetzt:** nach einem Lauf das Urteil („Neue Bestzeit, 8 % mehr DPS als sonst“), deine DPS und Zeit auf einer Messlatte gegen deine früheren Läufe, Gruppe und Bosse; daneben, was als Nächstes ansteht
+- **Kämpfe:** alle Läufe nach Tagen, Bestzeit <img src="docs/media/brand/ui/trophy.png" width="16" align="absmiddle" alt="" />, Kampfanalyse pro Spieler, „Als Bild/Text kopieren“ für Discord, Löschen mit „Rückgängig“
+- **Welt:** Timer mit Feldbossen (<img src="docs/media/brand/ui/star.png" width="16" align="absmiddle" alt="" /> = als Pill anzeigen und erinnern), Risse, Artefakt-Belagerung und eigene Countdowns · <a name="checkliste"></a>Checkliste (täglich und wöchentlich, automatischer Reset, Erinnerung) · Pets mit Fortschritt, Karte und Pet-Radar
+- **Daevas:** dein Profil oder jeder andere Charakter auf einem EU-Server, dazu die aktuelle Gruppe (Klick öffnet das Profil, „Neu in der Gruppe“ abschaltbar)
+- **Verbindung** klappt beim Statusfeld oben auf, **Einstellungen** (Zahnrad oder STRG+,) kommen als Blatt von rechts
 
 Wer das Hauptfenster schließt, lässt den Meter im Tray weiterlaufen.
 

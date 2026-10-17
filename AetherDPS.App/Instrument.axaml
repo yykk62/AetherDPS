@@ -281,7 +281,7 @@
   </Style>
 
   <!-- Gefährliche Aktion: ruhig, nur das Wort in Rot -->
-  <Style Selector=".ins Button.quiet.destructive TextBlock">
+  <Style Selector=".ins Button.destructive TextBlock">
     <Setter Property="Foreground" Value="{DynamicResource Signal.Bad}" />
   </Style>
 

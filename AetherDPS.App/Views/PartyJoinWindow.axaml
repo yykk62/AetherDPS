@@ -1,4 +1,4 @@
-<Window xmlns="https://github.com/avaloniaui"
+<Window Classes="ins" FontFamily="{DynamicResource Font.Ui}" xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:AetherDPS.App.ViewModels"
         xmlns:l="using:AetherDPS.App.Services"
@@ -9,21 +9,21 @@
         TransparencyLevelHint="Transparent" Background="Transparent">
   <Window.Styles>
     <Style Selector="TextBlock">
-      <Setter Property="Foreground" Value="#E6E8EC" />
+      <Setter Property="Foreground" Value="{DynamicResource Text.Primary}" />
     </Style>
     <Style Selector="TextBlock.dim">
-      <Setter Property="Foreground" Value="#8E96A3" />
+      <Setter Property="Foreground" Value="{DynamicResource Text.Muted}" />
     </Style>
     <Style Selector="TextBlock.val">
       <Setter Property="FontWeight" Value="SemiBold" />
-      <Setter Property="Foreground" Value="#E0A84A" />
+      <Setter Property="Foreground" Value="{DynamicResource Text.Primary}" />
       <Setter Property="FontSize" Value="13" />
     </Style>
   </Window.Styles>
-  <Border Background="#F2141820" BorderBrush="#99E0A84A" BorderThickness="1" CornerRadius="8" Padding="10">
+  <Border Background="{DynamicResource Surface.WellDeep}" BorderBrush="{DynamicResource Line.Frame}" BorderThickness="1" CornerRadius="8" Padding="10">
     <StackPanel Spacing="8">
       <Grid ColumnDefinitions="*,Auto">
-        <TextBlock Text="{l:T party.popup_title}" FontWeight="SemiBold" Foreground="#E0A84A" VerticalAlignment="Center" />
+        <TextBlock Text="{l:T party.popup_title}" FontWeight="SemiBold" Foreground="{DynamicResource Text.Primary}" VerticalAlignment="Center" />
         <Button Grid.Column="1" Padding="6,4" Background="Transparent" Command="{Binding CloseCommand}"><Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon close, Size=11}" Width="11" Height="11" /></Button>
       </Grid>
       <ItemsControl ItemsSource="{Binding Cards}">
@@ -32,9 +32,9 @@
             <Button Padding="0" Margin="0,0,0,6" Background="Transparent" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
                     Command="{Binding $parent[ItemsControl].((vm:PartyJoinViewModel)DataContext).OpenCommand}" CommandParameter="{Binding}"
                     ToolTip.Tip="{l:T party.popup_tip}">
-              <Border Padding="8" CornerRadius="6" Background="#14FFFFFF">
+              <Border Padding="8" CornerRadius="6" Background="{DynamicResource Surface.Hover}">
                 <Grid ColumnDefinitions="Auto,*">
-                  <Border Width="44" Height="44" CornerRadius="6" Background="#22000000" ClipToBounds="True" Margin="0,0,10,0" VerticalAlignment="Top">
+                  <Border Width="44" Height="44" CornerRadius="6" Background="{DynamicResource Surface.WellDeep}" ClipToBounds="True" Margin="0,0,10,0" VerticalAlignment="Top">
                     <Image Source="{Binding Portrait}" Stretch="UniformToFill" />
                   </Border>
                   <StackPanel Grid.Column="1" Spacing="3">

@@ -41,6 +41,8 @@ public sealed partial class GearRow : WithIcon
     public string Name => (Item.Enchant > 0 ? $"+{Item.Enchant} " : "") + Item.Name;
     public string Slot => Loc.T("armory.slot." + Item.Slot) is var s && !s.StartsWith("armory.", StringComparison.Ordinal) ? s : Item.Slot;
     public IBrush NameBrush => GradeColors.For(Item.Grade);
+    public string BaseName => Item.Name;
+    public string EnchantText => Item.Enchant > 0 ? $"+{Item.Enchant}" : "";
     [ObservableProperty] private bool isSelected;
 }
 
@@ -121,6 +123,8 @@ public sealed partial class ProfileViewModel : ObservableObject
     [ObservableProperty] private string daevanion = "";
     [ObservableProperty] private string titleCount = "";
     [ObservableProperty] private string extras = "";
+    /// <summary>Profil des eigenen Charakters: Kampfkraft in Gold („du“).</summary>
+    [ObservableProperty] private bool isSelf;
 
     [ObservableProperty] private bool hasDetail;
     [ObservableProperty] private bool detailLoading;
@@ -216,6 +220,7 @@ public sealed partial class ProfileViewModel : ObservableObject
         HasProfile = true;
         HasDetail = false;
         Name = p.Name;
+        IsSelf = string.Equals(p.Name, settings.CharacterName, StringComparison.OrdinalIgnoreCase);
         Subtitle = string.Join(" · ", new[] { p.ClassName, p.Race, p.Server, Loc.T("profile.level", p.Level) }.Where(s => !string.IsNullOrEmpty(s)));
         CombatPower = p.CombatPower.ToString("N0", Loc.Culture);
         ItemLevel = p.ItemLevel.ToString("N0", Loc.Culture);

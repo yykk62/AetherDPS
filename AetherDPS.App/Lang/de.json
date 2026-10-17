@@ -232,7 +232,7 @@
   "settings.section.start": "Start",
   "hub.character": "Dein Charakter: {0}",
   "hub.character_unknown": "Dein Charakter ist noch nicht erkannt. Er wird beim Login oder nach einem Teleport erkannt und danach gemerkt.",
-  "warning.title": "STAGGER",
+  "warning.title": "Stagger",
   "warning.points": "{0} / {1}",
   "warning.seconds": "{0} s",
   "settings.stagger_warning": "Stagger-Warnung bei Wipe-Mechanik",
@@ -539,7 +539,7 @@
   "page.settings.sub": "Sprache, Hotkeys, Meter, Discord, Datenschutz",
   "settings.nav.general": "Allgemein",
   "settings.nav.meter": "Meter",
-  "settings.nav.privacy": "Discord & Datenschutz",
+  "settings.nav.privacy": "Datenschutz",
   "shell.place.now": "Jetzt",
   "shell.place.fights": "Kämpfe",
   "shell.place.world": "Welt",
@@ -594,7 +594,6 @@
   "now.col_duration": "Dauer",
   "now.col_group_dps": "Gruppen-DPS",
   "now.empty_preview": "So sieht das nach deinem nächsten Lauf aus: deine DPS im Vergleich zu deinen früheren Läufen.",
-  "now.preview_needle": "heute",
   "now.preview_avg": "Ø dein Schnitt",
   "now.legend_best": "bisher bester",
   "now.delta_avg": "zu deinem Schnitt",
@@ -632,5 +631,8 @@
   "pets.detail_missing": "Noch nicht gesammelt",
   "pets.detail_stage": "Stufe {0}/{1}",
   "pets.detail_max": "Höchststufe erreicht",
-  "pets.detail_next": "noch {0} Seelen bis Stufe {1}"
+  "pets.detail_next": "noch {0} Seelen bis Stufe {1}",
+  "party.empty_title": "Gerade keine Gruppe",
+  "conn.check_title": "Wo hakt es?",
+  "fights.vs_best": "deine DPS im Vergleich zu deinem besten Lauf hier"
 }

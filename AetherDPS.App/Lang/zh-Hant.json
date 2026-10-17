@@ -539,7 +539,7 @@
   "page.settings.sub": "語言、快捷鍵、統計、Discord、隱私",
   "settings.nav.general": "一般",
   "settings.nav.meter": "統計",
-  "settings.nav.privacy": "Discord 與隱私",
+  "settings.nav.privacy": "隱私",
   "shell.place.now": "現在",
   "shell.place.fights": "戰鬥",
   "shell.place.world": "世界",
@@ -594,7 +594,6 @@
   "now.col_duration": "用時",
   "now.col_group_dps": "隊伍 DPS",
   "now.empty_preview": "下次紀錄後這裡會顯示：你的 DPS 與之前紀錄的對比。",
-  "now.preview_needle": "本次",
   "now.preview_avg": "你的平均",
   "now.legend_best": "目前最佳",
   "now.delta_avg": "與你的平均相比",
@@ -632,5 +631,8 @@
   "pets.detail_missing": "尚未收集",
   "pets.detail_stage": "等級 {0}/{1}",
   "pets.detail_max": "已達最高等級",
-  "pets.detail_next": "距離等級 {1} 還差 {0} 個靈魂"
+  "pets.detail_next": "距離等級 {1} 還差 {0} 個靈魂",
+  "party.empty_title": "目前沒有隊伍",
+  "conn.check_title": "問題出在哪裡？",
+  "fights.vs_best": "你的 DPS 與你在這裡的最佳紀錄相比"
 }

@@ -9,7 +9,7 @@ namespace AetherDPS.App.ViewModels;
 
 /// <summary>Ein Lauf in der Liste; <see cref="DayHeader"/> steht über dem ersten Lauf eines Tages.</summary>
 public sealed partial class RunListItem(string id, string title, bool isBest, bool isLive,
-    string? dayHeader = null, string time = "", string duration = "", string yourDps = "") : ObservableObject
+    string? dayHeader = null, string time = "", string duration = "", string yourDps = "", double dpsPercent = double.NaN) : ObservableObject
 {
     public string Id { get; } = id;
     public string Title { get; } = title;
@@ -19,6 +19,9 @@ public sealed partial class RunListItem(string id, string title, bool isBest, bo
     public string Time { get; } = time;
     public string Duration { get; } = duration;
     public string YourDps { get; } = yourDps;
+    /// <summary>Deine DPS im Vergleich zu deinem besten Lauf desselben Namens (0…100), für die Mini-Skala.</summary>
+    public double DpsPercent { get; } = dpsPercent;
+    public bool HasDpsPercent => double.IsFinite(DpsPercent);
     public bool HasDayHeader => DayHeader is not null;
 
     [ObservableProperty] private bool isSelected;
@@ -85,6 +88,8 @@ public sealed partial class RunsViewModel : ObservableObject
         Runs.Clear();
         if (mode.IsActive) Runs.Add(new RunListItem(LiveId, Loc.T("fights.live"), false, true));
         string? lastDay = null;
+        var bestDps = archive.All().GroupBy(r => r.Name)
+            .ToDictionary(g => g.Key, g => g.Select(r => r.Players.FirstOrDefault(p => p.IsUser)?.Dps ?? 0).DefaultIfEmpty(0).Max());
         foreach (var run in archive.All())
         {
             var best = archive.BestOf(run.Name);
@@ -92,7 +97,8 @@ public sealed partial class RunsViewModel : ObservableObject
             var day = RunComparison.Day(run.StartedAt);
             Runs.Add(new RunListItem(run.Id, run.Name, best?.Id == run.Id && run.BossesKilled > 0, false,
                 day != lastDay ? day : null, run.StartedAt.ToString("HH:mm"), RunComparison.Dur(run.Duration),
-                user is null ? "" : Format.CompactFixed(user.Dps) + "/s"));
+                user is null ? "" : Format.CompactFixed(user.Dps) + "/s",
+                user is not null && bestDps[run.Name] > 0 ? user.Dps * 100 / bestDps[run.Name] : double.NaN));
             lastDay = day;
         }
         HasAnyRun = Runs.Count > 0;

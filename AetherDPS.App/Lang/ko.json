@@ -539,7 +539,7 @@
   "page.settings.sub": "언어, 단축키, 미터, Discord, 개인정보",
   "settings.nav.general": "일반",
   "settings.nav.meter": "미터",
-  "settings.nav.privacy": "Discord 및 개인정보",
+  "settings.nav.privacy": "개인정보",
   "shell.place.now": "지금",
   "shell.place.fights": "전투",
   "shell.place.world": "월드",
@@ -594,7 +594,6 @@
   "now.col_duration": "소요 시간",
   "now.col_group_dps": "파티 DPS",
   "now.empty_preview": "다음 회차 후에는 이렇게 보입니다: 이전 기록과 비교한 내 DPS.",
-  "now.preview_needle": "이번",
   "now.preview_avg": "내 평균",
   "now.legend_best": "지금까지 최고",
   "now.delta_avg": "내 평균 대비",
@@ -632,5 +631,8 @@
   "pets.detail_missing": "아직 수집 안 함",
   "pets.detail_stage": "레벨 {0}/{1}",
   "pets.detail_max": "최고 레벨 달성",
-  "pets.detail_next": "레벨 {1}까지 영혼 {0}개 남음"
+  "pets.detail_next": "레벨 {1}까지 영혼 {0}개 남음",
+  "party.empty_title": "현재 파티 없음",
+  "conn.check_title": "어디서 문제가 생길까?",
+  "fights.vs_best": "이곳 최고 기록과 비교한 내 DPS"
 }

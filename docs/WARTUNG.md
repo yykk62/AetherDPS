@@ -94,8 +94,12 @@ Banner und Hintergründe. Quelle sind Higgsfield-Sheets (4k, lokal; im Repo nur 
 Nachziehen: `python tools/icons/slice.py` (zerlegen, freistellen, Übersichten) → `python tools/icons/sync.py` (nach `docs/media/brand`; die App bindet `assets/brand/icons/ui` direkt ein) → `python tools/icons/art.py` (Banner mit Text, Hintergründe, Zierleiste). In XAML: `{l:Icon name, Size=12}` (`Services/Icons.cs`),
 auf der Webseite `<Icon name="…" />`. Keine NCSOFT-Grafiken darin.
 Logo: `python tools/icons/logo.py` (aus `assets/brand/art/raw-logo.png` → `assets/brand/logo/`, `AetherDPS.App/Assets/icon.png|ico`, `docs/media/brand/logo.png`).
-Hauptfenster (`Views/HubWindow.axaml`): feste Seitenleiste (Knöpfe `nav` mit `Classes.active` über `TabIs`), Seiten per `IsVisible` auf `SelectedTab` (Indizes `HubViewModel.Tab*` unverändert), Kopfzeile aus `PageTitle`/`PageSubtitle`; Hinweiskarten nur auf der Übersicht.
-Farben und gemeinsame Styles der App (Gold statt Windows-Akzent, Karten, Knöpfe `primary`/`secondary`/`danger`/`plain`) stehen in `AetherDPS.App/Theme.axaml`; die UI-Tests binden dieselbe Datei ein, Fenster-Styles nur noch für Besonderes.
+Gestaltung „Instrument“ (ab 0.9): Richtung und Regeln in `docs/DESIGN.md`. Farben, Abstände, Radien und Schrift sind Tokens in `AetherDPS.App/Tokens.axaml`
+(Grundpalette → Semantik), die Bausteine (`well`, `place`, `cta`, `quiet`, `trace`, Textrollen …) in `Instrument.axaml` unter der Klasse `ins`; `Theme.axaml` biegt Fluent
+auf die Tokens um und bindet beides ein (die UI-Tests ebenso). Keine Hex-Werte in Views; C# holt Farben über `Services/TokenBrush.cs` (Ausnahme: Datenfarben wie Klassen, Seltenheit, Pet-Gattungen).
+Hauptfenster `Views/ShellWindow.axaml` (`ShellViewModel`): vier Orte Jetzt (`NowView`), Kämpfe (`FightsView`), Welt (Timer, Checkliste, Pets), Daevas (Profil, Gruppe);
+Verbindung (`ConnectionPanel`) und Einstellungen als Blätter; Daten und Aktualisierung weiter über `HubViewModel` (alte Reiter-Nummern `HubViewModel.Tab*` bildet `ShellViewModel.Show` auf Orte ab).
+Vergleich eines Laufs mit früheren (Urteil, Messlatten, Boss-Zeilen) in `ViewModels/RunComparison.cs`.
 
 ## Feldbosse
 

@@ -83,6 +83,8 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty] private bool hasDeaths;
     [ObservableProperty] private bool staggerVisible;
     [ObservableProperty] private bool showHpBar;
+    /// <summary>Stagger ohne bekanntes Ziel-Leben: eigene Leiste statt der gemeinsamen Rille.</summary>
+    [ObservableProperty] private bool staggerOnly;
     [ObservableProperty] private double staggerPercent;
     [ObservableProperty] private string staggerText = "";
 
@@ -232,7 +234,9 @@ public sealed partial class MainViewModel : ObservableObject
             StaggerText = Loc.T("card.stagger", st.Current, st.Max);
         }
         else StaggerVisible = false;
-        ShowHpBar = HasTarget && !StaggerVisible;
+        // Leben und Stagger stehen gemeinsam in einer Rille (docs/DESIGN.md)
+        ShowHpBar = HasTarget;
+        StaggerOnly = StaggerVisible && !HasTarget;
         int deaths = snapshot.Players.Sum(p => p.Deaths);
         HasDeaths = deaths > 0;
         DeathsText = Loc.T("card.deaths", deaths);
