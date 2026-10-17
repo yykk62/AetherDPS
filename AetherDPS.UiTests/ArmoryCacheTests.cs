@@ -25,6 +25,22 @@ public sealed class ArmoryCacheTests : IDisposable
         Assert.NotNull(detail);
     }
 
+    [Fact]
+    public async Task Profil_kommt_beim_Wiedersehen_aus_dem_Ordner()
+    {
+        // Radar: jemand läuft aus der Sicht und wieder hinein, oder der Meter wurde neu gestartet – keine neue Abfrage
+        Loc.Load("de");
+        var first = new Armory(new FakeNcsoft()) { CacheDir = dir };
+        Assert.NotNull(await first.LoadAsync("Testheld", 1317));
+
+        var second = new Armory(new NoItems()) { CacheDir = dir };
+        var again = await second.LoadAsync("Testheld", 1317);
+        Assert.NotNull(again);
+        Assert.NotEmpty(again!.Equipment);
+        // „frisch“ fragt trotzdem (eigener Verlauf, erneut suchen) – hier verweigert das Netz, also null
+        Assert.Null(await second.LoadAsync("Testheld", 1317, fresh: true));
+    }
+
     private sealed class NoItems : HttpMessageHandler
     {
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct) =>

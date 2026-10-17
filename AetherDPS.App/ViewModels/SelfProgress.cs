@@ -28,7 +28,7 @@ public sealed partial class GearIcon : WithIcon
 
 /// <summary>
 /// Dein Charakter über die Zeit (docs/DESIGN.md, „Jetzt“ und Daevas › Profil): letzter Stand mit Porträt,
-/// Ausrüstung, Kampfkraft und Itemstufe, dazu die Veränderung seit einer Woche und die Verlaufskurven.
+/// Ausrüstung, Kampfkraft und Gear Score, dazu die Veränderung seit einer Woche und die Verlaufskurven.
 /// Daten aus <see cref="ProfileHistory"/> (lokal); abgerufen beim Öffnen des eigenen Profils und alle 4 Std.
 /// </summary>
 public sealed partial class SelfProgress : ObservableObject

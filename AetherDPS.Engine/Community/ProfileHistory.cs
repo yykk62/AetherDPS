@@ -125,7 +125,7 @@ public sealed class ProfileWatcher(Armory armory, ProfileHistory history, MeterS
         if (Armory.ServerId(settings.CharacterServer) is not int server) return;
         var latest = history.Latest(settings.CharacterName!, server);
         if (latest is not null && DateTime.Now - latest.At < Interval - TimeSpan.FromMinutes(5)) return;   // kürzlich schon
-        if (await armory.LoadAsync(settings.CharacterName!, server) is { } profile) history.Add(profile);
+        if (await armory.LoadAsync(settings.CharacterName!, server, fresh: true) is { } profile) history.Add(profile);   // frisch, nicht aus dem Zwischenspeicher
     }
 
     public void Dispose() => timer?.Dispose();

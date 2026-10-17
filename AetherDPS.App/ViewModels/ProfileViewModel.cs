@@ -137,7 +137,7 @@ public sealed partial class ProfileViewModel : ObservableObject
 
     private readonly ProfileHistory history;
 
-    /// <summary>Verlauf von Kampfkraft und Itemstufe (nur beim eigenen Charakter sichtbar).</summary>
+    /// <summary>Verlauf von Kampfkraft und Gear Score (nur beim eigenen Charakter sichtbar).</summary>
     public SelfProgress Progress { get; }
 
     public ProfileViewModel(Armory armory, MeterSettings settings, ProfileHistory history, SelfProgress progress)
@@ -187,7 +187,9 @@ public sealed partial class ProfileViewModel : ObservableObject
             Status = Loc.T("profile.need_input");
             return Task.CompletedTask;
         }
-        return LoadAsync(SearchName.Trim(), SearchServer.Id);
+        // denselben Charakter noch einmal suchen = aktualisieren (sonst kommt er bis 6 Std. aus dem Zwischenspeicher)
+        bool again = HasProfile && string.Equals(Name, SearchName.Trim(), StringComparison.OrdinalIgnoreCase);
+        return LoadAsync(SearchName.Trim(), SearchServer.Id, fresh: again);
     }
 
     [RelayCommand]
@@ -205,13 +207,13 @@ public sealed partial class ProfileViewModel : ObservableObject
         SearchServer = Servers.FirstOrDefault(s => s.Id == id);
     }
 
-    private async Task LoadAsync(string characterName, int serverId)
+    private async Task LoadAsync(string characterName, int serverId, bool fresh = false)
     {
         if (IsLoading) return;
         IsLoading = true;
         LoadFailed = false;
         Status = Loc.T("armory.loading", characterName);
-        var loaded = await armory.LoadAsync(characterName, serverId);
+        var loaded = await armory.LoadAsync(characterName, serverId, fresh: fresh);
         IsLoading = false;
         if (loaded is null)
         {

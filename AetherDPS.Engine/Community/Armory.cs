@@ -76,7 +76,9 @@ public sealed partial class Armory
 {
     private const string SearchUrl = "https://api-search.plaync.com/aion2global/search/v2/character";
     private const string SiteUrl = "https://aion2.plaync.com/api/character";
-    private static readonly TimeSpan CacheTime = TimeSpan.FromMinutes(15);
+    /// <summary>So lange gilt ein geladenes Profil (Speicher und Ordner <c>Profile</c>), damit Gruppe und Profil-Reiter
+    /// nicht bei jedem Wiedersehen neu fragen. Der eigene Verlauf und „Aktualisieren“ holen frisch (<c>fresh</c>).</summary>
+    public static readonly TimeSpan CacheTime = TimeSpan.FromHours(6);
 
     /// <summary>Nur Bilder von diesen NCSOFT-Servern werden geladen.</summary>
     public static bool IsOfficialImage(string? url) =>
@@ -120,24 +122,33 @@ public sealed partial class Armory
     public static int? ServerId(string? server) =>
         server is not null && int.TryParse(server.TrimStart('#'), out var id) && id > 1000 ? id : null;
 
-    /// <summary>Schon geladenes Profil (ohne Anfrage), sonst null.</summary>
+    /// <summary>Schon geladenes Profil (ohne Anfrage): aus dem Speicher, sonst aus dem Ordner, höchstens <see cref="CacheTime"/> alt.</summary>
     public ArmoryProfile? Cached(string name, int serverId)
     {
         lock (cache)
-            return cache.TryGetValue((serverId, name), out var hit) && DateTime.Now - hit.LoadedAt < CacheTime ? hit : null;
+            if (cache.TryGetValue((serverId, name), out var hit) && DateTime.Now - hit.LoadedAt < CacheTime) return hit;
+        if (ReadProfile(name, serverId) is { } stored)
+        {
+            lock (cache) cache[(serverId, name)] = stored;
+            return stored;
+        }
+        return null;
     }
 
-    /// <summary>Profil per Name und Server laden (null = nicht gefunden oder keine Verbindung).</summary>
-    public async Task<ArmoryProfile?> LoadAsync(string name, int serverId, CancellationToken ct = default)
+    /// <summary>
+    /// Profil per Name und Server laden (null = nicht gefunden oder keine Verbindung). Bis <see cref="CacheTime"/> aus
+    /// Speicher/Ordner; <paramref name="fresh"/> fragt trotzdem NCSOFT (eigener Verlauf, „Aktualisieren“).
+    /// </summary>
+    public async Task<ArmoryProfile?> LoadAsync(string name, int serverId, CancellationToken ct = default, bool fresh = false)
     {
         if (string.IsNullOrWhiteSpace(name)) return null;
         name = name.Trim();
-        if (Cached(name, serverId) is { } hit) return hit;
+        if (!fresh && Cached(name, serverId) is { } hit) return hit;
 
         await gate.WaitAsync(ct);
         try
         {
-            if (Cached(name, serverId) is { } again) return again;   // kam während des Wartens
+            if (!fresh && Cached(name, serverId) is { } again) return again;   // kam während des Wartens
             var id = await FindAsync(name, serverId, ct);
             if (id is null) return null;
             var query = $"lang={Lang}&region=eu&serverId={serverId}&characterId={id}";
@@ -149,6 +160,7 @@ public sealed partial class Armory
             if (info is null) return null;
             var profile = Parse(info.RootElement, equipment?.RootElement) with { CharacterId = id };
             lock (cache) cache[(serverId, name)] = profile;
+            WriteProfile(name, serverId, profile);
             return profile;
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException or KeyNotFoundException or InvalidOperationException)
@@ -209,6 +221,36 @@ public sealed partial class Armory
         {
             if (background) backgroundGate.Release();
         }
+    }
+
+    private string? ProfileFile(string name, int serverId)
+    {
+        if (CacheDir is null) return null;
+        var safe = string.Concat($"{serverId}_{name}_{Lang}".Select(c => char.IsLetterOrDigit(c) || c is '_' or '-' ? c : '_'));
+        return Path.Combine(CacheDir, "profil_" + safe + ".json");
+    }
+
+    private ArmoryProfile? ReadProfile(string name, int serverId)
+    {
+        try
+        {
+            var file = ProfileFile(name, serverId);
+            if (file is null || !File.Exists(file)) return null;
+            var profile = JsonSerializer.Deserialize<ArmoryProfile>(File.ReadAllText(file));
+            return profile is not null && DateTime.Now - profile.LoadedAt < CacheTime ? profile : null;
+        }
+        catch (Exception ex) when (ex is IOException or JsonException or UnauthorizedAccessException or NotSupportedException) { return null; }
+    }
+
+    private void WriteProfile(string name, int serverId, ArmoryProfile profile)
+    {
+        try
+        {
+            if (ProfileFile(name, serverId) is not { } file) return;
+            Directory.CreateDirectory(Path.GetDirectoryName(file)!);
+            File.WriteAllText(file, JsonSerializer.Serialize(profile));
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or NotSupportedException) { }
     }
 
     private string? CacheFile(ArmoryProfile profile, ArmoryItem item)

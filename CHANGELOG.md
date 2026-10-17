@@ -9,7 +9,8 @@ Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des G
 - **Faire Vergleiche:** Läufe werden nur mit derselben Kategorie verglichen (Expedition, Eroberung, Transzendenz, Abyss), Bestzeit nur im selben Dungeon. Freie Welt zählt nicht mit
 - **Overlays platzieren:** STRG+P zeigt Kampfanzeige, Timer-Pills, Pet-Radar und Stagger-Warnung zugleich mit Beispieldaten; ziehen, einrasten, Esc legt fest. Neu: „Overlays nach Lage“ (Stadt: Timer, Dungeon: Kampfanzeige, Bosskampf: dazu Stagger)
 - **Echte Skill-Bilder** in Kampfanzeige und Kampfanalyse
-- **Profil:** lädt deutlich schneller, Item-Details liegen bis 6 Std. bereit. Für deinen Charakter ein Verlauf von Kampfkraft und Itemstufe (alle 4 Std., abschaltbar, nur auf deinem PC)
+- **Profil:** lädt deutlich schneller, schon gesehene Profile und Item-Details öffnen bis 6 Std. sofort (erneut suchen = aktualisieren). Für deinen Charakter ein Verlauf von Kampfkraft und Gear Score (alle 4 Std., abschaltbar, nur auf deinem PC)
+- „Itemstufe“ heißt jetzt wie im Spiel „Gear Score“
 - **Pets:** die Zahl passt jetzt zur gezeigten Liste
 
 ## 0.8.2
