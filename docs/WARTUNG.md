@@ -84,7 +84,7 @@ Seit 17.10.2026 zwei Ablagen:
 
 ## Vorschau für den eigenen PC
 
-`powershell -File toolselease.ps1 -Version 0.8.94 -Preview -OutDir artifactsorschau-neu -SkipTests` baut eine vollwertige exe, die zusätzlich den lokalen Update-Ordner `%LOCALAPPDATA%\AetherDPS\Vorschau` kennt (`latest.json` + versionierte exe, Pfad steht als AssemblyMetadata `PreviewFeed` in der exe). Eine laufende Vorschau findet neue Vorschauen dort über „Nach Updates suchen“ bzw. die automatische Prüfung und installiert sie wie ein normales Update; öffentliche Releases auf GitHub findet sie weiterhin, die höhere Version gewinnt. Vorschau-Nummern bleiben unter der nächsten öffentlichen Version (0.8.9x vor 0.9.0), damit danach wieder das normale Update greift. Öffentliche Builds (ohne `-Preview`) haben keinen Vorschau-Ordner.
+`powershell -File tools\release.ps1 -Version 0.8.94 -Preview -OutDir artifacts\vorschau-neu -SkipTests` baut eine vollwertige exe, die zusätzlich den lokalen Update-Ordner `%LOCALAPPDATA%\AetherDPS\Vorschau` kennt (`latest.json` + versionierte exe, Pfad steht als AssemblyMetadata `PreviewFeed` in der exe). Eine laufende Vorschau findet neue Vorschauen dort über „Nach Updates suchen“ bzw. die automatische Prüfung und installiert sie wie ein normales Update; öffentliche Releases auf GitHub findet sie weiterhin, die höhere Version gewinnt. Vorschau-Nummern bleiben unter der nächsten öffentlichen Version (0.8.9x vor 0.9.0), damit danach wieder das normale Update greift. Öffentliche Builds (ohne `-Preview`) haben keinen Vorschau-Ordner.
 
 ## Release
 
