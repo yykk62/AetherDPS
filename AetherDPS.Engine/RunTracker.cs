@@ -30,6 +30,7 @@ public sealed class RunTracker
     private DateTime? stoppedAt;
     private DateTime? lastHit;
     private string? dungeon;
+    private (int DungeonId, int MapId, bool Instance)? zone;
     private TimeSpan combatTime;
     // Schaden, den Spieler von Mobs bekommen (RATmeter verwirft diese Treffer, wir sehen sie über RawDamage)
     private readonly Dictionary<int, long> taken = [];
@@ -69,6 +70,9 @@ public sealed class RunTracker
     /// <summary>Name des aktuellen Dungeons (ZoneTracker); der erste im Lauf gesehene benennt den Lauf.</summary>
     public Func<string?>? DungeonSource { get; set; }
 
+    /// <summary>Dungeon-Id, Karte und ob Instanz (ZoneTracker); der erste im Lauf gesehene Stand gilt (für die Kategorie).</summary>
+    public Func<(int DungeonId, int MapId, bool Instance)>? ZoneSource { get; set; }
+
     /// <summary>Letzter Treffer im laufenden Lauf.</summary>
     public DateTime? LastHit { get { lock (gate) return lastHit; } }
 
@@ -86,6 +90,7 @@ public sealed class RunTracker
         stoppedAt = null;
         lastHit = null;
         dungeon = null;
+        zone = null;
         taken.Clear();
         combatTime = TimeSpan.Zero;
     }
@@ -114,6 +119,7 @@ public sealed class RunTracker
                 ResetLocked(hit.DateTime);
             }
             dungeon ??= DungeonSource?.Invoke();
+            if (zone is null && ZoneSource?.Invoke() is { MapId: > 0 } seen) zone = seen;
             var at = hit.DateTime;
 
             if (lastHit is DateTime previous && at - previous is var gap && gap > TimeSpan.Zero && gap <= CombatGap)
@@ -223,7 +229,7 @@ public sealed class RunTracker
             .ToList();
 
         return new RunSnapshot(startedAt is not null, stoppedAt is not null, startedAt ?? end, elapsed, combatTime,
-            total, total / seconds, rows, bosses, dungeon);
+            total, total / seconds, rows, bosses, dungeon, zone?.DungeonId ?? 0, zone?.MapId ?? 0, zone?.Instance ?? false);
     }
 
     /// <param name="summonIds">Zugeschlagene Beschwörungen (siehe SummonMerger) – deren Skills erscheinen mit Präfix.</param>
@@ -384,4 +390,5 @@ public sealed record RunBoss(string Name, TimeSpan StartOffset, TimeSpan Duratio
 }
 
 public sealed record RunSnapshot(bool Started, bool Stopped, DateTime StartedAt, TimeSpan Elapsed, TimeSpan CombatTime,
-    long TotalDamage, double PartyDps, IReadOnlyList<RunPlayer> Players, IReadOnlyList<RunBoss> Bosses, string? Dungeon = null);
+    long TotalDamage, double PartyDps, IReadOnlyList<RunPlayer> Players, IReadOnlyList<RunBoss> Bosses, string? Dungeon = null,
+    int DungeonId = 0, int MapId = 0, bool InInstance = false);

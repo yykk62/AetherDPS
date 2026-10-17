@@ -36,6 +36,8 @@ public sealed class ShellTests : IDisposable
         (204, "Kaelthar", false, 11, 0.86),
     ];
 
+    private const int DemoDungeon = 600062;
+
     private static readonly string[] Skills = ["Zielpfeil", "Scharfschuss", "Schnellfeuer", "Spiralpfeil", "Greifenpfeil", "Sprengpfeil"];
     private static readonly double[] Weights = [0.37, 0.21, 0.15, 0.11, 0.09, 0.07];
 
@@ -133,6 +135,25 @@ public sealed class ShellTests : IDisposable
     }
 
     [AvaloniaFact]
+    public void Jetzt_Weltboss_ohne_Vergleich()
+    {
+        Start(withRuns: true);
+        // neuester Lauf: Weltboss in der offenen Welt – darf keine Bestzeit und keinen Vergleich auslösen
+        var start = DateTime.Now.AddMinutes(-3);
+        var players = new List<ArchivedPlayer> { new(201, "Elyndra", true, 14, 900_000, 15_300, 100, 0, 90, [], [], 0) };
+        var run = new ArchivedRun(start.ToString("yyyyMMdd_HHmmss"), start, 63, 41, "Henker Nemok", 900_000, 15_300, players,
+            [new RunBoss("Henker Nemok", TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(41), true, 900_000, 1, 900_000)], 0, 1010, false);
+        File.WriteAllText(Path.Combine(dataDir, "Laeufe", run.Id + ".json"), JsonSerializer.Serialize(run));
+        var now = provider!.GetRequiredService<NowViewModel>();
+        var shell = provider!.GetRequiredService<ShellViewModel>();
+        var window = new ShellWindow(shell);
+        Assert.Equal("Henker Nemok", now.RunName);
+        Assert.False(now.TimeBest);
+        Assert.False(now.HasHistory);
+        Snap(window, "shell_jetzt_welt");
+    }
+
+    [AvaloniaFact]
     public void Jetzt_ohne_Lauf()
     {
         Start(withRuns: false);
@@ -175,8 +196,9 @@ public sealed class ShellTests : IDisposable
                 bossList.Add(new RunBoss(b, TimeSpan.FromSeconds(t), TimeSpan.FromSeconds(len), true, damage, 1, damage));
                 t += len + duration * 0.38 / bosses.Length;
             }
-            var run = new ArchivedRun(start.ToString("yyyyMMdd_HHmmss"), start, duration, combat, "Arkanis (Normal)",
-                players.Sum(p => p.Damage), total, players, bossList);
+            // echter Dungeon (Transzendenz), sonst zählt der Lauf nicht für Vergleiche
+            var run = new ArchivedRun(start.ToString("yyyyMMdd_HHmmss"), start, duration, combat, GameText.DungeonName(DemoDungeon) ?? "Arkanis",
+                players.Sum(p => p.Damage), total, players, bossList, DemoDungeon, DemoDungeon, true);
             File.WriteAllText(Path.Combine(folder, run.Id + ".json"), JsonSerializer.Serialize(run, json));
         }
     }

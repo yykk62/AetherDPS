@@ -29,6 +29,7 @@ public sealed partial class NowViewModel : ObservableObject
 
     [ObservableProperty] private bool hasResult;
     [ObservableProperty] private string runName = "";
+    [ObservableProperty] private string runKind = "";
     [ObservableProperty] private string verdict = "";
     [ObservableProperty] private string runLine = "";
 
@@ -118,6 +119,7 @@ public sealed partial class NowViewModel : ObservableObject
 
         var cmp = new RunComparison(run, archive.All());
         RunName = run.Name;
+        RunKind = cmp.KindText;
         Verdict = cmp.Verdict;
         TimeBest = cmp.IsBestTime;
         RunLine = string.Join(" ", new[] { Loc.T("now.run_line", RunComparison.When(run.StartedAt + run.Duration)), cmp.BossText, cmp.RankText }
@@ -126,9 +128,12 @@ public sealed partial class NowViewModel : ObservableObject
 
         // Messlatten: du gegen deine früheren Läufe mit demselben Namen
         var user = cmp.User;
-        HasHistory = cmp.HasHistory;
-        FirstRunText = Loc.T("now.first_run", run.Name);
-        HistoryLegend = Loc.T("now.scale_legend", cmp.DpsHistory.Count);
+        HasHistory = cmp.HasScale;
+        // Ohne Skala ein ehrlicher Satz statt verwirrender Striche: kein Vergleich, erster oder zweiter Lauf
+        FirstRunText = !cmp.Comparable ? Loc.T("now.not_comparable_text", cmp.KindText)
+            : cmp.DpsHistory.Count == 1 ? Loc.T("now.one_earlier", cmp.KindText, Format.CompactFixed(cmp.DpsHistory[0]) + "/s")
+            : Loc.T("now.first_run_in", cmp.KindText);
+        HistoryLegend = Loc.T("now.scale_legend_in", cmp.KindText, cmp.DpsHistory.Count);
         DpsHistory = cmp.DpsHistory;
         DpsAverage = cmp.DpsAverage;
         DpsBest = cmp.DpsBest;
@@ -143,7 +148,7 @@ public sealed partial class NowViewModel : ObservableObject
         }
 
         TimeHistory = cmp.TimeHistory;
-        HasTimeHistory = TimeHistory.Count > 0;
+        HasTimeHistory = cmp.HasScale && TimeHistory.Count >= 2;
         TimeCurrent = run.DurationSeconds;
         TimeAverage = cmp.TimeAverage;
         TimeBestValue = cmp.TimeBest;

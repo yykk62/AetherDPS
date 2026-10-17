@@ -9,7 +9,8 @@ namespace AetherDPS.App.ViewModels;
 
 /// <summary>Ein Lauf in der Liste; <see cref="DayHeader"/> steht über dem ersten Lauf eines Tages.</summary>
 public sealed partial class RunListItem(string id, string title, bool isBest, bool isLive,
-    string? dayHeader = null, string time = "", string duration = "", string yourDps = "", double dpsPercent = double.NaN) : ObservableObject
+    string? dayHeader = null, string time = "", string duration = "", string yourDps = "", double dpsPercent = double.NaN,
+    string kind = "", bool comparable = false) : ObservableObject
 {
     public string Id { get; } = id;
     public string Title { get; } = title;
@@ -22,6 +23,9 @@ public sealed partial class RunListItem(string id, string title, bool isBest, bo
     /// <summary>Deine DPS im Vergleich zu deinem besten Lauf desselben Namens (0…100), für die Mini-Skala.</summary>
     public double DpsPercent { get; } = dpsPercent;
     public bool HasDpsPercent => double.IsFinite(DpsPercent);
+    /// <summary>Kategorie („Expedition“, „Freie Welt“ …); nicht vergleichbare Läufe stehen gedämpft in der Liste.</summary>
+    public string Kind { get; } = kind;
+    public bool Comparable { get; } = comparable;
     public bool HasDayHeader => DayHeader is not null;
 
     [ObservableProperty] private bool isSelected;
@@ -83,6 +87,9 @@ public sealed partial class RunsViewModel : ObservableObject
     [ObservableProperty] private bool hasAnyRun;
     [ObservableProperty] private bool isLive;
     [ObservableProperty] private string runTitle = "";
+    [ObservableProperty] private string runKind = "";
+    /// <summary>Klassenfarbe des gewählten Spielers für die Spuren der Kampfanalyse.</summary>
+    [ObservableProperty] private Avalonia.Media.IBrush? playerBrush;
     [ObservableProperty] private string verdict = "";
     [ObservableProperty] private bool isBestTime;
     [ObservableProperty] private string runSummary = "";
@@ -114,17 +121,22 @@ public sealed partial class RunsViewModel : ObservableObject
         Runs.Clear();
         if (mode.IsActive) Runs.Add(new RunListItem(LiveId, Loc.T("fights.live"), false, true));
         string? lastDay = null;
-        var bestDps = archive.All().GroupBy(r => r.Name)
+        // Mini-Skala: deine DPS im Vergleich zu deinem besten Lauf derselben Kategorie (nur echte Dungeons)
+        var kinds = archive.All().ToDictionary(r => r.Id, RunCategory.Of);
+        var bestDps = archive.All().Where(r => RunCategory.IsComparable(kinds[r.Id])).GroupBy(r => kinds[r.Id])
             .ToDictionary(g => g.Key, g => g.Select(r => r.Players.FirstOrDefault(p => p.IsUser)?.Dps ?? 0).DefaultIfEmpty(0).Max());
         foreach (var run in archive.All())
         {
             var best = archive.BestOf(run.Name);
+            var kind = kinds[run.Id];
+            bool comparable = RunCategory.IsComparable(kind);
             var user = run.Players.FirstOrDefault(p => p.IsUser);
             var day = RunComparison.Day(run.StartedAt);
             Runs.Add(new RunListItem(run.Id, run.Name, best?.Id == run.Id && run.BossesKilled > 0, false,
                 day != lastDay ? day : null, run.StartedAt.ToString("HH:mm"), RunComparison.Dur(run.Duration),
                 user is null ? "" : Format.CompactFixed(user.Dps) + "/s",
-                user is not null && bestDps[run.Name] > 0 ? user.Dps * 100 / bestDps[run.Name] : double.NaN));
+                user is not null && comparable && bestDps.GetValueOrDefault(kind) > 0 ? user.Dps * 100 / bestDps[kind] : double.NaN,
+                Loc.T(RunCategory.Key(kind)), comparable));
             lastDay = day;
         }
         HasAnyRun = Runs.Count > 0;
@@ -175,6 +187,7 @@ public sealed partial class RunsViewModel : ObservableObject
         IsLive = SelectedRun!.IsLive;
         var cmp = new RunComparison(current, archive.All());
         RunTitle = IsLive ? Loc.T("fights.live") : current.Name;
+        RunKind = IsLive ? "" : cmp.KindText;
         Verdict = IsLive ? "" : cmp.Verdict;
         IsBestTime = !IsLive && cmp.IsBestTime;
         var combat = RunComparison.Dur(TimeSpan.FromSeconds(current.CombatSeconds));
@@ -205,6 +218,7 @@ public sealed partial class RunsViewModel : ObservableObject
         if (p is null) return;
 
         PlayerTitle = SelectedPlayer!.Name;
+        PlayerBrush = SelectedPlayer.ClassBrush;
         var facts = new List<string>
         {
             Loc.T("runs.active", p.ActivityPercent.ToString("0", Loc.Culture)),

@@ -458,14 +458,16 @@ public sealed class ReadmeMedia : IDisposable
         var folder = Directory.CreateDirectory(Path.Combine(dataDir, "Laeufe")).FullName;
         var json = new JsonSerializerOptions { WriteIndented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
         var day = DateTime.Today.AddHours(20);
-        var runs = new (string Dungeon, string[] Bosses, double Minutes, double DayOffset)[]
+        // echte Dungeon-Karten, damit die Läufe für Vergleiche zählen (RunCategory)
+        const int Deus = 600053, Arkanis = 600062, Cradle = 600123;
+        var runs = new (int Dungeon, string[] Bosses, double Minutes, double DayOffset)[]
         {
-            ("Forschungsbasis Deus (Schwer)", ["Atiel", "Nazmun", "Gelcos"], 13.9, 0),   // neueste = neue Bestzeit (Jetzt)
-            ("Forschungsbasis Deus (Schwer)", ["Atiel", "Nazmun", "Gelcos"], 16.2, -1),
-            ("Forschungsbasis Deus (Schwer)", ["Atiel", "Nazmun", "Gelcos"], 14.6, -2),
-            ("Arkanis (Normal)", ["Siliator der Täuschung", "Ruthilis des Schmerzes", "Talisra der Leere"], 18.3, -0.1),
-            ("Arkanis (Normal)", ["Siliator der Täuschung", "Ruthilis des Schmerzes", "Talisra der Leere"], 19.7, -3),
-            ("Limbus (Schwer)", ["Gequälter Bakarma", "Veltiras der Multidimension", "Ehrwürdiger Valkan"], 22.4, -1.2),
+            (Deus, ["Atiel", "Nazmun", "Gelcos"], 13.9, 0),   // neueste = neue Bestzeit (Jetzt)
+            (Deus, ["Atiel", "Nazmun", "Gelcos"], 16.2, -1),
+            (Deus, ["Atiel", "Nazmun", "Gelcos"], 14.6, -2),
+            (Arkanis, ["Siliator der Täuschung", "Ruthilis des Schmerzes", "Talisra der Leere"], 18.3, -0.1),
+            (Arkanis, ["Siliator der Täuschung", "Ruthilis des Schmerzes", "Talisra der Leere"], 19.7, -3),
+            (Cradle, ["Gequälter Bakarma", "Veltiras der Multidimension", "Ehrwürdiger Valkan"], 22.4, -1.2),
         };
         int k = 0;
         foreach (var (dungeon, bossNames, minutes, offset) in runs)
@@ -499,8 +501,8 @@ public sealed class ReadmeMedia : IDisposable
                 bossList.Add(new RunBoss(b, TimeSpan.FromSeconds(t), TimeSpan.FromSeconds(len), true, (long)(total * len), 1, (long)(total * len)));
                 t += len + duration * 0.38 / bossNames.Length;
             }
-            var run = new ArchivedRun(start.ToString("yyyyMMdd_HHmmss"), start, duration, combat, dungeon,
-                players.Sum(p => p.Damage), total, players, bossList);
+            var run = new ArchivedRun(start.ToString("yyyyMMdd_HHmmss"), start, duration, combat, GameText.DungeonName(dungeon) ?? $"#{dungeon}",
+                players.Sum(p => p.Damage), total, players, bossList, dungeon, dungeon, true);
             File.WriteAllText(Path.Combine(folder, run.Id + ".json"), JsonSerializer.Serialize(run, json));
             k++;
         }

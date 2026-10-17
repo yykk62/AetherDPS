@@ -10,7 +10,8 @@ public sealed record ArchivedPlayer(long PlayerId, string Name, bool IsUser, int
 
 public sealed record ArchivedRun(
     string Id, DateTime StartedAt, double DurationSeconds, double CombatSeconds, string Name,
-    long TotalDamage, double PartyDps, List<ArchivedPlayer> Players, List<RunBoss> Bosses)
+    long TotalDamage, double PartyDps, List<ArchivedPlayer> Players, List<RunBoss> Bosses,
+    int DungeonId = 0, int MapId = 0, bool InInstance = false)
 {
     public TimeSpan Duration => TimeSpan.FromSeconds(DurationSeconds);
     public int BossesKilled => Bosses.Count(b => b.Killed);
@@ -79,7 +80,7 @@ public sealed class RunArchive
             snapshot.StartedAt.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture),
             snapshot.StartedAt, snapshot.Elapsed.TotalSeconds, snapshot.CombatTime.TotalSeconds,
             snapshot.Dungeon ?? lastKill?.Name ?? Loc.T("runs.unnamed"), players.Sum(p => p.Damage), players.Sum(p => p.Dps), players,
-            snapshot.Bosses.ToList());
+            snapshot.Bosses.ToList(), snapshot.DungeonId, snapshot.MapId, snapshot.InInstance);
     }
 
     public IReadOnlyList<ArchivedRun> All()
@@ -91,9 +92,9 @@ public sealed class RunArchive
         }
     }
 
-    /// <summary>Kürzester Lauf mit demselben Namen und mindestens einem getöteten Boss.</summary>
+    /// <summary>Kürzester Lauf mit demselben Namen und mindestens einem getöteten Boss (nur echte Dungeons, siehe <see cref="RunCategory"/>).</summary>
     public ArchivedRun? BestOf(string name) =>
-        All().Where(r => r.Name == name && r.BossesKilled > 0).MinBy(r => r.DurationSeconds);
+        All().Where(r => r.Name == name && r.BossesKilled > 0 && RunCategory.IsComparable(r)).MinBy(r => r.DurationSeconds);
 
     /// <summary>Deine Ø-DPS in früheren Läufen mit demselben Namen (ohne den angegebenen).</summary>
     public double? AverageUserDps(string name, string? excludeId = null)

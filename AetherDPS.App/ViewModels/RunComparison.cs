@@ -7,12 +7,17 @@ namespace AetherDPS.App.ViewModels;
 public sealed record BossLine(string Name, string From, string Duration, string GroupDps, bool Killed, string Note = "");
 
 /// <summary>
-/// Ein Lauf im Vergleich zu deinen früheren Läufen mit demselben Namen: Urteil („Neue Bestzeit,
-/// 8 % mehr DPS als sonst“), Werte für die Messlatten, Platz in der Gruppe, Boss-Zeilen.
+/// Ein Lauf im Vergleich zu deinen früheren Läufen: DPS gegen alle Läufe derselben Kategorie (Expedition,
+/// Transzendenz, täglicher Dungeon, Abyss), Zeit und Bestzeit nur gegen denselben Dungeon. Freie Welt,
+/// unbekannte Instanzen (Quest-Dungeons) und alte Läufe ohne erkennbaren Dungeon werden nicht verglichen.
 /// Gemeinsam für „Jetzt“ und „Kämpfe“, damit beide dieselben Worte und Formate benutzen.
 /// </summary>
 public sealed class RunComparison
 {
+    public RunKind Kind { get; }
+    public bool Comparable { get; }
+    /// <summary>„Expeditionen“, „Transzendenz“ … für Legende und Überschrift.</summary>
+    public string KindText { get; }
     public ArchivedPlayer? User { get; }
     public IReadOnlyList<double> DpsHistory { get; }
     public double DpsAverage { get; }
@@ -29,8 +34,15 @@ public sealed class RunComparison
 
     public RunComparison(ArchivedRun run, IReadOnlyList<ArchivedRun> all)
     {
-        var earlier = all.Where(r => r.Name == run.Name && r.Id != run.Id && r.StartedAt < run.StartedAt).ToList();
+        Kind = RunCategory.Of(run);
+        Comparable = RunCategory.IsComparable(Kind);
+        KindText = Loc.T(RunCategory.Key(Kind));
         User = run.Players.FirstOrDefault(p => p.IsUser);
+
+        var earlier = Comparable
+            ? all.Where(r => r.Id != run.Id && r.StartedAt < run.StartedAt && RunCategory.Of(r) == Kind).ToList()
+            : [];
+        // DPS: alle Läufe derselben Kategorie (mehr Vergleichswerte); Zeit: nur derselbe Dungeon
         DpsHistory = earlier.Select(r => r.Players.FirstOrDefault(p => p.IsUser)?.Dps).OfType<double>().ToList();
         DpsAverage = DpsHistory.Count > 0 ? DpsHistory.Average() : double.NaN;
         DpsBest = DpsHistory.Count > 0 ? DpsHistory.Max() : double.NaN;
@@ -38,8 +50,8 @@ public sealed class RunComparison
         var bosses = Significant(run);
         BossCount = bosses.Count;
         BossesKilled = bosses.Count(b => b.Killed);
-        var complete = earlier.Where(r => r.BossesKilled > 0 && r.BossesKilled == r.Bosses.Count).ToList();
-        TimeHistory = complete.Select(r => r.DurationSeconds).ToList();
+        var sameDungeon = earlier.Where(r => r.Name == run.Name && r.BossesKilled > 0 && r.BossesKilled == r.Bosses.Count).ToList();
+        TimeHistory = sameDungeon.Select(r => r.DurationSeconds).ToList();
         TimeAverage = TimeHistory.Count > 0 ? TimeHistory.Average() : double.NaN;
         TimeBest = TimeHistory.Count > 0 ? TimeHistory.Min() : double.NaN;
         IsBestTime = TimeHistory.Count > 0 && BossCount > 0 && BossesKilled == BossCount && run.DurationSeconds < TimeBest;
@@ -57,10 +69,15 @@ public sealed class RunComparison
             double diff = (User.Dps / DpsAverage - 1) * 100;
             parts.Add(Loc.T(diff >= 0 ? "now.verdict_dps_up" : "now.verdict_dps_down", Math.Abs(diff).ToString("0", Loc.Culture)));
         }
-        Verdict = parts.Count > 0 ? string.Join(Loc.T("now.verdict_join"), parts) : Loc.T("now.verdict_first");
+        Verdict = !Comparable ? Loc.T("now.verdict_not_comparable", KindText)
+            : parts.Count > 0 ? string.Join(Loc.T("now.verdict_join"), parts)
+            : Loc.T("now.verdict_first_in", KindText);
     }
 
     public bool HasHistory => User is not null && DpsHistory.Count > 0;
+
+    /// <summary>Skala erst ab zwei früheren Läufen – mit einem einzigen ist „Strich = Schnitt = Bestwert“ nur verwirrend.</summary>
+    public bool HasScale => User is not null && DpsHistory.Count >= 2;
 
     /// <summary>„Alle 3 Bosse gelegt.“ / „2 von 3 Bossen gelegt.“ / leer</summary>
     public string BossText => BossCount == 0 ? ""

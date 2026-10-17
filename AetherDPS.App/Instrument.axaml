@@ -367,4 +367,21 @@
     <Setter Property="Minimum" Value="0" />
     <Setter Property="Maximum" Value="100" />
   </Style>
+
+  <!-- Kategorie eines Laufs (Expedition, Freie Welt …) neben dem Namen -->
+  <Style Selector=".ins Border.kindtag">
+    <Setter Property="CornerRadius" Value="{DynamicResource Radius.Mark}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Line.Frame}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Padding" Value="7,1" />
+  </Style>
+  <Style Selector=".ins Border.kindtag TextBlock">
+    <Setter Property="FontSize" Value="{DynamicResource Size.Small}" />
+    <Setter Property="Foreground" Value="{DynamicResource Text.Secondary}" />
+  </Style>
+  <Style Selector=".ins ProgressBar.trace.thick">
+    <Setter Property="MinHeight" Value="5" />
+    <Setter Property="Height" Value="5" />
+    <Setter Property="CornerRadius" Value="3" />
+  </Style>
 </Styles>

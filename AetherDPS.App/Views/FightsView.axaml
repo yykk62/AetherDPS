@@ -24,7 +24,7 @@
               <DataTemplate x:DataType="vm:RunListItem">
                 <StackPanel>
                   <TextBlock Classes="small muted" Text="{Binding DayHeader}" IsVisible="{Binding HasDayHeader}" Margin="10,14,0,6" />
-                  <Button Classes="runrow" Classes.current="{Binding IsSelected}"
+                  <Button Classes="runrow" Classes.current="{Binding IsSelected}" Classes.dim="{Binding !Comparable}"
                           Command="{Binding $parent[UserControl].((vm:RunsViewModel)DataContext).SelectRunCommand}" CommandParameter="{Binding}">
                     <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
                       <StackPanel Orientation="Horizontal" Spacing="7">
@@ -37,6 +37,8 @@
                         <Run Text="{Binding Time}" />
                         <Run Text="  " />
                         <Run Text="{Binding Duration}" />
+                        <Run Text="  " />
+                        <Run Text="{Binding Kind}" />
                       </TextBlock>
                       <!-- Mini-Skala: deine DPS im Vergleich zu deinem besten Lauf hier -->
                       <ProgressBar Grid.Row="1" Grid.Column="1" Classes="trace" Value="{Binding DpsPercent}" IsVisible="{Binding HasDpsPercent}"
@@ -58,7 +60,12 @@
           <Border Name="DetailsCard" Background="{DynamicResource Surface.Frame}" Padding="0,0,0,6">
             <StackPanel Spacing="14">
               <StackPanel Spacing="4">
-                <TextBlock Classes="display" Text="{Binding RunTitle}" TextWrapping="Wrap" />
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                  <TextBlock Classes="display" Text="{Binding RunTitle}" TextWrapping="Wrap" />
+                  <Border Classes="kindtag" VerticalAlignment="Center" IsVisible="{Binding RunKind, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                    <TextBlock Text="{Binding RunKind}" />
+                  </Border>
+                </StackPanel>
                 <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding Verdict, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                   <Image Source="{l:Icon trophy, Size=20}" Width="20" Height="20" IsVisible="{Binding IsBestTime}" VerticalAlignment="Center" />
                   <TextBlock Classes="title" Classes.self="{Binding IsBestTime}" Text="{Binding Verdict}" TextWrapping="Wrap" />
@@ -200,7 +207,7 @@
                         </Panel>
                         <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center" Margin="0,0,16,0">
                           <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
-                          <ProgressBar Classes="trace" Value="{Binding BarPercent}" Foreground="{DynamicResource Text.Secondary}" />
+                          <ProgressBar Classes="trace thick" Value="{Binding BarPercent}" Foreground="{Binding $parent[UserControl].((vm:RunsViewModel)DataContext).PlayerBrush}" />
                         </StackPanel>
                         <TextBlock Grid.Column="2" Classes="num" Text="{Binding Damage}" FontWeight="Medium" VerticalAlignment="Center" />
                         <TextBlock Grid.Column="3" Classes="num secondary" Text="{Binding Share}" VerticalAlignment="Center" />
@@ -247,4 +254,10 @@
       </ScrollViewer>
     </Grid>
   </Panel>
+  <UserControl.Styles>
+    <!-- Freie Welt, unbekannte Instanzen: zählen nicht für Vergleiche, deshalb ruhiger -->
+    <Style Selector="Button.runrow.dim">
+      <Setter Property="Opacity" Value="0.6" />
+    </Style>
+  </UserControl.Styles>
 </UserControl>

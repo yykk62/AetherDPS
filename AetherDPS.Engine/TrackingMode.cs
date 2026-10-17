@@ -56,6 +56,7 @@ public sealed class TrackingMode
             else run.Stop();
         };
         run.DungeonSource = () => zones.DungeonName;
+        run.ZoneSource = () => (zones.DungeonId, zones.MapId, zones.InInstance);
         this.sessions = sessions;
         this.run = run;
         this.entities = entities;

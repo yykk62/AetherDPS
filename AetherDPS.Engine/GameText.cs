@@ -151,6 +151,9 @@ public static class GameText
 
     public static string? ServerName(int id) => servers.GetValueOrDefault(id);
 
+    /// <summary>Alle bekannten Dungeon-Karten (Ids aus dungeons.json).</summary>
+    public static IEnumerable<int> DungeonIds => dungeons.Keys;
+
     /// <summary>Alle bekannten Server (ID → Name in der gewählten Sprache).</summary>
     public static IReadOnlyDictionary<int, string> Servers => servers;
 }
