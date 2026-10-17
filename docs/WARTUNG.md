@@ -68,7 +68,23 @@ Für Paket-Probleme braucht es einen Mitschnitt, den der Meter nicht verschickt 
 3. Den Mitschnitt nach `AetherDPS.Tests/Captures/` legen. Der Test `Echte_Mitschnitte_laufen_fehlerfrei_durch` spielt alle Mitschnitte dort ab.
    **Der Ordner ist per .gitignore ausgeschlossen**, weil Mitschnitte Spielernamen enthalten. Er wird nie committet.
 
+## Privat arbeiten, öffentlich freigeben
+
+Seit 17.10.2026 zwei Ablagen:
+
+| Remote | Repo | Sichtbar | Was dorthin geht |
+|---|---|---|---|
+| `privat` | `yykk62/AetherDPS-dev` | nur der Nutzer | alles, laufend (`git push privat main`, Feature-Branches) |
+| `origin` | `yykk62/AetherDPS` | öffentlich | nur Freigegebenes, Releases, `status.json` |
+
+- Gearbeitet wird auf `main`, gesichert nach `privat`. Keine Tags nach `privat` pushen (die Release-Pipeline startet bei Tags).
+- Der lokale Branch `oeffentlich` folgt `origin/main`. Freigeben: `git switch oeffentlich`, fertige Arbeit per `git merge main` (alles) oder `git cherry-pick <commit>` (einzeln) übernehmen, dann `git push origin oeffentlich:main`. Was erst später kommen soll (z. B. Bezahlfunktionen), bleibt auf eigenen Branches nur in `privat`.
+- Öffentlich bleiben müssen `status.json` auf main (die App liest Nachrichten daraus) und die Releases (Update-Prüfung). Eine Nachricht an alle geht deshalb weiter über `origin`.
+- Lizenz: Die App ist GPL-3.0 (Fork von RATmeter). Privat entwickeln ist erlaubt; wer eine veröffentlichte exe bekommt, hat Anspruch auf genau deren Quellcode. Was in einem Release steckt, muss also spätestens mit dem Release in `origin` stehen. Eigener Server-Code ist kein Teil der App und kann künftig privat bleiben (schon Veröffentlichtes bleibt unter der Lizenz, unter der es veröffentlicht wurde).
+
 ## Release
+
+Releases kommen nur aus `origin` (dort sucht die Update-Prüfung). Vorher den Stand über `oeffentlich` freigeben (siehe oben).
 
 1. Version in `AetherDPS.App/AetherDPS.App.csproj` (`<Version>`) erhöhen und einen Abschnitt `## x.y.z` oben in `CHANGELOG.md` schreiben.
 2. Committen, dann `git tag vx.y.z` und `git push origin main vx.y.z`.
