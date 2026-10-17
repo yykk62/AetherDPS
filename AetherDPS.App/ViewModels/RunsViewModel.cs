@@ -27,11 +27,37 @@ public sealed partial class RunListItem(string id, string title, bool isBest, bo
     [ObservableProperty] private bool isSelected;
 }
 
-/// <summary>Skill in der Kampfanalyse: Spalten statt eines zusammengeklebten Textes.</summary>
-public sealed record SkillLine(string Name, string Damage, string Share, string Hits, string Crit, double BarPercent);
+/// <summary>Skill in der Kampfanalyse: Spalten statt eines zusammengeklebten Textes, mit offiziellem Bild.</summary>
+public sealed partial class SkillLine : WithIcon
+{
+    public SkillLine(string name, string damage, string share, string hits, string crit, double barPercent)
+    {
+        (Name, Damage, Share, Hits, Crit, BarPercent) = (name, damage, share, hits, crit, barPercent);
+        LoadIcon(SkillIcons.ForName(name));
+    }
 
-/// <summary>Buff in der Kampfanalyse: Anteil der Kampfzeit und wie oft.</summary>
-public sealed record BuffLine(string Name, string Uptime, string Count, double BarPercent);
+    public string Name { get; }
+    public string Damage { get; }
+    public string Share { get; }
+    public string Hits { get; }
+    public string Crit { get; }
+    public double BarPercent { get; }
+}
+
+/// <summary>Buff in der Kampfanalyse: Anteil der Kampfzeit und wie oft; Bild vom gleichnamigen Skill, sonst keins.</summary>
+public sealed partial class BuffLine : WithIcon
+{
+    public BuffLine(string name, string uptime, string count, double barPercent)
+    {
+        (Name, Uptime, Count, BarPercent) = (name, uptime, count, barPercent);
+        LoadIcon(SkillIcons.ForName(name));
+    }
+
+    public string Name { get; }
+    public string Uptime { get; }
+    public string Count { get; }
+    public double BarPercent { get; }
+}
 
 /// <summary>Ort „Kämpfe“: alle gespeicherten Läufe, Details, Kampfanalyse je Spieler, Teilen, Löschen mit Rückgängig.</summary>
 public sealed partial class RunsViewModel : ObservableObject

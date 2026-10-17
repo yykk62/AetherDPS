@@ -127,15 +127,24 @@ public sealed partial class ProfileViewModel : ObservableObject
     [ObservableProperty] private bool isSelf;
 
     [ObservableProperty] private bool hasDetail;
+    /// <summary>„Details: 5 von 12 geladen“ – solange die Item-Details im Hintergrund nachgeladen werden.</summary>
+    [ObservableProperty] private string prefetchText = "";
     [ObservableProperty] private bool detailLoading;
     [ObservableProperty] private string detailTitle = "";
     [ObservableProperty] private IBrush detailBrush = GradeColors.For("");
     [ObservableProperty] private string detailFacts = "";
     [ObservableProperty] private string detailGods = "";
 
-    public ProfileViewModel(Armory armory, MeterSettings settings)
+    private readonly ProfileHistory history;
+
+    /// <summary>Verlauf von Kampfkraft und Itemstufe (nur beim eigenen Charakter sichtbar).</summary>
+    public SelfProgress Progress { get; }
+
+    public ProfileViewModel(Armory armory, MeterSettings settings, ProfileHistory history, SelfProgress progress)
     {
+        Progress = progress;
         this.armory = armory;
+        this.history = history;
         this.settings = settings;
         Servers = GameText.Servers
             .Where(s => s.Key is >= 1300 and < 1400 or >= 2300 and < 2400)
@@ -220,7 +229,9 @@ public sealed partial class ProfileViewModel : ObservableObject
         HasProfile = true;
         HasDetail = false;
         Name = p.Name;
-        IsSelf = string.Equals(p.Name, settings.CharacterName, StringComparison.OrdinalIgnoreCase);
+        IsSelf = string.Equals(p.Name, settings.CharacterName, StringComparison.OrdinalIgnoreCase)
+                 && Armory.ServerId(settings.CharacterServer) == p.ServerId;
+        if (IsSelf) history.Add(p);   // eigenes Profil fließt in den Verlauf
         Subtitle = string.Join(" · ", new[] { p.ClassName, p.Race, p.Server, Loc.T("profile.level", p.Level) }.Where(s => !string.IsNullOrEmpty(s)));
         CombatPower = p.CombatPower.ToString("N0", Loc.Culture);
         ItemLevel = p.ItemLevel.ToString("N0", Loc.Culture);
@@ -241,6 +252,7 @@ public sealed partial class ProfileViewModel : ObservableObject
         Jewelry.Clear();
         foreach (var item in p.Equipment)
             (Armory.IsArmorSlot(item.Slot) ? Armor : Jewelry).Add(new GearRow(item));
+        StartPrefetch(p);
 
         BaseStats.Clear();
         GodStats.Clear();
@@ -266,6 +278,41 @@ public sealed partial class ProfileViewModel : ObservableObject
         }
     }
 
+    private CancellationTokenSource? prefetch;
+    private int userWaiting;
+
+    /// <summary>
+    /// Nach dem Profil die Details aller Teile im Hintergrund nachladen (eins nach dem anderen, höflich
+    /// gedrosselt), damit ein Klick auf ein Teil sofort antwortet. Klickt der Nutzer, hat seine Anfrage Vorrang.
+    /// </summary>
+    private void StartPrefetch(ArmoryProfile p)
+    {
+        prefetch?.Cancel();
+        var cts = prefetch = new CancellationTokenSource();
+        var items = Armor.Concat(Jewelry).Select(r => r.Item).Where(i => i.Id != 0).ToList();
+        if (items.Count == 0) { PrefetchText = ""; return; }
+        _ = Task.Run(async () =>
+        {
+            int done = 0;
+            foreach (var item in items)
+            {
+                if (cts.IsCancellationRequested) return;
+                while (Volatile.Read(ref userWaiting) > 0) await Task.Delay(100, cts.Token);
+                Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+                {
+                    if (ReferenceEquals(profile, p)) PrefetchText = Loc.T("profile.prefetch", done, items.Count);
+                });
+                try { await armory.LoadItemAsync(p, item, cts.Token); }
+                catch (OperationCanceledException) { return; }
+                done++;
+            }
+            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            {
+                if (ReferenceEquals(profile, p)) PrefetchText = "";
+            });
+        });
+    }
+
     [RelayCommand]
     private async Task SelectItem(GearRow row)
     {
@@ -278,7 +325,11 @@ public sealed partial class ProfileViewModel : ObservableObject
         DetailFacts = "";
         DetailGods = "";
         DetailStats.Clear();
-        var detail = await armory.LoadItemAsync(profile, row.Item);
+        Interlocked.Increment(ref userWaiting);
+        ArmoryItemDetail? detail;
+        try { detail = await armory.LoadItemAsync(profile, row.Item); }
+        finally { Interlocked.Decrement(ref userWaiting); }
+        if (!row.IsSelected) return;   // inzwischen ein anderes Teil gewählt
         DetailLoading = false;
         if (detail is null)
         {

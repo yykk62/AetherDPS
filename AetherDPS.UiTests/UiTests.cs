@@ -36,6 +36,7 @@ public sealed class TestApp : Application
         // dieselben Farben und Karten wie die echte App (App.axaml bindet Theme.axaml genauso ein)
         Styles.Add(new StyleInclude(new Uri("avares://AetherDPS/")) { Source = new Uri("avares://AetherDPS/Theme.axaml") });
         RequestedThemeVariant = ThemeVariant.Dark;
+        AetherDPS.App.Services.RemoteImages.Offline = true;   // Tests laden nichts aus dem Netz
     }
 
     public static AppBuilder BuildAvaloniaApp() => AppBuilder.Configure<TestApp>()

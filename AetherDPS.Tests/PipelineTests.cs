@@ -505,6 +505,18 @@ public sealed class PipelineTests : IDisposable
     }
 
     [Fact]
+    public void Skills_und_Buffs_bekommen_offizielle_Bilder()
+    {
+        GameText.Apply("de");
+        var name = AionDpsMeter.Core.GameData.Services.GameDataProvider.Instance.Skills.Skills.Values
+            .First(s => s.Icon is { Length: > 0 } && !string.IsNullOrWhiteSpace(s.Name)).Name;
+        var url = SkillIcons.ForName(name);
+        Assert.StartsWith("https://assets.playnccdn.com/", url);
+        Assert.Equal(url, SkillIcons.ForName("Geist: " + name));   // Beschwörung mit Präfix
+        Assert.Null(SkillIcons.ForName("Gibt es nicht"));
+    }
+
+    [Fact]
     public void Echte_Mitschnitte_laufen_fehlerfrei_durch()
     {
         // Mitschnitte aus "Problem melden" landen in Captures/. Jeder muss sich

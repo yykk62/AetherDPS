@@ -461,7 +461,6 @@
   "pets.species.Nature": "Natural",
   "pets.species.Trans": "Variante",
   "pets.species.Special": "Especial",
-  "pets.summary": "{0} de {1} mascotes de {2} no nível máximo.",
   "pets.summary_unknown": "{0} mascotes com pontos de surgimento em {1}.",
   "pets.levels_hint": "O medidor conhece seus níveis de mascote assim que você entrar uma vez com ele aberto.",
   "pets.missing": "falta",
@@ -649,5 +648,18 @@
   "settings.placement_hint": "Mostra ao mesmo tempo o medidor de combate, os timers, o radar de mascotes e o aviso de Stagger com dados de exemplo. Arraste para mover, Esc ou Enter fixa. O cadeado de um overlay só deixa os cliques passarem para o jogo.",
   "settings.placement_now": "Posicionar agora",
   "settings.by_situation": "Overlays conforme a situação",
-  "settings.by_situation_hint": "Fora de masmorras os timers, na masmorra o medidor de combate, em lutas de chefe também o aviso de Stagger. Seu atalho continua mostrando e ocultando o medidor."
+  "settings.by_situation_hint": "Fora de masmorras os timers, na masmorra o medidor de combate, em lutas de chefe também o aviso de Stagger. Seu atalho continua mostrando e ocultando o medidor.",
+  "pets.count_all": "{0} mascotes em {1}",
+  "pets.count_missing": "Faltam {0} mascotes em {1}",
+  "pets.count_open": "{0} mascotes em {1} ainda não estão no nível máximo",
+  "self.cp": "Poder de combate",
+  "self.il": "Nível do item",
+  "self.today": "hoje",
+  "self.since_date": "desde {0}",
+  "self.unchanged": "sem alteração {0}",
+  "self.caption": "Dados das {0}, próxima consulta por volta das {1}.",
+  "self.caption_first": "A partir de agora o medidor registra seus dados a cada 4 h. Próxima consulta por volta das {1}.",
+  "settings.profile_history": "Guardar meu histórico",
+  "settings.profile_history_hint": "Enquanto o medidor estiver aberto, consulta seu perfil (nome e servidor) na NCSOFT a cada 4 horas, como ao abrir o perfil. Poder de combate e nível do item ficam no seu PC.",
+  "profile.prefetch": "Detalhes: {0} de {1} carregados"
 }

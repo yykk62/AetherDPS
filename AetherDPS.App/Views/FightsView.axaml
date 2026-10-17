@@ -181,25 +181,31 @@
               </StackPanel>
 
               <StackPanel Spacing="2">
-                <Grid ColumnDefinitions="*,84,72,64,72" Margin="0,0,0,4">
-                  <TextBlock Classes="section" Text="{l:T fights.skills}" />
-                  <TextBlock Grid.Column="1" Classes="small muted num" Text="{l:T fights.col_damage}" VerticalAlignment="Bottom" />
-                  <TextBlock Grid.Column="2" Classes="small muted num" Text="{l:T now.col_share}" VerticalAlignment="Bottom" />
-                  <TextBlock Grid.Column="3" Classes="small muted num" Text="{l:T fights.col_hits}" VerticalAlignment="Bottom" />
-                  <TextBlock Grid.Column="4" Classes="small muted num" Text="{l:T fights.col_crit}" VerticalAlignment="Bottom" />
+                <Grid ColumnDefinitions="36,*,84,72,64,72" Margin="0,0,0,4">
+                  <TextBlock Grid.ColumnSpan="2" Classes="section" Text="{l:T fights.skills}" />
+                  <TextBlock Grid.Column="2" Classes="small muted num" Text="{l:T fights.col_damage}" VerticalAlignment="Bottom" />
+                  <TextBlock Grid.Column="3" Classes="small muted num" Text="{l:T now.col_share}" VerticalAlignment="Bottom" />
+                  <TextBlock Grid.Column="4" Classes="small muted num" Text="{l:T fights.col_hits}" VerticalAlignment="Bottom" />
+                  <TextBlock Grid.Column="5" Classes="small muted num" Text="{l:T fights.col_crit}" VerticalAlignment="Bottom" />
                 </Grid>
                 <ItemsControl ItemsSource="{Binding Skills}">
                   <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="vm:SkillLine">
-                      <Grid ColumnDefinitions="*,84,72,64,72" Margin="0,4">
-                        <StackPanel Spacing="4" VerticalAlignment="Center" Margin="0,0,16,0">
+                      <Grid ColumnDefinitions="36,*,84,72,64,72" Margin="0,4">
+                        <Panel Width="28" Height="28" HorizontalAlignment="Left">
+                          <Border CornerRadius="{DynamicResource Radius.Mark}" Background="{DynamicResource Surface.WellDeep}" ClipToBounds="True">
+                            <Image Source="{Binding Icon}" />
+                          </Border>
+                          <Image Source="{l:Icon bolt, Size=16}" Width="16" Height="16" Opacity="0.6" IsVisible="{Binding Icon, Converter={x:Static ObjectConverters.IsNull}}" />
+                        </Panel>
+                        <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center" Margin="0,0,16,0">
                           <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
                           <ProgressBar Classes="trace" Value="{Binding BarPercent}" Foreground="{DynamicResource Text.Secondary}" />
                         </StackPanel>
-                        <TextBlock Grid.Column="1" Classes="num" Text="{Binding Damage}" FontWeight="Medium" VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="2" Classes="num secondary" Text="{Binding Share}" VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="3" Classes="num secondary" Text="{Binding Hits}" VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="4" Classes="num secondary" Text="{Binding Crit}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="2" Classes="num" Text="{Binding Damage}" FontWeight="Medium" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="3" Classes="num secondary" Text="{Binding Share}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="4" Classes="num secondary" Text="{Binding Hits}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="5" Classes="num secondary" Text="{Binding Crit}" VerticalAlignment="Center" />
                       </Grid>
                     </DataTemplate>
                   </ItemsControl.ItemTemplate>
@@ -208,22 +214,28 @@
 
               <Border Classes="rule" />
               <StackPanel Spacing="2">
-                <Grid ColumnDefinitions="*,84,64" Margin="0,0,0,4">
-                  <TextBlock Classes="section" Text="{l:T fights.buffs}" />
-                  <TextBlock Grid.Column="1" Classes="small muted num" Text="{l:T fights.col_uptime}" VerticalAlignment="Bottom" />
-                  <TextBlock Grid.Column="2" Classes="small muted num" Text="{l:T fights.col_count}" VerticalAlignment="Bottom" />
+                <Grid ColumnDefinitions="36,*,84,64" Margin="0,0,0,4">
+                  <TextBlock Grid.ColumnSpan="2" Classes="section" Text="{l:T fights.buffs}" />
+                  <TextBlock Grid.Column="2" Classes="small muted num" Text="{l:T fights.col_uptime}" VerticalAlignment="Bottom" />
+                  <TextBlock Grid.Column="3" Classes="small muted num" Text="{l:T fights.col_count}" VerticalAlignment="Bottom" />
                 </Grid>
                 <TextBlock Classes="small muted" Text="{l:T runs.buffs_empty}" IsVisible="{Binding !HasBuffs}" TextWrapping="Wrap" />
                 <ItemsControl ItemsSource="{Binding Buffs}">
                   <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="vm:BuffLine">
-                      <Grid ColumnDefinitions="*,84,64" Margin="0,4">
-                        <StackPanel Spacing="4" VerticalAlignment="Center" Margin="0,0,16,0">
+                      <Grid ColumnDefinitions="36,*,84,64" Margin="0,4">
+                        <Panel Width="28" Height="28" HorizontalAlignment="Left">
+                          <Border CornerRadius="{DynamicResource Radius.Mark}" Background="{DynamicResource Surface.WellDeep}" ClipToBounds="True">
+                            <Image Source="{Binding Icon}" />
+                          </Border>
+                          <Image Source="{l:Icon shield, Size=16}" Width="16" Height="16" Opacity="0.6" IsVisible="{Binding Icon, Converter={x:Static ObjectConverters.IsNull}}" />
+                        </Panel>
+                        <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center" Margin="0,0,16,0">
                           <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
                           <ProgressBar Classes="trace" Value="{Binding BarPercent}" Foreground="{DynamicResource Text.Muted}" />
                         </StackPanel>
-                        <TextBlock Grid.Column="1" Classes="num" Text="{Binding Uptime}" FontWeight="Medium" VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="2" Classes="num secondary" Text="{Binding Count}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="2" Classes="num" Text="{Binding Uptime}" FontWeight="Medium" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="3" Classes="num secondary" Text="{Binding Count}" VerticalAlignment="Center" />
                       </Grid>
                     </DataTemplate>
                   </ItemsControl.ItemTemplate>

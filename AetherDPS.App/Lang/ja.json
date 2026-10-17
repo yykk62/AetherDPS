@@ -461,7 +461,6 @@
   "pets.species.Nature": "自然",
   "pets.species.Trans": "変形",
   "pets.species.Special": "特殊",
-  "pets.summary": "{2}のペット{1}体中{0}体が最大レベル。",
   "pets.summary_unknown": "{1}で出現地点のあるペット：{0}体。",
   "pets.levels_hint": "メーター起動中に一度ログインすると、ペットのレベルが分かります。",
   "pets.missing": "未所持",
@@ -649,5 +648,18 @@
   "settings.placement_hint": "戦闘メーター、タイマー、ペットレーダー、グロッキー警告をサンプルデータで同時に表示します。ドラッグで移動、Esc か Enter で確定。各オーバーレイの鍵はクリックをゲームに通すだけです。",
   "settings.placement_now": "今すぐ配置",
   "settings.by_situation": "状況に応じたオーバーレイ",
-  "settings.by_situation_hint": "ダンジョン外ではタイマー、ダンジョンでは戦闘メーター、ボス戦ではさらにグロッキー警告。ショートカットで戦闘メーターの表示切替も引き続き可能です。"
+  "settings.by_situation_hint": "ダンジョン外ではタイマー、ダンジョンでは戦闘メーター、ボス戦ではさらにグロッキー警告。ショートカットで戦闘メーターの表示切替も引き続き可能です。",
+  "pets.count_all": "{1} のペット {0} 体",
+  "pets.count_missing": "{1} で未所持のペット {0} 体",
+  "pets.count_open": "{1} で最大レベル未満のペット {0} 体",
+  "self.cp": "戦闘力",
+  "self.il": "アイテムレベル",
+  "self.today": "今日",
+  "self.since_date": "{0} から",
+  "self.unchanged": "変化なし {0}",
+  "self.caption": "{0} 時点、次回取得は {1} ごろ。",
+  "self.caption_first": "これからメーターが4時間ごとに記録します。次回取得は {1} ごろ。",
+  "settings.profile_history": "自分の推移を記録する",
+  "settings.profile_history_hint": "メーター起動中は4時間ごとに、プロフィールを開いたときと同じようにNCSOFTへあなたのプロフィール（名前とサーバー）を問い合わせます。戦闘力とアイテムレベルはPC内に残ります。",
+  "profile.prefetch": "詳細: {1} 件中 {0} 件読み込み済み"
 }

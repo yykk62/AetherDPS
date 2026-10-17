@@ -47,7 +47,22 @@ public static class PlayerRows
     }
 }
 
-public sealed record SkillRow(string Name, string Damage, string Share, int Hits, string Crit, double BarPercent);
+/// <summary>Skill in der Kampfanzeige, mit offiziellem Bild (siehe <see cref="SkillIcons"/>).</summary>
+public sealed partial class SkillRow : WithIcon
+{
+    public SkillRow(string name, string damage, string share, int hits, string crit, double barPercent)
+    {
+        (Name, Damage, Share, Hits, Crit, BarPercent) = (name, damage, share, hits, crit, barPercent);
+        LoadIcon(SkillIcons.ForName(name));
+    }
+
+    public string Name { get; }
+    public string Damage { get; }
+    public string Share { get; }
+    public int Hits { get; }
+    public string Crit { get; }
+    public double BarPercent { get; }
+}
 
 /// <summary>Farbe und Icon pro Klassen-ID (AION 2). Farben passend zu den Klassen-Icons.</summary>
 public static class ClassVisuals

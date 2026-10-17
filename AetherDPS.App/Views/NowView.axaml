@@ -178,7 +178,7 @@
         </StackPanel>
       </StackPanel>
 
-      <!-- ── Als Nächstes: Kontext auf dem Rahmen ─────────────── -->
+      <!-- ── Als Nächstes und du: Kontext auf dem Rahmen ──────── -->
       <StackPanel Grid.Column="2" Spacing="4">
         <TextBlock Classes="title" Text="{l:T now.next}" Margin="0,4,0,8" />
         <Border Classes="framerule" />
@@ -200,6 +200,49 @@
             </DataTemplate>
           </ItemsControl.ItemTemplate>
         </ItemsControl>
+        <!-- Karte „Du“: dein Charakter mit Ausrüstung, Kampfkraft, Itemstufe und Verlauf -->
+        <StackPanel Spacing="10" IsVisible="{Binding Progress.HasData}" Margin="0,26,0,0">
+          <Grid ColumnDefinitions="Auto,*">
+            <Border Width="56" Height="56" CornerRadius="{DynamicResource Radius.Control}" Background="{DynamicResource Surface.WellDeep}" ClipToBounds="True" Margin="0,0,12,0">
+              <Image Source="{Binding Progress.Portrait}" Stretch="UniformToFill" />
+            </Border>
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+              <TextBlock Classes="title self" Text="{Binding Progress.Name}" TextTrimming="CharacterEllipsis" />
+              <TextBlock Classes="small muted" Text="{Binding Progress.Subtitle}" TextTrimming="CharacterEllipsis" />
+            </StackPanel>
+          </Grid>
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="0">
+              <TextBlock Classes="small muted" Text="{l:T self.cp}" />
+              <TextBlock Classes="title" Text="{Binding Progress.CombatPower}" />
+              <TextBlock Classes="small" Classes.good="{Binding Progress.CombatPowerUp}" Classes.muted="{Binding !Progress.CombatPowerUp}" Text="{Binding Progress.CombatPowerDelta}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Spacing="0" HorizontalAlignment="Right">
+              <TextBlock Classes="small muted" Text="{l:T self.il}" HorizontalAlignment="Right" />
+              <TextBlock Classes="title" Text="{Binding Progress.ItemLevel}" HorizontalAlignment="Right" />
+              <TextBlock Classes="small" Classes.good="{Binding Progress.ItemLevelUp}" Classes.muted="{Binding !Progress.ItemLevelUp}" Text="{Binding Progress.ItemLevelDelta}" HorizontalAlignment="Right" />
+            </StackPanel>
+          </Grid>
+          <views:TrendChart Height="60" Points="{Binding Progress.CombatPowerPoints}" Format="{Binding Progress.NumberFormat}" IsVisible="{Binding Progress.HasTrend}" EndLabel="{l:T self.today}"
+                            LineBrush="{DynamicResource Text.Secondary}" GridBrush="{DynamicResource Line.Frame}" LabelBrush="{DynamicResource Text.Muted}" />
+          <ItemsControl ItemsSource="{Binding Progress.Gear}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <WrapPanel />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:GearIcon">
+                <Border Width="38" Height="38" Margin="0,0,5,5" CornerRadius="{DynamicResource Radius.Mark}" BorderBrush="{Binding Brush}" BorderThickness="1.5"
+                        Background="{DynamicResource Surface.WellDeep}" ClipToBounds="True" ToolTip.Tip="{Binding Enchant}">
+                  <Image Source="{Binding Icon}" Width="34" Height="34" />
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <TextBlock Classes="small muted" Text="{Binding Progress.Caption}" TextWrapping="Wrap" />
+        </StackPanel>
+
       </StackPanel>
     </Grid>
   </ScrollViewer>
@@ -207,6 +250,9 @@
   <UserControl.Styles>
     <Style Selector="TextBlock.soon">
       <Setter Property="Foreground" Value="{DynamicResource Signal.Warn}" />
+    </Style>
+    <Style Selector="TextBlock.good">
+      <Setter Property="Foreground" Value="{DynamicResource Signal.Good}" />
     </Style>
     <Style Selector="TextBlock.reading.good">
       <Setter Property="Foreground" Value="{DynamicResource Signal.Good}" />

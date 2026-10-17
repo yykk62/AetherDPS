@@ -461,7 +461,6 @@
   "pets.species.Nature": "Natura",
   "pets.species.Trans": "Varius",
   "pets.species.Special": "Spéciaux",
-  "pets.summary": "{0} sur {1} familiers de {2} au niveau max.",
   "pets.summary_unknown": "{0} familiers avec points d'apparition dans {1}.",
   "pets.levels_hint": "Le meter connaît tes niveaux de familiers dès que tu te connectes une fois pendant qu'il tourne.",
   "pets.missing": "manquant",
@@ -649,5 +648,18 @@
   "settings.placement_hint": "Affiche en même temps le compteur de combat, les minuteurs, le radar des familiers et l'alerte de Stagger avec des données d'exemple. Fais glisser pour déplacer, Échap ou Entrée les fixe. Le cadenas d'un overlay laisse seulement passer les clics vers le jeu.",
   "settings.placement_now": "Placer maintenant",
   "settings.by_situation": "Overlays selon la situation",
-  "settings.by_situation_hint": "Hors donjon les minuteurs, en donjon le compteur de combat, en combat de boss aussi l'alerte de Stagger. Ton raccourci affiche et masque toujours le compteur."
+  "settings.by_situation_hint": "Hors donjon les minuteurs, en donjon le compteur de combat, en combat de boss aussi l'alerte de Stagger. Ton raccourci affiche et masque toujours le compteur.",
+  "pets.count_all": "{0} familiers à {1}",
+  "pets.count_missing": "Il te manque encore {0} familiers à {1}",
+  "pets.count_open": "{0} familiers à {1} ne sont pas encore au niveau max",
+  "self.cp": "Puissance de combat",
+  "self.il": "Niveau d'objet",
+  "self.today": "aujourd'hui",
+  "self.since_date": "depuis le {0}",
+  "self.unchanged": "inchangé {0}",
+  "self.caption": "État à {0}, prochaine vérification vers {1}.",
+  "self.caption_first": "Désormais, le compteur enregistre ton niveau toutes les 4 h. Prochaine vérification vers {1}.",
+  "settings.profile_history": "Garder mon historique",
+  "settings.profile_history_hint": "Tant que le compteur tourne, il demande ton profil (nom et serveur) à NCSOFT toutes les 4 heures, comme à l'ouverture du profil. Puissance de combat et niveau d'objet restent sur ton PC.",
+  "profile.prefetch": "Détails : {0} sur {1} chargés"
 }

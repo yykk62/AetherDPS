@@ -183,14 +183,11 @@ public sealed partial class PetsViewModel : ObservableObject
         Map = option.Map;
         int? keep = Selected?.Pet.Id;
         var rows = new List<PetRow>();
-        int total = 0, done = 0;
         foreach (var pet in pets.All)
         {
             int count = pets.Spawns(pet, option.Map).Count;
             if (count == 0) continue;
-            total++;
             var row = Row(pet, count);
-            if (row.Done) done++;
             if (SelectedSpecies?.Key is { } species && pet.Species != species) continue;
             if (SelectedFilter.Code == "open" && row.Done) continue;
             if (SelectedFilter.Code == "missing" && pets.Level(pet.Id) is > 0) continue;
@@ -200,7 +197,13 @@ public sealed partial class PetsViewModel : ObservableObject
         }
         Rows.Clear();
         foreach (var row in rows.OrderBy(r => r.Done).ThenBy(r => r.Name, StringComparer.CurrentCultureIgnoreCase)) Rows.Add(row);
-        Summary = pets.KnowsLevels ? Loc.T("pets.summary", done, total, option.Name) : Loc.T("pets.summary_unknown", total, option.Name);
+        // Zahl passend zur gezeigten Liste: alle / fehlende / nicht auf Höchststufe (Gattung und Suche eingerechnet)
+        Summary = !pets.KnowsLevels ? Loc.T("pets.summary_unknown", Rows.Count, option.Name) : SelectedFilter.Code switch
+        {
+            "missing" => Loc.T("pets.count_missing", Rows.Count, option.Name),
+            "open" => Loc.T("pets.count_open", Rows.Count, option.Name),
+            _ => Loc.T("pets.count_all", Rows.Count, option.Name),
+        };
         LevelsHint = pets.KnowsLevels ? "" : Loc.T("pets.levels_hint");
         Selected = Rows.FirstOrDefault(r => r.Pet.Id == keep) ?? Rows.FirstOrDefault();
         ShowSelected();

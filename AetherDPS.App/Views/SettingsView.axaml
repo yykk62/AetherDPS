@@ -249,6 +249,12 @@
           <TextBlock Classes="dim" Text="{Binding PresenceStatus}" Margin="28,0,0,0"
                      IsVisible="{Binding PresenceStatus, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
         </StackPanel>
+        <StackPanel Spacing="4">
+          <CheckBox IsChecked="{Binding ProfileHistory}">
+            <TextBlock Classes="label" Text="{l:T settings.profile_history}" />
+          </CheckBox>
+          <TextBlock Classes="hint" Text="{l:T settings.profile_history_hint}" />
+        </StackPanel>
         <TextBlock Classes="dim" Text="{l:T settings.privacy_hint}" />
       </StackPanel>
     </Border>

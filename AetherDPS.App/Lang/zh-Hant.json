@@ -461,7 +461,6 @@
   "pets.species.Nature": "自然",
   "pets.species.Trans": "變形",
   "pets.species.Special": "特殊",
-  "pets.summary": "{2}的{1}隻寵物中有{0}隻滿級。",
   "pets.summary_unknown": "{1}中有出現點的寵物：{0}隻。",
   "pets.levels_hint": "在計量器執行時登入一次，即可知道你的寵物等級。",
   "pets.missing": "未擁有",
@@ -649,5 +648,18 @@
   "settings.placement_hint": "用範例資料同時顯示戰鬥統計、計時器、寵物雷達和眩暈警告。拖曳即可移動，按 Esc 或 Enter 確定。浮動視窗上的鎖只讓點擊穿透到遊戲。",
   "settings.placement_now": "立即擺放",
   "settings.by_situation": "依情境顯示浮動視窗",
-  "settings.by_situation_hint": "副本外顯示計時器，副本內顯示戰鬥統計，首領戰時再加眩暈警告。快捷鍵仍可顯示或隱藏戰鬥統計。"
+  "settings.by_situation_hint": "副本外顯示計時器，副本內顯示戰鬥統計，首領戰時再加眩暈警告。快捷鍵仍可顯示或隱藏戰鬥統計。",
+  "pets.count_all": "{1} 的寵物 {0} 隻",
+  "pets.count_missing": "{1} 還缺 {0} 隻寵物",
+  "pets.count_open": "{1} 有 {0} 隻寵物未滿級",
+  "self.cp": "戰鬥力",
+  "self.il": "裝備等級",
+  "self.today": "今天",
+  "self.since_date": "自 {0} 起",
+  "self.unchanged": "無變化 {0}",
+  "self.caption": "截至 {0}，下次查詢約 {1}。",
+  "self.caption_first": "從現在起，每 4 小時記錄一次你的資料。下次查詢約 {1}。",
+  "settings.profile_history": "記錄我的成長",
+  "settings.profile_history_hint": "統計執行期間，每 4 小時向 NCSOFT 查詢一次你的角色資料（名稱與伺服器），與開啟資料頁相同。戰鬥力與裝備等級只保存在你的電腦上。",
+  "profile.prefetch": "詳情：已載入 {0}/{1}"
 }

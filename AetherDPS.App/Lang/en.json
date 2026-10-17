@@ -461,7 +461,6 @@
   "pets.species.Nature": "Natura",
   "pets.species.Trans": "Varian",
   "pets.species.Special": "Special",
-  "pets.summary": "{0} of {1} pets in {2} at max level.",
   "pets.summary_unknown": "{0} pets with spawn points in {1}.",
   "pets.levels_hint": "The meter learns your pet levels once you log in while it is running.",
   "pets.missing": "missing",
@@ -649,5 +648,18 @@
   "settings.placement_hint": "Shows the combat overlay, timers, pet radar and stagger warning at once with sample data. Drag to move, Esc or Enter locks them in. The lock on an overlay only lets clicks through to the game.",
   "settings.placement_now": "Place now",
   "settings.by_situation": "Overlays by situation",
-  "settings.by_situation_hint": "Outside dungeons the timers, in dungeons the combat overlay, in boss fights the stagger warning as well. Your shortcut still shows and hides the combat overlay."
+  "settings.by_situation_hint": "Outside dungeons the timers, in dungeons the combat overlay, in boss fights the stagger warning as well. Your shortcut still shows and hides the combat overlay.",
+  "pets.count_all": "{0} pets in {1}",
+  "pets.count_missing": "{0} pets in {1} still missing",
+  "pets.count_open": "{0} pets in {1} not at max level yet",
+  "self.cp": "Combat power",
+  "self.il": "Item level",
+  "self.today": "today",
+  "self.since_date": "since {0}",
+  "self.unchanged": "unchanged {0}",
+  "self.caption": "As of {0}, next check around {1}.",
+  "self.caption_first": "From now on the meter records your stats every 4 h. Next check around {1}.",
+  "settings.profile_history": "Keep my history",
+  "settings.profile_history_hint": "While the meter runs, asks NCSOFT for your profile (name and server) every 4 hours, just like opening the profile. Combat power and item level stay on your PC.",
+  "profile.prefetch": "Details: {0} of {1} loaded"
 }

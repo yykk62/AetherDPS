@@ -160,6 +160,8 @@ public sealed partial class Armory
         await gate.WaitAsync(ct);
         try
         {
+            lock (itemCache)
+                if (itemCache.TryGetValue(key, out var again)) return again;   // kam während des Wartens (Vorladen)
             var query = $"id={item.Id}&enchantLevel={item.Enchant}&slotPos={item.SlotPos}"
                         + $"&lang={Lang}&region=eu&serverId={profile.ServerId}&characterId={profile.CharacterId}";
             using var doc = await GetAsync($"{SiteUrl}/equipment/item?{query}", ct);

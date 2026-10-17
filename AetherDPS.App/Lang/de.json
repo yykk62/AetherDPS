@@ -461,7 +461,6 @@
   "pets.species.Nature": "Natura",
   "pets.species.Trans": "Varia",
   "pets.species.Special": "Specia",
-  "pets.summary": "{0} von {1} Pets in {2} auf Höchststufe.",
   "pets.summary_unknown": "{0} Pets mit Fundort in {1}.",
   "pets.levels_hint": "Deine Pet-Stufen kennt der Meter, sobald du einmal mit laufendem Meter einloggst.",
   "pets.missing": "fehlt",
@@ -649,5 +648,18 @@
   "settings.placement_hint": "Zeigt Kampfanzeige, Timer, Pet-Radar und Stagger-Warnung zugleich mit Beispieldaten. Ziehen verschiebt, Esc oder Enter legt sie fest. Das Schloss an einem Overlay lässt nur Klicks ins Spiel durch.",
   "settings.placement_now": "Jetzt platzieren",
   "settings.by_situation": "Overlays nach Lage",
-  "settings.by_situation_hint": "Außerhalb von Dungeons die Timer, im Dungeon die Kampfanzeige, im Bosskampf zusätzlich die Stagger-Warnung. Dein Kürzel blendet die Kampfanzeige weiter ein und aus."
+  "settings.by_situation_hint": "Außerhalb von Dungeons die Timer, im Dungeon die Kampfanzeige, im Bosskampf zusätzlich die Stagger-Warnung. Dein Kürzel blendet die Kampfanzeige weiter ein und aus.",
+  "pets.count_all": "{0} Pets in {1}",
+  "pets.count_missing": "{0} Pets in {1} fehlen dir noch",
+  "pets.count_open": "{0} Pets in {1} sind noch nicht auf Höchststufe",
+  "self.cp": "Kampfkraft",
+  "self.il": "Itemstufe",
+  "self.today": "heute",
+  "self.since_date": "seit {0}",
+  "self.unchanged": "unverändert {0}",
+  "self.caption": "Stand {0} Uhr, nächste Abfrage gegen {1} Uhr.",
+  "self.caption_first": "Ab jetzt hält der Meter alle 4 Std. deinen Stand fest. Nächste Abfrage gegen {1} Uhr.",
+  "settings.profile_history": "Meinen Verlauf festhalten",
+  "settings.profile_history_hint": "Fragt alle 4 Stunden, solange der Meter läuft, dein Profil (Name und Server) bei NCSOFT ab, genauso wie beim Öffnen des Profils. Kampfkraft und Itemstufe bleiben auf deinem PC.",
+  "profile.prefetch": "Details: {0} von {1} geladen"
 }

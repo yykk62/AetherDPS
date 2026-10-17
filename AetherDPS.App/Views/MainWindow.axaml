@@ -188,12 +188,15 @@
           <ItemsControl ItemsSource="{Binding Skills}" MaxHeight="200">
             <ItemsControl.ItemTemplate>
               <DataTemplate x:DataType="vm:SkillRow">
-                <Grid ColumnDefinitions="*,Auto,Auto,Auto" RowDefinitions="Auto,Auto" Margin="0,0,0,3">
-                  <TextBlock Classes="small" Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
-                  <TextBlock Grid.Column="1" Classes="small num" Text="{Binding Damage}" FontWeight="Medium" Margin="6,0,0,0" MinWidth="46" />
-                  <TextBlock Grid.Column="2" Classes="small muted num" Text="{Binding Hits, StringFormat='{}{0}×'}" Margin="6,0,0,0" MinWidth="32" />
-                  <TextBlock Grid.Column="3" Classes="small muted num" Text="{Binding Crit}" Margin="6,0,0,0" MinWidth="42" />
-                  <ProgressBar Grid.Row="1" Grid.ColumnSpan="4" Classes="trace" Value="{Binding BarPercent}" Foreground="{DynamicResource Text.Muted}" Margin="0,2,0,0" />
+                <Grid ColumnDefinitions="26,*,Auto,Auto,Auto" RowDefinitions="Auto,Auto" Margin="0,0,0,3">
+                  <Border Grid.RowSpan="2" Width="20" Height="20" CornerRadius="{DynamicResource Radius.Mark}" Background="{DynamicResource Surface.Well}" ClipToBounds="True" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <Image Source="{Binding Icon}" />
+                  </Border>
+                  <TextBlock Grid.Column="1" Classes="small" Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                  <TextBlock Grid.Column="2" Classes="small num" Text="{Binding Damage}" FontWeight="Medium" Margin="6,0,0,0" MinWidth="46" />
+                  <TextBlock Grid.Column="3" Classes="small muted num" Text="{Binding Hits, StringFormat='{}{0}×'}" Margin="6,0,0,0" MinWidth="32" />
+                  <TextBlock Grid.Column="4" Classes="small muted num" Text="{Binding Crit}" Margin="6,0,0,0" MinWidth="42" />
+                  <ProgressBar Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Classes="trace" Value="{Binding BarPercent}" Foreground="{DynamicResource Text.Muted}" Margin="0,2,0,0" />
                 </Grid>
               </DataTemplate>
             </ItemsControl.ItemTemplate>

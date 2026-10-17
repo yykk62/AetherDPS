@@ -118,6 +118,9 @@ public sealed class MeterSettings
     /// <summary>Einmal im Hauptfenster gefragt, ob die Rich Presence an soll (danach nie wieder).</summary>
     public bool DiscordPresenceOffered { get; set; }
 
+    /// <summary>Eigenes Profil alle paar Stunden bei NCSOFT abrufen und den Verlauf lokal festhalten (abschaltbar). Standard: an.</summary>
+    public bool ProfileHistory { get; set; } = true;
+
     /// <summary>Schon angezeigte Nachrichten an alle (Ids aus status.json).</summary>
     public List<string> SeenMessages { get; set; } = [];
 

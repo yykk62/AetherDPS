@@ -70,6 +70,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         this.presence = presence;
         discordPresence = meter.DiscordPresence;
         discordPresenceNames = meter.DiscordPresenceNames;
+        profileHistory = meter.ProfileHistory;
         presence.StatusChanged += (_, _) => Avalonia.Threading.Dispatcher.UIThread.Post(RefreshPresence);
         RefreshPresence();
         selectedLanguage = Languages.FirstOrDefault(l => l.Code == meter.Language) ?? Languages[0];
@@ -144,6 +145,16 @@ public sealed partial class SettingsViewModel : ObservableObject
         meter.DiscordPresence = value;
         meter.Save();
         RefreshPresence();
+    }
+
+    /// <summary>Eigenes Profil alle 4 Std. abrufen und den Verlauf festhalten.</summary>
+    [ObservableProperty] private bool profileHistory;
+
+    partial void OnProfileHistoryChanged(bool value)
+    {
+        if (meter.ProfileHistory == value) return;
+        meter.ProfileHistory = value;
+        meter.Save();
     }
 
     partial void OnDiscordPresenceNamesChanged(bool value)

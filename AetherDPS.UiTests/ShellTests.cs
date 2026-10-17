@@ -39,18 +39,22 @@ public sealed class ShellTests : IDisposable
     private static readonly string[] Skills = ["Zielpfeil", "Scharfschuss", "Schnellfeuer", "Spiralpfeil", "Greifenpfeil", "Sprengpfeil"];
     private static readonly double[] Weights = [0.37, 0.21, 0.15, 0.11, 0.09, 0.07];
 
-    private ServiceProvider Start(bool withRuns)
+    private ServiceProvider Start(bool withRuns, string self = "Elyndra")
     {
         Loc.Load("de");
         GameText.Apply("de");
         Directory.CreateDirectory(dataDir);
         Environment.CurrentDirectory = dataDir;
         var settings = MeterSettings.Load(dataDir);
-        settings.CharacterName = "Elyndra";
+        settings.CharacterName = self;
         settings.CharacterClassId = 14;
         settings.CharacterServer = "#1317";
         settings.Save();
-        if (withRuns) WriteRuns();
+        if (withRuns)
+        {
+            WriteRuns();
+            WriteHistory(self);
+        }
         var replay = Path.Combine(dataDir, "leer.txt");
         CaptureFile.Write(replay, []);
 
@@ -79,6 +83,8 @@ public sealed class ShellTests : IDisposable
         Assert.True(now.TimeBest);
         Assert.Equal(4, now.Players.Count);
         Assert.Equal(3, now.Bosses.Count);
+        Assert.True(now.Progress.HasData);
+        Assert.True(now.Progress.CombatPowerUp);
         Snap(window, "shell_jetzt");
         Snap(new ShellWindow(shell) { Height = 980 }, "shell_jetzt_ganz");
     }
@@ -105,6 +111,25 @@ public sealed class ShellTests : IDisposable
         runs.UndoCommand.Execute(null);
         Dispatcher.UIThread.RunJobs();
         Assert.Contains(runs.Runs, r => r.Id == id);
+    }
+
+    [AvaloniaFact]
+    public void Daevas_eigenes_Profil_mit_Verlauf()
+    {
+        Start(withRuns: true, self: "Testheld");
+        var shell = provider!.GetRequiredService<ShellViewModel>();
+        shell.Show(HubViewModel.TabProfile);
+        var profile = shell.Hub.Profile;
+        profile.EnsureLoaded();
+        for (int i = 0; i < 60 && !profile.HasProfile; i++)
+        {
+            Dispatcher.UIThread.RunJobs();
+            Thread.Sleep(50);
+        }
+        Assert.True(profile.HasProfile);
+        Assert.True(profile.IsSelf);
+        Assert.True(profile.Progress.HasTrend);
+        Snap(new ShellWindow(shell) { Height = 1100 }, "shell_profil_verlauf");
     }
 
     [AvaloniaFact]
@@ -153,6 +178,24 @@ public sealed class ShellTests : IDisposable
             var run = new ArchivedRun(start.ToString("yyyyMMdd_HHmmss"), start, duration, combat, "Arkanis (Normal)",
                 players.Sum(p => p.Damage), total, players, bossList);
             File.WriteAllText(Path.Combine(folder, run.Id + ".json"), JsonSerializer.Serialize(run, json));
+        }
+    }
+
+    /// <summary>Verlauf des eigenen Charakters über drei Wochen (erfundene Werte).</summary>
+    private void WriteHistory(string name = "Elyndra")
+    {
+        var history = new ProfileHistory(Path.Combine(dataDir, "profil_verlauf.json"));
+        var gear = new List<ArmoryItem>
+        {
+            new("MainHand", "Übungsbogen", "Unique", 10, null), new("Torso", "Übungsharnisch", "Epic", 8, null),
+            new("Helmet", "Übungshelm", "Legend", 6, null), new("Ring1", "Übungsring", "Rare", 0, null),
+        };
+        var start = DateTime.Now.AddDays(-21);
+        int[] cp = [68_200, 68_200, 68_900, 69_400, 69_400, 70_300, 70_800, 71_100, 71_900, 72_435];
+        for (int i = 0; i < cp.Length; i++)
+        {
+            var at = start.AddDays(i * 21.0 / (cp.Length - 1));
+            history.Add(new ArmoryProfile(name, "Hogalum", 1317, "Waldläufer", 45, 1_260 + i * 5, cp[i], "Elyos", gear, [], at) { ClassId = 14 }, at);
         }
     }
 

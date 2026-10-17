@@ -461,7 +461,6 @@
   "pets.species.Nature": "Naturas",
   "pets.species.Trans": "Varians",
   "pets.species.Special": "Especiales",
-  "pets.summary": "{0} de {1} mascotas de {2} al nivel máximo.",
   "pets.summary_unknown": "{0} mascotas con puntos de aparición en {1}.",
   "pets.levels_hint": "El medidor conoce tus niveles de mascota cuando inicies sesión una vez con él abierto.",
   "pets.missing": "falta",
@@ -649,5 +648,18 @@
   "settings.placement_hint": "Muestra a la vez el medidor de combate, los temporizadores, el radar de mascotas y el aviso de Stagger con datos de ejemplo. Arrastra para mover; Esc o Intro los fija. El candado de un overlay solo deja pasar los clics al juego.",
   "settings.placement_now": "Colocar ahora",
   "settings.by_situation": "Overlays según la situación",
-  "settings.by_situation_hint": "Fuera de mazmorras los temporizadores, en mazmorras el medidor de combate y en combates de jefe también el aviso de Stagger. Tu atajo sigue mostrando y ocultando el medidor."
+  "settings.by_situation_hint": "Fuera de mazmorras los temporizadores, en mazmorras el medidor de combate y en combates de jefe también el aviso de Stagger. Tu atajo sigue mostrando y ocultando el medidor.",
+  "pets.count_all": "{0} mascotas en {1}",
+  "pets.count_missing": "Te faltan {0} mascotas en {1}",
+  "pets.count_open": "{0} mascotas en {1} aún no están al nivel máximo",
+  "self.cp": "Poder de combate",
+  "self.il": "Nivel de objeto",
+  "self.today": "hoy",
+  "self.since_date": "desde {0}",
+  "self.unchanged": "sin cambios {0}",
+  "self.caption": "Datos de las {0}, próxima consulta hacia las {1}.",
+  "self.caption_first": "A partir de ahora el medidor guarda tus datos cada 4 h. Próxima consulta hacia las {1}.",
+  "settings.profile_history": "Guardar mi historial",
+  "settings.profile_history_hint": "Mientras el medidor está en marcha, consulta tu perfil (nombre y servidor) a NCSOFT cada 4 horas, igual que al abrir el perfil. El poder de combate y el nivel de objeto se quedan en tu PC.",
+  "profile.prefetch": "Detalles: {0} de {1} cargados"
 }

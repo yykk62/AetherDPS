@@ -461,7 +461,6 @@
   "pets.species.Nature": "自然",
   "pets.species.Trans": "变形",
   "pets.species.Special": "特殊",
-  "pets.summary": "{2}的{1}只宠物中有{0}只满级。",
   "pets.summary_unknown": "{1}中有出现点的宠物：{0}只。",
   "pets.levels_hint": "在计量器运行时登录一次，即可知道你的宠物等级。",
   "pets.missing": "未拥有",
@@ -649,5 +648,18 @@
   "settings.placement_hint": "用示例数据同时显示战斗统计、计时器、宠物雷达和眩晕警告。拖动即可移动，按 Esc 或 Enter 确定。悬浮窗上的锁只让点击穿透到游戏。",
   "settings.placement_now": "立即摆放",
   "settings.by_situation": "按场景显示悬浮窗",
-  "settings.by_situation_hint": "副本外显示计时器，副本内显示战斗统计，首领战时再加眩晕警告。快捷键仍可显示或隐藏战斗统计。"
+  "settings.by_situation_hint": "副本外显示计时器，副本内显示战斗统计，首领战时再加眩晕警告。快捷键仍可显示或隐藏战斗统计。",
+  "pets.count_all": "{1} 的宠物 {0} 只",
+  "pets.count_missing": "{1} 还缺 {0} 只宠物",
+  "pets.count_open": "{1} 有 {0} 只宠物未满级",
+  "self.cp": "战斗力",
+  "self.il": "装备等级",
+  "self.today": "今天",
+  "self.since_date": "自 {0} 起",
+  "self.unchanged": "无变化 {0}",
+  "self.caption": "截至 {0}，下次查询约 {1}。",
+  "self.caption_first": "从现在起，每 4 小时记录一次你的数据。下次查询约 {1}。",
+  "settings.profile_history": "记录我的成长",
+  "settings.profile_history_hint": "统计运行期间，每 4 小时向 NCSOFT 查询一次你的角色资料（名称和服务器），与打开资料页相同。战斗力和装备等级只保存在你的电脑上。",
+  "profile.prefetch": "详情：已加载 {0}/{1}"
 }

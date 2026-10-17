@@ -58,6 +58,7 @@ public static class MeterServices
         services.AddSingleton<PartyRoster>();
         services.AddSingleton<ConnectionMonitor>();
         services.AddSingleton<RunArchive>();
+        services.AddSingleton<Community.ProfileHistory>();
         services.AddSingleton<TimerService>();
         services.AddSingleton<ChecklistService>();
         services.AddSingleton<SelfIdentity>();

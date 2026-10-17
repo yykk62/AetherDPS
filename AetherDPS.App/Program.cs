@@ -63,6 +63,7 @@ internal static class Program
                 ReplayFile = ArgValue(args, "--replay") is { } r ? Path.GetFullPath(r) : null,
                 ReplaySpeed = ArgValue(args, "--speed") is { } s ? double.Parse(s, CultureInfo.InvariantCulture) : 1,
             };
+            RemoteImages.CacheDir = Path.Combine(dataDir, "Bilder");   // Skill- und Item-Bilder nur einmal laden
             var version = typeof(Program).Assembly.GetName().Version ?? new Version(0, 0, 0);
             bool justUpdated = args.Contains(AppUpdate.UpdatedArg);
             bool restarted = args.Contains(AppUpdate.RestartArg);
@@ -161,6 +162,7 @@ public static class AppServices
         services.AddSingleton<ChecklistViewModel>();
         services.AddSingleton<TimerOverlayViewModel>();
         services.AddSingleton<ShellWindow>();
+        services.AddSingleton<SelfProgress>();
         services.AddSingleton<NowViewModel>();
         services.AddSingleton<ShellViewModel>();
         services.AddSingleton<StaggerWarningViewModel>();
@@ -168,6 +170,7 @@ public static class AppServices
             typeof(Program).Assembly.GetName().Version ?? new Version(0, 0, 0)));
         services.AddSingleton<ReportViewModel>();
         services.AddSingleton<Armory>();
+        services.AddSingleton<ProfileWatcher>();
         services.AddSingleton<CommunityController>();
         return services;
     }

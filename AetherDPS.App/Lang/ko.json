@@ -461,7 +461,6 @@
   "pets.species.Nature": "자연",
   "pets.species.Trans": "변형",
   "pets.species.Special": "특수",
-  "pets.summary": "{2}의 펫 {1}마리 중 {0}마리 최고 레벨.",
   "pets.summary_unknown": "{1}에 출현 위치가 있는 펫 {0}마리.",
   "pets.levels_hint": "미터를 켠 채 한 번 접속하면 펫 레벨을 알 수 있습니다.",
   "pets.missing": "미보유",
@@ -649,5 +648,18 @@
   "settings.placement_hint": "전투 미터, 타이머, 펫 레이더, 그로기 경고를 예시 데이터로 한꺼번에 보여 줘요. 드래그로 옮기고 Esc나 Enter로 고정해요. 각 오버레이의 자물쇠는 클릭을 게임으로 넘기기만 해요.",
   "settings.placement_now": "지금 배치",
   "settings.by_situation": "상황별 오버레이",
-  "settings.by_situation_hint": "던전 밖에서는 타이머, 던전에서는 전투 미터, 보스전에서는 그로기 경고도 함께. 단축키로 전투 미터를 켜고 끄는 것도 그대로예요."
+  "settings.by_situation_hint": "던전 밖에서는 타이머, 던전에서는 전투 미터, 보스전에서는 그로기 경고도 함께. 단축키로 전투 미터를 켜고 끄는 것도 그대로예요.",
+  "pets.count_all": "{1} 펫 {0}마리",
+  "pets.count_missing": "{1}에서 아직 없는 펫 {0}마리",
+  "pets.count_open": "{1}에서 최고 레벨이 아닌 펫 {0}마리",
+  "self.cp": "전투력",
+  "self.il": "아이템 레벨",
+  "self.today": "오늘",
+  "self.since_date": "{0}부터",
+  "self.unchanged": "변화 없음 {0}",
+  "self.caption": "{0} 기준, 다음 조회는 {1}쯤.",
+  "self.caption_first": "이제부터 미터가 4시간마다 기록합니다. 다음 조회는 {1}쯤.",
+  "settings.profile_history": "내 기록 남기기",
+  "settings.profile_history_hint": "미터가 실행되는 동안 4시간마다 프로필을 열 때와 같은 방식으로 NCSOFT에 내 프로필(이름과 서버)을 조회합니다. 전투력과 아이템 레벨은 PC에만 저장됩니다.",
+  "profile.prefetch": "상세: {1}개 중 {0}개 로드됨"
 }

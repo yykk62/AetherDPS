@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:AetherDPS.App.ViewModels"
+             xmlns:views="using:AetherDPS.App.Views"
              xmlns:l="using:AetherDPS.App.Services"
              x:Class="AetherDPS.App.Views.ProfileView"
              x:DataType="vm:ProfileViewModel">
@@ -82,11 +83,37 @@
         </StackPanel>
       </Grid>
 
+      <!-- Dein Verlauf (nur beim eigenen Charakter) -->
+      <Grid ColumnDefinitions="*,36,*" IsVisible="{Binding IsSelf}">
+        <StackPanel Spacing="6">
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="0">
+              <TextBlock Classes="section" Text="{l:T self.cp}" />
+              <TextBlock Classes="small" Classes.good="{Binding Progress.CombatPowerUp}" Classes.muted="{Binding !Progress.CombatPowerUp}" Text="{Binding Progress.CombatPowerDelta}" />
+            </StackPanel>
+          </Grid>
+          <views:TrendChart Height="76" Points="{Binding Progress.CombatPowerPoints}" EndLabel="{l:T self.today}" Format="{Binding Progress.NumberFormat}"
+                            LineBrush="{DynamicResource Text.Secondary}" GridBrush="{DynamicResource Line.Frame}" LabelBrush="{DynamicResource Text.Muted}" />
+        </StackPanel>
+        <StackPanel Grid.Column="2" Spacing="6">
+          <StackPanel Spacing="0">
+            <TextBlock Classes="section" Text="{l:T self.il}" />
+            <TextBlock Classes="small" Classes.good="{Binding Progress.ItemLevelUp}" Classes.muted="{Binding !Progress.ItemLevelUp}" Text="{Binding Progress.ItemLevelDelta}" />
+          </StackPanel>
+          <views:TrendChart Height="76" Points="{Binding Progress.ItemLevelPoints}" EndLabel="{l:T self.today}" Format="{Binding Progress.NumberFormat}"
+                            LineBrush="{DynamicResource Text.Secondary}" GridBrush="{DynamicResource Line.Frame}" LabelBrush="{DynamicResource Text.Muted}" />
+        </StackPanel>
+      </Grid>
+      <TextBlock Classes="small muted" Text="{Binding Progress.Caption}" IsVisible="{Binding IsSelf}" Margin="0,-10,0,0" />
+
       <!-- Ausrüstung: Mulde mit großen Kacheln, Details daneben -->
       <Grid ColumnDefinitions="*,20,300" IsVisible="{Binding HasProfile}">
         <Border Classes="well">
           <StackPanel Spacing="10">
-            <TextBlock Classes="section" Text="{l:T profile.gear}" />
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="section" Text="{l:T profile.gear}" />
+              <TextBlock Grid.Column="1" Classes="small muted" Text="{Binding PrefetchText}" VerticalAlignment="Center" />
+            </Grid>
             <Grid ColumnDefinitions="*,12,*">
               <ItemsControl ItemsSource="{Binding Armor}">
                 <ItemsControl.ItemTemplate>
@@ -272,6 +299,9 @@
   </ScrollViewer>
 
   <UserControl.Styles>
+    <Style Selector="TextBlock.good">
+      <Setter Property="Foreground" Value="{DynamicResource Signal.Good}" />
+    </Style>
     <Style Selector="TextBlock.err">
       <Setter Property="Foreground" Value="{DynamicResource Signal.Bad}" />
     </Style>

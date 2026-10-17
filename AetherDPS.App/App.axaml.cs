@@ -175,6 +175,7 @@ public partial class App : Application
             {
                 Services.GetRequiredService<CommunityController>().Start(hubVm, ShowToast, askConsent: AppUpdate.CanSelfUpdate);
                 StartPartyJoinPopup(hubVm);
+                Services.GetRequiredService<AetherDPS.Engine.Community.ProfileWatcher>().Start();   // eigenes Profil alle 4 Std. (abschaltbar)
             }
         }
         // Wiedergabe: nur das Overlay, das Hauptfenster öffnet sich nicht von selbst

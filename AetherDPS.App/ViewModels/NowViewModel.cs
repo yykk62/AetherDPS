@@ -65,9 +65,13 @@ public sealed partial class NowViewModel : ObservableObject
     /// <summary>Beispielwerte für die Vorschau im leeren Zustand (ohne Zahlen beschriftet).</summary>
     public IReadOnlyList<double> PreviewHistory { get; } = [86, 90, 93, 92];
 
+    /// <summary>Karte „Du“ rechts: dein Charakter und sein Verlauf.</summary>
+    public SelfProgress Progress { get; }
+
     public NowViewModel(RunArchive archive, TrackingMode mode, TimerService timers, ChecklistService checklist,
-        FieldBosses fieldBosses, MeterSettings settings)
+        FieldBosses fieldBosses, MeterSettings settings, SelfProgress progress)
     {
+        Progress = progress;
         this.archive = archive;
         this.mode = mode;
         this.timers = timers;
