@@ -69,4 +69,11 @@
     <ProjectReference Include="..\AetherDPS.Engine\AetherDPS.Engine.csproj" />
   </ItemGroup>
 
+  <!-- Vorschau-Builds (tools/release.ps1 -Preview): lokaler Update-Ordner, öffentliche Builds haben das nicht -->
+  <ItemGroup Condition="'$(PreviewFeed)' != ''">
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>PreviewFeed</_Parameter1>
+      <_Parameter2>$(PreviewFeed)</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
 </Project>

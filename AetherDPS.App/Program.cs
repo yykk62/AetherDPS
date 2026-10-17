@@ -79,7 +79,10 @@ internal static class Program
                 }
             }
 
-            var updates = new UpdateService(dataDir, version);
+            // Vorschau-Builds (tools/release.ps1 -Preview) kennen zusätzlich einen lokalen Update-Ordner
+            var previewFeed = typeof(Program).Assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyMetadataAttribute), false)
+                .OfType<System.Reflection.AssemblyMetadataAttribute>().FirstOrDefault(a => a.Key == "PreviewFeed")?.Value;
+            var updates = new UpdateService(dataDir, version, previewFeed: previewFeed);
             if (AppUpdate.CanSelfUpdate && options.ReplayFile is null)
             {
                 UpdateService.CleanupOld(AppUpdate.ExePath);

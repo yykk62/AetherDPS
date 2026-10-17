@@ -82,6 +82,31 @@ public sealed class UpdateTests : IDisposable
         Assert.False(File.Exists(target + ".old"));
     }
 
+    [Fact]
+    public async Task Vorschau_aus_lokalem_Ordner_gewinnt_wenn_sie_neuer_ist()
+    {
+        // GitHub hat 0.2.0, der lokale Vorschau-Ordner 0.2.5 → die Vorschau wird geprüft und bereitgelegt
+        var feedDir = Directory.CreateDirectory(Path.Combine(dir, "Vorschau")).FullName;
+        byte[] preview = [.. exe, 42];
+        var feedExe = Path.Combine(feedDir, "AetherDPS-0.2.5.exe");
+        File.WriteAllBytes(feedExe, preview);
+        File.WriteAllText(feedExe + ".sha256", $"{Sha(preview)}  AetherDPS.exe\n");
+        var feed = Path.Combine(feedDir, "latest.json");
+        File.WriteAllText(feed, $$"""
+            {"tag_name":"v0.2.5","html_url":"","draft":false,"prerelease":false,"assets":[
+              {"name":"AetherDPS.exe","browser_download_url":"{{new Uri(feedExe).AbsoluteUri}}","size":{{preview.Length}},"digest":"sha256:{{Sha(preview).ToLowerInvariant()}}"},
+              {"name":"AetherDPS.exe.sha256","browser_download_url":"{{new Uri(feedExe + ".sha256").AbsoluteUri}}"}]}
+            """);
+        var service = new UpdateService(dir, new Version(0, 1, 0, 0), new FakeGitHub("v0.2.0", exe, Sha(exe)), "https://api.test/latest", feed);
+        Assert.Equal(UpdateState.Ready, await service.CheckAndDownloadAsync());
+        Assert.Equal(new Version(0, 2, 5), service.Pending!.Version);
+        Assert.Equal(preview, File.ReadAllBytes(service.Pending.File));
+
+        // Ohne Vorschau-Ordner (öffentliche Builds) bleibt es bei GitHub
+        var plain = new UpdateService(Path.Combine(dir, "b"), new Version(0, 1, 0, 0), new FakeGitHub("v0.2.0", exe, Sha(exe)), "https://api.test/latest");
+        Assert.Equal(new Version(0, 2, 0), (await plain.FetchLatestAsync())!.Version);
+    }
+
     [Theory]
     [InlineData("abc", null)]
     [InlineData("E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855  AetherDPS.exe", "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855")]

@@ -17,6 +17,8 @@ public enum UpdateState { Idle, Checking, UpToDate, Downloading, Ready, Failed }
 /// <c>AetherDPS.exe.sha256</c>. Die neue Datei wird nur übernommen, wenn der SHA-256 zur
 /// Prüfsumme passt (und zum Digest, den GitHub selbst für das Asset angibt).
 /// Es wird nichts hochgeladen – nur die öffentliche Release-Seite abgefragt.
+/// Vorschau-Builds (tools/release.ps1 -Preview) schauen zusätzlich in einen lokalen Ordner
+/// (<see cref="PreviewFeed"/>, eine latest.json im selben Format) und nehmen die höhere Version.
 /// </summary>
 public sealed class UpdateService
 {
@@ -36,10 +38,14 @@ public sealed class UpdateService
     public string? Error { get; private set; }
     public DateTime? LastCheck { get; private set; }
 
+    /// <summary>Lokaler Vorschau-Feed (Pfad zu latest.json) – nur in Vorschau-Builds gesetzt, sonst null.</summary>
+    public string? PreviewFeed { get; }
+
     public event EventHandler? Changed;
 
-    public UpdateService(string dataDir, Version current, HttpMessageHandler? handler = null, string? apiUrl = null)
+    public UpdateService(string dataDir, Version current, HttpMessageHandler? handler = null, string? apiUrl = null, string? previewFeed = null)
     {
+        PreviewFeed = string.IsNullOrWhiteSpace(previewFeed) ? null : previewFeed;
         UpdateDir = Path.Combine(dataDir, "Update");
         Current = Normalize(current);
         http = handler is null ? new HttpClient() : new HttpClient(handler);
@@ -95,6 +101,33 @@ public sealed class UpdateService
 
     public async Task<UpdateRelease?> FetchLatestAsync(CancellationToken ct = default)
     {
+        UpdateRelease? published = null;
+        Exception? failure = null;
+        try { published = await FetchPublishedAsync(ct); }
+        catch (Exception ex) when (PreviewFeed is not null && ex is not OperationCanceledException) { failure = ex; }   // offline: Vorschau trotzdem
+        var preview = ReadPreviewFeed();
+        if (preview is not null && (published is null || preview.Version > published.Version)) return preview;
+        if (published is null && failure is not null) throw failure;
+        return published;
+    }
+
+    /// <summary>Vorschau-Feed lesen (lokale Datei); fehlt er oder ist er kaputt: null.</summary>
+    private UpdateRelease? ReadPreviewFeed()
+    {
+        try
+        {
+            if (PreviewFeed is null || !File.Exists(PreviewFeed)) return null;
+            using var json = JsonDocument.Parse(File.ReadAllText(PreviewFeed));
+            return ParseRelease(json.RootElement);
+        }
+        catch (Exception ex) when (ex is IOException or JsonException or UnauthorizedAccessException or KeyNotFoundException or InvalidOperationException)
+        {
+            return null;
+        }
+    }
+
+    private async Task<UpdateRelease?> FetchPublishedAsync(CancellationToken ct)
+    {
         using var request = new HttpRequestMessage(HttpMethod.Get, apiUrl);
         request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
         using var response = await http.SendAsync(request, ct);
@@ -135,7 +168,7 @@ public sealed class UpdateService
 
     private async Task<PendingUpdate> DownloadAsync(UpdateRelease release, CancellationToken ct)
     {
-        var hashText = await http.GetStringAsync(release.HashUrl, ct);
+        var hashText = IsLocal(release.HashUrl) ? await File.ReadAllTextAsync(LocalPath(release.HashUrl), ct) : await http.GetStringAsync(release.HashUrl, ct);
         var expected = ParseHash(hashText) ?? throw new InvalidDataException("Prüfsumme im Release fehlt oder ist ungültig.");
         if (release.Digest is { } digest && digest.StartsWith("sha256:", StringComparison.OrdinalIgnoreCase)
             && !string.Equals(digest[7..], expected, StringComparison.OrdinalIgnoreCase))
@@ -146,6 +179,14 @@ public sealed class UpdateService
 
         var target = Path.Combine(UpdateDir, $"AetherDPS-{release.Version}.exe");
         var part = target + ".part";
+        if (IsLocal(release.ExeUrl))
+        {
+            // Vorschau aus dem lokalen Ordner: kopieren statt laden, geprüft wird gleich
+            await using var source = File.OpenRead(LocalPath(release.ExeUrl));
+            await using var file = File.Create(part);
+            await source.CopyToAsync(file, ct);
+        }
+        else
         using (var response = await http.GetAsync(release.ExeUrl, HttpCompletionOption.ResponseHeadersRead, ct))
         {
             response.EnsureSuccessStatusCode();
@@ -214,6 +255,10 @@ public sealed class UpdateService
         Pending = null;
         Set(UpdateState.Idle);
     }
+
+    private static bool IsLocal(string url) => url.StartsWith("file:", StringComparison.OrdinalIgnoreCase);
+
+    private static string LocalPath(string url) => new Uri(url).LocalPath;
 
     /// <summary>Die beim letzten Update übrig gebliebene alte exe löschen.</summary>
     public static void CleanupOld(string targetExe) => TryDelete(targetExe + ".old");
