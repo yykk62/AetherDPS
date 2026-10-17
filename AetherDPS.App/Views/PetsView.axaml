@@ -5,162 +5,145 @@
              xmlns:l="using:AetherDPS.App.Services"
              x:Class="AetherDPS.App.Views.PetsView"
              x:DataType="vm:PetsViewModel">
-  <UserControl.Styles>
-    <Style Selector="Border.chip">
-      <Setter Property="Background" Value="#262D3A" />
-      <Setter Property="CornerRadius" Value="11" />
-      <Setter Property="Padding" Value="7,1" />
-      <Setter Property="Margin" Value="0,0,4,4" />
-    </Style>
-  </UserControl.Styles>
 
-  <!-- Alles passt ins Fenster, nichts scrollt außen: Liste und Karte füllen die Höhe -->
-  <Grid RowDefinitions="Auto,*" Margin="12,4,22,22">
+  <!-- Welt › Pets: links Filter und Liste auf dem Rahmen, rechts das gewählte Pet mit großem
+       Fortschritt („12/25“, Balken, wie viele Seelen noch fehlen) und die Karte als Mulde. -->
+  <Grid ColumnDefinitions="300,*" Margin="0,0,0,0">
 
-    <!-- Pet-Radar im Spiel -->
-    <Border Classes="card" Padding="14,10" Margin="0,0,0,12" ToolTip.Tip="{l:T radar.enable_hint}">
-      <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
-        <Border Width="34" Height="34" CornerRadius="17" Background="#2A2416" VerticalAlignment="Center">
-          <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon center, Size=20}" Width="20" Height="20" HorizontalAlignment="Center" />
-        </Border>
-        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
-          <TextBlock Text="{l:T radar.settings_title}" FontWeight="SemiBold" />
-          <TextBlock Text="{l:T radar.short_hint}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
+    <!-- ── Liste ───────────────────────────────────────────────── -->
+    <Border BorderBrush="{DynamicResource Line.Frame}" BorderThickness="0,0,1,0">
+      <Grid RowDefinitions="Auto,Auto,Auto,*" Margin="20,10,14,16">
+        <StackPanel Spacing="6" Margin="0,0,0,8">
+          <ListBox Classes="seg" ItemsSource="{Binding MapOptions}" SelectedItem="{Binding SelectedMap}" IsVisible="{Binding HasMapChoice}">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:PetMapOption">
+                <TextBlock Text="{Binding Name}" FontSize="13" TextTrimming="CharacterEllipsis" />
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+          <ListBox Classes="seg" ItemsSource="{Binding SpeciesOptions}" SelectedItem="{Binding SelectedSpecies}">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:SpeciesOption">
+                <Panel ToolTip.Tip="{Binding Name}" Height="30">
+                  <TextBlock Text="{l:T pets.filter_short.all}" FontSize="13" IsVisible="{Binding IsAll}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                  <Border Width="30" Height="30" CornerRadius="15" ClipToBounds="True" BorderBrush="{Binding Brush}" BorderThickness="2"
+                          IsVisible="{Binding !IsAll}" Background="{DynamicResource Surface.WellDeep}">
+                    <Image Source="{Binding Icon}" Stretch="UniformToFill" />
+                  </Border>
+                </Panel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+          <ListBox Classes="seg" ItemsSource="{Binding FilterOptions}" SelectedItem="{Binding SelectedFilter}">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:PetFilterOption">
+                <TextBlock Text="{Binding Label}" ToolTip.Tip="{Binding Name}" FontSize="13" TextTrimming="CharacterEllipsis" />
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
         </StackPanel>
-        <ComboBox Grid.Column="2" ItemsSource="{Binding RadarModes}" SelectedItem="{Binding SelectedRadarMode}" MinWidth="250" VerticalAlignment="Center" />
+        <TextBox Grid.Row="1" Text="{Binding Search}" Watermark="{l:T pets.search}" Margin="0,0,0,8" />
+        <StackPanel Grid.Row="2" Spacing="2" Margin="2,0,0,8">
+          <TextBlock Classes="small muted" Text="{Binding Summary}" TextWrapping="Wrap" />
+          <TextBlock Classes="small warnline" Text="{Binding LevelsHint}" TextWrapping="Wrap"
+                     IsVisible="{Binding LevelsHint, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        </StackPanel>
+        <ListBox Grid.Row="3" Classes="plain" ItemsSource="{Binding Rows}" SelectedItem="{Binding Selected}">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:PetRow">
+              <Grid ColumnDefinitions="Auto,*,Auto" Margin="6,4">
+                <Border Width="38" Height="38" CornerRadius="{DynamicResource Radius.Control}" Background="{DynamicResource Surface.WellDeep}" ClipToBounds="True" Margin="0,0,10,0">
+                  <Image Source="{Binding Icon}" />
+                </Border>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+                  <TextBlock Text="{Binding Name}" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+                  <TextBlock Classes="small" Text="{Binding Species}" Foreground="{Binding SpeciesBrush}" />
+                </StackPanel>
+                <TextBlock Grid.Column="2" Classes="small num" Text="{Binding LevelText}" Foreground="{Binding LevelBrush}" VerticalAlignment="Center" Margin="8,0,4,0" />
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
       </Grid>
     </Border>
 
-    <Grid Grid.Row="1" ColumnDefinitions="290,*" ColumnSpacing="12">
+    <!-- ── Gewähltes Pet und Karte ────────────────────────────── -->
+    <Grid Grid.Column="1" RowDefinitions="Auto,Auto,*,Auto" Margin="28,10,32,16">
+      <Grid ColumnDefinitions="Auto,*,Auto" IsVisible="{Binding HasDetail}" Margin="0,0,0,12">
+        <Border Width="84" Height="84" CornerRadius="{DynamicResource Radius.Well}" Background="{DynamicResource Surface.WellDeep}" ClipToBounds="True" Margin="0,0,16,0">
+          <Image Source="{Binding DetailIcon}" />
+        </Border>
+        <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+          <TextBlock Classes="title" Text="{Binding DetailName}" TextTrimming="CharacterEllipsis" />
+          <TextBlock Text="{Binding DetailSpecies}" Foreground="{Binding DotBrush}" FontWeight="Medium" />
+          <TextBlock Classes="small muted" Text="{Binding DetailRegions}" TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis"
+                     ToolTip.Tip="{Binding DetailRegions}" Margin="0,2,0,0"
+                     IsVisible="{Binding DetailRegions, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        </StackPanel>
+        <!-- Fortschritt groß -->
+        <StackPanel Grid.Column="2" Spacing="4" VerticalAlignment="Center" MinWidth="220" Margin="20,0,0,0">
+          <TextBlock Classes="display" Text="{Binding DetailReading}" HorizontalAlignment="Right" />
+          <TextBlock Classes="small secondary" Text="{Binding DetailCaption}" HorizontalAlignment="Right" TextWrapping="Wrap" TextAlignment="Right" />
+          <ProgressBar Classes="fill" Value="{Binding DetailPercent}" Margin="0,4,0,0" />
+        </StackPanel>
+      </Grid>
 
-      <!-- Liste -->
-      <Border Classes="card" Padding="12">
-        <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
-          <TextBlock Classes="h2" Text="{l:T pets.title}" Margin="0,0,0,8" />
-          <StackPanel Grid.Row="1" Spacing="6" Margin="0,0,0,6">
-            <!-- Karte: nur die der eigenen Seite (+ Abyss) -->
-            <ListBox Classes="seg" ItemsSource="{Binding MapOptions}" SelectedItem="{Binding SelectedMap}" IsVisible="{Binding HasMapChoice}">
-              <ListBox.ItemTemplate>
-                <DataTemplate x:DataType="vm:PetMapOption">
-                  <TextBlock Text="{Binding Name}" FontSize="12" TextTrimming="CharacterEllipsis" />
-                </DataTemplate>
-              </ListBox.ItemTemplate>
-            </ListBox>
-            <!-- Gattung: Bild-Knöpfe -->
-            <ListBox Classes="seg" ItemsSource="{Binding SpeciesOptions}" SelectedItem="{Binding SelectedSpecies}">
-              <ListBox.ItemTemplate>
-                <DataTemplate x:DataType="vm:SpeciesOption">
-                  <Panel ToolTip.Tip="{Binding Name}" Height="30">
-                    <TextBlock Text="{l:T pets.filter_short.all}" FontSize="12" IsVisible="{Binding IsAll}" VerticalAlignment="Center" HorizontalAlignment="Center" />
-                    <Border Width="30" Height="30" CornerRadius="15" ClipToBounds="True" BorderBrush="{Binding Brush}" BorderThickness="2"
-                            IsVisible="{Binding !IsAll}" Background="#22000000">
-                      <Image Source="{Binding Icon}" Stretch="UniformToFill" />
-                    </Border>
-                  </Panel>
-                </DataTemplate>
-              </ListBox.ItemTemplate>
-            </ListBox>
-            <!-- Stand: alle / fehlen / nicht max -->
-            <ListBox Classes="seg" ItemsSource="{Binding FilterOptions}" SelectedItem="{Binding SelectedFilter}">
-              <ListBox.ItemTemplate>
-                <DataTemplate x:DataType="vm:PetFilterOption">
-                  <TextBlock Text="{Binding Label}" ToolTip.Tip="{Binding Name}" FontSize="12" TextTrimming="CharacterEllipsis" />
-                </DataTemplate>
-              </ListBox.ItemTemplate>
-            </ListBox>
-          </StackPanel>
-          <TextBox Grid.Row="2" Text="{Binding Search}" Watermark="{l:T pets.search}" Margin="0,0,0,6" />
-          <StackPanel Grid.Row="3" Spacing="2" Margin="2,0,0,6">
-            <TextBlock Text="{Binding Summary}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
-            <TextBlock Text="{Binding LevelsHint}" Foreground="#E0A84A" FontSize="11" TextWrapping="Wrap"
-                       IsVisible="{Binding LevelsHint, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-          </StackPanel>
-          <Border Grid.Row="4" CornerRadius="6" Background="#14181F" ClipToBounds="True">
-            <ListBox ItemsSource="{Binding Rows}" SelectedItem="{Binding Selected}" Background="Transparent" Padding="2">
-              <ListBox.Styles>
-                <Style Selector="ListBoxItem">
-                  <Setter Property="Padding" Value="6,4" />
-                  <Setter Property="CornerRadius" Value="5" />
-                  <Setter Property="Margin" Value="0,1" />
-                </Style>
-              </ListBox.Styles>
-              <ListBox.ItemTemplate>
-                <DataTemplate x:DataType="vm:PetRow">
-                  <Grid ColumnDefinitions="Auto,*,Auto">
-                    <Border Width="36" Height="36" CornerRadius="6" Background="#22000000" ClipToBounds="True" Margin="0,0,8,0">
-                      <Image Source="{Binding Icon}" />
-                    </Border>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                      <TextBlock Text="{Binding Name}" FontSize="12.5" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
-                      <TextBlock Text="{Binding Species}" Foreground="{Binding SpeciesBrush}" FontSize="10.5" />
-                    </StackPanel>
-                    <TextBlock Grid.Column="2" Text="{Binding LevelText}" Foreground="{Binding LevelBrush}" FontSize="11" VerticalAlignment="Center" Margin="6,0,0,0" />
-                  </Grid>
-                </DataTemplate>
-              </ListBox.ItemTemplate>
-            </ListBox>
-          </Border>
-        </Grid>
-      </Border>
-
-      <!-- Gewähltes Pet und Karte -->
-      <Border Grid.Column="1" Classes="card" Padding="12">
-        <Grid RowDefinitions="Auto,Auto,*,Auto">
-          <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,8">
-            <Border Width="64" Height="64" CornerRadius="8" Background="#22000000" ClipToBounds="True" Margin="0,0,12,0" VerticalAlignment="Top">
-              <Image Source="{Binding DetailIcon}" />
+      <!-- Monster, die die Seele droppen -->
+      <ItemsControl Grid.Row="1" ItemsSource="{Binding Monsters}" ToolTip.Tip="{l:T pets.monsters}" Margin="0,0,0,10">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <WrapPanel />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:PetMonsterRow">
+            <Border Classes="chip" ToolTip.Tip="{Binding Count}">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Classes="small" Text="{Binding Name}" />
+                <TextBlock Classes="small muted" Text="{Binding Number}" VerticalAlignment="Center" />
+              </StackPanel>
             </Border>
-            <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
-              <TextBlock Text="{Binding DetailTitle}" Classes="h2" />
-              <TextBlock Text="{Binding DetailLevel}" Foreground="#E0A84A" FontSize="12" />
-              <TextBlock Text="{Binding DetailRegions}" Classes="dim" FontSize="11" TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis"
-                         ToolTip.Tip="{Binding DetailRegions}"
-                         IsVisible="{Binding DetailRegions, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-            </StackPanel>
-          </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
 
-          <!-- Monster, die die Seele droppen -->
-          <!-- alle Monster sichtbar (kein verstecktes Scrollen), dafür kompakt -->
-          <ItemsControl Grid.Row="1" ItemsSource="{Binding Monsters}" ToolTip.Tip="{l:T pets.monsters}" Margin="0,0,0,3">
-            <ItemsControl.ItemsPanel>
-              <ItemsPanelTemplate>
-                <WrapPanel />
-              </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-              <DataTemplate x:DataType="vm:PetMonsterRow">
-                <Border Classes="chip" ToolTip.Tip="{Binding Count}">
-                  <StackPanel Orientation="Horizontal" Spacing="5">
-                    <TextBlock Text="{Binding Name}" FontSize="10.5" />
-                    <TextBlock Text="{Binding Number}" Foreground="#E0A84A" FontSize="10" VerticalAlignment="Center" />
-                  </StackPanel>
-                </Border>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
-
-          <Border Grid.Row="2" CornerRadius="6" ClipToBounds="True" BorderBrush="#232A36" BorderThickness="1" MinHeight="220">
-            <Panel>
-              <views:PetMapView Name="FinderMap" AutoFit="False" DotBrush="{Binding DotBrush}" Map="{Binding Map}" Spawns="{Binding Spawns}" Self="{Binding Self}" />
-              <Button Click="OnCenter" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="8" Padding="8,6"
-                      Background="#CC141820" ToolTip.Tip="{l:T radar.center}"><Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon center, Size=16}" Width="16" Height="16" /></Button>
-            </Panel>
-          </Border>
-
-          <Grid Grid.Row="3" ColumnDefinitions="Auto,Auto,*" Margin="2,8,0,0">
-            <StackPanel Orientation="Horizontal" Spacing="5" Margin="0,0,14,0">
-              <Ellipse Width="9" Height="9" Fill="{Binding DotBrush}" VerticalAlignment="Center" />
-              <TextBlock Text="{l:T pets.legend_spawn}" Classes="dim" FontSize="11" />
-            </StackPanel>
-            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="5" Margin="0,0,14,0">
-              <Ellipse Width="10" Height="10" Fill="White" Stroke="#1E6FD9" StrokeThickness="2.5" VerticalAlignment="Center" />
-              <TextBlock Text="{Binding PositionText}" Classes="dim" FontSize="11" />
-            </StackPanel>
-            <TextBlock Grid.Column="2" Text="{l:T pets.map_hint}" Classes="dim" FontSize="10.5" HorizontalAlignment="Right"
-                       TextTrimming="CharacterEllipsis" VerticalAlignment="Center" ToolTip.Tip="{l:T pets.source}" />
-          </Grid>
-        </Grid>
+      <Border Grid.Row="2" Classes="well" Padding="0" ClipToBounds="True" MinHeight="240">
+        <Panel>
+          <views:PetMapView Name="FinderMap" AutoFit="False" DotBrush="{Binding DotBrush}" Map="{Binding Map}" Spawns="{Binding Spawns}" Self="{Binding Self}" />
+          <Button Classes="quiet" Click="OnCenter" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10" Padding="8,6" ToolTip.Tip="{l:T radar.center}">
+            <Image Source="{l:Icon center, Size=16}" Width="16" Height="16" />
+          </Button>
+        </Panel>
       </Border>
+
+      <Grid Grid.Row="3" ColumnDefinitions="Auto,Auto,*,Auto" Margin="2,10,0,0">
+        <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,16,0">
+          <Ellipse Width="9" Height="9" Fill="{Binding DotBrush}" VerticalAlignment="Center" />
+          <TextBlock Classes="small muted" Text="{l:T pets.legend_spawn}" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,16,0">
+          <Ellipse Width="10" Height="10" Fill="{DynamicResource Text.Primary}" Stroke="{DynamicResource Accent.Phase}" StrokeThickness="2.5" VerticalAlignment="Center" />
+          <TextBlock Classes="small muted" Text="{Binding PositionText}" />
+        </StackPanel>
+        <!-- Pet-Radar im Spiel -->
+        <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8" ToolTip.Tip="{l:T radar.enable_hint}">
+          <Image Source="{l:Icon radar, Size=16}" Width="16" Height="16" VerticalAlignment="Center" />
+          <TextBlock Classes="small secondary" Text="{l:T radar.settings_title}" VerticalAlignment="Center" />
+          <ComboBox ItemsSource="{Binding RadarModes}" SelectedItem="{Binding SelectedRadarMode}" MinWidth="200" />
+        </StackPanel>
+      </Grid>
     </Grid>
   </Grid>
+
+  <UserControl.Styles>
+    <Style Selector="Border.chip">
+      <Setter Property="Background" Value="{DynamicResource Surface.Raised}" />
+      <Setter Property="CornerRadius" Value="{DynamicResource Radius.Mark}" />
+      <Setter Property="Padding" Value="8,3" />
+      <Setter Property="Margin" Value="0,0,6,6" />
+    </Style>
+    <Style Selector="TextBlock.warnline">
+      <Setter Property="Foreground" Value="{DynamicResource Signal.Warn}" />
+    </Style>
+  </UserControl.Styles>
 </UserControl>

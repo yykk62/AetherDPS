@@ -21,12 +21,12 @@ public sealed class PetMapView : Control
 
     private const int TileSource = 512;
     private static readonly Dictionary<string, Bitmap?[,]> TileCache = [];
-    private static readonly IBrush Background = new SolidColorBrush(Color.Parse("#11141B"));
-    private static readonly IBrush SpawnFill = new SolidColorBrush(Color.Parse("#E0A84A"));
-    private static readonly IPen SpawnPen = new Pen(new SolidColorBrush(Color.Parse("#1A1206")), 1.5);
+    private static IBrush Background => Services.TokenBrush.Get("Surface.WellDeep");
+    private static IBrush SpawnFill => Services.TokenBrush.Get("Text.Primary");
+    private static IPen SpawnPen => new Pen(Services.TokenBrush.Get("Surface.WellDeep"), 1.5);
     private static readonly IBrush SelfFill = Brushes.White;
-    private static readonly IPen SelfPen = new Pen(new SolidColorBrush(Color.Parse("#1E6FD9")), 3);
-    private static readonly IPen SelfRing = new Pen(new SolidColorBrush(Color.Parse("#884FC1E9")), 2);
+    private static IPen SelfPen => new Pen(Services.TokenBrush.Get("Accent.Phase"), 3);
+    private static IPen SelfRing => new Pen(Services.TokenBrush.Get("Accent.PhaseDim"), 2);
 
     private double zoom = 1;          // Bildschirm-Pixel je Karten-Pixel
     private Point center;             // Kartenmitte in Karten-Pixeln

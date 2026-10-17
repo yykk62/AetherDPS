@@ -1,156 +1,160 @@
-<!-- Farbwelt der App (assets/brand/README.md). Wird in App.axaml nach dem FluentTheme eingebunden
-     und ebenso in den UI-Tests (AetherDPS.UiTests), damit Bilder dort genauso aussehen wie im Programm.
-     Fluent-Standardfarben (Windows-Blau, Grau) werden auf Gold und die dunklen Flächen umgebogen,
-     damit Auswahl, Haken, Fokus und Knöpfe überall gleich aussehen. -->
+<!-- Farbwelt der App (docs/DESIGN.md). Wird in App.axaml nach dem FluentTheme eingebunden und ebenso in
+     den UI-Tests (AetherDPS.UiTests), damit Bilder dort genauso aussehen wie im Programm.
+     Fluent-Standardfarben werden auf die Tokens aus Tokens.axaml umgebogen: Akzent ist Pergament (hell),
+     nicht Gold – Gold bleibt „du“ und Rekorden vorbehalten. Keine Hex-Werte außer Transparenzen. -->
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <Styles.Resources>
     <ResourceDictionary>
-      <!-- Tokens des neuen Designs (docs/DESIGN.md) -->
       <ResourceDictionary.MergedDictionaries>
         <ResourceInclude Source="avares://AetherDPS/Tokens.axaml" />
       </ResourceDictionary.MergedDictionaries>
-      <!-- Akzent: Gold statt Windows-Akzentfarbe (Auswahl, Haken, Fokusrahmen, Reiter-Streifen, Fortschritt) -->
-      <Color x:Key="SystemAccentColor">#E0A84A</Color>
-      <Color x:Key="SystemAccentColorDark1">#C9933C</Color>
-      <Color x:Key="SystemAccentColorDark2">#B07F31</Color>
-      <Color x:Key="SystemAccentColorDark3">#966A27</Color>
-      <Color x:Key="SystemAccentColorLight1">#E8B862</Color>
-      <Color x:Key="SystemAccentColorLight2">#F0C87E</Color>
-      <Color x:Key="SystemAccentColorLight3">#F6D79C</Color>
+
+      <!-- Akzent (Haken, Schieber, Auswahlstreifen, Fortschritt): Pergament -->
+      <Color x:Key="SystemAccentColor">#F1EADB</Color>
+      <Color x:Key="SystemAccentColorDark1">#DDD5C4</Color>
+      <Color x:Key="SystemAccentColorDark2">#C9C0AE</Color>
+      <Color x:Key="SystemAccentColorDark3">#ABA290</Color>
+      <Color x:Key="SystemAccentColorLight1">#F6F0E3</Color>
+      <Color x:Key="SystemAccentColorLight2">#FBF6EC</Color>
+      <Color x:Key="SystemAccentColorLight3">#FFFFFF</Color>
       <CornerRadius x:Key="ControlCornerRadius">6</CornerRadius>
+      <FontFamily x:Key="ContentControlThemeFontFamily">Bahnschrift, Microsoft YaHei UI, Yu Gothic UI, Malgun Gothic, Segoe UI</FontFamily>
 
-      <!-- Knöpfe (Standard = „secondary“): dunkle Fläche mit feiner Linie -->
-      <SolidColorBrush x:Key="ButtonBackground" Color="#1F2530" />
-      <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#283040" />
-      <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#171C24" />
-      <SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="#171B23" />
-      <SolidColorBrush x:Key="ButtonForeground" Color="#E6E8EC" />
-      <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="#FFFFFF" />
-      <SolidColorBrush x:Key="ButtonForegroundPressed" Color="#C9CED6" />
-      <SolidColorBrush x:Key="ButtonForegroundDisabled" Color="#5C6473" />
-      <SolidColorBrush x:Key="ButtonBorderBrush" Color="#2C3442" />
-      <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="#3C4657" />
-      <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#2C3442" />
-      <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="#232A36" />
+      <!-- Knöpfe (Standard = ruhig): erhabene Fläche -->
+      <SolidColorBrush x:Key="ButtonBackground" Color="{StaticResource Stone700}" />
+      <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{StaticResource Stone600}" />
+      <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="{StaticResource Stone900}" />
+      <SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="{StaticResource Stone800}" />
+      <SolidColorBrush x:Key="ButtonForeground" Color="{StaticResource Parchment100}" />
+      <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="{StaticResource Parchment50}" />
+      <SolidColorBrush x:Key="ButtonForegroundPressed" Color="{StaticResource Parchment300}" />
+      <SolidColorBrush x:Key="ButtonForegroundDisabled" Color="{StaticResource Stone500}" />
+      <SolidColorBrush x:Key="ButtonBorderBrush" Color="Transparent" />
+      <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="Transparent" />
+      <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="Transparent" />
+      <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="Transparent" />
 
-      <!-- Eingabefelder -->
-      <SolidColorBrush x:Key="TextControlBackground" Color="#12161D" />
-      <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#151A22" />
-      <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#12161D" />
-      <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="#12161D" />
-      <SolidColorBrush x:Key="TextControlBorderBrush" Color="#2C3442" />
-      <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="#3C4657" />
-      <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="#E0A84A" />
-      <SolidColorBrush x:Key="TextControlForeground" Color="#E6E8EC" />
-      <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="#6C7483" />
-      <SolidColorBrush x:Key="TextControlPlaceholderForegroundPointerOver" Color="#7A8392" />
-      <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="#6C7483" />
+      <!-- Eingabefelder: eingelassen (Mulde) -->
+      <SolidColorBrush x:Key="TextControlBackground" Color="{StaticResource Stone900}" />
+      <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="{StaticResource Stone900}" />
+      <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="{StaticResource Stone950}" />
+      <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="{StaticResource Stone800}" />
+      <SolidColorBrush x:Key="TextControlBorderBrush" Color="{StaticResource Stone600}" />
+      <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="{StaticResource Stone500}" />
+      <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="{StaticResource Aether400}" />
+      <SolidColorBrush x:Key="TextControlForeground" Color="{StaticResource Parchment100}" />
+      <SolidColorBrush x:Key="TextControlForegroundFocused" Color="{StaticResource Parchment100}" />
+      <SolidColorBrush x:Key="TextControlForegroundPointerOver" Color="{StaticResource Parchment100}" />
+      <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="{StaticResource Stone400}" />
+      <SolidColorBrush x:Key="TextControlPlaceholderForegroundPointerOver" Color="{StaticResource Stone400}" />
+      <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="{StaticResource Stone400}" />
 
       <!-- Auswahllisten -->
-      <SolidColorBrush x:Key="ComboBoxBackground" Color="#1F2530" />
-      <SolidColorBrush x:Key="ComboBoxBackgroundPointerOver" Color="#283040" />
-      <SolidColorBrush x:Key="ComboBoxBackgroundPressed" Color="#171C24" />
-      <SolidColorBrush x:Key="ComboBoxBorderBrush" Color="#2C3442" />
-      <SolidColorBrush x:Key="ComboBoxBorderBrushPointerOver" Color="#3C4657" />
-      <SolidColorBrush x:Key="ComboBoxBorderBrushPressed" Color="#E0A84A" />
-      <SolidColorBrush x:Key="ComboBoxDropDownBackground" Color="#1C2230" />
-      <SolidColorBrush x:Key="ComboBoxDropDownBorderBrush" Color="#2C3442" />
-      <SolidColorBrush x:Key="ComboBoxItemBackgroundPointerOver" Color="#283040" />
-      <SolidColorBrush x:Key="ComboBoxItemBackgroundSelected" Color="#2E2818" />
-      <SolidColorBrush x:Key="ComboBoxItemBackgroundSelectedPointerOver" Color="#38301C" />
-      <SolidColorBrush x:Key="ComboBoxItemBackgroundSelectedPressed" Color="#2E2818" />
-      <SolidColorBrush x:Key="ComboBoxItemForegroundSelected" Color="#F0C87E" />
+      <SolidColorBrush x:Key="ComboBoxBackground" Color="{StaticResource Stone700}" />
+      <SolidColorBrush x:Key="ComboBoxBackgroundPointerOver" Color="{StaticResource Stone600}" />
+      <SolidColorBrush x:Key="ComboBoxBackgroundPressed" Color="{StaticResource Stone900}" />
+      <SolidColorBrush x:Key="ComboBoxBorderBrush" Color="Transparent" />
+      <SolidColorBrush x:Key="ComboBoxBorderBrushPointerOver" Color="Transparent" />
+      <SolidColorBrush x:Key="ComboBoxBorderBrushPressed" Color="{StaticResource Aether400}" />
+      <SolidColorBrush x:Key="ComboBoxDropDownBackground" Color="{StaticResource Stone800}" />
+      <SolidColorBrush x:Key="ComboBoxDropDownBorderBrush" Color="{StaticResource Stone600}" />
+      <SolidColorBrush x:Key="ComboBoxItemBackgroundPointerOver" Color="{StaticResource Stone700}" />
+      <SolidColorBrush x:Key="ComboBoxItemBackgroundSelected" Color="{StaticResource Stone700}" />
+      <SolidColorBrush x:Key="ComboBoxItemBackgroundSelectedPointerOver" Color="{StaticResource Stone600}" />
+      <SolidColorBrush x:Key="ComboBoxItemBackgroundSelectedPressed" Color="{StaticResource Stone700}" />
+      <SolidColorBrush x:Key="ComboBoxItemForegroundSelected" Color="{StaticResource Parchment50}" />
 
-      <!-- Listen (Läufe, Pets, Auswahllisten): gewählte Zeile warm getönt statt knallblau.
-           Fluent nimmt dafür die Highlight-Pinsel (Akzent mit Deckkraft); hier deckend und dunkel. -->
-      <SolidColorBrush x:Key="SystemControlHighlightListLowBrush" Color="#1F2530" />
-      <SolidColorBrush x:Key="SystemControlHighlightListMediumBrush" Color="#283040" />
-      <SolidColorBrush x:Key="SystemControlHighlightListAccentLowBrush" Color="#352C19" />
-      <SolidColorBrush x:Key="SystemControlHighlightListAccentMediumBrush" Color="#40351E" />
-      <SolidColorBrush x:Key="SystemControlHighlightListAccentHighBrush" Color="#4A3D22" />
+      <!-- Listen: gewählte Zeile als erhabene Fläche -->
+      <SolidColorBrush x:Key="SystemControlHighlightListLowBrush" Color="#0FFFFFFF" />
+      <SolidColorBrush x:Key="SystemControlHighlightListMediumBrush" Color="{StaticResource Stone700}" />
+      <SolidColorBrush x:Key="SystemControlHighlightListAccentLowBrush" Color="{StaticResource Stone700}" />
+      <SolidColorBrush x:Key="SystemControlHighlightListAccentMediumBrush" Color="{StaticResource Stone700}" />
+      <SolidColorBrush x:Key="SystemControlHighlightListAccentHighBrush" Color="{StaticResource Stone600}" />
 
-      <!-- Haken: dunkles Häkchen auf Gold -->
-      <SolidColorBrush x:Key="CheckBoxCheckGlyphForegroundChecked" Color="#141820" />
-      <SolidColorBrush x:Key="CheckBoxCheckGlyphForegroundCheckedPointerOver" Color="#141820" />
-      <SolidColorBrush x:Key="CheckBoxCheckGlyphForegroundCheckedPressed" Color="#141820" />
-      <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeUnchecked" Color="#3C4657" />
-      <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeUncheckedPointerOver" Color="#E0A84A" />
-      <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillUnchecked" Color="#12161D" />
-      <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillUncheckedPointerOver" Color="#151A22" />
+      <!-- Haken: dunkles Häkchen auf Pergament -->
+      <SolidColorBrush x:Key="CheckBoxCheckGlyphForegroundChecked" Color="{StaticResource Stone950}" />
+      <SolidColorBrush x:Key="CheckBoxCheckGlyphForegroundCheckedPointerOver" Color="{StaticResource Stone950}" />
+      <SolidColorBrush x:Key="CheckBoxCheckGlyphForegroundCheckedPressed" Color="{StaticResource Stone950}" />
+      <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeUnchecked" Color="{StaticResource Stone500}" />
+      <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeUncheckedPointerOver" Color="{StaticResource Parchment300}" />
+      <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillUnchecked" Color="{StaticResource Stone900}" />
+      <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillUncheckedPointerOver" Color="{StaticResource Stone900}" />
 
-      <!-- Aufklappbereiche (Feldbosse) -->
-      <SolidColorBrush x:Key="ExpanderHeaderBackground" Color="#1F2530" />
-      <SolidColorBrush x:Key="ExpanderHeaderBackgroundPointerOver" Color="#283040" />
-      <SolidColorBrush x:Key="ExpanderHeaderBackgroundPressed" Color="#171C24" />
-      <SolidColorBrush x:Key="ExpanderHeaderBorderBrush" Color="#2C3442" />
-      <SolidColorBrush x:Key="ExpanderContentBackground" Color="#151A22" />
-      <SolidColorBrush x:Key="ExpanderContentBorderBrush" Color="#2C3442" />
+      <!-- Aufklappbereiche -->
+      <SolidColorBrush x:Key="ExpanderHeaderBackground" Color="Transparent" />
+      <SolidColorBrush x:Key="ExpanderHeaderBackgroundPointerOver" Color="#0FFFFFFF" />
+      <SolidColorBrush x:Key="ExpanderHeaderBackgroundPressed" Color="Transparent" />
+      <SolidColorBrush x:Key="ExpanderHeaderBorderBrush" Color="Transparent" />
+      <SolidColorBrush x:Key="ExpanderContentBackground" Color="Transparent" />
+      <SolidColorBrush x:Key="ExpanderContentBorderBrush" Color="Transparent" />
 
       <!-- Bildlaufleisten, Tooltips -->
-      <SolidColorBrush x:Key="ScrollBarThumbFill" Color="#3C4657" />
-      <SolidColorBrush x:Key="ScrollBarThumbFillPointerOver" Color="#4C5768" />
-      <SolidColorBrush x:Key="ScrollBarThumbFillPressed" Color="#5C6778" />
-      <SolidColorBrush x:Key="ToolTipBackground" Color="#1C2230" />
-      <SolidColorBrush x:Key="ToolTipBorderBrush" Color="#2C3442" />
-      <SolidColorBrush x:Key="ToolTipForeground" Color="#E6E8EC" />
+      <SolidColorBrush x:Key="ScrollBarThumbFill" Color="{StaticResource Stone600}" />
+      <SolidColorBrush x:Key="ScrollBarThumbFillPointerOver" Color="{StaticResource Stone500}" />
+      <SolidColorBrush x:Key="ScrollBarThumbFillPressed" Color="{StaticResource Stone400}" />
+      <SolidColorBrush x:Key="ToolTipBackground" Color="{StaticResource Stone900}" />
+      <SolidColorBrush x:Key="ToolTipBorderBrush" Color="{StaticResource Stone600}" />
+      <SolidColorBrush x:Key="ToolTipForeground" Color="{StaticResource Parchment100}" />
     </ResourceDictionary>
   </Styles.Resources>
-  <!-- Bausteine des neuen Designs (nur innerhalb von .ins) -->
+
+  <!-- Bausteine des neuen Designs (gelten unter .ins) -->
   <StyleInclude Source="avares://AetherDPS/Instrument.axaml" />
 
-    <!-- Eigene Icons (Assets/icons): werden aus der doppelten Auflösung herunterskaliert, deshalb hochwertig filtern -->
   <Style Selector="Image.ic">
     <Setter Property="VerticalAlignment" Value="Center" />
   </Style>
 
-  <!-- Karten und Knöpfe, überall gleich -->
+  <!-- Ältere Klassen, auf die neue Sprache abgebildet (Nebenfenster bis zu ihrem Umbau):
+       card = Abschnitt auf dem Rahmen (keine Kartenwand), primary = helle Hauptaktion,
+       secondary = ruhig, danger = ruhig mit rotem Wort. -->
   <Style Selector="Border.card">
-    <Setter Property="Background" Value="#F2191E28" />
-    <Setter Property="CornerRadius" Value="10" />
-    <Setter Property="Padding" Value="18" />
-    <Setter Property="BorderBrush" Value="#262E3B" />
-    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="CornerRadius" Value="0" />
+    <Setter Property="Padding" Value="0,14,0,4" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Line.Frame}" />
+    <Setter Property="BorderThickness" Value="0,1,0,0" />
   </Style>
   <Style Selector="Button.primary">
-    <Setter Property="Background" Value="#E0A84A" />
-    <Setter Property="Foreground" Value="#141820" />
+    <Setter Property="Background" Value="{DynamicResource Action.Primary}" />
+    <Setter Property="Foreground" Value="{DynamicResource Text.OnAction}" />
     <Setter Property="BorderThickness" Value="0" />
     <Setter Property="FontWeight" Value="SemiBold" />
-    <Setter Property="Padding" Value="18,8" />
-    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Padding" Value="16,8" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Radius.Control}" />
   </Style>
   <Style Selector="Button.primary:pointerover /template/ ContentPresenter">
-    <Setter Property="Background" Value="#F0BC62" />
-    <Setter Property="Foreground" Value="#141820" />
+    <Setter Property="Background" Value="{DynamicResource Action.PrimaryHover}" />
+    <Setter Property="Foreground" Value="{DynamicResource Text.OnAction}" />
   </Style>
   <Style Selector="Button.primary:pressed /template/ ContentPresenter">
-    <Setter Property="Background" Value="#C9933C" />
-    <Setter Property="Foreground" Value="#141820" />
+    <Setter Property="Background" Value="{DynamicResource Action.PrimaryPressed}" />
+    <Setter Property="Foreground" Value="{DynamicResource Text.OnAction}" />
   </Style>
   <Style Selector="Button.primary:disabled /template/ ContentPresenter">
-    <Setter Property="Background" Value="#4A3D22" />
-    <Setter Property="Foreground" Value="#8E8469" />
+    <Setter Property="Background" Value="{DynamicResource Surface.Raised}" />
+    <Setter Property="Foreground" Value="{DynamicResource Text.Muted}" />
+  </Style>
+  <Style Selector="Button.primary TextBlock">
+    <Setter Property="Foreground" Value="{DynamicResource Text.OnAction}" />
   </Style>
   <Style Selector="Button.secondary">
-    <Setter Property="Padding" Value="14,8" />
-    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Padding" Value="14,7" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Radius.Control}" />
   </Style>
-  <!-- Löschen und Ähnliches: rötlich, aber ruhig -->
   <Style Selector="Button.danger">
-    <Setter Property="Padding" Value="14,8" />
-    <Setter Property="CornerRadius" Value="6" />
-    <Setter Property="Background" Value="#2A1B1E" />
-    <Setter Property="BorderBrush" Value="#4A2A30" />
-    <Setter Property="Foreground" Value="#F0908A" />
+    <Setter Property="Padding" Value="14,7" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Radius.Control}" />
+    <Setter Property="Foreground" Value="{DynamicResource Signal.Bad}" />
   </Style>
   <Style Selector="Button.danger:pointerover /template/ ContentPresenter">
-    <Setter Property="Background" Value="#3A2328" />
-    <Setter Property="Foreground" Value="#FFA8A2" />
+    <Setter Property="Foreground" Value="{DynamicResource Signal.Bad}" />
   </Style>
-  <!-- Knopfleiste statt Dropdown: ein ListBox mit nebeneinander gleich breiten Feldern -->
+
+  <!-- Knopfleiste statt Dropdown: gleich breite Felder in einer Mulde -->
   <Style Selector="ListBox.seg">
-    <Setter Property="Background" Value="#14181F" />
+    <Setter Property="Background" Value="{DynamicResource Surface.WellDeep}" />
     <Setter Property="CornerRadius" Value="7" />
     <Setter Property="Padding" Value="3" />
     <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
@@ -170,13 +174,14 @@
     <Setter Property="MinHeight" Value="0" />
   </Style>
   <Style Selector="ListBox.seg ListBoxItem:selected /template/ ContentPresenter">
-    <Setter Property="Background" Value="#3A3120" />
+    <Setter Property="Background" Value="{DynamicResource Surface.Raised}" />
   </Style>
   <Style Selector="ListBox.seg TextBlock">
     <Setter Property="TextWrapping" Value="NoWrap" />
+    <Setter Property="Foreground" Value="{DynamicResource Text.Secondary}" />
   </Style>
   <Style Selector="ListBox.seg ListBoxItem:selected TextBlock">
-    <Setter Property="Foreground" Value="#E0A84A" />
+    <Setter Property="Foreground" Value="{DynamicResource Text.Primary}" />
   </Style>
 
   <!-- Nur Icon, keine Fläche (Schließen, Aufklappen) -->
@@ -189,9 +194,9 @@
     <Setter Property="CornerRadius" Value="5" />
   </Style>
   <Style Selector="Button.plain:pointerover /template/ ContentPresenter">
-    <Setter Property="Background" Value="#1AFFFFFF" />
+    <Setter Property="Background" Value="{DynamicResource Surface.Hover}" />
   </Style>
   <Style Selector="Button.plain:pressed /template/ ContentPresenter">
-    <Setter Property="Background" Value="#0DFFFFFF" />
+    <Setter Property="Background" Value="Transparent" />
   </Style>
 </Styles>

@@ -102,10 +102,12 @@ public sealed partial class FieldBossRow(FieldBosses service, FieldBossInfo boss
     [ObservableProperty] private string state = "";
     [ObservableProperty] private string at = "";
     [ObservableProperty] private bool isUp;
+    [ObservableProperty] private bool isEstimated;
 
     public void Update(FieldBossView view, DateTime now)
     {
         IsFavorite = view.Favorite;
+        IsEstimated = view.Estimated || view.Status is FieldBossStatus.ProbablyUp or FieldBossStatus.Unknown;
         IsUp = view.Status is FieldBossStatus.Alive or FieldBossStatus.ProbablyUp;
         At = view.Time is DateTime t && view.Status != FieldBossStatus.Unknown
             ? (t.Date == now.Date ? t.ToString("HH:mm", Loc.Culture) : t.ToString("ddd HH:mm", Loc.Culture)) : "";

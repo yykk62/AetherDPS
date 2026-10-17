@@ -115,6 +115,9 @@ public sealed class RunArchive
         Changed?.Invoke(this, EventArgs.Empty);
     }
 
+    /// <summary>Gelöschten Lauf zurückholen („Rückgängig“).</summary>
+    public void Restore(ArchivedRun run) => Save(run);
+
     private void Save(ArchivedRun run)
     {
         lock (gate)

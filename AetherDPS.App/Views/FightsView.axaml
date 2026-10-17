@@ -1,0 +1,231 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AetherDPS.App.ViewModels"
+             xmlns:views="using:AetherDPS.App.Views"
+             xmlns:l="using:AetherDPS.App.Services"
+             x:Class="AetherDPS.App.Views.FightsView"
+             x:DataType="vm:RunsViewModel">
+
+  <!-- Ort „Kämpfe“: links alle Läufe nach Tagen, rechts der gewählte Lauf (teilbar als Bild),
+       darunter die Kampfanalyse des gewählten Spielers als einzige Mulde (das Instrument). -->
+  <Panel>
+    <!-- Leer -->
+    <StackPanel IsVisible="{Binding !HasAnyRun}" Spacing="8" MaxWidth="560" HorizontalAlignment="Left" Margin="32,40,32,0">
+      <TextBlock Classes="display" Text="{l:T fights.empty_title}" />
+      <TextBlock Classes="lead" Text="{l:T fights.empty_text}" TextWrapping="Wrap" />
+    </StackPanel>
+
+    <Grid ColumnDefinitions="300,*" IsVisible="{Binding HasAnyRun}">
+      <!-- ── Liste ───────────────────────────────────────────── -->
+      <Border BorderBrush="{DynamicResource Line.Frame}" BorderThickness="0,0,1,0">
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+          <ItemsControl ItemsSource="{Binding Runs}" Margin="12,14,12,20">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:RunListItem">
+                <StackPanel>
+                  <TextBlock Classes="small muted" Text="{Binding DayHeader}" IsVisible="{Binding HasDayHeader}" Margin="10,14,0,6" />
+                  <Button Classes="runrow" Classes.current="{Binding IsSelected}"
+                          Command="{Binding $parent[UserControl].((vm:RunsViewModel)DataContext).SelectRunCommand}" CommandParameter="{Binding}">
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                      <StackPanel Orientation="Horizontal" Spacing="7">
+                        <Ellipse Width="8" Height="8" Fill="{DynamicResource Signal.Bad}" IsVisible="{Binding IsLive}" VerticalAlignment="Center" />
+                        <Image Source="{l:Icon trophy, Size=14}" Width="14" Height="14" IsVisible="{Binding IsBest}" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding Title}" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+                      </StackPanel>
+                      <TextBlock Grid.Column="1" Classes="num self" Text="{Binding YourDps}" Margin="8,0,0,0" />
+                      <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Classes="small muted" Margin="0,2,0,0">
+                        <Run Text="{Binding Time}" />
+                        <Run Text="  " />
+                        <Run Text="{Binding Duration}" />
+                      </TextBlock>
+                    </Grid>
+                  </Button>
+                </StackPanel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </Border>
+
+      <!-- ── Gewählter Lauf ──────────────────────────────────── -->
+      <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Spacing="16" Margin="28,22,32,28" IsVisible="{Binding HasRun}">
+          <!-- Teilbarer Teil: wird als Bild kopiert bzw. an Discord geschickt -->
+          <Border Name="DetailsCard" Background="{DynamicResource Surface.Frame}" Padding="0,0,0,6">
+            <StackPanel Spacing="14">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="display" Text="{Binding RunTitle}" TextWrapping="Wrap" />
+                <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding Verdict, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                  <Image Source="{l:Icon trophy, Size=20}" Width="20" Height="20" IsVisible="{Binding IsBestTime}" VerticalAlignment="Center" />
+                  <TextBlock Classes="title" Classes.self="{Binding IsBestTime}" Text="{Binding Verdict}" TextWrapping="Wrap" />
+                </StackPanel>
+                <TextBlock Classes="lead" Text="{Binding RunSummary}" TextWrapping="Wrap" />
+              </StackPanel>
+
+              <!-- Gruppe: Klick wählt den Spieler für die Kampfanalyse -->
+              <StackPanel Spacing="2">
+                <Grid ColumnDefinitions="*,92,72,64" Margin="12,0,12,6">
+                  <TextBlock Classes="section" Text="{l:T now.party}" />
+                  <TextBlock Grid.Column="1" Classes="small muted num" Text="{l:T now.col_dps}" VerticalAlignment="Bottom" />
+                  <TextBlock Grid.Column="2" Classes="small muted num" Text="{l:T fights.col_damage}" VerticalAlignment="Bottom" />
+                  <TextBlock Grid.Column="3" Classes="small muted num" Text="{l:T now.col_share}" VerticalAlignment="Bottom" />
+                </Grid>
+                <Border Classes="framerule" />
+                <ItemsControl ItemsSource="{Binding Players}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:PlayerRow">
+                      <Button Classes="playerrow" Classes.current="{Binding IsSelected}" Classes.me="{Binding IsUser}"
+                              Command="{Binding $parent[UserControl].((vm:RunsViewModel)DataContext).SelectPlayerCommand}" CommandParameter="{Binding}">
+                        <Grid ColumnDefinitions="28,12,*,92,72,64">
+                          <Image Source="{Binding ClassIcon}" Width="24" Height="24" VerticalAlignment="Center" />
+                          <StackPanel Grid.Column="2" Spacing="5" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                              <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="Medium" Classes.self="{Binding IsUser}" />
+                              <Border Classes="selftag" IsVisible="{Binding IsUser}">
+                                <TextBlock Text="{l:T now.you}" />
+                              </Border>
+                              <TextBlock Classes="small muted" Text="{Binding ClassName}" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <ProgressBar Classes="trace" Value="{Binding BarPercent}" Foreground="{Binding ClassBrush}" />
+                          </StackPanel>
+                          <TextBlock Grid.Column="3" Classes="num" Text="{Binding Dps}" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" />
+                          <TextBlock Grid.Column="4" Classes="num secondary" Text="{Binding Total}" VerticalAlignment="Center" />
+                          <TextBlock Grid.Column="5" Classes="num secondary" Text="{Binding Share}" VerticalAlignment="Center" />
+                        </Grid>
+                      </Button>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+
+              <!-- Bosse -->
+              <StackPanel Spacing="2">
+                <Grid ColumnDefinitions="*,80,92,120" Margin="12,0,12,6">
+                  <TextBlock Classes="section" Text="{l:T now.bosses}" />
+                  <TextBlock Grid.Column="1" Classes="small muted num" Text="{l:T now.col_from}" VerticalAlignment="Bottom" />
+                  <TextBlock Grid.Column="2" Classes="small muted num" Text="{l:T now.col_duration}" VerticalAlignment="Bottom" />
+                  <TextBlock Grid.Column="3" Classes="small muted num" Text="{l:T now.col_group_dps}" VerticalAlignment="Bottom" />
+                </Grid>
+                <Border Classes="framerule" />
+                <ItemsControl ItemsSource="{Binding Bosses}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:BossLine">
+                      <Grid ColumnDefinitions="18,10,*,80,92,120" MinHeight="32" Margin="12,0">
+                        <Image Source="{Binding Killed, Converter={x:Static views:NowView.KilledIcon}}" Width="16" Height="16" VerticalAlignment="Center" />
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                          <TextBlock Text="{Binding Name}" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+                          <TextBlock Classes="small estimate" Text="{Binding Note}" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="3" Classes="muted num" Text="{Binding From}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="4" Classes="num" Text="{Binding Duration}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="5" Classes="num secondary" Text="{Binding GroupDps}" VerticalAlignment="Center" />
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+
+              <TextBlock Classes="small muted" Text="{l:T share.footer}" HorizontalAlignment="Right" />
+            </StackPanel>
+          </Border>
+
+          <!-- Aktionen: ruhig; Löschen ohne Nachfrage, dafür mit Rückgängig -->
+          <WrapPanel Orientation="Horizontal">
+            <Button Classes="quiet" Command="{Binding CopyImageCommand}" Margin="0,0,8,8">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Image Source="{l:Icon image, Size=16}" Width="16" Height="16" />
+                <TextBlock Text="{l:T runs.copy_image}" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+            <Button Classes="quiet" Command="{Binding CopyTextCommand}" Margin="0,0,8,8">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Image Source="{l:Icon copy, Size=16}" Width="16" Height="16" />
+                <TextBlock Text="{l:T runs.copy_text}" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+            <Button Classes="quiet" Command="{Binding SendToDiscordCommand}" IsVisible="{Binding HasWebhook}" IsEnabled="{Binding !IsPosting}" Margin="0,0,8,8">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Image Source="{l:Icon send, Size=16}" Width="16" Height="16" />
+                <TextBlock Text="{l:T runs.send_discord}" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+            <Button Classes="quiet destructive" Command="{Binding DeleteRunCommand}" IsVisible="{Binding !IsLive}" Margin="0,0,8,8">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Image Source="{l:Icon trash, Size=16}" Width="16" Height="16" />
+                <TextBlock Text="{l:T runs.delete}" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+            <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center" Margin="6,0,0,8"
+                        IsVisible="{Binding Notice, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+              <TextBlock Classes="secondary" Text="{Binding Notice}" VerticalAlignment="Center" />
+              <Button Classes="icon" Padding="8,4" Command="{Binding UndoCommand}" IsVisible="{Binding CanUndo}">
+                <TextBlock Text="{l:T fights.undo}" FontWeight="SemiBold" />
+              </Button>
+            </StackPanel>
+          </WrapPanel>
+
+          <!-- Kampfanalyse: das Instrument dieses Orts -->
+          <Border Classes="well" IsVisible="{Binding HasPlayer}">
+            <StackPanel Spacing="14">
+              <StackPanel Spacing="2">
+                <TextBlock Classes="small muted" Text="{l:T fights.analysis}" />
+                <TextBlock Classes="title" Text="{Binding PlayerTitle}" />
+                <TextBlock Classes="secondary" Text="{Binding PlayerFacts}" TextWrapping="Wrap" />
+              </StackPanel>
+
+              <StackPanel Spacing="2">
+                <Grid ColumnDefinitions="*,84,72,64,72" Margin="0,0,0,4">
+                  <TextBlock Classes="section" Text="{l:T fights.skills}" />
+                  <TextBlock Grid.Column="1" Classes="small muted num" Text="{l:T fights.col_damage}" VerticalAlignment="Bottom" />
+                  <TextBlock Grid.Column="2" Classes="small muted num" Text="{l:T now.col_share}" VerticalAlignment="Bottom" />
+                  <TextBlock Grid.Column="3" Classes="small muted num" Text="{l:T fights.col_hits}" VerticalAlignment="Bottom" />
+                  <TextBlock Grid.Column="4" Classes="small muted num" Text="{l:T fights.col_crit}" VerticalAlignment="Bottom" />
+                </Grid>
+                <ItemsControl ItemsSource="{Binding Skills}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:SkillLine">
+                      <Grid ColumnDefinitions="*,84,72,64,72" Margin="0,4">
+                        <StackPanel Spacing="4" VerticalAlignment="Center" Margin="0,0,16,0">
+                          <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                          <ProgressBar Classes="trace" Value="{Binding BarPercent}" Foreground="{DynamicResource Text.Secondary}" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" Classes="num" Text="{Binding Damage}" FontWeight="Medium" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="2" Classes="num secondary" Text="{Binding Share}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="3" Classes="num secondary" Text="{Binding Hits}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="4" Classes="num secondary" Text="{Binding Crit}" VerticalAlignment="Center" />
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+
+              <Border Classes="rule" />
+              <StackPanel Spacing="2">
+                <Grid ColumnDefinitions="*,84,64" Margin="0,0,0,4">
+                  <TextBlock Classes="section" Text="{l:T fights.buffs}" />
+                  <TextBlock Grid.Column="1" Classes="small muted num" Text="{l:T fights.col_uptime}" VerticalAlignment="Bottom" />
+                  <TextBlock Grid.Column="2" Classes="small muted num" Text="{l:T fights.col_count}" VerticalAlignment="Bottom" />
+                </Grid>
+                <TextBlock Classes="small muted" Text="{l:T runs.buffs_empty}" IsVisible="{Binding !HasBuffs}" TextWrapping="Wrap" />
+                <ItemsControl ItemsSource="{Binding Buffs}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:BuffLine">
+                      <Grid ColumnDefinitions="*,84,64" Margin="0,4">
+                        <StackPanel Spacing="4" VerticalAlignment="Center" Margin="0,0,16,0">
+                          <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                          <ProgressBar Classes="trace" Value="{Binding BarPercent}" Foreground="{DynamicResource Text.Muted}" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" Classes="num" Text="{Binding Uptime}" FontWeight="Medium" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="2" Classes="num secondary" Text="{Binding Count}" VerticalAlignment="Center" />
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </ScrollViewer>
+    </Grid>
+  </Panel>
+</UserControl>

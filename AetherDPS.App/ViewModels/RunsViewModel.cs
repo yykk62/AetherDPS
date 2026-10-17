@@ -7,43 +7,65 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace AetherDPS.App.ViewModels;
 
-public sealed record RunListItem(string Id, string Title, string Subtitle, bool IsBest, bool IsLive);
+/// <summary>Ein Lauf in der Liste; <see cref="DayHeader"/> steht über dem ersten Lauf eines Tages.</summary>
+public sealed partial class RunListItem(string id, string title, bool isBest, bool isLive,
+    string? dayHeader = null, string time = "", string duration = "", string yourDps = "") : ObservableObject
+{
+    public string Id { get; } = id;
+    public string Title { get; } = title;
+    public bool IsBest { get; } = isBest;
+    public bool IsLive { get; } = isLive;
+    public string? DayHeader { get; } = dayHeader;
+    public string Time { get; } = time;
+    public string Duration { get; } = duration;
+    public string YourDps { get; } = yourDps;
+    public bool HasDayHeader => DayHeader is not null;
 
-public sealed record BossRow(string Name, string Detail, bool Killed);
+    [ObservableProperty] private bool isSelected;
+}
 
-public sealed record AnalysisRow(string Name, string Value, double BarPercent);
+/// <summary>Skill in der Kampfanalyse: Spalten statt eines zusammengeklebten Textes.</summary>
+public sealed record SkillLine(string Name, string Damage, string Share, string Hits, string Crit, double BarPercent);
 
-/// <summary>Reiter „Läufe“: Archiv, Details, Kampfanalyse, Teilen.</summary>
+/// <summary>Buff in der Kampfanalyse: Anteil der Kampfzeit und wie oft.</summary>
+public sealed record BuffLine(string Name, string Uptime, string Count, double BarPercent);
+
+/// <summary>Ort „Kämpfe“: alle gespeicherten Läufe, Details, Kampfanalyse je Spieler, Teilen, Löschen mit Rückgängig.</summary>
 public sealed partial class RunsViewModel : ObservableObject
 {
     private const string LiveId = "live";
     private readonly RunArchive archive;
     private readonly RunTracker tracker;
     private readonly TrackingMode mode;
+    private readonly MeterSettings meterSettings;
     private ArchivedRun? current;
+    private ArchivedRun? deleted;
+    private DispatcherTimer? undoTimer;
 
     public ObservableCollection<RunListItem> Runs { get; } = [];
     public ObservableCollection<PlayerRow> Players { get; } = [];
-    public ObservableCollection<BossRow> Bosses { get; } = [];
-    public ObservableCollection<AnalysisRow> Skills { get; } = [];
-    public ObservableCollection<AnalysisRow> Buffs { get; } = [];
+    public ObservableCollection<BossLine> Bosses { get; } = [];
+    public ObservableCollection<SkillLine> Skills { get; } = [];
+    public ObservableCollection<BuffLine> Buffs { get; } = [];
 
     [ObservableProperty] private RunListItem? selectedRun;
     [ObservableProperty] private PlayerRow? selectedPlayer;
     [ObservableProperty] private bool hasRun;
+    [ObservableProperty] private bool hasAnyRun;
+    [ObservableProperty] private bool isLive;
     [ObservableProperty] private string runTitle = "";
+    [ObservableProperty] private string verdict = "";
+    [ObservableProperty] private bool isBestTime;
     [ObservableProperty] private string runSummary = "";
-    [ObservableProperty] private string comparison = "";
     [ObservableProperty] private bool hasPlayer;
     [ObservableProperty] private string playerTitle = "";
     [ObservableProperty] private string playerFacts = "";
     [ObservableProperty] private string notice = "";
+    [ObservableProperty] private bool canUndo;
     [ObservableProperty] private bool hasBuffs;
 
     /// <summary>Die View rendert die Details als Bild (Control nötig) – Anfrage per Event.</summary>
     public event EventHandler? CopyImageRequested;
-
-    private readonly MeterSettings meterSettings;
 
     public RunsViewModel(RunArchive archive, RunTracker tracker, TrackingMode mode, MeterSettings meterSettings)
     {
@@ -61,21 +83,45 @@ public sealed partial class RunsViewModel : ObservableObject
     {
         var keep = SelectedRun?.Id;
         Runs.Clear();
-        if (mode.IsActive) Runs.Add(new RunListItem(LiveId, "● " + Loc.T("runs.live_title"), Loc.T("runs.live_sub"), false, true));
+        if (mode.IsActive) Runs.Add(new RunListItem(LiveId, Loc.T("fights.live"), false, true));
+        string? lastDay = null;
         foreach (var run in archive.All())
         {
             var best = archive.BestOf(run.Name);
             var user = run.Players.FirstOrDefault(p => p.IsUser);
-            var subtitle = $"{run.StartedAt:dd.MM. HH:mm} · {RunArchive.Fmt(run.Duration)} · Gruppe {Format.Compact(run.PartyDps)}/s"
-                           + (user is null ? "" : $" · du {Format.Compact(user.Dps)}/s");
-            Runs.Add(new RunListItem(run.Id, run.Name, subtitle, best?.Id == run.Id && run.BossesKilled > 0, false));
+            var day = RunComparison.Day(run.StartedAt);
+            Runs.Add(new RunListItem(run.Id, run.Name, best?.Id == run.Id && run.BossesKilled > 0, false,
+                day != lastDay ? day : null, run.StartedAt.ToString("HH:mm"), RunComparison.Dur(run.Duration),
+                user is null ? "" : Format.CompactFixed(user.Dps) + "/s"));
+            lastDay = day;
         }
+        HasAnyRun = Runs.Count > 0;
         SelectedRun = Runs.FirstOrDefault(r => r.Id == keep) ?? Runs.FirstOrDefault();
     }
 
-    partial void OnSelectedRunChanged(RunListItem? value) => ShowRun();
+    partial void OnSelectedRunChanged(RunListItem? value)
+    {
+        foreach (var r in Runs) r.IsSelected = ReferenceEquals(r, value);
+        ShowRun();
+    }
 
-    partial void OnSelectedPlayerChanged(PlayerRow? value) => ShowPlayer();
+    [RelayCommand]
+    private void SelectRun(RunListItem? item)
+    {
+        if (item is not null) SelectedRun = item;
+    }
+
+    [RelayCommand]
+    private void SelectPlayer(PlayerRow? row)
+    {
+        if (row is not null) SelectedPlayer = row;
+    }
+
+    partial void OnSelectedPlayerChanged(PlayerRow? value)
+    {
+        foreach (var p in Players) p.IsSelected = ReferenceEquals(p, value);
+        ShowPlayer();
+    }
 
     /// <summary>Jede Sekunde vom Hauptfenster – nur der laufende Lauf ändert sich.</summary>
     public void Tick()
@@ -94,46 +140,24 @@ public sealed partial class RunsViewModel : ObservableObject
         HasRun = current is not null;
         if (current is null) return;
 
-        RunTitle = SelectedRun!.IsLive ? Loc.T("runs.live_title") : current.Name;
-        RunSummary = Loc.T("runs.summary", current.StartedAt.ToString("g", Loc.Culture), RunArchive.Fmt(current.Duration),
-            RunArchive.Fmt(TimeSpan.FromSeconds(current.CombatSeconds)), Format.Compact(current.TotalDamage), Format.Compact(current.PartyDps));
+        IsLive = SelectedRun!.IsLive;
+        var cmp = new RunComparison(current, archive.All());
+        RunTitle = IsLive ? Loc.T("fights.live") : current.Name;
+        Verdict = IsLive ? "" : cmp.Verdict;
+        IsBestTime = !IsLive && cmp.IsBestTime;
+        var combat = RunComparison.Dur(TimeSpan.FromSeconds(current.CombatSeconds));
+        RunSummary = string.Join(" ", new[]
+        {
+            IsLive ? "" : Loc.T("now.run_line", RunComparison.When(current.StartedAt + current.Duration)),
+            Loc.T("fights.summary", RunComparison.Dur(current.Duration), combat, Format.CompactFixed(current.TotalDamage), Format.CompactFixed(current.PartyDps) + "/s"),
+            cmp.BossText,
+        }.Where(s => s.Length > 0));
 
-        var best = archive.BestOf(current.Name);
-        var user = current.Players.FirstOrDefault(p => p.IsUser);
-        var avg = archive.AverageUserDps(current.Name, current.Id);
-        var parts = new List<string>();
-        if (best is not null && current.BossesKilled > 0)
-            parts.Add(best.Id == current.Id ? Loc.T("runs.best_new") : Loc.T("runs.best", RunArchive.Fmt(best.Duration), best.StartedAt.ToString("d", Loc.Culture)));
-        if (user is not null && avg is double a && a > 0)
-            parts.Add(Loc.T("runs.your_dps", Format.Compact(user.Dps), (user.Dps >= a ? "+" : "") + ((user.Dps / a - 1) * 100).ToString("0", Loc.Culture), Format.Compact(a)));
-        Comparison = string.Join(" · ", parts);
-
-        long top = current.Players.Count > 0 ? current.Players.Max(p => p.Damage) : 0;
         var selectedId = SelectedPlayer?.PlayerId;
         Players.Clear();
-        foreach (var p in current.Players)
-        {
-            Players.Add(new PlayerRow(p.PlayerId)
-            {
-                Name = p.Name.StartsWith("Player_", StringComparison.Ordinal) ? Loc.T("player.unknown", p.PlayerId) : p.Name,
-                ClassName = GameText.ClassName(p.ClassId, ""),
-                ClassBrush = ClassVisuals.Brush(p.ClassId),
-                ClassIcon = ClassVisuals.Icon(p.ClassId),
-                Dps = Format.Compact(p.Dps) + "/s",
-                Total = Format.Compact(p.Damage),
-                Share = Format.Percent(p.Share),
-                BarPercent = top > 0 ? p.Damage * 100.0 / top : 0,
-                IsUser = p.IsUser,
-            });
-        }
-
+        foreach (var row in PlayerRows.From(current)) Players.Add(row);
         Bosses.Clear();
-        foreach (var b in current.Bosses.Where(b => b.IsSignificant(current.TotalDamage)))
-            Bosses.Add(new BossRow(b.Name,
-                Loc.T("runs.boss_detail", RunArchive.Fmt(b.StartOffset), RunArchive.Fmt(b.Duration), Format.Compact(b.Damage))
-                    + (b.Attempts > 1 ? " · " + Loc.T("runs.attempts", b.Attempts) : "")
-                    + (b.Coverage is double c ? " · " + Loc.T("runs.coverage", Math.Min(100, c).ToString("0", Loc.Culture)) : ""),
-                b.Killed));
+        foreach (var b in RunComparison.BossLines(current)) Bosses.Add(b);
 
         SelectedPlayer = Players.FirstOrDefault(p => p.PlayerId == selectedId)
                          ?? Players.FirstOrDefault(p => p.IsUser) ?? Players.FirstOrDefault();
@@ -148,22 +172,22 @@ public sealed partial class RunsViewModel : ObservableObject
         Buffs.Clear();
         if (p is null) return;
 
-        PlayerTitle = Loc.T("runs.analysis_title", SelectedPlayer!.Name);
+        PlayerTitle = SelectedPlayer!.Name;
         var facts = new List<string>
         {
             Loc.T("runs.active", p.ActivityPercent.ToString("0", Loc.Culture)),
             p.Deaths == 0 ? Loc.T("runs.no_deaths") : Loc.T("runs.deaths", p.Deaths),
             Loc.T("runs.hits", p.Skills.Sum(s => s.Hits)),
-            p.DamageTaken > 0 ? Loc.T("runs.taken", Format.Compact(p.DamageTaken)) : "",
+            p.DamageTaken > 0 ? Loc.T("runs.taken", Format.CompactFixed(p.DamageTaken)) : "",
         };
-        PlayerFacts = string.Join(" · ", facts.Where(f => f.Length > 0));
+        PlayerFacts = string.Join(Loc.T("now.verdict_join"), facts.Where(f => f.Length > 0));
 
         long top = p.Skills.Count > 0 ? p.Skills.Max(s => s.Damage) : 0;
         foreach (var s in p.Skills)
-            Skills.Add(new AnalysisRow(s.Name, Loc.T("runs.skill_line", Format.Compact(s.Damage), Format.Percent(s.Share), s.Hits, s.CritRate.ToString("0", Loc.Culture)),
-                top > 0 ? s.Damage * 100.0 / top : 0));
+            Skills.Add(new SkillLine(s.Name, Format.CompactFixed(s.Damage), Format.Percent(s.Share), s.Hits + "×",
+                s.CritRate.ToString("0", Loc.Culture) + " %", top > 0 ? s.Damage * 100.0 / top : 0));
         foreach (var b in p.Buffs)
-            Buffs.Add(new AnalysisRow(b.Name, Loc.T("runs.buff_line", b.UptimePercent.ToString("0", Loc.Culture), b.Applications), b.UptimePercent));
+            Buffs.Add(new BuffLine(b.Name, b.UptimePercent.ToString("0", Loc.Culture) + " %", b.Applications + "×", b.UptimePercent));
         HasBuffs = Buffs.Count > 0;
     }
 
@@ -176,7 +200,7 @@ public sealed partial class RunsViewModel : ObservableObject
             ? d.MainWindow?.Clipboard : null;
         if (clipboard is null) return;
         await clipboard.SetTextAsync(text);
-        Notice = Loc.T("runs.copied_text");
+        ShowNotice(Loc.T("runs.copied_text"));
     }
 
     [RelayCommand]
@@ -200,18 +224,46 @@ public sealed partial class RunsViewModel : ObservableObject
         var ok = await AetherDPS.Engine.Community.DiscordWebhook.SendAsync(meterSettings.DiscordWebhook!,
             RunArchive.ToDiscordText(current, GameText.ClassName), png);
         IsPosting = false;
-        Notice = Loc.T(ok ? "runs.discord_sent" : "runs.discord_failed");
+        ShowNotice(Loc.T(ok ? "runs.discord_sent" : "runs.discord_failed"));
     }
 
     public void RefreshWebhook() => OnPropertyChanged(nameof(HasWebhook));
 
-    public void ReportImageCopied(bool ok) =>
-        Notice = ok ? Loc.T("runs.copied_image") : Loc.T("runs.copy_failed");
+    public void ReportImageCopied(bool ok) => ShowNotice(ok ? Loc.T("runs.copied_image") : Loc.T("runs.copy_failed"));
 
+    /// <summary>Löscht sofort; „Rückgängig“ holt den Lauf ein paar Sekunden lang zurück (statt einer Nachfrage).</summary>
     [RelayCommand]
     private void DeleteRun()
     {
         if (current is null || SelectedRun?.IsLive != false) return;
+        deleted = current;
         archive.Delete(current.Id);
+        ShowNotice(Loc.T("fights.deleted", deleted.Name), undo: true);
+    }
+
+    [RelayCommand]
+    private void Undo()
+    {
+        if (deleted is null) return;
+        var run = deleted;
+        deleted = null;
+        archive.Restore(run);
+        SelectedRun = Runs.FirstOrDefault(r => r.Id == run.Id) ?? SelectedRun;
+        ShowNotice(Loc.T("fights.restored"));
+    }
+
+    private void ShowNotice(string text, bool undo = false)
+    {
+        Notice = text;
+        CanUndo = undo;
+        undoTimer?.Stop();
+        undoTimer = new DispatcherTimer(TimeSpan.FromSeconds(undo ? 8 : 5), DispatcherPriority.Background, (_, _) =>
+        {
+            undoTimer?.Stop();
+            Notice = "";
+            CanUndo = false;
+            deleted = null;
+        });
+        undoTimer.Start();
     }
 }

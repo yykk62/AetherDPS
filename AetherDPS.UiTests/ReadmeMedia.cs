@@ -124,6 +124,14 @@ public sealed class ReadmeMedia : IDisposable
         return provider;
     }
 
+    /// <summary>Hauptfenster am Ort, der zur alten Reiter-Nummer gehört.</summary>
+    private ShellWindow Main(int tab, double height)
+    {
+        var shell = Get<ShellViewModel>();
+        shell.Show(tab);
+        return new ShellWindow(shell) { Height = height };
+    }
+
     private EntityTracker Entities => provider!.GetRequiredService<EntityTracker>();
     private T Get<T>() where T : notnull => provider!.GetRequiredService<T>();
 
@@ -206,8 +214,7 @@ public sealed class ReadmeMedia : IDisposable
     private void Runs()
     {
         var hub = Get<HubViewModel>();
-        var window = new HubWindow(hub) { Height = 900 };
-        hub.SelectedTab = HubViewModel.TabRuns;
+        var window = Main(HubViewModel.TabRuns, 900);
         hub.Refresh();
         Settle(0.5);
         if (hub.Runs.Runs.FirstOrDefault(r => r.IsBest) is { } best) hub.Runs.SelectedRun = best;
@@ -234,16 +241,14 @@ public sealed class ReadmeMedia : IDisposable
                      (HubViewModel.TabSettings, "hub_settings", 900), (HubViewModel.TabParty, "hub_party", 660),
                  })
         {
-            var window = new HubWindow(hub) { Height = height };
-            hub.SelectedTab = tab;
+            var window = Main(tab, height);
             hub.Refresh();
             Settle(1);
             Snap(window, name);
         }
 
         // Profil: echt (bei FROM) inklusive Bilder
-        var profileWindow = new HubWindow(hub) { Height = 2900 };
-        hub.SelectedTab = HubViewModel.TabProfile;
+        var profileWindow = Main(HubViewModel.TabProfile, 2900);
         hub.Refresh();
         profileWindow.Show();
         var profile = hub.Profile;
@@ -276,9 +281,8 @@ public sealed class ReadmeMedia : IDisposable
         Settle(1);
 
         var hub = Get<HubViewModel>();
-        hub.SelectedTab = HubViewModel.TabPets;
+        var window = Main(HubViewModel.TabPets, 760);
         hub.Refresh();
-        var window = new HubWindow(hub) { Height = 760 };
         window.Show();
         Settle(1);
         var vm = hub.Pets;
@@ -354,9 +358,8 @@ public sealed class ReadmeMedia : IDisposable
         Settle(1);
 
         var hub = Get<HubViewModel>();
-        hub.SelectedTab = HubViewModel.TabTimers;
+        var window = Main(HubViewModel.TabTimers, 1250);
         hub.Refresh();
-        var window = new HubWindow(hub) { Height = 1250 };
         Settle(1);
         Snap(window, "hub_timers");
 

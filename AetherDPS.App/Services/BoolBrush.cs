@@ -6,42 +6,44 @@ namespace AetherDPS.App.Services;
 
 public static class BoolBrush
 {
-    private static readonly IBrush Green = new SolidColorBrush(Color.Parse("#4CC36A"));
-    private static readonly IBrush Amber = new SolidColorBrush(Color.Parse("#E0A84A"));
-    private static readonly IBrush Red = new SolidColorBrush(Color.Parse("#E86A6A"));
-    private static readonly IBrush Text = new SolidColorBrush(Color.Parse("#C9CED6"));
+    // Farben aus den Design-Tokens (Tokens.axaml), keine Hex-Werte im Code
+    private static IBrush Green => TokenBrush.Get("Signal.Good");
+    private static IBrush Amber => TokenBrush.Get("Signal.Warn");
+    private static IBrush Red => TokenBrush.Get("Signal.Bad");
+    private static IBrush Text => TokenBrush.Get("Text.Secondary");
+    private static IBrush Muted => TokenBrush.Get("Text.Muted");
 
     public static readonly IValueConverter ConnectedGreenElseAmber =
         new FuncValueConverter<bool, IBrush>(connected => connected ? Green : Amber);
 
     public static readonly IValueConverter LockedGoldElseSubtle =
-        new FuncValueConverter<bool, IBrush>(locked => locked ? new SolidColorBrush(Color.Parse("#99E0A84A")) : new SolidColorBrush(Color.Parse("#33FFFFFF")));
+        new FuncValueConverter<bool, IBrush>(locked => locked ? TokenBrush.Get("Text.Primary") : TokenBrush.Get("Line.Frame"));
 
     public static readonly IValueConverter DueGreenElseText =
         new FuncValueConverter<bool, IBrush>(due => due ? Green : Text);
 
     /// <summary>Stagger-Warnung: unter 5 s rot, sonst hell.</summary>
     public static readonly IValueConverter HurryRedElseText =
-        new FuncValueConverter<bool, IBrush>(hurry => hurry ? Red : Brushes.White);
+        new FuncValueConverter<bool, IBrush>(hurry => hurry ? Red : TokenBrush.Get("Text.Primary"));
 
     public static readonly IValueConverter ErrorRedElseText =
         new FuncValueConverter<bool, IBrush>(error => error ? Red : Text);
 
     /// <summary>Statuszeile unter einer Suche: Fehler rötlich, sonst gedämpft.</summary>
     public static readonly IValueConverter ErrorRedElseMuted =
-        new FuncValueConverter<bool, IBrush>(error => error ? Red : new SolidColorBrush(Color.Parse("#8E96A3")));
+        new FuncValueConverter<bool, IBrush>(error => error ? Red : Muted);
 
-    /// <summary>Kachel hinter dem Icon der Kampfkarte: Boss rötlich, normales Ziel goldbraun.</summary>
+    /// <summary>Kachel hinter dem Icon der Kampfkarte: Boss rötlich, normales Ziel ruhig.</summary>
     public static readonly IValueConverter BossRedElseGoldTile =
-        new FuncValueConverter<bool, IBrush>(boss => boss ? new SolidColorBrush(Color.Parse("#3A1F24")) : new SolidColorBrush(Color.Parse("#2A2416")));
+        new FuncValueConverter<bool, IBrush>(boss => boss ? TokenBrush.Get("Surface.Boss") : TokenBrush.Get("Surface.Raised"));
 
     /// <summary>Hinweiskarten im Hauptfenster: Warnung bernsteinfarben getönt, sonst normale Karte.</summary>
     public static readonly IValueConverter WarningElseCard =
-        new FuncValueConverter<bool, IBrush>(warning => new SolidColorBrush(Color.Parse(warning ? "#2A2418" : "#191E28")));
+        new FuncValueConverter<bool, IBrush>(warning => warning ? TokenBrush.Get("Surface.NoticeWarn") : TokenBrush.Get("Surface.Notice"));
 
-    /// <summary>Gewählte Zeile (Pet-Radar): leicht golden hinterlegt.</summary>
+    /// <summary>Gewählte Zeile (Pet-Radar): erhaben hinterlegt.</summary>
     public static readonly IValueConverter SelectedRow =
-        new FuncValueConverter<bool, IBrush>(selected => new SolidColorBrush(Color.Parse(selected ? "#40E0A84A" : "#00000000")));
+        new FuncValueConverter<bool, IBrush>(selected => selected ? TokenBrush.Get("Surface.Raised") : Brushes.Transparent);
 
     /// <summary>Ausgewähltes Item im Profil: farbiger Rahmen.</summary>
     public static readonly IValueConverter SelectedBorder =
@@ -49,19 +51,19 @@ public static class BoolBrush
 
     /// <summary>Großer Status-Kreis auf der Übersicht: Meter läuft grün getönt, sonst goldbraun.</summary>
     public static readonly IValueConverter ActiveGreenElseGoldTile =
-        new FuncValueConverter<bool, IBrush>(active => new SolidColorBrush(Color.Parse(active ? "#1F3A2A" : "#2A2416")));
+        new FuncValueConverter<bool, IBrush>(active => active ? TokenBrush.Get("Surface.Raised") : TokenBrush.Get("Surface.Raised"));
 
     public static readonly IValueConverter WarningBorderElseCard =
-        new FuncValueConverter<bool, IBrush>(warning => new SolidColorBrush(Color.Parse(warning ? "#7A5A22" : "#2E3746")));
+        new FuncValueConverter<bool, IBrush>(warning => warning ? TokenBrush.Get("Signal.Warn") : TokenBrush.Get("Line.Frame"));
 }
 
-/// <summary>Schritt-Kreis: erledigt = grün, aktiv = gold, später = grau.</summary>
+/// <summary>Schritt-Kreis: erledigt = grün, aktiv = hell, später = grau.</summary>
 public sealed class StepBrush : IValueConverter
 {
     public static readonly StepBrush Instance = new();
-    private static readonly IBrush Done = new SolidColorBrush(Color.Parse("#4CC36A"));
-    private static readonly IBrush Active = new SolidColorBrush(Color.Parse("#E0A84A"));
-    private static readonly IBrush Later = new SolidColorBrush(Color.Parse("#4A5160"));
+    private static IBrush Done => TokenBrush.Get("Signal.Good");
+    private static IBrush Active => TokenBrush.Get("Text.Primary");
+    private static IBrush Later => TokenBrush.Get("Line.Frame");
 
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {

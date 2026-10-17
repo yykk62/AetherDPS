@@ -1,3 +1,5 @@
+using AetherDPS.App.Services;
+using AetherDPS.Engine;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
@@ -21,6 +23,28 @@ public sealed partial class PlayerRow(long playerId) : ObservableObject
     [ObservableProperty] private Bitmap? classIcon;
     [ObservableProperty] private long sortKey;
     [ObservableProperty] private string combatPower = "";
+}
+
+/// <summary>Spielerzeilen eines gespeicherten Laufs, nach Schaden sortiert (Balken relativ zum Besten).</summary>
+public static class PlayerRows
+{
+    public static IEnumerable<PlayerRow> From(ArchivedRun run)
+    {
+        var ranked = run.Players.OrderByDescending(p => p.Damage).ToList();
+        long top = ranked.Count > 0 ? ranked[0].Damage : 0;
+        return ranked.Select(p => new PlayerRow(p.PlayerId)
+        {
+            Name = p.Name.StartsWith("Player_", StringComparison.Ordinal) ? Loc.T("player.unknown", p.PlayerId) : p.Name,
+            ClassName = GameText.ClassName(p.ClassId, ""),
+            ClassBrush = ClassVisuals.Brush(p.ClassId),
+            ClassIcon = ClassVisuals.Icon(p.ClassId),
+            Dps = Format.CompactFixed(p.Dps) + "/s",
+            Total = Format.CompactFixed(p.Damage),
+            Share = Format.Percent(p.Share),
+            BarPercent = top > 0 ? p.Damage * 100.0 / top : 0,
+            IsUser = p.IsUser,
+        });
+    }
 }
 
 public sealed record SkillRow(string Name, string Damage, string Share, int Hits, string Crit, double BarPercent);

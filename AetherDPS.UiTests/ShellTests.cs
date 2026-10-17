@@ -36,6 +36,9 @@ public sealed class ShellTests : IDisposable
         (204, "Kaelthar", false, 11, 0.86),
     ];
 
+    private static readonly string[] Skills = ["Zielpfeil", "Scharfschuss", "Schnellfeuer", "Spiralpfeil", "Greifenpfeil", "Sprengpfeil"];
+    private static readonly double[] Weights = [0.37, 0.21, 0.15, 0.11, 0.09, 0.07];
+
     private ServiceProvider Start(bool withRuns)
     {
         Loc.Load("de");
@@ -81,6 +84,30 @@ public sealed class ShellTests : IDisposable
     }
 
     [AvaloniaFact]
+    public void Kaempfe_mit_Laeufen()
+    {
+        Start(withRuns: true);
+        var shell = provider!.GetRequiredService<ShellViewModel>();
+        shell.Show(HubViewModel.TabRuns);
+        var runs = shell.Hub.Runs;
+        Assert.Equal(5, runs.Runs.Count);
+        Assert.True(runs.Runs[0].IsSelected);
+        Assert.Equal(4, runs.Players.Count);
+        Assert.True(runs.HasPlayer);
+        Snap(new ShellWindow(shell) { Height = 1060 }, "shell_kaempfe");
+
+        // Löschen mit Rückgängig
+        var id = runs.SelectedRun!.Id;
+        runs.DeleteRunCommand.Execute(null);
+        Dispatcher.UIThread.RunJobs();
+        Assert.DoesNotContain(runs.Runs, r => r.Id == id);
+        Assert.True(runs.CanUndo);
+        runs.UndoCommand.Execute(null);
+        Dispatcher.UIThread.RunJobs();
+        Assert.Contains(runs.Runs, r => r.Id == id);
+    }
+
+    [AvaloniaFact]
     public void Jetzt_ohne_Lauf()
     {
         Start(withRuns: false);
@@ -107,8 +134,13 @@ public sealed class ShellTests : IDisposable
             var start = DateTime.Now.AddDays(-daysAgo).AddMinutes(-20 - minutes);
             var dps = Crew.Select(c => userDps * c.Power * (c.User ? 1 : 0.92 + rng.NextDouble() * 0.16)).ToList();
             double total = dps.Sum();
-            var players = Crew.Select((c, i) => new ArchivedPlayer(c.Id, c.Name, c.User, c.Class, (long)(dps[i] * combat), dps[i],
-                dps[i] / total * 100, 0, 92, [], [], 0)).ToList();
+            var players = Crew.Select((c, i) =>
+            {
+                long damage = (long)(dps[i] * combat);
+                var skills = Skills.Select((n, j) => new RunSkill(n, (long)(damage * Weights[j]), Weights[j] * 100, 60 + rng.Next(140), 24 + rng.NextDouble() * 16)).ToList();
+                List<RunBuff> buffs = c.User ? [new("Segen der Kraft", 91.3, 12), new("Heiliger Schild", 64.0, 18), new("Wut", 38.5, 9)] : [];
+                return new ArchivedPlayer(c.Id, c.Name, c.User, c.Class, damage, dps[i], dps[i] / total * 100, 0, 92, skills, buffs, (long)(damage * 0.07));
+            }).ToList();
             var bossList = new List<RunBoss>();
             double t = 75;
             foreach (var b in bosses)

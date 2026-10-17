@@ -12,15 +12,26 @@
         FontFamily="{DynamicResource Font.Ui}"
         Background="{DynamicResource Surface.Frame}" Icon="/Assets/icon.ico">
 
-  <!-- Aufbau (docs/DESIGN.md): Leiste oben mit vier Orten, Status und Meter-Schalter;
-       darunter der Ort. Daten liegen in Mulden, Kontext liegt direkt auf dem Rahmen. -->
+  <!-- Aufbau (docs/DESIGN.md): Leiste oben mit vier Orten, Status und Meter-Schalter; darunter
+       Hinweise als Zeilen, dann der Ort. Verbindung klappt unter dem Statusfeld auf, Einstellungen
+       kommen als Blatt von rechts über den Ort. -->
   <Window.Styles>
     <Style Selector="TextBlock.warn">
       <Setter Property="Foreground" Value="{DynamicResource Signal.Warn}" />
     </Style>
   </Window.Styles>
 
+  <Window.KeyBindings>
+    <KeyBinding Gesture="Ctrl+D1" Command="{Binding GoCommand}" CommandParameter="0" />
+    <KeyBinding Gesture="Ctrl+D2" Command="{Binding GoCommand}" CommandParameter="1" />
+    <KeyBinding Gesture="Ctrl+D3" Command="{Binding GoCommand}" CommandParameter="2" />
+    <KeyBinding Gesture="Ctrl+D4" Command="{Binding GoCommand}" CommandParameter="3" />
+    <KeyBinding Gesture="Ctrl+OemComma" Command="{Binding ToggleSettingsCommand}" />
+    <KeyBinding Gesture="Escape" Command="{Binding CloseSheetsCommand}" />
+  </Window.KeyBindings>
+
   <DockPanel>
+    <!-- ── Leiste ─────────────────────────────────────────────── -->
     <Border DockPanel.Dock="Top" Height="56" Background="{DynamicResource Surface.Bar}"
             BorderBrush="{DynamicResource Line.Frame}" BorderThickness="0,0,0,1">
       <Grid ColumnDefinitions="Auto,*,Auto" Margin="20,0,16,0">
@@ -30,35 +41,35 @@
         </StackPanel>
 
         <StackPanel Grid.Column="1" Orientation="Horizontal">
-          <Button Classes="place" Classes.current="{Binding IsNow}" Command="{Binding GoCommand}" CommandParameter="0" Content="{l:T shell.place.now}" />
-          <Button Classes="place" Classes.current="{Binding IsFights}" Command="{Binding GoCommand}" CommandParameter="1" Content="{l:T shell.place.fights}" />
-          <Button Classes="place" Classes.current="{Binding IsWorld}" Command="{Binding GoCommand}" CommandParameter="2" Content="{l:T shell.place.world}" />
-          <Button Classes="place" Classes.current="{Binding IsDaevas}" Command="{Binding GoCommand}" CommandParameter="3" Content="{l:T shell.place.daevas}" />
+          <Button Classes="place" Classes.current="{Binding IsNow}" Command="{Binding GoCommand}" CommandParameter="0" Content="{l:T shell.place.now}" ToolTip.Tip="STRG+1" />
+          <Button Classes="place" Classes.current="{Binding IsFights}" Command="{Binding GoCommand}" CommandParameter="1" Content="{l:T shell.place.fights}" ToolTip.Tip="STRG+2" />
+          <Button Classes="place" Classes.current="{Binding IsWorld}" Command="{Binding GoCommand}" CommandParameter="2" Content="{l:T shell.place.world}" ToolTip.Tip="STRG+3" />
+          <Button Classes="place" Classes.current="{Binding IsDaevas}" Command="{Binding GoCommand}" CommandParameter="3" Content="{l:T shell.place.daevas}" ToolTip.Tip="STRG+4" />
         </StackPanel>
 
         <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
-          <!-- Verbindung ist ein Zustand, kein Ort: Klick klappt später die Messwerte auf.
-               Icon + Wort; ist etwas nicht in Ordnung, wird das Wort warnfarben. -->
-          <Button Classes="icon" Padding="10,6" ToolTip.Tip="{l:T shell.status.tip}">
-            <StackPanel Orientation="Horizontal" Spacing="16">
-              <StackPanel Orientation="Horizontal" Spacing="6">
-                <Image Source="{l:Icon link, Size=16}" Width="16" Height="16" VerticalAlignment="Center" />
-                <TextBlock Classes="small secondary" Classes.warn="{Binding !Overlay.IsConnected}" Text="{Binding ConnectionStatus}"
-                           VerticalAlignment="Center" MaxWidth="160" TextTrimming="CharacterEllipsis" />
-              </StackPanel>
-              <StackPanel Orientation="Horizontal" Spacing="6">
-                <Image Source="{l:Icon monitor, Size=16}" Width="16" Height="16" VerticalAlignment="Center" />
-                <TextBlock Classes="small secondary" Classes.warn="{Binding !GameRunning}" Text="{Binding GameStatus}" VerticalAlignment="Center" />
-              </StackPanel>
+          <!-- Verbindung: Zustand, Klick klappt Messwerte und Prüfung auf -->
+          <Button Classes="icon" Classes.open="{Binding ConnectionOpen}" Padding="10,6" Command="{Binding ToggleConnectionCommand}" ToolTip.Tip="{l:T shell.status.tip}">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <Image Source="{l:Icon link, Size=16}" Width="16" Height="16" VerticalAlignment="Center" />
+              <TextBlock Classes="small secondary" Classes.warn="{Binding !Overlay.IsConnected}" Text="{Binding ConnectionStatus}"
+                         VerticalAlignment="Center" MaxWidth="170" TextTrimming="CharacterEllipsis" />
             </StackPanel>
           </Button>
-          <Button Classes="icon" ToolTip.Tip="{l:T hub.tab.settings}">
+          <!-- Spiel: läuft es nicht, startet ein Klick AION 2 -->
+          <Button Classes="icon" Padding="10,6" Command="{Binding StartGameCommand}" ToolTip.Tip="{l:T hub.launch_hint}">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <Image Source="{l:Icon monitor, Size=16}" Width="16" Height="16" VerticalAlignment="Center" />
+              <TextBlock Classes="small secondary" Classes.warn="{Binding !GameRunning}" Text="{Binding GameStatus}" VerticalAlignment="Center" />
+            </StackPanel>
+          </Button>
+          <Button Classes="icon" Classes.open="{Binding SettingsOpen}" Command="{Binding ToggleSettingsCommand}" ToolTip.Tip="{l:T shell.settings_tip}">
             <Image Source="{l:Icon gear, Size=20}" Width="20" Height="20" />
           </Button>
 
           <!-- Meter: ein Schalter, der seinen Zustand zeigt („Meter starten“ bzw. „● Zeichnet auf | Stoppen“) -->
           <Border Width="1" Height="24" Background="{DynamicResource Line.Frame}" Margin="8,0,10,0" />
-          <Button Classes="quiet" Command="{Binding Now.ToggleMeterCommand}">
+          <Button Classes="quiet" Command="{Binding Now.ToggleMeterCommand}" IsVisible="{Binding !Hub.IsAuto}">
             <StackPanel Orientation="Horizontal" Spacing="10">
               <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding Now.IsActive}">
                 <Ellipse Width="9" Height="9" VerticalAlignment="Center" Fill="{DynamicResource Signal.Bad}" />
@@ -71,13 +82,167 @@
               </Border>
             </StackPanel>
           </Button>
+          <!-- Automatisch: kein Schalter, nur der Zustand -->
+          <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding Hub.IsAuto}" Margin="0,0,6,0" ToolTip.Tip="{Binding Hub.ModeText}">
+            <Ellipse Width="9" Height="9" VerticalAlignment="Center" Fill="{DynamicResource Signal.Bad}" IsVisible="{Binding Now.IsActive}" />
+            <TextBlock Text="{Binding Hub.ModeTitle}" FontWeight="Medium" VerticalAlignment="Center" />
+          </StackPanel>
         </StackPanel>
       </Grid>
     </Border>
 
+    <!-- ── Hinweise: eine Zeile je Hinweis, aufklappbar ──────── -->
+    <StackPanel DockPanel.Dock="Top">
+      <Border Classes="noticebar" IsVisible="{Binding Hub.UpdateBanner, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+        <Grid ColumnDefinitions="Auto,*,Auto">
+          <Image Source="{l:Icon download, Size=16}" Width="16" Height="16" VerticalAlignment="Center" />
+          <TextBlock Grid.Column="1" Text="{Binding Hub.UpdateBanner}" Margin="10,0" VerticalAlignment="Center" />
+          <Button Grid.Column="2" Classes="cta" MinHeight="28" Padding="12,4" Content="{l:T update.restart}" Command="{Binding Hub.RestartForUpdateCommand}" />
+        </Grid>
+      </Border>
+      <ItemsControl ItemsSource="{Binding Hub.Notices}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:HubNotice">
+            <Border Classes="noticebar" Classes.warning="{Binding IsWarning}">
+              <StackPanel Spacing="6">
+                <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                  <Image Source="{Binding Icon, Converter={x:Static l:Icons.ByName}}" Width="16" Height="16" VerticalAlignment="Center" />
+                  <Button Grid.Column="1" Classes="icon" Command="{Binding ToggleCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="10,2">
+                    <TextBlock Text="{Binding Title}" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+                  </Button>
+                  <Button Grid.Column="2" Classes="icon" Padding="6" Command="{Binding ToggleCommand}" ToolTip.Tip="{Binding IsExpanded, Converter={x:Static vm:NoticeConv.CollapseElseExpandTip}}">
+                    <Image Source="{Binding IsExpanded, Converter={x:Static vm:NoticeConv.ChevronUpElseDown}}" Width="12" Height="12" />
+                  </Button>
+                  <Button Grid.Column="3" Classes="icon" Padding="6" Command="{Binding Close}" IsVisible="{Binding CanClose}" ToolTip.Tip="{l:T notice.close}">
+                    <Image Source="{l:Icon close, Size=12}" Width="12" Height="12" />
+                  </Button>
+                </Grid>
+                <StackPanel Spacing="10" Margin="26,0,6,6" IsVisible="{Binding IsExpanded}" MaxWidth="760" HorizontalAlignment="Left">
+                  <TextBlock Classes="secondary" Text="{Binding Text}" TextWrapping="Wrap" />
+                  <Border IsVisible="{Binding HasDetail}" Background="{DynamicResource Surface.WellDeep}" CornerRadius="{DynamicResource Radius.Control}" Padding="10,6">
+                    <SelectableTextBlock Text="{Binding Detail}" FontFamily="Consolas,monospace" FontSize="12" Foreground="{DynamicResource Text.Secondary}" TextWrapping="Wrap" />
+                  </Border>
+                  <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding HasPrimary}">
+                    <Button Classes="cta" Content="{Binding PrimaryText}" Command="{Binding Primary}" IsVisible="{Binding HasPrimary}" />
+                    <Button Classes="quiet" Content="{Binding SecondaryText}" Command="{Binding Secondary}" IsVisible="{Binding HasSecondary}" />
+                  </StackPanel>
+                </StackPanel>
+              </StackPanel>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+
+    <!-- ── Orte ───────────────────────────────────────────────── -->
     <Panel>
       <Panel IsVisible="{Binding IsNow}">
         <views:NowView DataContext="{Binding Now}" />
+      </Panel>
+      <Panel IsVisible="{Binding IsFights}">
+        <views:FightsView DataContext="{Binding Hub.Runs}" />
+      </Panel>
+
+      <!-- Welt: Timer, Checkliste, Pets -->
+      <DockPanel IsVisible="{Binding IsWorld}">
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="4" Margin="20,14,20,0">
+          <Button Classes="section" Classes.current="{Binding IsTimers}" Command="{Binding GoWorldCommand}" CommandParameter="0">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Image Source="{l:Icon hourglass, Size=18}" Width="18" Height="18" />
+              <TextBlock Text="{l:T hub.tab.timers}" VerticalAlignment="Center" />
+            </StackPanel>
+          </Button>
+          <Button Classes="section" Classes.current="{Binding IsChecklist}" Command="{Binding GoWorldCommand}" CommandParameter="1">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Image Source="{l:Icon checklist, Size=18}" Width="18" Height="18" />
+              <TextBlock Text="{l:T hub.tab.checklist}" VerticalAlignment="Center" />
+            </StackPanel>
+          </Button>
+          <Button Classes="section" Classes.current="{Binding IsPets}" Command="{Binding GoWorldCommand}" CommandParameter="2">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Image Source="{l:Icon paw, Size=18}" Width="18" Height="18" />
+              <TextBlock Text="{l:T hub.tab.pets}" VerticalAlignment="Center" />
+            </StackPanel>
+          </Button>
+        </StackPanel>
+        <Panel Margin="0,8,0,0">
+          <views:TimersView DataContext="{Binding Hub.Timers}" IsVisible="{Binding $parent[Window].((vm:ShellViewModel)DataContext).IsTimers}" />
+          <views:ChecklistView DataContext="{Binding Hub.Checklist}" IsVisible="{Binding $parent[Window].((vm:ShellViewModel)DataContext).IsChecklist}" />
+          <views:PetsView DataContext="{Binding Hub.Pets}" IsVisible="{Binding $parent[Window].((vm:ShellViewModel)DataContext).IsPets}" />
+        </Panel>
+      </DockPanel>
+
+      <!-- Daevas: du (bzw. gesuchter Charakter), aktuelle Gruppe -->
+      <DockPanel IsVisible="{Binding IsDaevas}">
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="4" Margin="20,14,20,0">
+          <Button Classes="section" Classes.current="{Binding IsMe}" Command="{Binding GoDaevasCommand}" CommandParameter="0">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Image Source="{l:Icon helmet, Size=18}" Width="18" Height="18" />
+              <TextBlock Text="{l:T hub.tab.profile}" VerticalAlignment="Center" />
+            </StackPanel>
+          </Button>
+          <Button Classes="section" Classes.current="{Binding IsParty}" Command="{Binding GoDaevasCommand}" CommandParameter="1">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Image Source="{l:Icon group, Size=18}" Width="18" Height="18" />
+              <TextBlock Text="{l:T hub.tab.party}" VerticalAlignment="Center" />
+            </StackPanel>
+          </Button>
+        </StackPanel>
+        <Panel Margin="0,8,0,0">
+          <views:ProfileView DataContext="{Binding Hub.Profile}" IsVisible="{Binding $parent[Window].((vm:ShellViewModel)DataContext).IsMe}" />
+          <views:PartyView DataContext="{Binding Hub.Party}" IsVisible="{Binding $parent[Window].((vm:ShellViewModel)DataContext).IsParty}" />
+        </Panel>
+      </DockPanel>
+
+      <!-- ── Verbindung: klappt unter dem Statusfeld auf ──────── -->
+      <Panel IsVisible="{Binding ConnectionOpen}">
+        <Button Classes="scrim" Command="{Binding CloseSheetsCommand}" />
+        <Border Classes="sheet" Width="560" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,200,0">
+          <views:ConnectionPanel DataContext="{Binding Hub}" />
+        </Border>
+      </Panel>
+
+      <!-- ── Einstellungen: Blatt von rechts ──────────────────── -->
+      <Panel IsVisible="{Binding SettingsOpen}">
+        <Button Classes="scrim" Command="{Binding CloseSheetsCommand}" />
+        <Border Classes="sheet side" Width="600" HorizontalAlignment="Right">
+          <DockPanel>
+            <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="24,18,16,8">
+              <TextBlock Classes="title" Text="{l:T hub.tab.settings}" VerticalAlignment="Center" />
+              <Button Grid.Column="1" Classes="icon" Command="{Binding CloseSheetsCommand}" ToolTip.Tip="{l:T notice.close}">
+                <Image Source="{l:Icon close, Size=14}" Width="14" Height="14" />
+              </Button>
+            </Grid>
+            <!-- Fuß: Hilfe und Datenordner -->
+            <Border DockPanel.Dock="Bottom" BorderBrush="{DynamicResource Line.Frame}" BorderThickness="0,1,0,0" Padding="16,10">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <Button Classes="icon" Padding="10,6" Command="{Binding Hub.ReportProblemCommand}">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Image Source="{l:Icon bug, Size=16}" Width="16" Height="16" />
+                    <TextBlock Classes="small secondary" Text="{l:T hub.report}" VerticalAlignment="Center" />
+                  </StackPanel>
+                </Button>
+                <Button Classes="icon" Padding="10,6" Command="{Binding Hub.OpenDataFolderCommand}">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Image Source="{l:Icon folder, Size=16}" Width="16" Height="16" />
+                    <TextBlock Classes="small secondary" Text="{l:T hub.folder}" VerticalAlignment="Center" />
+                  </StackPanel>
+                </Button>
+                <Button Classes="icon" Padding="10,6" Command="{Binding Hub.OpenDiscordCommand}"
+                        IsVisible="{Binding Hub.DiscordUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Image Source="{l:Icon chat, Size=16}" Width="16" Height="16" />
+                    <TextBlock Classes="small secondary" Text="{l:T hub.discord}" VerticalAlignment="Center" />
+                  </StackPanel>
+                </Button>
+                <TextBlock Classes="small muted" Text="{Binding Hub.VersionText}" VerticalAlignment="Center" Margin="10,0,0,0" />
+              </StackPanel>
+            </Border>
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+              <views:SettingsView DataContext="{Binding Hub.Settings}" Margin="24,0,24,24" />
+            </ScrollViewer>
+          </DockPanel>
+        </Border>
       </Panel>
     </Panel>
   </DockPanel>

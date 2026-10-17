@@ -31,10 +31,10 @@ public sealed class PingGraph : Control
     /// <summary>Angezeigtes Zeitfenster.</summary>
     public TimeSpan Window { get; set; } = TimeSpan.FromMinutes(5);
 
-    private static readonly IPen GridPen = new Pen(new SolidColorBrush(Color.Parse("#22FFFFFF")), 1);
-    private static readonly IPen LinePen = new Pen(new SolidColorBrush(Color.Parse("#E0A84A")), 1.6);
-    private static readonly IBrush SpikeBrush = new SolidColorBrush(Color.Parse("#E86A6A"));
-    private static readonly IBrush LabelBrush = new SolidColorBrush(Color.Parse("#8E96A3"));
+    private static IPen GridPen => new Pen(Services.TokenBrush.Get("Line.Well"), 1);
+    private static IPen LinePen => new Pen(Services.TokenBrush.Get("Text.Primary"), 1.6);
+    private static IBrush SpikeBrush => Services.TokenBrush.Get("Signal.Bad");
+    private static IBrush LabelBrush => Services.TokenBrush.Get("Text.Muted");
     private static readonly Typeface Font = new("Inter");
 
     public override void Render(DrawingContext context)

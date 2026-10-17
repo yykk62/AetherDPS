@@ -160,7 +160,7 @@ public static class AppServices
         services.AddSingleton<TimersViewModel>();
         services.AddSingleton<ChecklistViewModel>();
         services.AddSingleton<TimerOverlayViewModel>();
-        services.AddSingleton<HubWindow>();
+        services.AddSingleton<ShellWindow>();
         services.AddSingleton<NowViewModel>();
         services.AddSingleton<ShellViewModel>();
         services.AddSingleton<StaggerWarningViewModel>();

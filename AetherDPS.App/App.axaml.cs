@@ -79,7 +79,7 @@ public partial class App : Application
             viewModel.SetupRequested += (_, _) => ShowSetup();
             viewModel.SettingsRequested += (_, _) => ShowHub(HubTabSettings);
             window = Services.GetRequiredService<MainWindow>();
-            hub = Services.GetRequiredService<HubWindow>();
+            hub = Services.GetRequiredService<ShellWindow>();
 
             // Charakter aus der letzten Sitzung (gilt, solange das Spiel nicht neu gestartet wurde)
             var restored = Services.GetRequiredService<SelfIdentity>().Restore(GameLauncher.StartedAt());
@@ -234,7 +234,7 @@ public partial class App : Application
     private const int HubTabDps = HubViewModel.TabDps, HubTabSettings = HubViewModel.TabSettings;
     private TrackingMode? mode;
     private GameHotkey? hotkey;
-    private HubWindow? hub;
+    private ShellWindow? hub;
 
     private void ShowHub(int tab)
     {

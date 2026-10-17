@@ -15,7 +15,7 @@ public static class PetColors
     };
 
     /// <summary>Unterschiedliche Farben, wenn nur eine Gattung gezeigt wird.</summary>
-    public static readonly IBrush[] Palette = new[] { "#E0A84A", "#3FD0B0", "#E86AB0", "#8BD65A", "#7FA6F5" }.Select(Brush).ToArray();
+    public static readonly IBrush[] Palette = new[] { "#3FD0B0", "#E86AB0", "#8BD65A", "#7FA6F5", "#F07C4A" }.Select(Brush).ToArray();
 
     public static IBrush ForSpecies(string species) => Species.GetValueOrDefault(species) ?? Palette[0];
 

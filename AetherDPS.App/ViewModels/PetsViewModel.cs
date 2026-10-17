@@ -45,10 +45,10 @@ public sealed record PetMonsterRow(string Name, string Count, int Number = 0);
 /// </summary>
 public sealed partial class PetsViewModel : ObservableObject
 {
-    private static readonly IBrush Missing = new SolidColorBrush(Color.Parse("#E86A6A"));
-    private static readonly IBrush Partial = new SolidColorBrush(Color.Parse("#E0A84A"));
-    private static readonly IBrush Max = new SolidColorBrush(Color.Parse("#4CC36A"));
-    private static readonly IBrush Unknown = new SolidColorBrush(Color.Parse("#8E96A3"));
+    private static IBrush Missing => Services.TokenBrush.Get("Signal.Bad");
+    private static IBrush Partial => Services.TokenBrush.Get("Text.Primary");
+    private static IBrush Max => Services.TokenBrush.Get("Signal.Good");
+    private static IBrush Unknown => Services.TokenBrush.Get("Text.Muted");
 
     private readonly Pets pets;
     private readonly MeterSettings settings;
@@ -84,6 +84,12 @@ public sealed partial class PetsViewModel : ObservableObject
     [ObservableProperty] private IBrush dotBrush = Services.PetColors.Palette[0];
     [ObservableProperty] private string detailLevel = "";
     [ObservableProperty] private string detailRegions = "";
+    [ObservableProperty] private string detailName = "";
+    [ObservableProperty] private string detailSpecies = "";
+    [ObservableProperty] private string detailReading = "";
+    [ObservableProperty] private string detailCaption = "";
+    [ObservableProperty] private double detailPercent;
+    [ObservableProperty] private bool hasDetail;
     [ObservableProperty] private string positionText = "";
 
     public PetsViewModel(Pets pets, MeterSettings settings)
@@ -221,6 +227,7 @@ public sealed partial class PetsViewModel : ObservableObject
             DetailIcon = null;
             DetailLevel = "";
             DetailRegions = "";
+            HasDetail = false;
             return;
         }
         var spawns = pets.Spawns(row.Pet, option.Map);
@@ -229,6 +236,21 @@ public sealed partial class PetsViewModel : ObservableObject
         DetailIcon = row.Icon;
         DotBrush = row.SpeciesBrush;
         DetailLevel = row.LevelText == "?" ? Loc.T("pets.level_unknown") : row.LevelText;
+        HasDetail = true;
+        DetailName = row.Name;
+        DetailSpecies = row.Species;
+        // Fortschritt groß: Seelen bis zur nächsten Stufe (wie im Pet-Fenster), sonst Stufe bzw. „fehlt“
+        int? level = pets.Level(row.Pet.Id);
+        int needed = level is int l ? Pets.Needed(l) : 0;
+        int progress = pets.Progress(row.Pet.Id);
+        (DetailReading, DetailCaption, DetailPercent) = level switch
+        {
+            null => ("?", Loc.T("pets.level_unknown"), 0),
+            0 => ("0", Loc.T("pets.detail_missing"), 0),
+            >= Pets.TopLevel => (Loc.T("pets.detail_stage", level, Pets.TopLevel), Loc.T("pets.detail_max"), 100),
+            _ when needed > 0 => ($"{progress}/{needed}", Loc.T("pets.detail_next", needed - progress, level + 1), progress * 100.0 / needed),
+            _ => (Loc.T("pets.detail_stage", level, Pets.TopLevel), "", level.Value * 100.0 / Pets.TopLevel),
+        };
         var regions = pets.Regions(row.Pet, option.Map);
         DetailRegions = regions.Count > 0 ? string.Join(", ", regions) : "";
         foreach (var g in spawns.GroupBy(s => s.Npc).OrderByDescending(g => g.Count()))

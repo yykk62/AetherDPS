@@ -81,6 +81,9 @@ public sealed partial class HubViewModel : ObservableObject
     /// <summary>Hinweiskarten oben (Zustimmung, Absturz, Was ist neu, Nachrichten, Spiel-Update).</summary>
     public ObservableCollection<HubNotice> Notices { get; } = [];
 
+    /// <summary>Nach jeder Aktualisierung (jede Sekunde, solange das Hauptfenster offen ist).</summary>
+    public event EventHandler? Refreshed;
+
     /// <summary>„Problem melden“ öffnet das Meldefenster (App).</summary>
     public event EventHandler? ReportRequested;
 
@@ -89,6 +92,7 @@ public sealed partial class HubViewModel : ObservableObject
     [ObservableProperty] private string pingJitter = "–";
     [ObservableProperty] private string spikeCount = "–";
     [ObservableProperty] private string retransmits = "–";
+    [ObservableProperty] private string pingSummary = "";
     [ObservableProperty] private IReadOnlyList<PingSample>? pingSamples;
     [ObservableProperty] private double spikeThreshold = double.MaxValue;
     [ObservableProperty] private bool hasPingData;
@@ -160,6 +164,7 @@ public sealed partial class HubViewModel : ObservableObject
             case TabChecklist: Checklist.Refresh(); break;
             case TabConnection: RefreshConnection(); break;
         }
+        Refreshed?.Invoke(this, EventArgs.Empty);
     }
 
     private void RefreshRun()
@@ -209,6 +214,7 @@ public sealed partial class HubViewModel : ObservableObject
         PingSamples = monitor.Samples();
         SpikeThreshold = stats.SpikeThreshold;
         ServerText = monitor.ServerAddress is { } ip ? Loc.T("conn.server", ip) : "";
+        PingSummary = HasPingData ? Loc.T("conn.summary", PingAvg, PingJitter, SpikeCount, Retransmits) : "";
     }
 
     partial void OnSelectedTabChanged(int value)

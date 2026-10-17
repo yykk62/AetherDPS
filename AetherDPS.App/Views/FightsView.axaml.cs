@@ -4,11 +4,11 @@ using Avalonia.Controls;
 
 namespace AetherDPS.App.Views;
 
-public partial class RunsView : UserControl
+public partial class FightsView : UserControl
 {
     private RunsViewModel? subscribed;
 
-    public RunsView()
+    public FightsView()
     {
         InitializeComponent();
         DataContextChanged += (_, _) =>

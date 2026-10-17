@@ -4,143 +4,179 @@
              xmlns:l="using:AetherDPS.App.Services"
              x:Class="AetherDPS.App.Views.TimersView"
              x:DataType="vm:TimersViewModel">
-  <UserControl.Styles>
-    <Style Selector="CheckBox.day">
-      <Setter Property="MinWidth" Value="0" />
-      <Setter Property="Margin" Value="0,0,6,0" />
-    </Style>
-  </UserControl.Styles>
 
+  <!-- Welt › Timer: links was als Nächstes kommt (Mulde) und die Feldbosse je Karte,
+       rechts auf dem Rahmen eigene Timer, feste Termine und die Overlay-Einstellungen. -->
   <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Spacing="12" Margin="12,4,22,22">
+    <Grid ColumnDefinitions="*,36,300" Margin="32,10,32,28">
 
-      <!-- Overlay und Erinnerungen -->
-      <Border Classes="card">
-        <StackPanel Spacing="10">
-          <TextBlock Classes="h2" Text="{l:T timers.overlay_title}" />
-          <WrapPanel>
-            <TextBlock Text="{l:T timers.overlay_mode}" VerticalAlignment="Center" Margin="0,0,8,6" />
-            <ComboBox ItemsSource="{Binding OverlayModes}" SelectedItem="{Binding SelectedOverlayMode}" MinWidth="220" Margin="0,0,14,6" />
-            <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding IsSoonMode}" Margin="0,0,0,6">
-              <TextBox Text="{Binding SoonMinutes}" Width="50" />
-              <TextBlock Text="{l:T timers.overlay_soon_minutes}" VerticalAlignment="Center" />
-            </StackPanel>
-          </WrapPanel>
-          <StackPanel Orientation="Horizontal" Spacing="6">
-            <TextBlock Text="{l:T timers.reminder_minutes}" VerticalAlignment="Center" />
-            <TextBox Text="{Binding ReminderMinutes}" Width="50" />
-            <Button Classes="secondary" Content="{l:T timers.save}" Command="{Binding SaveReminderCommand}" />
-          </StackPanel>
-          <CheckBox IsChecked="{Binding OverlayLocked}" Content="{l:T timers.overlay_locked}" />
-          <TextBlock Text="{l:T timers.overlay_hint}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
-        </StackPanel>
-      </Border>
-
-      <!-- Alle Timer -->
-      <Border Classes="card">
-        <StackPanel Spacing="8">
-          <TextBlock Classes="h2" Text="{l:T timers.title}" />
-          <ItemsControl ItemsSource="{Binding Rows}">
-            <ItemsControl.ItemTemplate>
-              <DataTemplate x:DataType="vm:TimerRow">
-                <Border CornerRadius="4" Background="#14FFFFFF" Padding="10,6" Margin="0,0,0,4">
-                  <StackPanel Spacing="6">
-                    <Grid ColumnDefinitions="26,*,Auto,Auto,Auto">
-                      <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{Binding Icon, Converter={x:Static l:Icons.ByName}}" Width="16" Height="16" HorizontalAlignment="Left" />
-                      <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
-                        <TextBlock Text="{Binding Detail}" Classes="dim" FontSize="11" />
+      <StackPanel Spacing="22">
+        <!-- Alle Timer: das Instrument dieses Bereichs -->
+        <Border Classes="well" Padding="8,12,8,8">
+          <StackPanel Spacing="2">
+            <TextBlock Classes="section" Text="{l:T timers.title}" Margin="12,0,12,6" />
+            <ItemsControl ItemsSource="{Binding Rows}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:TimerRow">
+                  <Border Classes="timerrow" Classes.soon="{Binding IsSoon}" Classes.due="{Binding IsDue}">
+                    <StackPanel Spacing="6">
+                      <Grid ColumnDefinitions="28,*,Auto,Auto,Auto">
+                        <Image Source="{Binding Icon, Converter={x:Static l:Icons.ByName}}" Width="20" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+                          <TextBlock Text="{Binding Name}" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+                          <TextBlock Classes="small muted" Text="{Binding Detail}" TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="2" Classes="muted num" Text="{Binding At}" VerticalAlignment="Center" Margin="12,0,0,0" />
+                        <TextBlock Grid.Column="3" Classes="num countdown" Text="{Binding Remaining}" VerticalAlignment="Center" MinWidth="96" />
+                        <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center" Margin="8,0,0,0">
+                          <Button Classes="icon" Command="{Binding StartCommand}" IsVisible="{Binding IsCustom}" ToolTip.Tip="{l:T timers.start}">
+                            <Image Source="{l:Icon play, Size=14}" Width="14" Height="14" />
+                          </Button>
+                          <Button Classes="icon" Command="{Binding RemoveCommand}" IsVisible="{Binding IsCustom}" ToolTip.Tip="{l:T timers.remove}">
+                            <Image Source="{l:Icon close, Size=12}" Width="12" Height="12" />
+                          </Button>
+                          <Button Classes="icon" Command="{Binding RemoveCommand}" IsVisible="{Binding IsBoss}" ToolTip.Tip="{l:T timers.remove}">
+                            <Image Source="{l:Icon close, Size=12}" Width="12" Height="12" />
+                          </Button>
+                        </StackPanel>
+                      </Grid>
+                      <!-- Unbekannter Boss: einmal Respawn eintragen oder ignorieren -->
+                      <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding NeedsRespawn}" Margin="28,0,0,2">
+                        <TextBlock Classes="small secondary" Text="{l:T timers.respawn}" VerticalAlignment="Center" />
+                        <TextBox Text="{Binding RespawnMinutes}" Width="70" Watermark="{l:T timers.minutes_watermark}" />
+                        <Button Classes="quiet" Content="{l:T timers.save}" Command="{Binding SaveRespawnCommand}" />
+                        <Button Classes="icon" Padding="10,6" Command="{Binding IgnoreCommand}" ToolTip.Tip="{l:T timers.ignore_hint}">
+                          <TextBlock Classes="small secondary" Text="{l:T timers.ignore}" />
+                        </Button>
                       </StackPanel>
-                      <TextBlock Grid.Column="2" Text="{Binding At}" Classes="dim" VerticalAlignment="Center" Margin="12,0,0,0" />
-                      <TextBlock Grid.Column="3" Text="{Binding Remaining}" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" Margin="12,0"
-                                 Foreground="{Binding IsDue, Converter={x:Static l:BoolBrush.DueGreenElseText}}" />
-                      <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
-                        <Button Classes="secondary" Content="{l:T timers.start}" Command="{Binding StartCommand}" IsVisible="{Binding IsCustom}" />
-                        <Button Classes="secondary" Command="{Binding RemoveCommand}" IsVisible="{Binding IsCustom}" ToolTip.Tip="{l:T timers.remove}"><Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon close, Size=11}" Width="11" Height="11" /></Button>
-                        <Button Classes="secondary" Command="{Binding RemoveCommand}" IsVisible="{Binding IsBoss}" ToolTip.Tip="{l:T timers.remove}"><Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{l:Icon close, Size=11}" Width="11" Height="11" /></Button>
-                      </StackPanel>
-                    </Grid>
-                    <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding NeedsRespawn}" Margin="26,0,0,0">
-                      <TextBlock Text="{l:T timers.respawn}" Classes="dim" VerticalAlignment="Center" FontSize="12" />
-                      <TextBox Text="{Binding RespawnMinutes}" Width="70" Watermark="Min." />
-                      <Button Classes="secondary" Content="{l:T timers.save}" Command="{Binding SaveRespawnCommand}" />
-                      <Button Classes="secondary" Content="{l:T timers.ignore}" Command="{Binding IgnoreCommand}" ToolTip.Tip="{l:T timers.ignore_hint}" />
                     </StackPanel>
-                  </StackPanel>
-                </Border>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
-          <TextBlock Text="{l:T timers.boss_note}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
-        </StackPanel>
-      </Border>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock Classes="small muted" Text="{l:T timers.boss_note_short}" TextWrapping="Wrap" Margin="12,8,12,2" />
+          </StackPanel>
+        </Border>
 
-      <!-- Feldbosse -->
-      <Border Classes="card">
-        <StackPanel Spacing="8">
-          <TextBlock Classes="h2" Text="{l:T fb.title}" />
-          <TextBlock Classes="dim" FontSize="12" TextWrapping="Wrap" Text="{l:T fb.hint}" />
-          <TextBlock Foreground="#E0A84A" FontSize="12" TextWrapping="Wrap" Text="{l:T fb.open_map}" IsVisible="{Binding !FieldBossesKnown}" />
-          <ItemsControl ItemsSource="{Binding FieldBossGroups}">
+        <!-- Feldbosse je Karte -->
+        <StackPanel Spacing="6">
+          <TextBlock Classes="section" Text="{l:T fb.title}" />
+          <TextBlock Classes="small muted" Text="{l:T fb.hint_short}" TextWrapping="Wrap" />
+          <TextBlock Classes="warnline" Text="{l:T fb.open_map}" IsVisible="{Binding !FieldBossesKnown}" TextWrapping="Wrap" Margin="0,4,0,0" />
+          <ItemsControl ItemsSource="{Binding FieldBossGroups}" Margin="0,6,0,0">
             <ItemsControl.ItemTemplate>
               <DataTemplate x:DataType="vm:FieldBossGroup">
-                <Expander Header="{Binding Name}" IsExpanded="{Binding Expanded}" HorizontalAlignment="Stretch" Margin="0,0,0,6">
-                  <ItemsControl ItemsSource="{Binding Rows}">
-                    <ItemsControl.ItemTemplate>
-                      <DataTemplate x:DataType="vm:FieldBossRow">
-                        <Grid ColumnDefinitions="30,*,Auto,Auto" Margin="0,1">
-                          <Button Command="{Binding ToggleFavoriteCommand}" Background="Transparent" Padding="4,3" ToolTip.Tip="{l:T fb.star_tip}">
-                            <Image Classes="ic" RenderOptions.BitmapInterpolationMode="HighQuality" Source="{Binding IsFavorite, Converter={x:Static l:Icons.StarFilledElseOutline}}" Width="15" Height="15" />
-                          </Button>
-                          <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                          <TextBlock Grid.Column="2" Text="{Binding At}" Classes="dim" FontSize="12" VerticalAlignment="Center" Margin="12,0,0,0" />
-                          <TextBlock Grid.Column="3" Text="{Binding State}" MinWidth="110" TextAlignment="Right" FontWeight="SemiBold" VerticalAlignment="Center" Margin="12,0,0,0"
-                                     Foreground="{Binding IsUp, Converter={x:Static l:BoolBrush.DueGreenElseText}}" />
-                        </Grid>
-                      </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                  </ItemsControl>
-                </Expander>
+                <StackPanel>
+                  <Border Classes="framerule" />
+                  <Expander Classes="map" Header="{Binding Name}" IsExpanded="{Binding Expanded}" HorizontalAlignment="Stretch">
+                    <ItemsControl ItemsSource="{Binding Rows}" Margin="0,0,0,8">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:FieldBossRow">
+                          <Grid ColumnDefinitions="32,*,Auto,Auto" MinHeight="32">
+                            <Button Classes="icon" Padding="5" Command="{Binding ToggleFavoriteCommand}" ToolTip.Tip="{l:T fb.star_tip}">
+                              <Image Source="{Binding IsFavorite, Converter={x:Static l:Icons.StarFilledElseOutline}}" Width="16" Height="16" />
+                            </Button>
+                            <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="6,0,0,0" />
+                            <TextBlock Grid.Column="2" Classes="small muted num" Text="{Binding At}" VerticalAlignment="Center" Margin="12,0,0,0" />
+                            <TextBlock Grid.Column="3" Classes="num fbstate" Classes.up="{Binding IsUp}" Classes.estimate="{Binding IsEstimated}"
+                                       Text="{Binding State}" MinWidth="120" VerticalAlignment="Center" Margin="12,0,4,0" />
+                          </Grid>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </Expander>
+                </StackPanel>
               </DataTemplate>
             </ItemsControl.ItemTemplate>
           </ItemsControl>
         </StackPanel>
-      </Border>
+      </StackPanel>
 
-      <!-- Feste Termine -->
-      <Border Classes="card">
+      <!-- ── rechts: anlegen, Termine, Overlay ───────────────── -->
+      <StackPanel Grid.Column="2" Spacing="24">
         <StackPanel Spacing="8">
-          <TextBlock Classes="h2" Text="{l:T timers.schedules}" />
-          <TextBlock Text="{l:T timers.schedules_hint}" Classes="dim" FontSize="11" TextWrapping="Wrap" />
+          <TextBlock Classes="section" Text="{l:T timers.custom}" />
+          <TextBox Text="{Binding NewName}" Watermark="{l:T timers.custom_name}" />
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBox Text="{Binding NewMinutes}" Width="80" Watermark="{l:T timers.minutes_watermark}" />
+            <Button Classes="quiet" Content="{l:T timers.add}" Command="{Binding AddCustomCommand}" />
+          </StackPanel>
+        </StackPanel>
+
+        <StackPanel Spacing="6">
+          <TextBlock Classes="section" Text="{l:T timers.schedules_short}" />
           <ItemsControl ItemsSource="{Binding Schedules}">
             <ItemsControl.ItemTemplate>
               <DataTemplate x:DataType="vm:ScheduleToggle">
-                <Grid ColumnDefinitions="*,Auto" Margin="0,2">
-                  <CheckBox IsChecked="{Binding Enabled}">
-                    <StackPanel>
-                      <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
-                      <TextBlock Text="{Binding Detail}" Classes="dim" FontSize="11" />
-                    </StackPanel>
-                  </CheckBox>
-                  <CheckBox Grid.Column="1" IsChecked="{Binding Reminder}" Content="{l:T timers.remind}" IsEnabled="{Binding Enabled}" />
-                </Grid>
+                <StackPanel>
+                  <Grid ColumnDefinitions="*,Auto" Margin="0,6">
+                    <CheckBox IsChecked="{Binding Enabled}" VerticalAlignment="Top">
+                      <StackPanel Spacing="1">
+                        <TextBlock Text="{Binding Name}" FontWeight="Medium" TextWrapping="Wrap" />
+                        <TextBlock Classes="small muted" Text="{Binding Detail}" TextWrapping="Wrap" />
+                      </StackPanel>
+                    </CheckBox>
+                    <ToggleButton Grid.Column="1" Classes="bell" IsChecked="{Binding Reminder}" IsEnabled="{Binding Enabled}" ToolTip.Tip="{l:T timers.remind}" VerticalAlignment="Top">
+                      <Image Source="{l:Icon bell, Size=16}" Width="16" Height="16" />
+                    </ToggleButton>
+                  </Grid>
+                  <Border Classes="framerule" />
+                </StackPanel>
               </DataTemplate>
             </ItemsControl.ItemTemplate>
           </ItemsControl>
         </StackPanel>
-      </Border>
 
-      <!-- Eigener Countdown -->
-      <Border Classes="card">
-        <StackPanel Spacing="8">
-          <TextBlock Classes="h2" Text="{l:T timers.custom}" />
-          <StackPanel Orientation="Horizontal" Spacing="6">
-            <TextBox Text="{Binding NewName}" Width="220" Watermark="{l:T timers.custom_name}" />
-            <TextBox Text="{Binding NewMinutes}" Width="80" Watermark="Min." />
-            <Button Classes="primary" Content="{l:T timers.add}" Command="{Binding AddCustomCommand}" />
+        <StackPanel Spacing="10">
+          <TextBlock Classes="section" Text="{l:T timers.overlay_title}" />
+          <ComboBox ItemsSource="{Binding OverlayModes}" SelectedItem="{Binding SelectedOverlayMode}" HorizontalAlignment="Stretch" />
+          <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding IsSoonMode}">
+            <TextBox Text="{Binding SoonMinutes}" Width="56" />
+            <TextBlock Classes="secondary" Text="{l:T timers.overlay_soon_minutes}" VerticalAlignment="Center" />
           </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBox Text="{Binding ReminderMinutes}" Width="56" />
+            <TextBlock Classes="secondary" Text="{l:T timers.reminder_short}" VerticalAlignment="Center" TextWrapping="Wrap" />
+            <Button Classes="icon" Padding="10,6" Command="{Binding SaveReminderCommand}">
+              <TextBlock Classes="small" Text="{l:T timers.save}" />
+            </Button>
+          </StackPanel>
+          <CheckBox IsChecked="{Binding OverlayLocked}">
+            <TextBlock Text="{l:T timers.overlay_locked}" TextWrapping="Wrap" />
+          </CheckBox>
+          <TextBlock Classes="small muted" Text="{l:T timers.overlay_hint_short}" TextWrapping="Wrap" />
         </StackPanel>
-      </Border>
-    </StackPanel>
+      </StackPanel>
+    </Grid>
   </ScrollViewer>
+
+  <UserControl.Styles>
+    <Style Selector="Border.timerrow">
+      <Setter Property="CornerRadius" Value="{DynamicResource Radius.Control}" />
+      <Setter Property="Padding" Value="12,8" />
+      <Setter Property="Margin" Value="0,1" />
+    </Style>
+    <Style Selector="Border.timerrow.soon">
+      <Setter Property="Background" Value="{DynamicResource Surface.NoticeWarn}" />
+    </Style>
+    <Style Selector="TextBlock.countdown">
+      <Setter Property="FontSize" Value="20" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="Border.timerrow.soon TextBlock.countdown">
+      <Setter Property="Foreground" Value="{DynamicResource Signal.Warn}" />
+    </Style>
+    <Style Selector="Border.timerrow.due TextBlock.countdown">
+      <Setter Property="Foreground" Value="{DynamicResource Signal.Good}" />
+    </Style>
+    <Style Selector="TextBlock.fbstate">
+      <Setter Property="FontWeight" Value="Medium" />
+    </Style>
+    <Style Selector="TextBlock.fbstate.up">
+      <Setter Property="Foreground" Value="{DynamicResource Signal.Good}" />
+    </Style>
+    <Style Selector="TextBlock.warnline">
+      <Setter Property="Foreground" Value="{DynamicResource Signal.Warn}" />
+    </Style>
+  </UserControl.Styles>
 </UserControl>

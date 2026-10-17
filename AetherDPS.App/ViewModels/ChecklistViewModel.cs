@@ -33,6 +33,10 @@ public sealed partial class ChecklistViewModel : ObservableObject
     [ObservableProperty] private bool newIsWeekly;
     [ObservableProperty] private string dailyInfo = "";
     [ObservableProperty] private string weeklyInfo = "";
+    [ObservableProperty] private string dailyProgress = "";
+    [ObservableProperty] private string weeklyProgress = "";
+    [ObservableProperty] private double dailyPercent;
+    [ObservableProperty] private double weeklyPercent;
     [ObservableProperty] private int dailyHour;
     [ObservableProperty] private int weeklyDay;
     [ObservableProperty] private int weeklyHour;
@@ -52,8 +56,12 @@ public sealed partial class ChecklistViewModel : ObservableObject
         var now = DateTime.Now;
         Fill(Daily, ChecklistPeriod.Daily, now);
         Fill(Weekly, ChecklistPeriod.Weekly, now);
-        DailyInfo = Info(ChecklistPeriod.Daily, now, Daily);
-        WeeklyInfo = Info(ChecklistPeriod.Weekly, now, Weekly);
+        DailyInfo = Info(ChecklistPeriod.Daily, now);
+        WeeklyInfo = Info(ChecklistPeriod.Weekly, now);
+        DailyProgress = Loc.T("now.next_done", Daily.Count(r => r.IsDone), Daily.Count);
+        WeeklyProgress = Loc.T("now.next_done", Weekly.Count(r => r.IsDone), Weekly.Count);
+        DailyPercent = Daily.Count == 0 ? 0 : Daily.Count(r => r.IsDone) * 100.0 / Daily.Count;
+        WeeklyPercent = Weekly.Count == 0 ? 0 : Weekly.Count(r => r.IsDone) * 100.0 / Weekly.Count;
         loading = false;
     }
 
@@ -66,12 +74,13 @@ public sealed partial class ChecklistViewModel : ObservableObject
         for (int i = 0; i < items.Count; i++) target.Add(new ChecklistRow(this, items[i], states[i]));
     }
 
-    private string Info(ChecklistPeriod period, DateTime now, IReadOnlyCollection<ChecklistRow> rows)
+    /// <summary>„Neu in 3 Std. 42 Min. (Mi 06:00 Uhr)“</summary>
+    private string Info(ChecklistPeriod period, DateTime now)
     {
         var next = service.NextReset(period, now);
         var left = next - now;
         var leftText = left.TotalHours >= 24 ? Loc.T("time.days_hours", (int)left.TotalDays, left.Hours) : Loc.T("time.hours_minutes", (int)left.TotalHours, left.Minutes);
-        return $"{rows.Count(r => r.IsDone)}/{rows.Count} erledigt · Reset {next:ddd HH:mm} (in {leftText})";
+        return Loc.T("check.reset_in", leftText, next.ToString("ddd HH:mm", Loc.Culture));
     }
 
     public void SetDone(ChecklistRow row, bool done)

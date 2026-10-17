@@ -112,6 +112,14 @@ public sealed class UiTests : IDisposable
         window.Close();
     }
 
+    /// <summary>Hauptfenster am Ort, der zur alten Reiter-Nummer gehört (Einstellungen/Verbindung als Blatt).</summary>
+    private ShellWindow Main(int tab)
+    {
+        var shell = provider!.GetRequiredService<ShellViewModel>();
+        shell.Show(tab);
+        return new ShellWindow(shell);
+    }
+
     private MainWindow Overlay() =>
         new(provider!.GetRequiredService<MainViewModel>(), provider!.GetRequiredService<IAppSettingsService>());
 
@@ -158,8 +166,7 @@ public sealed class UiTests : IDisposable
         string[] names = ["dps", "laeufe", "gruppe", "profil", "pets", "timer", "checkliste", "verbindung", "einstellungen"];
         for (int tab = 0; tab < names.Length; tab++)
         {
-            var window = new HubWindow(hub);
-            hub.SelectedTab = tab;
+            var window = Main(tab);
             hub.Refresh();
             Settle();
             Shot(window, "hub_" + names[tab]);
@@ -349,14 +356,14 @@ public sealed class UiTests : IDisposable
         hub.ShowNotice(new HubNotice { Id = "patch", Title = Loc.T("patch.title"), Text = Loc.T("patch.text"), IsWarning = true });
         Assert.Equal(2, hub.Notices.Count);
         hub.DiscordUrl = "https://discord.gg/beispiel";
-        Shot(new HubWindow(hub), "hub_hinweise");
+        Shot(Main(HubViewModel.TabDps), "hub_hinweise");
 
         // Einmaliger Vorschlag fürs Discord-Profil: „Ja“ schaltet ein und fragt nie wieder
         hub.RemoveNotice("consent");
         hub.RemoveNotice("patch");
         community.ShowPresenceOffer();
         var offer = Assert.Single(hub.Notices);
-        Shot(new HubWindow(hub), "hub_discord_vorschlag");
+        Shot(Main(HubViewModel.TabDps), "hub_discord_vorschlag");
         var settings = provider!.GetRequiredService<MeterSettings>();
         offer.Primary!.Execute(null);
         Assert.True(settings.DiscordPresence);
@@ -383,8 +390,7 @@ public sealed class UiTests : IDisposable
                 var hub = provider!.GetRequiredService<HubViewModel>();
                 foreach (var (tab, name) in new[] { (HubViewModel.TabDps, "dps"), (HubViewModel.TabSettings, "einstellungen") })
                 {
-                    var window = new HubWindow(hub);
-                    hub.SelectedTab = tab;
+                    var window = Main(tab);
                     hub.Refresh();
                     Shot(window, $"{lang}_hub_{name}");
                 }
@@ -432,7 +438,7 @@ public sealed class UiTests : IDisposable
         Assert.True(profile.HasDetail);
         Assert.Contains(profile.DetailStats, s => s.Value == "223 (+50)");
         Assert.Contains(profile.DetailStats, s => s.Name == Loc.T("profile.empty_slots", 2));
-        Shot(new HubWindow(hub), "hub_profil_item");
+        Shot(Main(HubViewModel.TabProfile), "hub_profil_item");
     }
 
     [AvaloniaFact]
@@ -483,7 +489,7 @@ public sealed class UiTests : IDisposable
         pets.Selected = pets.Rows.First(r => r.Pet.Id == 1007);
         Assert.NotEmpty(pets.Spawns!);
         Assert.NotEmpty(pets.Monsters);
-        Shot(new HubWindow(hub), "pets_karte");
+        Shot(Main(HubViewModel.TabPets), "pets_karte");
     }
 
     [AvaloniaFact]

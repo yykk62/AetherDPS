@@ -186,4 +186,185 @@
     <Setter Property="Minimum" Value="0" />
     <Setter Property="Maximum" Value="100" />
   </Style>
+
+  <!-- Unterreiter eines Orts (z. B. Welt: Timer, Checkliste, Pets) -->
+  <Style Selector=".ins Button.section">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="12,7" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Radius.Control}" />
+    <Setter Property="Opacity" Value="0.7" />
+  </Style>
+  <Style Selector=".ins Button.section TextBlock">
+    <Setter Property="FontSize" Value="15" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="Foreground" Value="{DynamicResource Text.Secondary}" />
+  </Style>
+  <Style Selector=".ins Button.section:pointerover">
+    <Setter Property="Opacity" Value="1" />
+  </Style>
+  <Style Selector=".ins Button.section:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector=".ins Button.section.current">
+    <Setter Property="Opacity" Value="1" />
+    <Setter Property="Background" Value="{DynamicResource Surface.Raised}" />
+  </Style>
+  <Style Selector=".ins Button.section.current:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Surface.Raised}" />
+  </Style>
+  <Style Selector=".ins Button.section.current TextBlock">
+    <Setter Property="Foreground" Value="{DynamicResource Text.Primary}" />
+  </Style>
+
+  <!-- Symbolknopf, dessen Blatt gerade offen ist -->
+  <Style Selector=".ins Button.icon.open">
+    <Setter Property="Background" Value="{DynamicResource Surface.Raised}" />
+  </Style>
+
+  <!-- Abdunklung hinter Blättern: Klick schließt -->
+  <Style Selector=".ins Button.scrim">
+    <Setter Property="Background" Value="{DynamicResource Surface.Scrim}" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="VerticalAlignment" Value="Stretch" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="0" />
+    <Setter Property="Cursor" Value="Arrow" />
+  </Style>
+  <Style Selector=".ins Button.scrim:pointerover /template/ ContentPresenter, .ins Button.scrim:pressed /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Surface.Scrim}" />
+  </Style>
+
+  <!-- Blatt: liegt über dem Ort (einzige Stelle mit Schatten, weil es wirklich darüber liegt) -->
+  <Style Selector=".ins Border.sheet">
+    <Setter Property="Background" Value="{DynamicResource Surface.Sheet}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Line.Frame}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="0,0,10,10" />
+    <Setter Property="BoxShadow" Value="0 12 32 0 #66000000" />
+  </Style>
+  <Style Selector=".ins Border.sheet.side">
+    <Setter Property="CornerRadius" Value="0" />
+    <Setter Property="BorderThickness" Value="1,0,0,0" />
+  </Style>
+
+  <!-- Hinweiszeile unter der Leiste -->
+  <Style Selector=".ins Border.noticebar">
+    <Setter Property="Background" Value="{DynamicResource Surface.Notice}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Line.Frame}" />
+    <Setter Property="BorderThickness" Value="0,0,0,1" />
+    <Setter Property="Padding" Value="20,6,16,6" />
+  </Style>
+  <Style Selector=".ins Border.noticebar.warning">
+    <Setter Property="Background" Value="{DynamicResource Surface.NoticeWarn}" />
+  </Style>
+
+  <!-- Auswahllisten: ruhig, Auswahl als erhabene Fläche mit heller Kante links -->
+  <Style Selector=".ins ListBox.plain">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Padding" Value="0" />
+  </Style>
+  <Style Selector=".ins ListBox.plain ListBoxItem">
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Margin" Value="0,1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Radius.Control}" />
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector=".ins ListBox.plain ListBoxItem:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Surface.Hover}" />
+  </Style>
+  <Style Selector=".ins ListBox.plain ListBoxItem:selected /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Surface.Raised}" />
+  </Style>
+  <Style Selector=".ins ListBox.plain ListBoxItem:selected:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Surface.Raised}" />
+  </Style>
+
+  <!-- Gefährliche Aktion: ruhig, nur das Wort in Rot -->
+  <Style Selector=".ins Button.quiet.destructive TextBlock">
+    <Setter Property="Foreground" Value="{DynamicResource Signal.Bad}" />
+  </Style>
+
+  <!-- Zeilen, die man wählen kann (Läufe, Spieler): ganze Zeile klickbar, Auswahl erhaben mit heller Kante -->
+  <Style Selector=".ins Button.runrow, .ins Button.playerrow">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="2,0,0,0" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Radius.Control}" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="Padding" Value="10,8" />
+    <Setter Property="Margin" Value="0,1" />
+  </Style>
+  <Style Selector=".ins Button.playerrow">
+    <Setter Property="Padding" Value="12,7" />
+  </Style>
+  <Style Selector=".ins Button.runrow:pointerover /template/ ContentPresenter, .ins Button.playerrow:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Surface.Hover}" />
+  </Style>
+  <Style Selector=".ins Button.playerrow.me">
+    <Setter Property="Background" Value="{DynamicResource Surface.Self}" />
+  </Style>
+  <Style Selector=".ins Button.playerrow.me:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Surface.Self}" />
+  </Style>
+  <Style Selector=".ins Button.runrow.current, .ins Button.playerrow.current">
+    <Setter Property="Background" Value="{DynamicResource Surface.Raised}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Text.Primary}" />
+  </Style>
+  <Style Selector=".ins Button.runrow.current:pointerover /template/ ContentPresenter, .ins Button.playerrow.current:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Surface.Raised}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Text.Primary}" />
+  </Style>
+  <Style Selector=".ins Button.playerrow.me.current">
+    <Setter Property="Background" Value="{DynamicResource Surface.Self}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Accent.Self}" />
+  </Style>
+
+  <!-- Geschätzt / unvollständig: eigene, gedämpfte Darstellung -->
+  <Style Selector=".ins TextBlock.estimate">
+    <Setter Property="Foreground" Value="{DynamicResource Text.Estimate}" />
+    <Setter Property="FontStyle" Value="Italic" />
+  </Style>
+
+  <!-- Schalter als Symbol (z. B. Glocke = erinnern): an = erhaben und voll, aus = blass -->
+  <Style Selector=".ins ToggleButton.bell">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="7" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Radius.Control}" />
+    <Setter Property="Opacity" Value="0.4" />
+  </Style>
+  <Style Selector=".ins ToggleButton.bell:checked">
+    <Setter Property="Opacity" Value="1" />
+  </Style>
+  <Style Selector=".ins ToggleButton.bell:checked /template/ ContentPresenter, .ins ToggleButton.bell:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Surface.Raised}" />
+  </Style>
+  <Style Selector=".ins ToggleButton.bell:disabled">
+    <Setter Property="Opacity" Value="0.15" />
+  </Style>
+
+  <!-- Aufklapper ohne Kasten (z. B. Feldbosse je Karte) -->
+  <Style Selector=".ins Expander.map">
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="FontSize" Value="15" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+  <Style Selector=".ins Expander.map /template/ ToggleButton#ExpanderHeader">
+    <Setter Property="Padding" Value="0,10" />
+  </Style>
+
+  <!-- Fortschritt, der sich füllt (Checkliste, Pets): breiter als die Spur, Pergament auf Mulde -->
+  <Style Selector=".ins ProgressBar.fill">
+    <Setter Property="MinHeight" Value="6" />
+    <Setter Property="Height" Value="6" />
+    <Setter Property="MinWidth" Value="0" />
+    <Setter Property="CornerRadius" Value="3" />
+    <Setter Property="Background" Value="{DynamicResource Surface.WellDeep}" />
+    <Setter Property="Foreground" Value="{DynamicResource Text.Primary}" />
+    <Setter Property="Minimum" Value="0" />
+    <Setter Property="Maximum" Value="100" />
+  </Style>
 </Styles>

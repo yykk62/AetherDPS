@@ -9,9 +9,6 @@ namespace AetherDPS.App.ViewModels;
 /// <summary>Eine Zeile unter „Als Nächstes“: Termin, Checkliste, Feldboss.</summary>
 public sealed record NextRow(string Icon, string Title, string Detail, string Right, bool Soon);
 
-/// <summary>Ein Boss im Lauf: ab wann, wie lange, Gruppen-DPS, gelegt oder nicht.</summary>
-public sealed record BossLine(string Name, string From, string Duration, string GroupDps, bool Killed);
-
 /// <summary>
 /// Ort „Jetzt“ im neuen Hauptfenster (docs/DESIGN.md): richtet sich nach der Lage. Nach einem Lauf
 /// zuerst das Urteil (Bestzeit? mehr DPS als sonst?), dann die Messlatten, Gruppe und Bosse; ohne Lauf
@@ -79,15 +76,30 @@ public sealed partial class NowViewModel : ObservableObject
         this.settings = settings;
     }
 
-    public void Refresh()
+    private string? shownRun;
+    private DateTime nextShownAt;
+
+    /// <summary>Jede Sekunde vom Hauptfenster. Ergebnis nur neu, wenn ein neuer Lauf da ist; „Als Nächstes“ alle 15 s.</summary>
+    public void Refresh(bool full = true)
     {
         IsActive = mode.IsCapturing;
         MeterState = Loc.T("shell.meter.on");
         MeterAction = Loc.T(IsActive ? "shell.meter.stop_short" : "shell.meter.start_short");
         MeterButton = IsActive ? MeterAction : Loc.T("shell.meter.start");
         Hotkey = settings.HotkeyText;
-        ShowResult(archive.All().FirstOrDefault());
-        ShowNext(DateTime.Now);
+        if (!full) return;
+        var latest = archive.All().FirstOrDefault();
+        var key = latest is null ? "" : latest.Id + ":" + archive.All().Count;
+        if (key != shownRun)
+        {
+            shownRun = key;
+            ShowResult(latest);
+        }
+        if (DateTime.Now >= nextShownAt)
+        {
+            nextShownAt = DateTime.Now.AddSeconds(15);
+            ShowNext(DateTime.Now);
+        }
     }
 
     [RelayCommand]
@@ -100,25 +112,25 @@ public sealed partial class NowViewModel : ObservableObject
         Bosses.Clear();
         if (run is null) return;
 
+        var cmp = new RunComparison(run, archive.All());
         RunName = run.Name;
-        var bosses = run.Bosses.Where(b => b.IsSignificant(run.TotalDamage)).ToList();
-        int killed = bosses.Count(b => b.Killed);
-        foreach (var b in bosses)
-            Bosses.Add(new BossLine(b.Name, Loc.T("now.boss_from", RunArchive.Fmt(b.StartOffset)), Dur(b.Duration),
-                Format.CompactFixed(b.Damage / Math.Max(1, b.Duration.TotalSeconds)) + "/s", b.Killed));
+        Verdict = cmp.Verdict;
+        TimeBest = cmp.IsBestTime;
+        RunLine = string.Join(" ", new[] { Loc.T("now.run_line", RunComparison.When(run.StartedAt + run.Duration)), cmp.BossText, cmp.RankText }
+            .Where(s => s.Length > 0));
+        foreach (var b in RunComparison.BossLines(run)) Bosses.Add(b);
 
         // Messlatten: du gegen deine früheren Läufe mit demselben Namen
-        var earlier = archive.All().Where(r => r.Name == run.Name && r.Id != run.Id && r.StartedAt < run.StartedAt).ToList();
-        var user = run.Players.FirstOrDefault(p => p.IsUser);
-        DpsHistory = earlier.Select(r => r.Players.FirstOrDefault(p => p.IsUser)?.Dps).OfType<double>().ToList();
-        HasHistory = DpsHistory.Count > 0 && user is not null;
+        var user = cmp.User;
+        HasHistory = cmp.HasHistory;
         FirstRunText = Loc.T("now.first_run", run.Name);
-        HistoryLegend = Loc.T("now.scale_legend", DpsHistory.Count);
+        HistoryLegend = Loc.T("now.scale_legend", cmp.DpsHistory.Count);
+        DpsHistory = cmp.DpsHistory;
+        DpsAverage = cmp.DpsAverage;
+        DpsBest = cmp.DpsBest;
         DpsCurrent = user?.Dps ?? double.NaN;
-        DpsAverage = DpsHistory.Count > 0 ? DpsHistory.Average() : double.NaN;
         DpsNeedle = user is null ? "" : Loc.T("now.scale_today", Format.CompactFixed(user.Dps) + "/s");
         DpsAverageText = double.IsFinite(DpsAverage) ? Loc.T("now.scale_avg", Format.CompactFixed(DpsAverage) + "/s") : "";
-        DpsBest = DpsHistory.Count > 0 ? DpsHistory.Max() : double.NaN;
         if (user is not null && double.IsFinite(DpsAverage) && DpsAverage > 0)
         {
             double diff = (user.Dps / DpsAverage - 1) * 100;
@@ -126,59 +138,21 @@ public sealed partial class NowViewModel : ObservableObject
             DpsDelta = (diff >= 0 ? "+" : "−") + Math.Abs(diff).ToString("0", Loc.Culture) + " %";
         }
 
-        var complete = earlier.Where(r => r.BossesKilled > 0 && r.BossesKilled == r.Bosses.Count).ToList();
-        TimeHistory = complete.Select(r => r.DurationSeconds).ToList();
+        TimeHistory = cmp.TimeHistory;
         HasTimeHistory = TimeHistory.Count > 0;
         TimeCurrent = run.DurationSeconds;
-        TimeAverage = TimeHistory.Count > 0 ? TimeHistory.Average() : double.NaN;
-        TimeNeedle = Loc.T("now.scale_today", Dur(run.Duration));
-        TimeAverageText = double.IsFinite(TimeAverage) ? Loc.T("now.scale_avg", Dur(TimeSpan.FromSeconds(TimeAverage))) : "";
-        TimeBestValue = TimeHistory.Count > 0 ? TimeHistory.Min() : double.NaN;
+        TimeAverage = cmp.TimeAverage;
+        TimeBestValue = cmp.TimeBest;
+        TimeNeedle = Loc.T("now.scale_today", RunComparison.Dur(run.Duration));
+        TimeAverageText = double.IsFinite(TimeAverage) ? Loc.T("now.scale_avg", RunComparison.Dur(TimeSpan.FromSeconds(TimeAverage))) : "";
         if (double.IsFinite(TimeAverage))
         {
             double diff = run.DurationSeconds - TimeAverage;
             TimeDeltaGood = diff <= 0;
             TimeDelta = (diff <= 0 ? "−" : "+") + RunArchive.Fmt(TimeSpan.FromSeconds(Math.Abs(Math.Round(diff))));
         }
-        double? best = complete.Count > 0 ? complete.Min(r => r.DurationSeconds) : null;
-        TimeBest = best is double b0 && killed == bosses.Count && run.DurationSeconds < b0;
 
-        // Urteil: das, was man nach einem Lauf in fünf Sekunden wissen will
-        var parts = new List<string>();
-        if (best is double b1)
-            parts.Add(TimeBest ? Loc.T("now.verdict_best")
-                : Loc.T("now.verdict_behind", Dur(TimeSpan.FromSeconds(run.DurationSeconds - b1))));
-        if (user is not null && double.IsFinite(DpsAverage) && DpsAverage > 0)
-        {
-            double diff = (user.Dps / DpsAverage - 1) * 100;
-            parts.Add(Loc.T(diff >= 0 ? "now.verdict_dps_up" : "now.verdict_dps_down", Math.Abs(diff).ToString("0", Loc.Culture)));
-        }
-        Verdict = parts.Count > 0 ? string.Join(Loc.T("now.verdict_join"), parts) : Loc.T("now.verdict_first");
-
-        var bossText = bosses.Count == 0 ? ""
-            : killed == bosses.Count ? (bosses.Count == 1 ? Loc.T("now.boss_one") : Loc.T("now.bosses_all", bosses.Count))
-            : Loc.T("now.bosses_some", killed, bosses.Count);
-        var ranked = run.Players.OrderByDescending(p => p.Damage).ToList();
-        int rank = user is null ? 0 : ranked.IndexOf(user) + 1;
-        var rankText = rank > 0 && ranked.Count > 1 ? Loc.T("now.rank", rank, ranked.Count) : "";
-        RunLine = string.Join(" ", new[] { Loc.T("now.run_line", When(run.StartedAt + run.Duration)), bossText, rankText }.Where(s => s.Length > 0));
-
-        long top = ranked.Count > 0 ? ranked[0].Damage : 0;
-        foreach (var p in ranked)
-        {
-            Players.Add(new PlayerRow(p.PlayerId)
-            {
-                Name = p.Name.StartsWith("Player_", StringComparison.Ordinal) ? Loc.T("player.unknown", p.PlayerId) : p.Name,
-                ClassName = GameText.ClassName(p.ClassId, ""),
-                ClassBrush = ClassVisuals.Brush(p.ClassId),
-                ClassIcon = ClassVisuals.Icon(p.ClassId),
-                Dps = Format.CompactFixed(p.Dps) + "/s",
-                Total = Format.CompactFixed(p.Damage),
-                Share = Format.Percent(p.Share),
-                BarPercent = top > 0 ? p.Damage * 100.0 / top : 0,
-                IsUser = p.IsUser,
-            });
-        }
+        foreach (var row in PlayerRows.From(run)) Players.Add(row);
     }
 
     private void ShowNext(DateTime now)
@@ -208,13 +182,4 @@ public sealed partial class NowViewModel : ObservableObject
         left.TotalHours >= 24 ? Loc.T("time.days_hours", (int)left.TotalDays, left.Hours)
         : left.TotalHours >= 1 ? Loc.T("time.hours_minutes", (int)left.TotalHours, left.Minutes)
         : Loc.T("now.minutes", Math.Max(1, (int)Math.Ceiling(left.TotalMinutes)));
-
-    /// <summary>Dauer mit Einheit, damit „18:18“ nicht wie eine Uhrzeit aussieht.</summary>
-    private static string Dur(TimeSpan t) => Loc.T(t.TotalHours >= 1 ? "now.dur_hours" : "now.dur_minutes", RunArchive.Fmt(t));
-
-    private static string When(DateTime at)
-    {
-        var day = at.Date == DateTime.Today ? Loc.T("now.today") : at.Date == DateTime.Today.AddDays(-1) ? Loc.T("now.yesterday") : at.ToString("d", Loc.Culture);
-        return Loc.T("now.when", day, at.ToString("HH:mm"));
-    }
 }
