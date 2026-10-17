@@ -30,7 +30,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/media/hero.png" width="100%" alt="AetherDPS: Hauptfenster mit Pet-Finder, Live-Meter im Bosskampf und Timer-Pills" />
+  <img src="docs/media/hero.png" width="100%" alt="AetherDPS: Hauptfenster auf „Jetzt“ nach einem Lauf, Live-Meter im Bosskampf und Timer-Pills" />
 </p>
 
 <p align="center"><sub><img src="docs/media/brand/icons/globe.png" width="16" align="absmiddle" alt="" /> Deutsch · English · Français · Español · Português · Русский · 日本語 · 한국어 · 简体中文 · 繁體中文</sub></p>
@@ -97,9 +97,9 @@ Nach deinem Tod zeigt der Meter, **woran du gestorben bist**, und läuft ein lan
 <a name="laeufe-archiv"></a>
 <p align="center"><img src="docs/media/brand/banner-runs.webp" width="100%" alt="Läufe-Archiv" /></p>
 
-Jeder Lauf wird nach dem Dungeon benannt und mit Boss-Zeiten gespeichert. <img src="docs/media/brand/ui/trophy.png" width="16" align="absmiddle" alt="" /> markiert deine **Bestzeit**, daneben steht der Vergleich mit deinem Durchschnitt. Die **Kampfanalyse** zeigt pro Spieler Aktivität, Tode, erlittenen Schaden, Schaden nach Skill und Buff-Laufzeit. **Als Bild kopieren**, als Text oder per Klick in deinen eigenen Discord-Kanal.
+Direkt nach einem Lauf zeigt **Jetzt** das Urteil („Neue Bestzeit, 8 % mehr DPS als sonst“) und deine DPS und Zeit auf einer Messlatte gegen deine früheren Läufe. Unter **Kämpfe** wird jeder Lauf nach dem Dungeon benannt und mit Boss-Zeiten gespeichert. <img src="docs/media/brand/ui/trophy.png" width="16" align="absmiddle" alt="" /> markiert deine **Bestzeit**, daneben steht der Vergleich mit deinem Durchschnitt. Die **Kampfanalyse** zeigt pro Spieler Aktivität, Tode, erlittenen Schaden, Schaden nach Skill und Buff-Laufzeit. **Als Bild kopieren**, als Text oder per Klick in deinen eigenen Discord-Kanal.
 
-<p align="center"><img src="docs/media/runs.png" width="100%" alt="Läufe-Archiv mit Bestzeiten und Kampfanalyse" /></p>
+<p align="center"><img src="docs/media/runs.png" width="100%" alt="Kämpfe: Läufe nach Tagen mit Bestzeiten und Kampfanalyse" /></p>
 
 <a name="profil"></a>
 <p align="center"><img src="docs/media/brand/banner-profile.webp" width="100%" alt="Profil" /></p>
@@ -123,7 +123,7 @@ Dein Charakter auf einen Blick, **auch ohne laufendes Spiel**: Kampfkraft, Items
 <a name="neu-in-der-gruppe"></a>
 <p align="center"><img src="docs/media/brand/banner-party.webp" width="100%" alt="Neu in der Gruppe" /></p>
 
-Tritt jemand deiner Gruppe bei, erscheint am Bildschirmrand seine Karte mit **Kampfkraft, Itemstufe, Verzauberung, Daevanion und Waffe**. Ein Klick öffnet das ganze Profil. Abschaltbar im Reiter Gruppe. Verfehlt die Gruppe einen Stagger, zeigt der Meter, wer wie viel beigetragen hat.
+Tritt jemand deiner Gruppe bei, erscheint am Bildschirmrand seine Karte mit **Kampfkraft, Itemstufe, Verzauberung, Daevanion und Waffe**. Ein Klick öffnet das ganze Profil. Abschaltbar unter Daevas → Gruppe. Verfehlt die Gruppe einen Stagger, zeigt der Meter, wer wie viel beigetragen hat.
 
 <p align="center"><img src="docs/media/popups.png" width="100%" alt="Karte „Neu in der Gruppe“ und Stagger-Auswertung" /></p>
 
@@ -158,7 +158,7 @@ Ein Klick auf ein Pet zeigt nur noch seine Fundorte, nochmal klicken bringt das 
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/media/timers.png" width="100%" alt="Reiter Timer mit Feldbossen" /></td>
+    <td width="50%"><img src="docs/media/timers.png" width="100%" alt="Welt → Timer mit Feldbossen" /></td>
     <td>
 
 Jeder Timer ist eine eigene **Pill** über dem Spiel:
@@ -176,11 +176,11 @@ Jeder Timer ist eine eigene **Pill** über dem Spiel:
 <a name="verbindung-und-mehr"></a>
 <p align="center"><img src="docs/media/brand/banner-connection.webp" width="100%" alt="Verbindung & mehr" /></p>
 
-Der Reiter Verbindung zeigt deinen Spiel-Ping als Verlauf mit Lag-Spitzen und neu gesendeten Paketen. **Verbindung prüfen** sagt dir, ob ein Problem im Heimnetz, beim Internetanbieter oder auf dem Weg zum Spielserver liegt.
+Ein Klick aufs Statusfeld „Verbunden“ oben klappt die Verbindung auf: dein Spiel-Ping als Verlauf mit Lag-Spitzen und neu gesendeten Paketen. **Verbindung prüfen** sagt dir, ob ein Problem im Heimnetz, beim Internetanbieter oder auf dem Weg zum Spielserver liegt.
 
 **Im Discord-Profil anzeigen** (Einstellungen → Datenschutz, standardmäßig aus): Freunde und deine Gilde sehen in Discord, was du gerade machst, z. B. „AION 2 · Dungeon: Draupnir“, „Bosskampf: …“ oder „In Bereitschaft“, mit Laufzeit und Knöpfen zum Herunterladen und zu unserem Discord. Dungeon- und Bossnamen lassen sich ausblenden, Spieler- und Charakternamen erscheinen nie.
 
-<p align="center"><img src="docs/media/connection.png" width="100%" alt="Ping-Verlauf mit Lag-Spitze" /></p>
+<p align="center"><img src="docs/media/connection.png" width="100%" alt="Verbindung, aufgeklappt am Statusfeld: Ping-Verlauf mit Lag-Spitze" /></p>
 
 ## Häufige Fragen
 
@@ -192,7 +192,7 @@ Der Reiter Verbindung zeigt deinen Spiel-Ping als Verlauf mit Lag-Spitzen und ne
 - die **Update-Prüfung** und das Lesen von Neuigkeiten auf GitHub (es wird nichts gesendet),
 - eine **anonyme Nutzungszahl**, nur wenn du beim ersten Start zustimmst: einmal am Tag `{"v":"0.7.4","lang":"de","new":false}`, also Version, Sprache und ob es die erste Nutzung ist. Keine Namen, kein Server, keine Kennung. Jederzeit abschaltbar unter Einstellungen → Datenschutz,
 - **Fehlerberichte**, nur wenn du selbst auf „Senden“ klickst. Namen von Spielern werden vorher entfernt, und du siehst vorher, was rausgeht.
-- **Charakter-Profile** von NCSOFT (dieselben öffentlichen Daten wie auf aion2.plaync.com): wenn du den Reiter Profil öffnest (dein Charakter), auf jemanden klickst oder sucht, und – abschaltbar im Reiter Gruppe – wenn jemand deiner Gruppe beitritt. Dabei gehen nur Name und Server an NCSOFT.
+- **Charakter-Profile** von NCSOFT (dieselben öffentlichen Daten wie auf aion2.plaync.com): wenn du unter Daevas dein Profil öffnest, auf jemanden klickst oder suchst, und – abschaltbar unter Daevas → Gruppe – wenn jemand deiner Gruppe beitritt. Dabei gehen nur Name und Server an NCSOFT.
 - **Discord-Profil**, nur wenn du es unter Einstellungen → Datenschutz einschaltest: Der Meter sagt dem Discord auf deinem PC (lokal, nicht über das Internet und nicht über uns), was du gerade machst, z. B. „AION 2 · Dungeon: Draupnir“. Discord zeigt das dann wie bei jedem Spiel in deinem Profil. Keine Spieler- oder Charakternamen, keine Kampfdaten; Dungeon- und Bossnamen lassen sich ausblenden.
 
 Der Server dafür ist offen einsehbar im Ordner [`server/`](server/) und speichert keine IP-Adressen. Gegen Spam zählt er je Absender höchstens einen Ping und fünf Berichte pro Tag; dafür merkt er sich bis Tagesende nur einen Hash mit täglich neuem Zufallswert, der danach gelöscht wird.
@@ -245,8 +245,8 @@ Wer das Hauptfenster schließt, lässt den Meter im Tray weiterlaufen.
 | Ausblenden (Bereitschaft) | <img src="docs/media/brand/ui/close.png" width="16" align="absmiddle" alt="" />. Ganz beenden über das Tray-Symbol → „Beenden“ |
 | Skill-Details | <img src="docs/media/brand/ui/menu.png" width="16" align="absmiddle" alt="" /> oder auf einen Spieler klicken |
 | Sperren (Mausklicks gehen ins Spiel) | <img src="docs/media/brand/ui/lock.png" width="16" align="absmiddle" alt="" /> Schloss-Symbol. Zum Entsperren wieder aufs Schloss klicken, es bleibt immer klickbar |
-| Timer-Pills | ziehen; Rechtsklick → Gruppieren, Lösen, Entfernen, Sperren. Entsperren im Reiter Timer |
-| Pet-Radar | erscheint mit der Spielkarte (Reiter Pets: auch „Immer“). Mausrad zoomt (wird gemerkt), Ziehen schaut kurz woanders hin, nach 5 s ist die Karte wieder bei dir. Knöpfe auf der Karte: <img src="docs/media/brand/ui/drag.png" width="16" align="absmiddle" alt="" /> verschieben, <img src="docs/media/brand/ui/chevron-down.png" width="16" align="absmiddle" alt="" /> einklappen, <img src="docs/media/brand/ui/close.png" width="16" align="absmiddle" alt="" /> bis zum nächsten Öffnen ausblenden, <img src="docs/media/brand/ui/menu.png" width="16" align="absmiddle" alt="" /> Liste ein/aus, <img src="docs/media/brand/ui/center.png" width="16" align="absmiddle" alt="" /> zu dir. Größe über die Ecke unten rechts |
+| Timer-Pills | ziehen; Rechtsklick → Gruppieren, Lösen, Entfernen, Sperren. Entsperren unter Welt → Timer |
+| Pet-Radar | erscheint mit der Spielkarte (Welt → Pets: auch „Immer“). Mausrad zoomt (wird gemerkt), Ziehen schaut kurz woanders hin, nach 5 s ist die Karte wieder bei dir. Knöpfe auf der Karte: <img src="docs/media/brand/ui/drag.png" width="16" align="absmiddle" alt="" /> verschieben, <img src="docs/media/brand/ui/chevron-down.png" width="16" align="absmiddle" alt="" /> einklappen, <img src="docs/media/brand/ui/close.png" width="16" align="absmiddle" alt="" /> bis zum nächsten Öffnen ausblenden, <img src="docs/media/brand/ui/menu.png" width="16" align="absmiddle" alt="" /> Liste ein/aus, <img src="docs/media/brand/ui/center.png" width="16" align="absmiddle" alt="" /> zu dir. Größe über die Ecke unten rechts |
 | Einstellungen | <img src="docs/media/brand/ui/gear.png" width="16" align="absmiddle" alt="" /> oder Tray-Symbol: Hotkey ändern, Deckkraft, nur meine Gruppe (Standard: an), „Du“ statt Name |
 | Screenshot auf den Zweitbildschirm | **STRG+S** im Spiel (änderbar). Der Spiel-Bildschirm erscheint im Vollbild auf dem anderen Monitor, jeder neue ersetzt das alte Bild. Klick oder ESC blendet aus |
 | AION 2 starten | Knopf im Hauptfenster oder Einstellung „AION 2 mit dem Meter starten“ (Steam). Läuft der Meter beim Login schon, kennt er deinen Charakter sofort |
@@ -295,7 +295,7 @@ Alles mit Lizenzen steht in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). Kl
 
 **Download:** [AetherDPS.exe](https://github.com/yykk62/AetherDPS/releases/latest), a single file with no installation needed (Windows 10/11, 64-bit). On first start it sets up Npcap with one click.
 
-**Privacy:** your combat data never leaves your PC. The only outgoing data is the update check, an optional anonymous daily usage count (version and language only, opt-in), problem reports you send yourself and character profile lookups at NCSOFT (name and server only: when you open the Profile tab, look someone up, or – switchable – when someone joins your party). If you turn on the Discord profile, the meter tells the Discord app on your PC (locally, not through us) what you are doing, without player or character names. The server code is in [`server/`](server/); it stores no IP addresses and counts at most one ping per sender per day.
+**Privacy:** your combat data never leaves your PC. The only outgoing data is the update check, an optional anonymous daily usage count (version and language only, opt-in), problem reports you send yourself and character profile lookups at NCSOFT (name and server only: when you open your profile under Daevas, look someone up, or – switchable – when someone joins your party). If you turn on the Discord profile, the meter tells the Discord app on your PC (locally, not through us) what you are doing, without player or character names. The server code is in [`server/`](server/); it stores no IP addresses and counts at most one ping per sender per day.
 
 **Is it allowed?** The meter only reads network traffic passively. It does not modify the game, read game memory or send anything to the game. It is an unofficial fan project, not affiliated with NCSOFT. Use at your own risk.
 

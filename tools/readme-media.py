@@ -6,6 +6,7 @@ Schatten, GIFs. Braucht Pillow und ffmpeg (für GIFs mit guter Palette).
   dotnet test AetherDPS.UiTests --filter ReadmeMedia
   python tools/readme-media.py <rohordner>               → docs/media/
 """
+import json
 import math
 import shutil
 import subprocess
@@ -13,7 +14,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
 
 ROOT = Path(__file__).resolve().parent.parent
 RAW = Path(sys.argv[1])
@@ -26,6 +27,22 @@ GOLD = (224, 168, 74)
 
 def load(name):
     return Image.open(RAW / f"{name}.png").convert("RGBA")
+
+
+def marks():
+    """Lage einzelner Stellen (Abschnittstitel, Blätter) aus ReadmeMedia: name → [links, oben, rechts, unten]."""
+    path = RAW / "layout.json"
+    return json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+
+
+def content_bottom(img, top=0, pad=40):
+    """Unterkante des Inhalts: leere Zeilen in der Fensterfarbe unten abschneiden."""
+    rgb = img.convert("RGB")
+    frame = rgb.getpixel((rgb.width - 8, rgb.height - 8))
+    blank = Image.new("RGB", rgb.size, frame)
+    diff = ImageChops.difference(rgb, blank).convert("L").point(lambda v: 255 if v > 12 else 0)
+    box = diff.crop((0, top, rgb.width - 30, rgb.height)).getbbox()   # rechts den Scrollbalken auslassen
+    return min(img.height, top + box[3] + pad) if box else img.height
 
 
 def font(size, bold=False):
@@ -298,15 +315,17 @@ def popups():
 # ── Großes Titelbild ────────────────────────────────────────────────────────────────────────
 
 def hero():
-    w, h = 2400, 1340
+    """Hauptfenster auf „Jetzt“ nach einem Lauf, daneben Kampfanzeige und Timer-Pills."""
+    h, side, gap = 1340, 620, 60
+    hub = fit(load("hub_now"), height=h - 150)
+    w = 80 + hub.width + 70 + side + 80
     bg = stage(w, h, glow=(0.62, 0.0))
-    hub = fit(load("hub_pets"), height=h - 150)
     place(bg, hub, (80, 75), radius=24, border=True)
-    overlay = fit(Image.open(sorted((RAW / "frames_overlay").glob("*.png"))[30]).convert("RGBA"), width=w - hub.width - 230)
-    ox = 80 + hub.width + 70
-    place(bg, overlay, (ox, 75))
-    group = fit(load("pills_group"), width=overlay.width)
-    place(bg, group, (ox, 75 + overlay.height + 60))
+    overlay = fit(Image.open(sorted((RAW / "frames_overlay").glob("*.png"))[30]).convert("RGBA"), width=side)
+    group = fit(load("pills_group"), width=side)
+    ox, oy = 80 + hub.width + 70, (h - overlay.height - gap - group.height) // 2
+    place(bg, overlay, (ox, oy))
+    place(bg, group, (ox, oy + overlay.height + gap))
     save(fit(rounded(bg, 40), width=1600), "hero")
 
 
@@ -316,18 +335,26 @@ def main():
     pills_gif()
     hero()
     card(load("hub_runs"), "runs")
-    # Ausschnitte des langen Profils (Fensterhöhe 2900 im Generator, doppelte Auflösung)
+    # Profil (Daevas → Profil, Fensterhöhe 2900): oben bis Daevanion, darunter Daevanion bis Skills,
+    # Item-Details von Ausrüstung bis Werte. Ohne Fensterleiste rechts (Scrollbalken).
+    m = marks()
     profile = load("hub_profile")
-    card(profile, "profile", crop=(0, 0, profile.width, 2770))
-    card(profile, "profile-skills", crop=(300, 2760, profile.width - 20, 4190))
+    w = profile.width - 20
+    daev = m["profile_daevanion"][1] - 40
+    card(profile, "profile", crop=(0, 0, w, daev))
+    card(profile, "profile-skills", crop=(0, daev, w, content_bottom(profile, daev)))
     item = load("hub_profile_item")
-    card(item, "profile-item", crop=(300, 1700, item.width - 20, 2600))
+    card(item, "profile-item", crop=(0, m["item_gear"][1] - 90, w, m["item_stats"][1] - 30))
     card(load("hub_pets"), "pets")
     radar_trio()
     timers = load("hub_timers")
-    card(timers, "timers", crop=(0, 0, timers.width, min(timers.height, 2300)))
+    # Feldbosse-Liste läuft unten aus dem Fenster: nach den Bossen mit Zeiten abschneiden
+    card(timers, "timers", crop=(0, 0, timers.width, min(content_bottom(timers), 1965)))
     popups()
-    card(load("hub_connection"), "connection")
+    # Verbindung klappt unter dem Statusfeld auf: Leiste und Blatt, der abgedunkelte Ort nur am Rand
+    conn = load("hub_connection")
+    sl, st, sr, sb = m["connection_sheet"]
+    card(conn, "connection", crop=(max(0, sl - 40), 0, conn.width, min(conn.height, sb + 24)))
     card(load("overlay_skills"), "overlay-skills", out_width=900)
 
 

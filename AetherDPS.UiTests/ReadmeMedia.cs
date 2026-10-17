@@ -19,6 +19,7 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AetherDPS.UiTests;
@@ -155,6 +156,23 @@ public sealed class ReadmeMedia : IDisposable
         Timers();
         PartyJoin();
         Extras();
+        File.WriteAllText(Path.Combine(Out!, "layout.json"), JsonSerializer.Serialize(layout, new JsonSerializerOptions { WriteIndented = true }));
+    }
+
+    /// <summary>Lage einzelner Stellen im Bild (Pixel in doppelter Auflösung), für die Ausschnitte in tools/readme-media.py.</summary>
+    private readonly Dictionary<string, int[]> layout = [];
+
+    private void Mark(Window window, string name, Control control)
+    {
+        if (control.TranslatePoint(new Point(0, 0), window) is not { } p) return;
+        layout[name] = [(int)(p.X * Scale), (int)(p.Y * Scale), (int)((p.X + control.Bounds.Width) * Scale), (int)((p.Y + control.Bounds.Height) * Scale)];
+    }
+
+    /// <summary>Abschnittstitel (TextBlock.section) mit diesem Text.</summary>
+    private void MarkSection(Window window, string name, string key)
+    {
+        if (window.GetVisualDescendants().OfType<TextBlock>().FirstOrDefault(t => t.Classes.Contains("section") && t.Text == Loc.T(key) && t.IsEffectivelyVisible) is { } t)
+            Mark(window, name, t);
     }
 
     // ── Kampf: Overlay als Bildfolge (GIF) ────────────────────────────────────────────────
@@ -236,14 +254,21 @@ public sealed class ReadmeMedia : IDisposable
         }
         foreach (var (tab, name, height) in new[]
                  {
-                     (HubViewModel.TabDps, "hub_dps", 660),
+                     (HubViewModel.TabDps, "hub_now", 660),
                      (HubViewModel.TabChecklist, "hub_checklist", 660), (HubViewModel.TabConnection, "hub_connection", 580),
                      (HubViewModel.TabSettings, "hub_settings", 900), (HubViewModel.TabParty, "hub_party", 660),
                  })
         {
             var window = Main(tab, height);
             hub.Refresh();
+            window.Show();
             Settle(1);
+            if (tab == HubViewModel.TabConnection
+                && window.GetVisualDescendants().OfType<Border>().FirstOrDefault(b => b.Classes.Contains("sheet") && b.IsEffectivelyVisible) is { } sheet)
+            {
+                sheet.BoxShadow = default;   // mit Schatten zeichnet RenderTargetBitmap bei doppelter Auflösung den Inhalt doppelt skaliert
+                Mark(window, "connection_sheet", sheet);
+            }
             Snap(window, name);
         }
 
@@ -254,12 +279,18 @@ public sealed class ReadmeMedia : IDisposable
         var profile = hub.Profile;
         WaitFor(() => profile.HasProfile, 30);
         Settle(8);   // Bilder
+        MarkSection(profileWindow, "profile_gear", "profile.gear");
+        MarkSection(profileWindow, "profile_stats", "profile.stats");
+        MarkSection(profileWindow, "profile_daevanion", "profile.daevanion");
+        MarkSection(profileWindow, "profile_skills", "profile.skills");
         Snap(profileWindow, "hub_profile", keepOpen: true);
         if (profile.Armor.Count > 0)
         {
             profile.SelectItemCommand.Execute(profile.Armor[0]);
             WaitFor(() => profile.HasDetail, 20);
             Settle(3);
+            MarkSection(profileWindow, "item_gear", "profile.gear");
+            MarkSection(profileWindow, "item_stats", "profile.stats");
             Snap(profileWindow, "hub_profile_item", keepOpen: true);
         }
         profileWindow.Close();
@@ -358,8 +389,12 @@ public sealed class ReadmeMedia : IDisposable
         Settle(1);
 
         var hub = Get<HubViewModel>();
-        var window = Main(HubViewModel.TabTimers, 1250);
+        hub.SelectedTab = HubViewModel.TabTimers;
         hub.Refresh();
+        Settle(1);
+        foreach (var group in hub.Timers.FieldBossGroups.Take(1)) group.Expanded = true;   // Karte mit den Lieblingsbossen
+        var window = Main(HubViewModel.TabTimers, 1250);
+        window.Show();
         Settle(1);
         Snap(window, "hub_timers");
 
@@ -425,9 +460,9 @@ public sealed class ReadmeMedia : IDisposable
         var day = DateTime.Today.AddHours(20);
         var runs = new (string Dungeon, string[] Bosses, double Minutes, double DayOffset)[]
         {
-            ("Forschungsbasis Deus (Schwer)", ["Atiel", "Nazmun", "Gelcos"], 14.6, 0),
+            ("Forschungsbasis Deus (Schwer)", ["Atiel", "Nazmun", "Gelcos"], 13.9, 0),   // neueste = neue Bestzeit (Jetzt)
             ("Forschungsbasis Deus (Schwer)", ["Atiel", "Nazmun", "Gelcos"], 16.2, -1),
-            ("Forschungsbasis Deus (Schwer)", ["Atiel", "Nazmun", "Gelcos"], 13.9, -2),
+            ("Forschungsbasis Deus (Schwer)", ["Atiel", "Nazmun", "Gelcos"], 14.6, -2),
             ("Arkanis (Normal)", ["Siliator der Täuschung", "Ruthilis des Schmerzes", "Talisra der Leere"], 18.3, -0.1),
             ("Arkanis (Normal)", ["Siliator der Täuschung", "Ruthilis des Schmerzes", "Talisra der Leere"], 19.7, -3),
             ("Limbus (Schwer)", ["Gequälter Bakarma", "Veltiras der Multidimension", "Ehrwürdiger Valkan"], 22.4, -1.2),
