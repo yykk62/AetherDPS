@@ -161,6 +161,8 @@ public static class AppServices
         services.AddSingleton<ChecklistViewModel>();
         services.AddSingleton<TimerOverlayViewModel>();
         services.AddSingleton<HubWindow>();
+        services.AddSingleton<NowViewModel>();
+        services.AddSingleton<ShellViewModel>();
         services.AddSingleton<StaggerWarningViewModel>();
         services.AddSingleton(sp => new CommunityService(sp.GetRequiredService<MeterSettings>(),
             typeof(Program).Assembly.GetName().Version ?? new Version(0, 0, 0)));

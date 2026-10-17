@@ -1,0 +1,215 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AetherDPS.App.ViewModels"
+             xmlns:views="using:AetherDPS.App.Views"
+             xmlns:l="using:AetherDPS.App.Services"
+             x:Class="AetherDPS.App.Views.NowView"
+             x:DataType="vm:NowViewModel">
+
+  <!-- Ort „Jetzt“ nach einem Lauf: oben das Urteil, darunter die Messlatten als einzige Mulde
+       (das Instrument), Gruppe und Bosse als Tabellen direkt auf dem Rahmen; rechts, was als
+       Nächstes ansteht. Ohne Lauf: Startknopf und eine als Beispiel erkennbare Vorschau. -->
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+    <Grid ColumnDefinitions="*,40,264" Margin="32,22,32,28">
+
+      <!-- ── Leer: noch kein Lauf ─────────────────────────────── -->
+      <StackPanel IsVisible="{Binding !HasResult}" Spacing="20" Margin="0,18,0,0">
+        <StackPanel Spacing="8" MaxWidth="560" HorizontalAlignment="Left">
+          <TextBlock Classes="display" Text="{l:T now.empty_title}" />
+          <TextBlock Classes="lead" Text="{l:T now.empty_text}" TextWrapping="Wrap" />
+        </StackPanel>
+        <Button Classes="cta" HorizontalAlignment="Left" Command="{Binding ToggleMeterCommand}">
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <TextBlock Text="{l:T shell.meter.start}" VerticalAlignment="Center" />
+            <Border Classes="keycap">
+              <TextBlock Text="{Binding Hotkey}" />
+            </Border>
+          </StackPanel>
+        </Button>
+        <!-- Vorschau: Beispiel ohne Zahlen, damit sie nicht wie echte Daten wirkt -->
+        <Border Classes="well" Opacity="0.6" Margin="0,12,0,0" Padding="20,14,20,10">
+          <StackPanel Spacing="8">
+            <TextBlock Classes="small muted" Text="{l:T now.empty_preview}" TextWrapping="Wrap" />
+            <Grid ColumnDefinitions="160,*">
+              <StackPanel Spacing="2" VerticalAlignment="Center" Margin="0,10,0,0">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <Image Source="{l:Icon swords, Size=18}" Width="18" Height="18" />
+                  <TextBlock Classes="secondary" Text="{l:T now.your_dps}" VerticalAlignment="Center" />
+                </StackPanel>
+                <TextBlock Classes="reading muted" Text="± %" />
+              </StackPanel>
+              <views:Messlatte Grid.Column="1" History="{Binding PreviewHistory}" Current="98" Average="90" Best="93"
+                               NeedleText="{l:T now.preview_needle}" AverageText="{l:T now.preview_avg}"
+                               WorseText="{l:T now.scale_less}" BetterText="{l:T now.scale_more}"
+                               SlotBrush="{DynamicResource Surface.WellDeep}" TickBrush="{DynamicResource Line.Tick}"
+                               BestBrush="{DynamicResource Text.Secondary}"
+                               NeedleBrush="{DynamicResource Accent.Self}" AverageBrush="{DynamicResource Text.Secondary}"
+                               LabelBrush="{DynamicResource Text.Muted}" />
+            </Grid>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+
+      <!-- ── Ergebnis ──────────────────────────────────────────── -->
+      <StackPanel IsVisible="{Binding HasResult}" Spacing="18">
+        <StackPanel Spacing="2">
+          <TextBlock Classes="title secondary" Text="{Binding RunName}" TextTrimming="CharacterEllipsis" />
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <Image Source="{l:Icon trophy, Size=30}" Width="30" Height="30" IsVisible="{Binding TimeBest}" VerticalAlignment="Center" />
+            <TextBlock Classes="display" Text="{Binding Verdict}" TextWrapping="Wrap" />
+          </StackPanel>
+          <TextBlock Classes="lead" Text="{Binding RunLine}" TextWrapping="Wrap" Margin="0,2,0,0" />
+        </StackPanel>
+
+        <!-- Messlatten: die einzige Mulde der Seite -->
+        <Border Classes="well" Padding="20,12,20,12">
+          <StackPanel Spacing="4">
+            <TextBlock Classes="muted" Text="{Binding FirstRunText}" IsVisible="{Binding !HasHistory}" TextWrapping="Wrap" Margin="0,8" />
+            <!-- Legende oben, damit man sie vor den Skalen liest -->
+            <StackPanel Orientation="Horizontal" Spacing="18" IsVisible="{Binding HasHistory}" HorizontalAlignment="Right">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <Border Width="1.5" Height="12" Background="{DynamicResource Line.Tick}" VerticalAlignment="Center" />
+                <TextBlock Classes="small muted" Text="{Binding HistoryLegend}" VerticalAlignment="Center" />
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <Border Width="2" Height="16" Background="{DynamicResource Text.Secondary}" VerticalAlignment="Center" />
+                <TextBlock Classes="small muted" Text="{l:T now.legend_best}" VerticalAlignment="Center" />
+              </StackPanel>
+            </StackPanel>
+
+            <Grid ColumnDefinitions="160,*" IsVisible="{Binding HasHistory}">
+              <StackPanel Spacing="0" VerticalAlignment="Center" Margin="0,10,0,0">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <Image Source="{l:Icon swords, Size=18}" Width="18" Height="18" />
+                  <TextBlock Classes="secondary" Text="{l:T now.your_dps}" VerticalAlignment="Center" />
+                </StackPanel>
+                <TextBlock Classes="reading" Classes.good="{Binding DpsDeltaGood}" Text="{Binding DpsDelta}" />
+                <TextBlock Classes="small muted" Text="{l:T now.delta_avg}" />
+              </StackPanel>
+              <views:Messlatte Grid.Column="1"
+                               History="{Binding DpsHistory}" Current="{Binding DpsCurrent}" Average="{Binding DpsAverage}" Best="{Binding DpsBest}"
+                               NeedleText="{Binding DpsNeedle}" AverageText="{Binding DpsAverageText}"
+                               WorseText="{l:T now.scale_less}" BetterText="{l:T now.scale_more}"
+                               SlotBrush="{DynamicResource Surface.WellDeep}" TickBrush="{DynamicResource Line.Tick}"
+                               BestBrush="{DynamicResource Text.Secondary}"
+                               NeedleBrush="{DynamicResource Accent.Self}" AverageBrush="{DynamicResource Text.Secondary}"
+                               LabelBrush="{DynamicResource Text.Muted}" />
+            </Grid>
+            <Border Classes="rule" IsVisible="{Binding HasTimeHistory}" Margin="0,6" />
+            <Grid ColumnDefinitions="160,*" IsVisible="{Binding HasTimeHistory}">
+              <StackPanel Spacing="0" VerticalAlignment="Center" Margin="0,10,0,0">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <Image Source="{l:Icon stopwatch, Size=18}" Width="18" Height="18" />
+                  <TextBlock Classes="secondary" Text="{l:T now.duration}" VerticalAlignment="Center" />
+                </StackPanel>
+                <TextBlock Classes="reading" Classes.good="{Binding TimeDeltaGood}" Text="{Binding TimeDelta}" />
+                <TextBlock Classes="small muted" Text="{l:T now.delta_avg}" />
+              </StackPanel>
+              <views:Messlatte Grid.Column="1" LowerIsBetter="True"
+                               History="{Binding TimeHistory}" Current="{Binding TimeCurrent}" Average="{Binding TimeAverage}" Best="{Binding TimeBestValue}"
+                               NeedleText="{Binding TimeNeedle}" AverageText="{Binding TimeAverageText}"
+                               WorseText="{l:T now.scale_slower}" BetterText="{l:T now.scale_faster}"
+                               SlotBrush="{DynamicResource Surface.WellDeep}" TickBrush="{DynamicResource Line.Tick}"
+                               BestBrush="{DynamicResource Text.Secondary}"
+                               NeedleBrush="{DynamicResource Accent.Self}" AverageBrush="{DynamicResource Text.Secondary}"
+                               LabelBrush="{DynamicResource Text.Muted}" />
+            </Grid>
+          </StackPanel>
+        </Border>
+
+        <!-- Gruppe: Tabelle auf dem Rahmen -->
+        <StackPanel Spacing="2">
+          <Grid ColumnDefinitions="*,92,64" Margin="12,0,12,6">
+            <TextBlock Classes="section" Text="{l:T now.party}" />
+            <TextBlock Grid.Column="1" Classes="small muted num" Text="{l:T now.col_dps}" VerticalAlignment="Bottom" />
+            <TextBlock Grid.Column="2" Classes="small muted num" Text="{l:T now.col_share}" VerticalAlignment="Bottom" />
+          </Grid>
+          <Border Classes="framerule" />
+          <ItemsControl ItemsSource="{Binding Players}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:PlayerRow">
+                <StackPanel>
+                  <Border CornerRadius="{DynamicResource Radius.Control}" Padding="12,7" Margin="0,2"
+                          Background="{Binding IsUser, Converter={x:Static views:NowView.SelfBackground}}">
+                    <Grid ColumnDefinitions="28,12,*,92,64">
+                      <Image Source="{Binding ClassIcon}" Width="26" Height="26" VerticalAlignment="Center" />
+                      <StackPanel Grid.Column="2" Spacing="5" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="Medium" Classes.self="{Binding IsUser}" />
+                          <Border Classes="selftag" IsVisible="{Binding IsUser}">
+                            <TextBlock Text="{l:T now.you}" />
+                          </Border>
+                          <TextBlock Classes="small muted" Text="{Binding ClassName}" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <ProgressBar Classes="trace" Value="{Binding BarPercent}" Foreground="{Binding ClassBrush}" />
+                      </StackPanel>
+                      <TextBlock Grid.Column="3" Classes="num" Text="{Binding Dps}" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" />
+                      <TextBlock Grid.Column="4" Classes="num secondary" Text="{Binding Share}" VerticalAlignment="Center" />
+                    </Grid>
+                  </Border>
+                </StackPanel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+
+        <!-- Bosse: eine Zeile je Boss, auf dem Rahmen -->
+        <StackPanel Spacing="2">
+          <Grid ColumnDefinitions="*,80,92,120" Margin="12,0,12,6">
+            <TextBlock Classes="section" Text="{l:T now.bosses}" />
+            <TextBlock Grid.Column="1" Classes="small muted num" Text="{l:T now.col_from}" VerticalAlignment="Bottom" />
+            <TextBlock Grid.Column="2" Classes="small muted num" Text="{l:T now.col_duration}" VerticalAlignment="Bottom" />
+            <TextBlock Grid.Column="3" Classes="small muted num" Text="{l:T now.col_group_dps}" VerticalAlignment="Bottom" />
+          </Grid>
+          <Border Classes="framerule" />
+          <ItemsControl ItemsSource="{Binding Bosses}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:BossLine">
+                <Grid ColumnDefinitions="18,10,*,80,92,120" Height="32" Margin="12,0">
+                  <Image Source="{Binding Killed, Converter={x:Static views:NowView.KilledIcon}}" Width="16" Height="16" VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="2" Text="{Binding Name}" FontWeight="Medium" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                  <TextBlock Grid.Column="3" Classes="muted num" Text="{Binding From}" VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="4" Classes="num" Text="{Binding Duration}" VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="5" Classes="num secondary" Text="{Binding GroupDps}" VerticalAlignment="Center" />
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </StackPanel>
+
+      <!-- ── Als Nächstes: Kontext auf dem Rahmen ─────────────── -->
+      <StackPanel Grid.Column="2" Spacing="4">
+        <TextBlock Classes="title" Text="{l:T now.next}" Margin="0,4,0,8" />
+        <Border Classes="framerule" />
+        <ItemsControl ItemsSource="{Binding Next}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:NextRow">
+              <StackPanel>
+                <Grid ColumnDefinitions="22,12,*,Auto" Margin="0,11">
+                  <Image Source="{Binding Icon, Converter={x:Static views:NowView.IconOf}}" Width="20" Height="20" VerticalAlignment="Top" Margin="0,1,0,0" />
+                  <StackPanel Grid.Column="2" Spacing="2">
+                    <TextBlock Text="{Binding Title}" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Classes="small muted" Text="{Binding Detail}" TextTrimming="CharacterEllipsis" />
+                  </StackPanel>
+                  <TextBlock Grid.Column="3" Classes="num" Text="{Binding Right}" Margin="10,0,0,0" FontWeight="Medium"
+                             Classes.soon="{Binding Soon}" />
+                </Grid>
+                <Border Classes="framerule" />
+              </StackPanel>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+    </Grid>
+  </ScrollViewer>
+
+  <UserControl.Styles>
+    <Style Selector="TextBlock.soon">
+      <Setter Property="Foreground" Value="{DynamicResource Signal.Warn}" />
+    </Style>
+    <Style Selector="TextBlock.reading.good">
+      <Setter Property="Foreground" Value="{DynamicResource Signal.Good}" />
+    </Style>
+  </UserControl.Styles>
+</UserControl>

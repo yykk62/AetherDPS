@@ -1,0 +1,95 @@
+<!-- Design-Tokens „Instrument“ (docs/DESIGN.md). Drei Stufen:
+     1. Grundpalette (Color, nur hier verwendet)
+     2. Semantik (Brush, Abstände, Radien, Schrift) – Views und Styles verwenden nur diese
+     3. Bausteine stehen in Instrument.axaml und greifen auf die Semantik zu.
+     Keine Hex-Werte in Views. -->
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- ── 1. Grundpalette ─────────────────────────────────────────── -->
+  <Color x:Key="Stone950">#100E17</Color>
+  <Color x:Key="Stone900">#17141F</Color>
+  <Color x:Key="Stone800">#29243A</Color>
+  <Color x:Key="Stone700">#363049</Color>
+  <Color x:Key="Stone600">#4A4262</Color>
+  <Color x:Key="Stone500">#5E5677</Color>
+  <Color x:Key="Stone400">#9A92B3</Color>
+  <Color x:Key="Parchment50">#FBF6EC</Color>
+  <Color x:Key="Parchment100">#F1EADB</Color>
+  <Color x:Key="Parchment300">#C9C0AE</Color>
+  <Color x:Key="Gold300">#F5CF86</Color>
+  <Color x:Key="Gold400">#EDBB5F</Color>
+  <Color x:Key="Gold700">#7A5A22</Color>
+  <Color x:Key="Gold900">#2E2416</Color>
+  <Color x:Key="Aether400">#A898FF</Color>
+  <Color x:Key="Aether800">#3B3270</Color>
+  <Color x:Key="Life400">#6FD08C</Color>
+  <Color x:Key="Danger400">#F2735F</Color>
+  <Color x:Key="Ember400">#F09A4E</Color>
+
+  <!-- ── 2. Semantik: Flächen ───────────────────────────────────── -->
+  <!-- Rahmen = Fensterfläche; Mulde = eingelassene Datenfläche (dunkler, innerer Schatten) -->
+  <SolidColorBrush x:Key="Surface.Frame" Color="{StaticResource Stone800}" />
+  <SolidColorBrush x:Key="Surface.Bar" Color="{StaticResource Stone900}" />
+  <SolidColorBrush x:Key="Surface.Well" Color="{StaticResource Stone900}" />
+  <SolidColorBrush x:Key="Surface.WellDeep" Color="{StaticResource Stone950}" />
+  <SolidColorBrush x:Key="Surface.Raised" Color="{StaticResource Stone700}" />
+  <SolidColorBrush x:Key="Surface.RaisedHover" Color="{StaticResource Stone600}" />
+  <SolidColorBrush x:Key="Surface.Self" Color="{StaticResource Gold900}" />
+  <SolidColorBrush x:Key="Surface.Track" Color="{StaticResource Stone700}" />
+  <SolidColorBrush x:Key="Surface.Keycap" Color="#26000000" />
+
+  <!-- Linien -->
+  <SolidColorBrush x:Key="Line.Frame" Color="{StaticResource Stone600}" />
+  <SolidColorBrush x:Key="Line.Well" Color="{StaticResource Stone700}" />
+  <SolidColorBrush x:Key="Line.Tick" Color="{StaticResource Stone400}" />
+  <!-- Lichtkante oben an Bedienelementen (Metall), Schatten innen in Mulden -->
+  <SolidColorBrush x:Key="Line.Bevel" Color="#14FFFFFF" />
+  <!-- Gravur ohne inneren Schatten: dunkle Oberkante als Verlauf, helle Unterkante als Linie -->
+  <LinearGradientBrush x:Key="Surface.WellEngraved" StartPoint="0%,0%" EndPoint="0%,100%">
+    <GradientStop Offset="0" Color="{StaticResource Stone950}" />
+    <GradientStop Offset="0.08" Color="{StaticResource Stone900}" />
+    <GradientStop Offset="1" Color="{StaticResource Stone900}" />
+  </LinearGradientBrush>
+
+  <!-- Text -->
+  <SolidColorBrush x:Key="Text.Primary" Color="{StaticResource Parchment100}" />
+  <SolidColorBrush x:Key="Text.Secondary" Color="{StaticResource Parchment300}" />
+  <SolidColorBrush x:Key="Text.Muted" Color="{StaticResource Stone400}" />
+  <SolidColorBrush x:Key="Text.Estimate" Color="{StaticResource Stone400}" />
+
+  <!-- Bedeutung -->
+  <SolidColorBrush x:Key="Accent.Self" Color="{StaticResource Gold400}" />
+  <SolidColorBrush x:Key="Accent.SelfStrong" Color="{StaticResource Gold300}" />
+  <SolidColorBrush x:Key="Accent.SelfDim" Color="{StaticResource Gold700}" />
+  <SolidColorBrush x:Key="Accent.Phase" Color="{StaticResource Aether400}" />
+  <SolidColorBrush x:Key="Accent.PhaseDim" Color="{StaticResource Aether800}" />
+  <SolidColorBrush x:Key="Signal.Good" Color="{StaticResource Life400}" />
+  <SolidColorBrush x:Key="Signal.Bad" Color="{StaticResource Danger400}" />
+  <SolidColorBrush x:Key="Signal.Warn" Color="{StaticResource Ember400}" />
+  <SolidColorBrush x:Key="Focus.Ring" Color="{StaticResource Aether400}" />
+  <!-- Hauptaktion hell (Pergament), damit Gold allein „du“ und Rekorde meint -->
+  <SolidColorBrush x:Key="Action.Primary" Color="{StaticResource Parchment100}" />
+  <SolidColorBrush x:Key="Action.PrimaryHover" Color="{StaticResource Parchment50}" />
+  <SolidColorBrush x:Key="Action.PrimaryPressed" Color="{StaticResource Parchment300}" />
+  <SolidColorBrush x:Key="Text.OnAction" Color="{StaticResource Stone950}" />
+
+  <!-- ── 2. Semantik: Maße ──────────────────────────────────────── -->
+  <!-- Radien nach Rang: Mulde > Bedienelement > Marke -->
+  <CornerRadius x:Key="Radius.Well">10</CornerRadius>
+  <CornerRadius x:Key="Radius.Control">6</CornerRadius>
+  <CornerRadius x:Key="Radius.Mark">3</CornerRadius>
+  <!-- 4er-Raster -->
+  <Thickness x:Key="Pad.Well">20,18</Thickness>
+  <Thickness x:Key="Pad.Control">14,7</Thickness>
+  <x:Double x:Key="Space.Gap">16</x:Double>
+
+  <!-- Schrift: Bahnschrift (DIN), für CJK springt die Systemschrift ein -->
+  <FontFamily x:Key="Font.Display">Bahnschrift, Microsoft YaHei UI, Yu Gothic UI, Malgun Gothic, Segoe UI</FontFamily>
+  <FontFamily x:Key="Font.Ui">Bahnschrift, Microsoft YaHei UI, Yu Gothic UI, Malgun Gothic, Segoe UI</FontFamily>
+  <x:Double x:Key="Size.Display">34</x:Double>
+  <x:Double x:Key="Size.Title">21</x:Double>
+  <x:Double x:Key="Size.Lead">16</x:Double>
+  <x:Double x:Key="Size.Body">14</x:Double>
+  <x:Double x:Key="Size.Small">12</x:Double>
+</ResourceDictionary>

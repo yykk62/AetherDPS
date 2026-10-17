@@ -33,8 +33,8 @@ public static class ClassVisuals
         [10] = ("#D65CC8", "elementalist"), // Geist (Beschwörung)
         [11] = ("#4FC1C9", "gladiator"),
         [12] = ("#5B8DEF", "templar"),
-        [13] = ("#8BC34A", "assassin"),
-        [14] = ("#3FAE7A", "ranger"),
+        [13] = ("#B3CF3F", "assassin"),
+        [14] = ("#2BA88F", "ranger"),
         [15] = ("#A15CE0", "sorcerer"),
         [16] = ("#D65CC8", "elementalist"),
         [17] = ("#E0B84A", "cleric"),

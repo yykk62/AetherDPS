@@ -6,6 +6,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <Styles.Resources>
     <ResourceDictionary>
+      <!-- Tokens des neuen Designs (docs/DESIGN.md) -->
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://AetherDPS/Tokens.axaml" />
+      </ResourceDictionary.MergedDictionaries>
       <!-- Akzent: Gold statt Windows-Akzentfarbe (Auswahl, Haken, Fokusrahmen, Reiter-Streifen, Fortschritt) -->
       <Color x:Key="SystemAccentColor">#E0A84A</Color>
       <Color x:Key="SystemAccentColorDark1">#C9933C</Color>
@@ -92,6 +96,8 @@
       <SolidColorBrush x:Key="ToolTipForeground" Color="#E6E8EC" />
     </ResourceDictionary>
   </Styles.Resources>
+  <!-- Bausteine des neuen Designs (nur innerhalb von .ins) -->
+  <StyleInclude Source="avares://AetherDPS/Instrument.axaml" />
 
     <!-- Eigene Icons (Assets/icons): werden aus der doppelten Auflösung herunterskaliert, deshalb hochwertig filtern -->
   <Style Selector="Image.ic">

@@ -1,0 +1,84 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AetherDPS.App.ViewModels"
+        xmlns:views="using:AetherDPS.App.Views"
+        xmlns:l="using:AetherDPS.App.Services"
+        x:Class="AetherDPS.App.Views.ShellWindow"
+        x:DataType="vm:ShellViewModel"
+        Classes="ins"
+        Title="{l:T hub.title}"
+        Width="1120" Height="800" MinWidth="900" MinHeight="600"
+        WindowStartupLocation="CenterScreen"
+        FontFamily="{DynamicResource Font.Ui}"
+        Background="{DynamicResource Surface.Frame}" Icon="/Assets/icon.ico">
+
+  <!-- Aufbau (docs/DESIGN.md): Leiste oben mit vier Orten, Status und Meter-Schalter;
+       darunter der Ort. Daten liegen in Mulden, Kontext liegt direkt auf dem Rahmen. -->
+  <Window.Styles>
+    <Style Selector="TextBlock.warn">
+      <Setter Property="Foreground" Value="{DynamicResource Signal.Warn}" />
+    </Style>
+  </Window.Styles>
+
+  <DockPanel>
+    <Border DockPanel.Dock="Top" Height="56" Background="{DynamicResource Surface.Bar}"
+            BorderBrush="{DynamicResource Line.Frame}" BorderThickness="0,0,0,1">
+      <Grid ColumnDefinitions="Auto,*,Auto" Margin="20,0,16,0">
+        <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center" Margin="0,0,20,0">
+          <Image Source="/Assets/icon.png" Width="28" Height="28" RenderOptions.BitmapInterpolationMode="HighQuality" />
+          <TextBlock Text="{l:T app.title}" FontSize="17" FontWeight="SemiBold" VerticalAlignment="Center" />
+        </StackPanel>
+
+        <StackPanel Grid.Column="1" Orientation="Horizontal">
+          <Button Classes="place" Classes.current="{Binding IsNow}" Command="{Binding GoCommand}" CommandParameter="0" Content="{l:T shell.place.now}" />
+          <Button Classes="place" Classes.current="{Binding IsFights}" Command="{Binding GoCommand}" CommandParameter="1" Content="{l:T shell.place.fights}" />
+          <Button Classes="place" Classes.current="{Binding IsWorld}" Command="{Binding GoCommand}" CommandParameter="2" Content="{l:T shell.place.world}" />
+          <Button Classes="place" Classes.current="{Binding IsDaevas}" Command="{Binding GoCommand}" CommandParameter="3" Content="{l:T shell.place.daevas}" />
+        </StackPanel>
+
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+          <!-- Verbindung ist ein Zustand, kein Ort: Klick klappt später die Messwerte auf.
+               Icon + Wort; ist etwas nicht in Ordnung, wird das Wort warnfarben. -->
+          <Button Classes="icon" Padding="10,6" ToolTip.Tip="{l:T shell.status.tip}">
+            <StackPanel Orientation="Horizontal" Spacing="16">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <Image Source="{l:Icon link, Size=16}" Width="16" Height="16" VerticalAlignment="Center" />
+                <TextBlock Classes="small secondary" Classes.warn="{Binding !Overlay.IsConnected}" Text="{Binding ConnectionStatus}"
+                           VerticalAlignment="Center" MaxWidth="160" TextTrimming="CharacterEllipsis" />
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <Image Source="{l:Icon monitor, Size=16}" Width="16" Height="16" VerticalAlignment="Center" />
+                <TextBlock Classes="small secondary" Classes.warn="{Binding !GameRunning}" Text="{Binding GameStatus}" VerticalAlignment="Center" />
+              </StackPanel>
+            </StackPanel>
+          </Button>
+          <Button Classes="icon" ToolTip.Tip="{l:T hub.tab.settings}">
+            <Image Source="{l:Icon gear, Size=20}" Width="20" Height="20" />
+          </Button>
+
+          <!-- Meter: ein Schalter, der seinen Zustand zeigt („Meter starten“ bzw. „● Zeichnet auf | Stoppen“) -->
+          <Border Width="1" Height="24" Background="{DynamicResource Line.Frame}" Margin="8,0,10,0" />
+          <Button Classes="quiet" Command="{Binding Now.ToggleMeterCommand}">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding Now.IsActive}">
+                <Ellipse Width="9" Height="9" VerticalAlignment="Center" Fill="{DynamicResource Signal.Bad}" />
+                <TextBlock Text="{Binding Now.MeterState}" FontWeight="Medium" VerticalAlignment="Center" />
+                <Border Width="1" Height="16" Background="{DynamicResource Line.Frame}" VerticalAlignment="Center" />
+              </StackPanel>
+              <TextBlock Text="{Binding Now.MeterButton}" VerticalAlignment="Center" FontWeight="Medium" />
+              <Border Classes="keycap">
+                <TextBlock Classes="secondary" Text="{Binding Now.Hotkey}" />
+              </Border>
+            </StackPanel>
+          </Button>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <Panel>
+      <Panel IsVisible="{Binding IsNow}">
+        <views:NowView DataContext="{Binding Now}" />
+      </Panel>
+    </Panel>
+  </DockPanel>
+</Window>

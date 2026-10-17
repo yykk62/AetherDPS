@@ -1,0 +1,189 @@
+<!-- Bausteine „Instrument“ (docs/DESIGN.md). Greifen nur auf Tokens.axaml zu.
+     Gelten innerhalb eines Elements mit der Klasse „ins“ (neues Hauptfenster), damit die alten
+     Fenster bis zu ihrem Umbau unverändert bleiben. -->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- Grundschrift -->
+  <Style Selector=".ins TextBlock">
+    <Setter Property="Foreground" Value="{DynamicResource Text.Primary}" />
+    <Setter Property="FontSize" Value="{DynamicResource Size.Body}" />
+  </Style>
+  <Style Selector=".ins TextBlock.display">
+    <Setter Property="FontFamily" Value="{DynamicResource Font.Display}" />
+    <Setter Property="FontSize" Value="{DynamicResource Size.Display}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+  <Style Selector=".ins TextBlock.title">
+    <Setter Property="FontSize" Value="{DynamicResource Size.Title}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+  <Style Selector=".ins TextBlock.section">
+    <Setter Property="FontSize" Value="15" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{DynamicResource Text.Secondary}" />
+  </Style>
+  <Style Selector=".ins TextBlock.lead">
+    <Setter Property="FontSize" Value="{DynamicResource Size.Lead}" />
+    <Setter Property="Foreground" Value="{DynamicResource Text.Secondary}" />
+  </Style>
+  <Style Selector=".ins TextBlock.small">
+    <Setter Property="FontSize" Value="{DynamicResource Size.Small}" />
+  </Style>
+  <Style Selector=".ins TextBlock.muted">
+    <Setter Property="Foreground" Value="{DynamicResource Text.Muted}" />
+  </Style>
+  <Style Selector=".ins TextBlock.secondary">
+    <Setter Property="Foreground" Value="{DynamicResource Text.Secondary}" />
+  </Style>
+  <Style Selector=".ins TextBlock.self">
+    <Setter Property="Foreground" Value="{DynamicResource Accent.Self}" />
+  </Style>
+  <Style Selector=".ins TextBlock.num">
+    <Setter Property="TextAlignment" Value="Right" />
+  </Style>
+  <Style Selector=".ins TextBlock.reading">
+    <Setter Property="FontSize" Value="30" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
+  <!-- Mulde: eingelassene Datenfläche -->
+  <Style Selector=".ins Border.well">
+    <Setter Property="Background" Value="{DynamicResource Surface.WellEngraved}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Radius.Well}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Line.Bevel}" />
+    <Setter Property="BorderThickness" Value="0,0,0,1" />
+    <Setter Property="Padding" Value="{DynamicResource Pad.Well}" />
+  </Style>
+  <Style Selector=".ins Border.rule">
+    <Setter Property="Height" Value="1" />
+    <Setter Property="Background" Value="{DynamicResource Line.Well}" />
+  </Style>
+  <Style Selector=".ins Border.framerule">
+    <Setter Property="Height" Value="1" />
+    <Setter Property="Background" Value="{DynamicResource Line.Frame}" />
+  </Style>
+
+  <!-- Orte in der Leiste: aktueller Ort hell mit Strich, sonst gedämpft -->
+  <Style Selector=".ins Button.place">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="14,0" />
+    <Setter Property="VerticalAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="CornerRadius" Value="0" />
+    <Setter Property="Foreground" Value="{DynamicResource Text.Muted}" />
+    <Setter Property="FontSize" Value="15" />
+    <Setter Property="FontWeight" Value="Medium" />
+  </Style>
+  <Style Selector=".ins Button.place:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Text.Secondary}" />
+  </Style>
+  <Style Selector=".ins Button.place:pressed /template/ ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector=".ins Button.place.current">
+    <Setter Property="Foreground" Value="{DynamicResource Text.Primary}" />
+  </Style>
+  <Style Selector=".ins Button.place.current /template/ ContentPresenter">
+    <Setter Property="BorderBrush" Value="{DynamicResource Text.Primary}" />
+    <Setter Property="BorderThickness" Value="0,0,0,2" />
+  </Style>
+  <Style Selector=".ins Button.place.current:pointerover /template/ ContentPresenter">
+    <Setter Property="Foreground" Value="{DynamicResource Text.Primary}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Text.Primary}" />
+  </Style>
+
+  <!-- Hauptaktion: hell (Pergament), höchstens eine je Ort -->
+  <Style Selector=".ins Button.cta">
+    <Setter Property="Background" Value="{DynamicResource Action.Primary}" />
+    <Setter Property="Foreground" Value="{DynamicResource Text.OnAction}" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Radius.Control}" />
+    <Setter Property="Padding" Value="16,8" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="MinHeight" Value="36" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+  <Style Selector=".ins Button.cta:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Action.PrimaryHover}" />
+  </Style>
+  <Style Selector=".ins Button.cta:pressed /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Action.PrimaryPressed}" />
+  </Style>
+  <Style Selector=".ins Button.cta TextBlock">
+    <Setter Property="Foreground" Value="{DynamicResource Text.OnAction}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
+  <!-- Ruhige Aktion: erhabene Fläche -->
+  <Style Selector=".ins Button.quiet">
+    <Setter Property="Background" Value="{DynamicResource Surface.Raised}" />
+    <Setter Property="Foreground" Value="{DynamicResource Text.Primary}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Line.Bevel}" />
+    <Setter Property="BorderThickness" Value="0,1,0,0" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Radius.Control}" />
+    <Setter Property="Padding" Value="{DynamicResource Pad.Control}" />
+    <Setter Property="MinHeight" Value="34" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+  <Style Selector=".ins Button.quiet:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Surface.RaisedHover}" />
+    <Setter Property="Foreground" Value="{DynamicResource Text.Primary}" />
+  </Style>
+
+  <!-- Ruhige Knöpfe (Symbol) -->
+  <Style Selector=".ins Button.icon">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="7" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Radius.Control}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector=".ins Button.icon:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Surface.Raised}" />
+  </Style>
+
+  <!-- Tastatur-Fokus überall in Äther-Violett -->
+  <Style Selector=".ins Button:focus-visible /template/ ContentPresenter">
+    <Setter Property="BorderBrush" Value="{DynamicResource Focus.Ring}" />
+    <Setter Property="BorderThickness" Value="2" />
+  </Style>
+
+  <!-- Tastenkappe neben einer Aktion -->
+  <Style Selector=".ins Border.keycap">
+    <Setter Property="CornerRadius" Value="{DynamicResource Radius.Mark}" />
+    <Setter Property="Padding" Value="5,1" />
+    <Setter Property="Background" Value="{DynamicResource Surface.Keycap}" />
+  </Style>
+  <Style Selector=".ins Border.keycap TextBlock">
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="FontWeight" Value="Medium" />
+  </Style>
+
+  <!-- Marke „Du“ an deiner Zeile (Zeichen zusätzlich zur Farbe) -->
+  <Style Selector=".ins Border.selftag">
+    <Setter Property="CornerRadius" Value="{DynamicResource Radius.Mark}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Accent.Self}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Padding" Value="5,0" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector=".ins Border.selftag TextBlock">
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{DynamicResource Accent.Self}" />
+  </Style>
+
+  <!-- Spur unter einem Namen (Anteil), schmal statt vollflächig -->
+  <Style Selector=".ins ProgressBar.trace">
+    <Setter Property="MinHeight" Value="3" />
+    <Setter Property="Height" Value="3" />
+    <Setter Property="MinWidth" Value="0" />
+    <Setter Property="CornerRadius" Value="2" />
+    <Setter Property="Background" Value="{DynamicResource Surface.Track}" />
+    <Setter Property="Minimum" Value="0" />
+    <Setter Property="Maximum" Value="100" />
+  </Style>
+</Styles>

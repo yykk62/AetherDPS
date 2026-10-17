@@ -534,7 +534,7 @@ public sealed class ReadmeMedia : IDisposable
     }
 
     /// <summary>Tut so, als liefe ein echter Mitschnitt (Status „Verbunden“).</summary>
-    private sealed class ShowcaseCapture : IPacketCaptureDevice
+    internal sealed class ShowcaseCapture : IPacketCaptureDevice
     {
         public bool IsCapturing => true;
         public string? DeviceName => "Ethernet";
