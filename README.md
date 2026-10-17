@@ -42,7 +42,7 @@
 | <img src="docs/media/brand/icons/swords.png" width="22" align="absmiddle" alt="" /> **[Live-DPS-Meter](#live-dps-meter)** | Boss mit Lebens- und Stagger-Balken, Schaden, DPS und Anteil deiner Gruppe, Skill-Details per Klick |
 | <img src="docs/media/brand/icons/trophy.png" width="22" align="absmiddle" alt="" /> **[Läufe-Archiv](#laeufe-archiv)** | Nach jedem Lauf das Urteil (Bestzeit? mehr DPS als sonst?), Boss-Zeiten und Kampfanalyse, als Bild oder Text für Discord |
 | <img src="docs/media/brand/icons/helmet.png" width="22" align="absmiddle" alt="" /> **[Profil](#profil)** | Dein Charakter (oder jeder auf einem EU-Server) ohne laufendes Spiel: Ausrüstung, Werte, Daevanion, Skills und der Verlauf deiner Kampfkraft |
-| <img src="docs/media/brand/icons/group.png" width="22" align="absmiddle" alt="" /> **[Neu in der Gruppe](#neu-in-der-gruppe)** | Tritt jemand bei, siehst du sofort Kampfkraft, Gear Score, Verzauberung und Waffe |
+| <img src="docs/media/brand/icons/group.png" width="22" align="absmiddle" alt="" /> **[Neu in der Gruppe](#neu-in-der-gruppe)** | Tritt jemand bei, siehst du sofort Kampfkraft, Itemstufe, Verzauberung und Waffe |
 | <img src="docs/media/brand/icons/paw.png" width="22" align="absmiddle" alt="" /> **[Pet-Finder & Radar](#pet-finder-und-pet-radar)** | Alle Pets mit deiner Stufe, ihre Spawnpunkte auf der Karte und ein Radar zu den fehlenden in deiner Nähe |
 | <img src="docs/media/brand/icons/hourglass.png" width="22" align="absmiddle" alt="" /> **[Timer & Feldbosse](#timer-und-feldbosse)** | Echte Respawn-Zeiten vom Server, Risse, Belagerung, eigene Timer als Pills über dem Spiel |
 | <img src="docs/media/brand/icons/signal.png" width="22" align="absmiddle" alt="" /> **[Verbindung](#verbindung-und-mehr)** | Ping-Verlauf, Lag-Spitzen und die Antwort, ob es an dir, am Anbieter oder am Spielserver liegt |
@@ -57,7 +57,7 @@
 - <img src="docs/media/brand/icons/compass.png" width="20" align="absmiddle" alt="" /> **Das Pet-Radar ersetzt deine Karte.** Öffnest du im Spiel die Karte, liegt es genau darüber, folgt dir live (auch im Flug) und zeigt die fehlenden Pets mit Entfernung, Richtung und dem Monster, das die Seele droppt. Kein Extra-Knopf, kein Hotkey.
 - <img src="docs/media/brand/icons/stagger.png" width="20" align="absmiddle" alt="" /> **Stagger je Spieler:** Nach jeder Stagger-Phase siehst du, ob sie geklappt hat und wer wie viel beigetragen hat.
 - <img src="docs/media/brand/icons/lag.png" width="20" align="absmiddle" alt="" /> **Warum laggt es?** Die Verbindungsprüfung sagt, ob es am Heimnetz, am Internetanbieter oder am Spielserver liegt.
-- <img src="docs/media/brand/icons/group.png" width="20" align="absmiddle" alt="" /> **Neu in der Gruppe:** Kampfkraft, Gear Score, Verzauberung und Waffe erscheinen, sobald jemand beitritt.
+- <img src="docs/media/brand/icons/group.png" width="20" align="absmiddle" alt="" /> **Neu in der Gruppe:** Kampfkraft, Itemstufe, Verzauberung und Waffe erscheinen, sobald jemand beitritt.
 - <img src="docs/media/brand/icons/patch.png" width="20" align="absmiddle" alt="" /> **Ehrlich nach Patches:** Versteht der Meter das Spiel nicht mehr, sagt er es, statt leere oder falsche Zahlen zu zeigen.
 - <img src="docs/media/brand/icons/lock.png" width="20" align="absmiddle" alt="" /> **Deine Daten bleiben bei dir:** keine Uploads, keine Bestenlisten, kein Konto.
 
@@ -105,7 +105,7 @@ Jeder Lauf wird nach dem Dungeon benannt und mit Boss-Zeiten gespeichert. <img s
 <a name="profil"></a>
 <p align="center"><img src="docs/media/brand/banner-profile.webp" width="100%" alt="Profil" /></p>
 
-Dein Charakter auf einen Blick, **auch ohne laufendes Spiel**: Kampfkraft, Gear Score, mittlere Verzauberung, die komplette Ausrüstung, alle Werte mit ihren Wirkungen, Daevanion-Fortschritt je Brett, Titel, Pet, Flügel, Skills und Stigma-Skills. Für deinen eigenen Charakter hält der Meter alle 4 Stunden **Kampfkraft und Gear Score als Verlauf** fest (nur auf deinem PC). Jeden anderen Charakter auf einem EU-Server findest du per Name. Die Daten sind dieselben öffentlichen wie auf aion2.plaync.com.
+Dein Charakter auf einen Blick, **auch ohne laufendes Spiel**: Kampfkraft, Itemstufe, mittlere Verzauberung, die komplette Ausrüstung, alle Werte mit ihren Wirkungen, Daevanion-Fortschritt je Brett, Titel, Pet, Flügel, Skills und Stigma-Skills. Für deinen eigenen Charakter hält der Meter alle 4 Stunden **Kampfkraft und Itemstufe als Verlauf** fest (nur auf deinem PC). Jeden anderen Charakter auf einem EU-Server findest du per Name. Die Daten sind dieselben öffentlichen wie auf aion2.plaync.com.
 
 <p align="center"><img src="docs/media/profile.png" width="100%" alt="Profil eines Charakters mit Ausrüstung und Werten" /></p>
 
@@ -124,7 +124,7 @@ Dein Charakter auf einen Blick, **auch ohne laufendes Spiel**: Kampfkraft, Gear 
 <a name="neu-in-der-gruppe"></a>
 <p align="center"><img src="docs/media/brand/banner-party.webp" width="100%" alt="Neu in der Gruppe" /></p>
 
-Tritt jemand deiner Gruppe bei, erscheint am Bildschirmrand seine Karte mit **Kampfkraft, Gear Score, Verzauberung, Daevanion und Waffe**. Ein Klick öffnet das ganze Profil. Abschaltbar im Reiter Gruppe. Verfehlt die Gruppe einen Stagger, zeigt der Meter, wer wie viel beigetragen hat.
+Tritt jemand deiner Gruppe bei, erscheint am Bildschirmrand seine Karte mit **Kampfkraft, Itemstufe, Verzauberung, Daevanion und Waffe**. Ein Klick öffnet das ganze Profil. Abschaltbar im Reiter Gruppe. Verfehlt die Gruppe einen Stagger, zeigt der Meter, wer wie viel beigetragen hat.
 
 <p align="center"><img src="docs/media/popups.png" width="100%" alt="Karte „Neu in der Gruppe“ und Stagger-Auswertung" /></p>
 
@@ -193,7 +193,7 @@ Der Reiter Verbindung zeigt deinen Spiel-Ping als Verlauf mit Lag-Spitzen und ne
 - die **Update-Prüfung** und das Lesen von Neuigkeiten auf GitHub (es wird nichts gesendet),
 - eine **anonyme Nutzungszahl**, nur wenn du beim ersten Start zustimmst: einmal am Tag `{"v":"0.7.4","lang":"de","new":false}`, also Version, Sprache und ob es die erste Nutzung ist. Keine Namen, kein Server, keine Kennung. Jederzeit abschaltbar unter Einstellungen → Datenschutz,
 - **Fehlerberichte**, nur wenn du selbst auf „Senden“ klickst. Namen von Spielern werden vorher entfernt, und du siehst vorher, was rausgeht.
-- **Charakter-Profile** von NCSOFT (dieselben öffentlichen Daten wie auf aion2.plaync.com): wenn du den Reiter Profil öffnest (dein Charakter), auf jemanden klickst oder sucht, – abschaltbar im Reiter Gruppe – wenn jemand deiner Gruppe beitritt, und – abschaltbar unter Einstellungen → Datenschutz – alle 4 Stunden dein eigenes Profil, solange der Meter läuft (für deinen Verlauf von Kampfkraft und Gear Score, der nur auf deinem PC liegt). Dabei gehen nur Name und Server an NCSOFT.
+- **Charakter-Profile** von NCSOFT (dieselben öffentlichen Daten wie auf aion2.plaync.com): wenn du den Reiter Profil öffnest (dein Charakter), auf jemanden klickst oder sucht, – abschaltbar im Reiter Gruppe – wenn jemand deiner Gruppe beitritt, und – abschaltbar unter Einstellungen → Datenschutz – alle 4 Stunden dein eigenes Profil, solange der Meter läuft (für deinen Verlauf von Kampfkraft und Itemstufe, der nur auf deinem PC liegt). Dabei gehen nur Name und Server an NCSOFT.
 - **Skill- und Item-Bilder** direkt von NCSOFT (assets.playnccdn.com), z. B. in der Kampfanalyse. Jedes Bild wird einmal geladen und dann im Datenordner aufbewahrt; dabei wird nichts von dir gesendet.
 - **Discord-Profil**, nur wenn du es unter Einstellungen → Datenschutz einschaltest: Der Meter sagt dem Discord auf deinem PC (lokal, nicht über das Internet und nicht über uns), was du gerade machst, z. B. „AION 2 · Dungeon: Draupnir“. Discord zeigt das dann wie bei jedem Spiel in deinem Profil. Keine Spieler- oder Charakternamen, keine Kampfdaten; Dungeon- und Bossnamen lassen sich ausblenden.
 

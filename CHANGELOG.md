@@ -2,6 +2,16 @@
 
 Neue Versionen oben. Der Abschnitt einer Version wird automatisch zum Text des GitHub-Releases.
 
+## 0.9.0
+
+- **Neues Aussehen „Instrument“:** ruhiger, klarer, Gold nur noch für dich. Statt vieler Reiter vier Orte: Jetzt, Kämpfe, Welt, Daevas (STRG+1 bis STRG+4); Verbindung klappt am Statusfeld auf, Einstellungen kommen als Blatt von rechts
+- **Jetzt:** nach jedem Lauf das Urteil („Neue Bestzeit, 7 % mehr DPS als sonst“), deine DPS und Zeit auf einer Messlatte gegen frühere Läufe, daneben, was als Nächstes ansteht
+- **Faire Vergleiche:** Läufe werden nur mit derselben Kategorie verglichen (Expedition, Eroberung, Transzendenz, Abyss), Bestzeit nur im selben Dungeon. Freie Welt zählt nicht mit
+- **Overlays platzieren:** STRG+P zeigt Kampfanzeige, Timer-Pills, Pet-Radar und Stagger-Warnung zugleich mit Beispieldaten; ziehen, einrasten, Esc legt fest. Neu: „Overlays nach Lage“ (Stadt: Timer, Dungeon: Kampfanzeige, Bosskampf: dazu Stagger)
+- **Echte Skill-Bilder** in Kampfanzeige und Kampfanalyse
+- **Profil:** lädt deutlich schneller, Item-Details liegen bis 6 Std. bereit. Für deinen Charakter ein Verlauf von Kampfkraft und Itemstufe (alle 4 Std., abschaltbar, nur auf deinem PC)
+- **Pets:** die Zahl passt jetzt zur gezeigten Liste
+
 ## 0.8.2
 
 - Hauptfenster neu aufgebaut: Seitenleiste mit Gruppen Start, Charakter, Welt, System; Seitentitel oben; Start/Stopp auf jeder Seite erreichbar
